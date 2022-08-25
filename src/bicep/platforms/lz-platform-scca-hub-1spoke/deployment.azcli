@@ -1,0 +1,45 @@
+
+# AZ CLI
+
+# Create Base64 script value
+script64=$(cat script.sh | base64)
+
+# Hub/Spoke - Change variables to match your deployment
+az deployment sub create --name deploy-hubspoke-aks-network --location EastUS --template-file anoa.hubspoke.bicep  --parameters @parameters/anoa.hubspoke.parameters.example.json --subscription xxxxxxx-xxxx-4317-a791-469396bef7fa
+
+# Clean Up
+# Delete Resource Locks - Change variables to match your deployment
+az resource lock delete --name lockName -g storageAccount --resource myvnet --resource-type Microsoft.Storage/storageAccounts
+
+# Delete Diagnostic Settings - Change variables to match your deployment
+# View diagnostic settings in the current subscription
+az monitor diagnostic-settings subscription list --query value[] --output table
+
+# Delete a diagnostic setting
+az monitor diagnostic-settings subscription delete --name <diagnostic setting name>
+
+# Delete Resource Groups - Change variables to match your deployment
+az group delete -n anoa-eastus-aks-logging-rg -y
+az group delete -n anoa-eastus-aks-hub-rg -y
+az group delete -n anoa-eastus-aks-operations-rg -y
+az group delete -n anoa-eastus-aks-sharedservices-rg -y
+az group delete -n anoa-eastus-aks-artifacts-rg -y
+
+# Delete Deployments - Change variables to match your deployment
+az deployment sub delete -n deploy-hubspoke-aks-network
+
+# AZ PowerShell
+# Hub/Spoke - Change variables to match your deployment
+New-AzSubscriptionDeployment -TemplateFile .\anoa.hubspoke.bicep -TemplateParameterFile .\parameters\anoa.hubspoke.parameters.example.json -Location "EastUS" -Name deploy-hubspoke-network
+
+# Clean Up
+# Delete Resource Groups - Change variables to match your deployment
+Remove-AzResourceGroup -Name anoa-eastus-aks-logging-rg
+Remove-AzResourceGroup -Name anoa-eastus-aks-hub-rg
+Remove-AzResourceGroup -Name anoa-eastus-aks-identity-rg
+Remove-AzResourceGroup -Name anoa-eastus-aks-operations-rg
+Remove-AzResourceGroup -Name anoa-eastus-aks-sharedservices-rg
+Remove-AzResourceGroup -Name anoa-eastus-aks-artifacts-rg
+
+# Delete Deployments - Change variables to match your deployment
+Remove-AzSubscriptionDeployment -Name deploy-hubspoke-aks-network

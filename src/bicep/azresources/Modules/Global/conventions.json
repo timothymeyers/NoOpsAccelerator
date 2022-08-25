@@ -1,0 +1,62 @@
+{
+    "global": {
+      "appConfiguration": {
+        "name": "%ORGANIZATION%-config-%HOST%-cfg",
+        "resourceGroupName": "%ORGANIZATION%-config-%HOST%-rg"
+      },
+      "logAnalyticsWorkspace": {
+        "name": "%ORGANIZATION%-monitoring-%HOST%-ws",
+        "resourceGroupName": "%ORGANIZATION%-monitoring-%HOST%-rg"
+      },
+      "apiManagement": {
+        "name": "%ORGANIZATION%-gateway-%HOST%-apim",
+        "keyVaultName": "%ORGANIZATION%-gateway-%HOST%-akv",
+        "resourceGroupName": "%ORGANIZATION%-gateway-%HOST%-rg"
+      },
+      "containerRegistery": {
+        "name": "%ORGANIZATION%%REGION%%HOST%acr",
+        "resourceGroupName": "%ORGANIZATION%-%REGION%-%HOST%-rg"
+      },
+      "keyVault": {
+        "name": "%ORGANIZATION%sharedServices%HOST%akv"
+      },
+      "dnsZone": {
+        "anoa.us": "anoa-rg-anoa"
+      }
+    },    
+    "naming": {
+      "smallPrefix": "%ORGANIZATION%%APPLICATION%%HOST%",
+      "prefix": "%ORGANIZATION%-%REGION%-%APPLICATION%-%HOST%-",
+      "suffixes": {
+        "bastion": "bas",
+        "firewall": "afw",
+        "appGateway": "agw",
+        "firewallPolicy": "afwp",
+        "ipConfiguration": "ipconf",
+        "resourceGroup": "rg",        
+        "appConfiguration": "cfg",
+        "logAnalyticsWorkspace": "log",
+        "apiManagement": "apim",
+        "apiManagementApi": "apimapi",
+        "apiManagementApiVersionSet": "apimversionset",
+        "functionsApplication": "fn",
+        "applicationInsights": "ai",
+        "cdnProfile": "cdnp",
+        "cdnEndpoint": "cdne",
+        "servicePlan": "asp",
+        "serviceBusNamespace": "sbn",
+        "storageAccount": "asto",
+        "keyVault": "akv",
+        "dashboard": "dsh",
+        "staticWebApplication": "swa",
+        "virtualNetwork": "vnet",
+        "virtualMachine": "vm",
+        "networkInterface": "nic",
+        "networkSecurityGroup": "nsg",
+        "subnet": "snet",
+        "publicIpAddress": "pip",
+        "containerRegistry": "acr", 
+        "sqlServer": "sqlsvr" 
+      }
+    }
+  }

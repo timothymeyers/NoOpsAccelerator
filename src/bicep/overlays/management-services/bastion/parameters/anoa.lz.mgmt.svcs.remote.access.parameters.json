@@ -1,0 +1,93 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "parOrgPrefix": {
+            "value": "anoa"
+        },
+        "parDeployEnvironment": {
+            "value": "platforms"
+        },
+        "parHubVirtualNetworkName": {
+            "value": "anoa-eastus-platforms-hub-vnet"
+        },
+        "parHubSubnetResourceId": {
+            "value": "/subscriptions/xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx/resourceGroups/anoa-eastus-platforms-hub-rg/providers/Microsoft.Network/virtualNetworks/anoa-eastus-platforms-hub-vnet/subnets/anoa-eastus-platforms-hub-snet"
+        },
+        "parHubNetworkSecurityGroupResourceId": {
+            "value": "/subscriptions/xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx/resourceGroups/anoa-eastus-platforms-hub-rg/providers/Microsoft.Network/networkSecurityGroups/anoa-eastus-platforms-hub-nsg"
+        },
+        "parBastionHostSubnetAddressPrefix": {
+            "value": "192.168.0.0/16"
+        },
+        "parBastionHostPublicIPAddressAvailabilityZones": {
+            "value": []
+        },
+        "parLinuxVmAdminUsername": {
+            "value": "azureuser"
+        },
+        "parLinuxVmAuthenticationType": {
+            "value": "password"
+        },
+        "parLinuxVmAdminPasswordOrKey": {
+            "value": "Rem0te@2020246"
+        },
+        "parLinuxVmSize": {
+            "value": "Standard_B2s"
+        },
+        "parLinuxVmOsDiskCreateOption": {
+            "value": "FromImage"
+        },
+        "parLinuxVmOsDiskType": {
+            "value": "Standard_LRS"
+        },
+        "parLinuxVmImagePublisher": {
+            "value": "Canonical"
+        },
+        "parLinuxVmImageOffer": {
+            "value": "UbuntuServer"
+        },
+        "parLinuxVmImageSku": {
+            "value": "18.04-LTS"
+        },
+        "parLinuxVmImageVersion": {
+            "value": "latest"
+        },
+        "parLinuxNetworkInterfacePrivateIPAddressAllocationMethod": {
+            "value": "Dynamic"
+        },
+        "parWindowsVmAdminUsername": {
+            "value": "azureuser"
+        },
+        "parWindowsVmAdminPassword": {
+            "value": "Rem0te@2020246"
+        },
+        "parWindowsVmSize": {
+            "value": "Standard_DS1_v2"
+        },
+        "parWindowsVmPublisher": {
+            "value": "MicrosoftWindowsServer"
+        },
+        "parWindowsVmOffer": {
+            "value": "WindowsServer"
+        },
+        "parWindowsVmSku": {
+            "value": "2019-datacenter"
+        },
+        "parWindowsVmVersion": {
+            "value": "latest"
+        },
+        "parWindowsVmCreateOption": {
+            "value": "FromImage"
+        },
+        "parWindowsVmStorageAccountType": {
+            "value": "StandardSSD_LRS"
+        },
+        "parWindowsNetworkInterfacePrivateIPAddressAllocationMethod": {
+            "value": "Dynamic"
+        },
+        "parLogAnalyticsWorkspaceId": {
+            "value": "/subscriptions/xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx/resourcegroups/anoa-eastus-platforms-logging-rg/providers/microsoft.operationalinsights/workspaces/anoa-eastus-platforms-logging-log"
+        }
+    }
+}

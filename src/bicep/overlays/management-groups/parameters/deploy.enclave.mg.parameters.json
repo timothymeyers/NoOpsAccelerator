@@ -1,0 +1,83 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {            
+      "parRootMg": {
+        "value": "ANOA"
+      },
+      "parRequireAuthorizationForGroupCreation": {
+        "value": true
+      },
+      "parManagementGroups": {
+        "value": [
+          {
+            "name": "anoa",
+            "displayName": "ANOA",
+            "parentMGName": "0ff59ae6-406c-4aba-a174-fddb35d8dd6f"
+          },
+          {
+            "name": "anoa-lzs",
+            "displayName": "anoa-lzs",
+            "parentMGName": "anoa"
+          },          
+          {
+            "name": "anoa-lzs-sandbox",
+            "displayName": "anoa-lzs-sandbox",
+            "parentMGName": "anoa-lzs"
+          },          
+          {
+            "name": "anoa-lzs-workloads",
+            "displayName": "anoa-lzs-workloads",
+            "parentMGName": "anoa-lzs"
+          },
+          {
+            "name": "anoa-lzs-internal",
+            "displayName": "anoa-lzs-internal",
+            "parentMGName": "anoa-lzs-workloads"
+          },          
+          {
+            "name": "anoa-lzs-internal-dev",
+            "displayName": "anoa-lzs-internal-nonprod",
+            "parentMGName": "anoa-lzs-internal"
+          },          
+          {
+            "name": "anoa-lzs-internal-prod",
+            "displayName": "anoa-lzs-internal-prod",
+            "parentMGName": "anoa-lzs-internal"
+          },
+          {
+            "name": "anoa-platform",
+            "displayName": "anoa-platform",
+            "parentMGName": "anoa"
+          },
+          {
+            "name": "anoa-transport",
+            "displayName": "anoa-transport",
+            "parentMGName": "anoa-platform"
+          },
+          {
+            "name": "anoa-management",
+            "displayName": "anoa-management",
+            "parentMGName": "anoa-platform"
+          }
+          ,
+          {
+            "name": "anoa-identity",
+            "displayName": "anoa-identity",
+            "parentMGName": "anoa-platform"
+          }
+        ]
+      },
+      "parSubscriptions":{
+        "value": [
+          {
+            "subscriptionId": "c24647bf-0c86-4408-8d29-6a67262a2701",
+            "managementGroupName": "anoa-management"
+          }
+        ]
+      },
+      "parTenantId":{
+        "value": "0ff59ae6-406c-4aba-a174-fddb35d8dd6f"
+      }
+    }
+  }

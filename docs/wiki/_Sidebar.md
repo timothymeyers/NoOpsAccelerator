@@ -1,0 +1,21 @@
+# Wiki Top Navigation
+
+* [What's New?](https://github.com/Azure/NoOpsAccelerator/wiki/Whats-new)
+* [Community Calls](https://github.com/Azure/NoOpsAccelerator/wiki/Community-Calls)
+* [Frequently Asked Questions (FAQ)](https://github.com/Azure/NoOpsAccelerator/wiki/FAQ)
+* [What is NoOps Accelerator?](https://github.com/Azure/NoOpsAccelerator/wiki/What-is-NoOps-Accelerator)
+  * [Understanding Archetypes](https://github.com/Azure/NoOpsAccelerator/wiki/What-is-NoOps-Accelerator#understanding-archetypes)
+  * [Policy as Code](https://github.com/Azure/NoOpsAccelerator/wiki/What-is-NoOps-Accelerator#policy-as-code)
+  * [What is NoOps Accelerator reference implementation?](https://github.com/Azure/NoOpsAccelerator/wiki/What-is-NoOps-Accelerator#what-is-noops-accelerator-reference-implementation)
+* [How does the NoOps Accelerator Work?](https://github.com/Azure/NoOpsAccelerator/wiki/How-NoOps-Accelerator-Works)
+  * [Requirements for Successful NoOps](https://github.com/Azure/NoOpsAccelerator/wiki/How-NoOps-Accelerator-Works#requirements-for-successful-noops)
+  * [Separating platform and enclaves](https://github.com/Azure/NoOpsAccelerator/wiki/How-NoOps-Accelerator-Works#separating-platform-and-landing-zones)
+  * [Landing zone owners responsibilities](https://github.com/Azure/NoOpsAccelerator/wiki/How-NoOps-Accelerator-Works#landing-zone-owners-responsibilities)
+  * [NoOps Accelerator Architecture](https://github.com/Azure/NoOpsAccelerator/wiki/How-NoOps-Accelerator-Works#noops-accelerator-architecture)
+  * [What happens when you deploy NoOps Accelerator reference implementation?](https://github.com/Azure/NoOpsAccelerator/wiki/How-NoOps-Accelerator-Works#what-happens-when-you-deploy-noops-accelerator-reference-implementation)
+* Deploying NoOps Accelerator
+  * [Pre-requisites](https://github.com/Azure/NoOpsAccelerator/wiki/Deploying-NoOps-Accelerator-Pre-requisites)
+  * [Telemetry Tracking Using Customer Usage Attribution (PID)](https://github.com/Azure/NoOpsAccelerator/wiki/Deploying-NoOps-Accelerator-CustomerUsage)
+  * [Deploy NoOps Accelerator with a hub and spoke based network topology](https://github.com/Azure/NoOpsAccelerator/wiki/Deploying-NoOps-Accelerator-HubAndSpoke)
+  * [Deploying to the Azure platform using NoOps Accelerator (Infrastructure as Code with GitHub Actions)](https://github.com/Azure/NoOpsAccelerator/wiki/Deploying-NoOps-Accelerator-GitHub-Actions#operating-the-azure-platform-using-noops-accelerator-infrastructure-as-code-with-github-actions)
+* [Contributing](./Contributing)

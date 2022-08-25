@@ -1,0 +1,34 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "organizationName": {
+            "value": "anoa"
+        },
+        "deployEnvironment": {
+            "value": "dev"
+        },
+        "templateVersion": {
+            "value": "v1.0"
+        },
+        "parScopeSubscription": {
+            "value": "/subscriptions/<<subscriptionId>>"
+        },
+        "parAlertNotifications": {
+            "value": "Off"
+        },
+        "parAlertsToAdminsNotifications": {
+            "value": "Off"
+        },
+        "parEmailSecurityContact": {
+            "value": "value"
+        },
+        "parPhoneSecurityContact": {
+            "value": "value"
+        },
+        "parLogAnalyticsWorkspaceResourceId": {
+            "value": "/subscriptions/<<subscriptionId>>/resourcegroups/validation-rg/providers/microsoft.operationalinsights/workspaces/adp-<<namePrefix>>-az-law-x-001"
+        }
+
+    }
+}

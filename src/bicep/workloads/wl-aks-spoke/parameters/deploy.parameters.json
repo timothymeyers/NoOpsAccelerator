@@ -1,0 +1,63 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "parOrgPrefix": {
+      "value": "anoa"
+    },
+    "parDeployEnvironment": {
+      "value": "platforms"
+    },
+    "parTargetSubscriptionId": {
+      "value": "c24647bf-0c86-4408-8d29-6a67262a2701"
+    },
+    "parWorkloadName": {
+      "value": ""
+    },
+    "parTags": {
+      "value": {}
+    },
+    "parHubSubscriptionId": {
+      "value": ""
+    },
+    "parHubResourceGroupName": {
+      "value": ""
+    },
+    "parHubVirtualNetworkName": {
+      "value": ""
+    },
+    "parHubVirtualNetworkResourceId": {
+      "value": ""
+    },
+    "parFirewallPrivateIPAddress": {
+      "value": ""
+    },
+    "parLogAnalyticsWorkspaceResourceId": {
+      "value": ""
+    },
+    "parLogAnalyticsWorkspaceName": {
+      "value": ""
+    },
+    "parAksClusterKubernetesVersion": {
+      "value": ""
+    },
+    "parAppGatewayResourceId": {
+      "value": ""
+    },
+    "parIngressApplicationGatewayEnabled": {
+      "value": false
+    },
+    "parAksClusterDockerBridgeCidr": {
+      "value": ""
+    },
+    "parAksClusterLoadBalancerSku": {
+      "value": ""
+    },
+    "parEnablePrivateCluster": {
+      "value": false
+    },
+    "parEnableAzureDefender": {
+      "value": false
+    }
+  }
+}

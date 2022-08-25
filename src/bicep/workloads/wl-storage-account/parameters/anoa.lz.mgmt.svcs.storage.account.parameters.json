@@ -1,0 +1,33 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "parOrgPrefix": {
+            "value": "anoa"
+        },
+        "parTemplateVersion": {
+            "value": "v1.0"
+        },       
+        "parTargetSubscriptionId": {
+            "value": "896f5276-df9a-4317-a791-469396bef7fa"
+        },
+        "parTargetResourceGroup": {
+            "value": "anoa-eastus-platforms-hub-rg"
+        },
+        "parDeployEnvironment": {
+            "value": "platforms"
+        },
+        "parSkuName": {
+            "value": "Standard_LRS"
+        },        
+        "parAddRoleAssignmentForStorageAccount": {
+            "value": false
+        },
+        "parStorageAccountAccessObjectId": {
+            "value": "58bdb4dc-3f63-4646-8627-821e5180ef3b"
+        },
+        "parStorageAccountAccessType": {
+            "value": "Group"
+        }
+    }
+}

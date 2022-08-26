@@ -1,3 +1,4 @@
+/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 @description('Required. Name of the private link scoped resource.')
 @minLength(1)
 param name string

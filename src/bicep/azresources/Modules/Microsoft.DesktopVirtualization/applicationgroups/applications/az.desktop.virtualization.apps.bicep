@@ -1,3 +1,4 @@
+/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 @sys.description('Conditional. The name of the parent Application Group to create the application(s) in. Required if the template is used in a standalone deployment.')
 param appGroupName string
 

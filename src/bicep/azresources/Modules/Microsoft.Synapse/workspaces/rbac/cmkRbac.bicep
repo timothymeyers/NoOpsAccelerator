@@ -1,3 +1,4 @@
+/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 param keyvaultName string
 param workspaceIdentity string
 param usesRbacAuthorization bool = false

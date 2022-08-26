@@ -1,3 +1,4 @@
+/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 // Parameters
 @maxLength(50)
 @description('Required. The name of the Synapse Workspace.')

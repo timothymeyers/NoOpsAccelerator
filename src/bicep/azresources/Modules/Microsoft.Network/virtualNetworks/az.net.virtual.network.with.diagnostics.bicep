@@ -1,3 +1,4 @@
+/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 @description('Required. The Virtual Network (vNet) Name.')
 param name string
 

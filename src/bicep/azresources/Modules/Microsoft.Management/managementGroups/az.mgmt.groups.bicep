@@ -1,3 +1,4 @@
+/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 targetScope = 'managementGroup'
 
 @description('Required. The group ID of the Management group.')

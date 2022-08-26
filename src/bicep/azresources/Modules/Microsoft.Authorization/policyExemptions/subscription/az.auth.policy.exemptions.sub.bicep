@@ -1,3 +1,4 @@
+/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 targetScope = 'subscription'
 
 @sys.description('Required. Specifies the name of the policy exemption. Maximum length is 64 characters for subscription scope.')

@@ -1,3 +1,4 @@
+/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 /*
 SUMMARY: This module moves one or more subscriptions to be a child of the specified management group. Once the subscription(s) are moved under the management group, Azure Policies assigned to the management group or its parent management group(s) will begin to govern the subscription(s).
 DESCRIPTION: The following components will be options in this deployment
@@ -8,10 +9,6 @@ AUTHOR/S: jspinella
 VERSION: 1.x.x
 */
 
-/*
-Copyright (c) Microsoft Corporation.
-Licensed under the MIT License.
-*/
 
 targetScope='tenant'
 

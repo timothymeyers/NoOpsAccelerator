@@ -1,14 +1,10 @@
+/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 /*
 SUMMARY: Workload Module to deploy a premium Azure Web App to an target sub and RG.
 DESCRIPTION: The following components will be options in this deployment
               Azure Web App    
 AUTHOR/S: jspinella
 VERSION: 1.x.x
-*/
-
-/*
-Copyright (c) Microsoft Corporation.
-Licensed under the MIT License.
 */
 
 // === PARAMETERS ===

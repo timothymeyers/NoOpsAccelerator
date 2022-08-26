@@ -1,3 +1,4 @@
+/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 /*
 SUMMARY: Module Example to deploy the Full Hub/ 3 Spoke Enclave with AKS Workload
 DESCRIPTION: The following components will be options in this deployment
@@ -21,11 +22,6 @@ DESCRIPTION: The following components will be options in this deployment
             * Workload: (Tier 3) - Azure Kubernetes Service
 AUTHOR/S: jspinella
 VERSION: 1.x.x
-*/
-
-/*
-Copyright (c) Microsoft Corporation.
-Licensed under the MIT License.
 */
 
 /*

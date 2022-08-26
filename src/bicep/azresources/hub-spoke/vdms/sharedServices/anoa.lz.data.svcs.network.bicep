@@ -1,3 +1,4 @@
+/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 /*
 SUMMARY: Module to deploy the Shared Services Network and it's components based on the Azure Mission Landing Zone conceptual architecture 
 DESCRIPTION: The following components will be options in this deployment
@@ -12,10 +13,6 @@ AUTHOR/S: jspinella
 VERSION: 1.x.x
 */
 
-/*
-Copyright (c) Microsoft Corporation.
-Licensed under the MIT License.
-*/
 
 targetScope = 'subscription'
 

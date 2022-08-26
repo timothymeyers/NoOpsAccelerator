@@ -1,3 +1,4 @@
+/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 @sys.description('Required. Name of the Application Group to create this application in.')
 @minLength(1)
 param name string

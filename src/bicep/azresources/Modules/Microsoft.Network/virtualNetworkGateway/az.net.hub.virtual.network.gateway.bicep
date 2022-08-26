@@ -1,3 +1,4 @@
+/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 @description('Required. Specifies the Virtual Network Gateway name.')
 param name string
 

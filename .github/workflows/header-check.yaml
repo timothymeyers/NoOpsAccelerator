@@ -1,0 +1,15 @@
+name: Header Validator
+
+on:
+  push:
+    paths:
+      - '**.bicep'
+  workflow_dispatch:
+
+jobs:
+  check-license-lines:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Check License Lines
+      uses: kt3k/license_checker@v1.0.6

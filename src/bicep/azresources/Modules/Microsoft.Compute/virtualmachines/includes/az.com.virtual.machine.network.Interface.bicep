@@ -1,3 +1,4 @@
+/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 param networkInterfaceName string
 param virtualMachineName string
 param location string

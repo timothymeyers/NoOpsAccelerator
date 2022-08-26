@@ -1,3 +1,4 @@
+/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 targetScope = 'subscription'
 
 @description('Optional. Name of the ActivityLog diagnostic settings.')

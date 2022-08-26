@@ -1,3 +1,4 @@
+/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 /*
 SUMMARY: Module to add the customer usage attribution (PID) to Management Group deployments.
 DESCRIPTION: This module will create a deployment at the management group level which will add the unique PID and location as the deployment name

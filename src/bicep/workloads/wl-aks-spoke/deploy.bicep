@@ -1,14 +1,10 @@
+/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 /*
 SUMMARY: Workload Module to deploy a Azure Kubernetes Service to an target sub.
 DESCRIPTION: The following components will be options in this deployment
               Azure Kubernetes Service
 AUTHOR/S: jspinella
 VERSION: 1.x.x
-*/
-
-/*
-Copyright (c) Microsoft Corporation.
-Licensed under the MIT License.
 */
 
 // === PARAMETERS ===

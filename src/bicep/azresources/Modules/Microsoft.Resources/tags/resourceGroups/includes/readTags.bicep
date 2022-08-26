@@ -1,3 +1,4 @@
+/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 @description('Optional. The name of the tags resource.')
 param name string = 'default'
 

@@ -41,6 +41,13 @@ targetScope = 'subscription' //Deploying at Subscription scope to allow resource
 //     "deployEnvironment": "mlz"
 //   }
 // }
+
+@description('Application Rule Collection')
+param parApplicationRuleCollections array = []
+
+@description('Network Rule Collection')
+param parNetworkRuleCollections array = []
+
 @description('Required values used with all resources.')
 param parRequired object
 

@@ -173,7 +173,7 @@ var varRouteTableName = '${varDataServicesSubnetName}-routetable'
 
 @description('Resource group tags')
 module modTags '../../../Modules/Microsoft.Resources/tags/az.resources.tags.bicep' = {
-  name: 'deploy-${varDataServicesShortName}-tags-${parLocation}-${parDeploymentNameSuffix}'
+  name: 'deploy-${varDataServicesShortName}-tags-${parDeploymentNameSuffix}'
   params: {
     onlyUpdate: true
     tags: {

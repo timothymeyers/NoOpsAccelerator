@@ -165,7 +165,7 @@ var varRouteTableName = '${varIdentitySubnetName}-routetable'
 
 @description('Resource group tags')
 module modTags '../../../Modules/Microsoft.Resources/tags/az.resources.tags.bicep' = {
-  name: 'deploy-${varIdentityShortName}-tags--${parLocation}-${parDeploymentNameSuffix}'
+  name: 'deploy-${varIdentityShortName}-tags-${parDeploymentNameSuffix}'
   params: {
     tags: parTags
   }

@@ -174,7 +174,7 @@ var opsddosName = replace(varDdosNamingConvention, varNameToken, varOperationsNa
 
 @description('Resource group tags')
 module modTags '../../../Modules/Microsoft.Resources/tags/az.resources.tags.bicep' = {
-  name: 'deploy-${varOperationsShortName}-tags-${parLocation}-${parDeploymentNameSuffix}'
+  name: 'deploy-${varOperationsShortName}-tags-${parDeploymentNameSuffix}'
   params: {
     onlyUpdate: true
     tags: parTags

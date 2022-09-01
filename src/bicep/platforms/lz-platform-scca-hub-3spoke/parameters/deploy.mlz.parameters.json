@@ -121,7 +121,7 @@
     },
     "parLogging": {
       "value": {
-        "enableSentinel": "true",
+        "enableSentinel": true,
         "logAnalyticsWorkspaceCappingDailyQuotaGb": -1,
         "logAnalyticsWorkspaceRetentionInDays": 30,
         "logAnalyticsWorkspaceSkuName": "PerGB2018",

@@ -266,7 +266,7 @@ module modLogAnalyticsWorkspace '../../../Modules/Microsoft.OperationalInsights/
 }
 
 // LOG ANALYTICS WORKSPACE SOLUTIONS
-
+// Using ${parLocation}, which is Azure Region greater or equal to 14 characters will fail this solution deployment due to name length restrictions for log analytics workspace names.
 module modLogAnalyticsWorkspaceSolutions '../../../Modules/Microsoft.OperationsManagement/solutions/az.operational.insights.solutions.bicep' = [for solution in varSolutions: if (solution.deploy) {
   name: 'deploy-laws-${solution.name}-${parLocation}-${parDeploymentNameSuffix}'
   scope: resourceGroup(varLoggingResourceGroupName)

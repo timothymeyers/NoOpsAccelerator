@@ -77,7 +77,7 @@
     },
     "parDdosStandard": {
       "value": {
-        "enabled": false
+        "enable": false
       }
     },
     "parAzureFirewallEnabled": {

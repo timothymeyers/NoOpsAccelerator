@@ -845,7 +845,7 @@ module modRemoteAccess '../../overlays/management-services/bastion/anoa.lz.mgmt.
     parBastionHostSubnetAddressPrefix: parRemoteAccess.bastion.subnetAddressPrefix
 
     // Linux Parameters 
-    parEnableLinux:  parRemoteAccess.bastion.linux.enable
+    parEnableLinux:  parRemoteAccess.enable
     parLinuxVmSize: parRemoteAccess.bastion.linux.vmSize
     parLinuxVmOsDiskCreateOption: parRemoteAccess.bastion.linux.vmOsDiskCreateOption
     parLinuxVmOsDiskType: parRemoteAccess.bastion.linux.vmOsDiskType
@@ -858,7 +858,7 @@ module modRemoteAccess '../../overlays/management-services/bastion/anoa.lz.mgmt.
     parLinuxNetworkInterfacePrivateIPAddressAllocationMethod: parRemoteAccess.bastion.linux.networkInterfacePrivateIPAddressAllocationMethod
 
     // Windows Parameters 
-    parEnableWindows: parRemoteAccess.bastion.windows.enable
+    parEnableWindows: parRemoteAccess.enable
     parWindowsVmSize: parRemoteAccess.bastion.windows.vmSize
     parWindowsVmAdminUsername: parRemoteAccess.bastion.windows.vmAdminUsername
     parWindowsVmAdminPassword: parRemoteAccess.bastion.windows.vmAdminPassword

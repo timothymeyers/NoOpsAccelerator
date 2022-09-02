@@ -871,7 +871,7 @@ module modRemoteAccess '../../overlays/management-services/bastion/anoa.lz.mgmt.
     parWindowsNetworkInterfacePrivateIPAddressAllocationMethod: parRemoteAccess.bastion.windows.networkInterfacePrivateIPAddressAllocationMethod
 
     // Log Analytics Parameters
-    parLogAnalyticsWorkspaceId: modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceId
+    parLogAnalyticsWorkspaceId: modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceResourceId
     parEnableLinuxVmPasswordAuthentication: parRemoteAccess.bastion.linux.enableVmPasswordAuthentication
 
   }

@@ -254,7 +254,12 @@ module modLinuxVirtualMachine '../../../azresources/Modules/Microsoft.Compute/vi
 
     disablePasswordAuthentication: parEnableLinuxVmPasswordAuthentication
     adminUsername: parLinuxVmAdminUsername
-    adminPassword: parLinuxVmAdminPasswordOrKey //kv.getSecret('LinuxVmAdminPasswordOrKey')
+    publicKeys: [
+      {
+        path: '/home/${parLinuxVmAdminUsername}/.ssh/authorized_keys'
+        keyData: parLinuxVmAdminPasswordOrKey
+      }
+    ]
 
     diagnosticWorkspaceId: parLogAnalyticsWorkspaceId
     availabilitySetName: modAvSet.outputs.name

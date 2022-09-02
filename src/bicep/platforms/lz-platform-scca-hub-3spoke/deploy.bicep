@@ -843,9 +843,10 @@ module modRemoteAccess '../../overlays/management-services/bastion/anoa.lz.mgmt.
     // Bastion Host Parameters   
     parBastionHostSku: parRemoteAccess.bastion.sku    
     parBastionHostSubnetAddressPrefix: parRemoteAccess.bastion.subnetAddressPrefix
+    parEncryptionAtHost: parRemoteAccess.bastion.encryptionAtHost
 
     // Linux Parameters 
-    parEnableLinux:  parRemoteAccess.enable
+    parEnableLinux:  parRemoteAccess.bastion.linux.enable
     parLinuxVmSize: parRemoteAccess.bastion.linux.vmSize
     parLinuxVmOsDiskCreateOption: parRemoteAccess.bastion.linux.vmOsDiskCreateOption
     parLinuxVmOsDiskType: parRemoteAccess.bastion.linux.vmOsDiskType
@@ -856,9 +857,10 @@ module modRemoteAccess '../../overlays/management-services/bastion/anoa.lz.mgmt.
     parLinuxVmAdminUsername: parRemoteAccess.bastion.linux.vmAdminUsername
     parLinuxVmAdminPasswordOrKey: parRemoteAccess.bastion.linux.vmAdminPasswordOrKey
     parLinuxNetworkInterfacePrivateIPAddressAllocationMethod: parRemoteAccess.bastion.linux.networkInterfacePrivateIPAddressAllocationMethod
+    parEnableLinuxVmPasswordAuthentication: parRemoteAccess.bastion.linux.enableVmPasswordAuthentication
 
     // Windows Parameters 
-    parEnableWindows: parRemoteAccess.enable
+    parEnableWindows: parRemoteAccess.bastion.windows.enable
     parWindowsVmSize: parRemoteAccess.bastion.windows.vmSize
     parWindowsVmAdminUsername: parRemoteAccess.bastion.windows.vmAdminUsername
     parWindowsVmAdminPassword: parRemoteAccess.bastion.windows.vmAdminPassword
@@ -872,8 +874,6 @@ module modRemoteAccess '../../overlays/management-services/bastion/anoa.lz.mgmt.
 
     // Log Analytics Parameters
     parLogAnalyticsWorkspaceId: modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceResourceId
-    parEnableLinuxVmPasswordAuthentication: parRemoteAccess.bastion.linux.enableVmPasswordAuthentication
-
   }
 }
 

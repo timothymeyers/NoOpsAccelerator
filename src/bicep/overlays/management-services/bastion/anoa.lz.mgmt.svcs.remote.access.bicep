@@ -269,7 +269,7 @@ module modLinuxVirtualMachine '../../../azresources/Modules/Microsoft.Compute/vi
         ipConfigurations: [
           {
             name: 'win-ipconfig01'
-            subnetId: modBastionHost.outputs.ipConfAzureBastionSubnetResourceId
+            subnetResourceId: modBastionHost.outputs.ipConfAzureBastionSubnetResourceId
           }
         ]
         nicSuffix: '-nic-01'
@@ -337,7 +337,7 @@ module windowsVirtualMachine '../../../azresources/Modules/Microsoft.Compute/vir
         ipConfigurations: [
           {
             name: 'win-ipconfig01'
-            subnetId: modBastionHost.outputs.ipConfAzureBastionSubnetResourceId
+            subnetResourceId: modBastionHost.outputs.ipConfAzureBastionSubnetResourceId
           }
         ]
         nicSuffix: '-nic-01'

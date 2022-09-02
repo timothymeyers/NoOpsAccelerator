@@ -215,4 +215,4 @@ output location string = azureBastion.location
 output ipConfAzureBastionSubnet object = azureBastion.properties.ipConfigurations[0]
 
 @description('The ResourceId for the AzureBastionSubnet.')
-output ipConfAzureBastionSubnetResourceId string = azureBastion.properties.ipConfigurations[0].properties.subnet
+output ipConfAzureBastionSubnetResourceId string = azureBastion.properties.ipConfigurations[0].properties.subnet.id

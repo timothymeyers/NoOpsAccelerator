@@ -130,18 +130,18 @@
     },
     "parRemoteAccess": {
       "value": {
-        "enable": true,
-        "enableJumpBoxes": true,
+        "enable": true,        
         "bastion": {
           "sku": "Standard",
           "subnetAddressPrefix": "10.0.100.160/27",
           "publicIPAddressAvailabilityZones": [],
+          "encryptionAtHost": false,
           "linux": {
+            "enable": true,
             "vmAdminUsername": "azureuser",
             "enableVmPasswordAuthentication": true,
-            "vmAuthenticationType": "password",
-            "vmAdminPasswordOrKey": "Rem0te@2020246",
-            "vmSize": "Standard_B2s",
+            "vmAuthenticationType": "password",            
+            "vmSize": "Standard_DS1_v2",
             "vmOsDiskCreateOption": "FromImage",
             "vmOsDiskType": "Standard_LRS",
             "vmImagePublisher": "Canonical",
@@ -151,6 +151,7 @@
             "networkInterfacePrivateIPAddressAllocationMethod": "Dynamic"
           },
           "windows": {
+            "enable": true,
             "vmAdminUsername": "azureuser",
             "VmAdminPassword": "Rem0te@2020246",
             "vmSize": "Standard_DS1_v2",

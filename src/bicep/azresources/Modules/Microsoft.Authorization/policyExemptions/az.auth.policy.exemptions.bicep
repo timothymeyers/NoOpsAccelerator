@@ -1,4 +1,3 @@
-/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 targetScope = 'managementGroup'
 
 @sys.description('Required. Specifies the name of the policy exemption. Maximum length is 64 characters for management group, subscription and resource group scopes.')

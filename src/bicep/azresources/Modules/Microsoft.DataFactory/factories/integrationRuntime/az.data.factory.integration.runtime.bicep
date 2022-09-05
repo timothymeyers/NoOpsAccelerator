@@ -1,4 +1,3 @@
-/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 @description('Conditional. The name of the parent Azure Data Factory. Required if the template is used in a standalone deployment.')
 param dataFactoryName string
 

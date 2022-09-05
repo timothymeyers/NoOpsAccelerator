@@ -1,4 +1,3 @@
-/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 @description('Required. Name prefix of the Image Template to be built by the Azure Image Builder service.')
 param name string
 

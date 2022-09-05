@@ -1,4 +1,3 @@
-/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 @description('Required. The name of the availability set that is being created.')
 param name string
 

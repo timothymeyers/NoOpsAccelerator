@@ -1,4 +1,3 @@
-/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 targetScope = 'subscription'
 
 @description('Required. The full Azure ID of the workspace to save the data in.')

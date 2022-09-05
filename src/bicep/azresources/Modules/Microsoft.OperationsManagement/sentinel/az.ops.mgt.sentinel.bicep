@@ -1,4 +1,3 @@
-/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 param location string = resourceGroup().location
 param sentinelName string = 'sentinel'
 

@@ -1,4 +1,3 @@
-/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 /*
 SUMMARY: Module to deploy a Bastion Host with Windows/Linux Jump Boxes to the Hub Network
 DESCRIPTION: The following components will be options in this deployment
@@ -7,6 +6,11 @@ DESCRIPTION: The following components will be options in this deployment
               Lunix VM
 AUTHOR/S: jspinella
 VERSION: 1.x.x
+*/
+
+/*
+Copyright (c) Microsoft Corporation.
+Licensed under the MIT License.
 */
 
 targetScope = 'subscription'
@@ -54,7 +58,6 @@ param parStorageAccountAccess object
 
 // VM KEYS
 @secure()
-@minLength(12)
 param parLinuxVmAdminPasswordOrKey string
 
 @secure()

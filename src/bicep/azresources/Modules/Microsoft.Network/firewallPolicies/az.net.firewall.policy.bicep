@@ -1,4 +1,3 @@
-/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 @description('Required. Name of the Firewall Policy.')
 param name string
 
@@ -73,6 +72,7 @@ param fqdns array = []
 @description('Optional. List of IP addresses for the ThreatIntel Allowlist.')
 param ipAddresses array = []
 
+@secure()
 @description('Optional. Secret ID of (base-64 encoded unencrypted PFX) Secret or Certificate object stored in KeyVault.')
 param keyVaultSecretId string = ''
 
@@ -112,7 +112,7 @@ resource firewallPolicy 'Microsoft.Network/firewallPolicies@2021-08-01' = {
       }
       retentionDays: retentionDays
     } : null
-    intrusionDetection: (mode != 'Off') ? {
+    intrusionDetection: ((tier == 'Premium') && mode != 'Off') ? {
       configuration: {
         bypassTrafficSettings: !empty(bypassTrafficSettings) ? bypassTrafficSettings : null
         signatureOverrides: !empty(signatureOverrides) ? signatureOverrides : null

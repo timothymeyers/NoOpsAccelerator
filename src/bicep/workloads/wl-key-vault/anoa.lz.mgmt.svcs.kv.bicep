@@ -1,10 +1,14 @@
-/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 /*
 SUMMARY: Workload Module to deploy a premium Azure Key Vault to support hardware backed secrets and certificates storage to an target sub and RG.
 DESCRIPTION: The following components will be options in this deployment
               Azure Key Vault    
 AUTHOR/S: jspinella
 VERSION: 1.x.x
+*/
+
+/*
+Copyright (c) Microsoft Corporation.
+Licensed under the MIT License.
 */
 
 // === PARAMETERS ===

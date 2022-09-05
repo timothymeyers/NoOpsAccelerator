@@ -1,4 +1,3 @@
-/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 /*
   Deploy a Storage Account with blob containers
 */

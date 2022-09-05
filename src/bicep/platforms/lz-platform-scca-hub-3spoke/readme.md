@@ -1,25 +1,37 @@
 # NoOps Accelerator - Platforms - SCCA Compliant Hub - 3 Spoke
 
-## Authored and Tested With
+## Authored & Tested With
 
-* [azure-cli](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) version 2.39.0
+* [azure-cli](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) version 2.38.0
 * bicep cli version v0.9.1
 * [bicep](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-bicep) v0.9.1 vscode extension
 
+Module Tested on:
+
+* Azure Commercial ✔️
+* Azure Government ✔️
+* Azure Government Secret ❔
+* Azure Government Top Secret ❔
+
+> ✔️ = tested,  ❔= currently testing
+
 ## Navigation
 
-- [Overview](#overview)
-- [Architecture](#architecture)
-- [Pre-requisites](#pre-requisites)
-- [Deployment](#deployment)
-- [Parameters](#add-on-parameters)
-- [Outputs](#Outputs)
-- [Resource Types](#Resource-Types)
-
+- [NoOps Accelerator - Platforms - SCCA Compliant Hub - 3 Spoke](#noops-accelerator---platforms---scca-compliant-hub---3-spoke)
+  - [Authored & Tested With](#authored--tested-with)
+  - [Navigation](#navigation)
+  - [Overview](#overview)
+  - [Architecture](#architecture)
+  - [Pre-requisites](#pre-requisites)
+  - [Deployment examples](#deployment-examples)
+  - [Parameters](#parameters)
+    - [Parameter Usage: `appSettingsKeyValuePairs`](#parameter-usage-appsettingskeyvaluepairs)
+  - [Outputs](#outputs)
+  - [Resource Types](#resource-types)
 
 ## Overview
 
-This platform module deploys a hub / spoke landing zone.
+This platform module deploys Hub/Spoke landing zone.
 
 > NOTE: This is only the landing zone. The workloads will be deployed with the enclave or can be deployed after the landing zone is created.
 
@@ -29,24 +41,20 @@ Read on to understand what this landing zone does, and when you're ready, collec
 
  ![Hub/Spoke landing zone Architecture](../../../bicep/)
 
-## Pre-Requisites
+## Pre-requisites
 
-- One or more Azure subscriptions where you, or an identity you manage, has Owner RBAC permissions
+* One or more Azure subscriptions where you or an identity you manage has Owner RBAC permissions
+* For deployments in the Azure Portal you need access to the portal in the cloud you want to deploy to, such as <https://portal.azure.com> or <https://portal.azure.us>.
+* For deployments in BASH or a Windows shell, then a terminal instance with the AZ CLI installed is required. For example, Azure Cloud Shell, the MLZ development container, or a command shell on your local machine with the AZ CLI installed.
+* For PowerShell deployments you need a PowerShell terminal with the Azure Az PowerShell module installed.
 
-- For deployments in the Azure Portal you need access to the portal in the cloud you want to deploy to, such as https://portal.azure.com or https://portal.azure.us.
+>NOTE: The AZ CLI will automatically install the Bicep tools when a command is run that needs them, or you can manually install them following the instructions here.
 
-- For deployments in BASH or a Windows shell, then a terminal instance with the AZ CLI installed is required. For example, Azure Cloud Shell, the MLZ development container, or a command shell on your local machine with the AZ CLI installed.
-
-- For PowerShell deployments you need a PowerShell terminal with the Azure Az PowerShell module installed.
-
-    >NOTE: The AZ CLI will automatically install the Bicep tools when a command is run that needs them, or you can manually install them following the instructions here.
-
-## Deployment Examples
+## Deployment examples
 
 The following module usage examples are retrieved from the content of the files hosted in the module's `lz-platform-hub-spoke` folder.
 
    >**Note**: The name of each example is based on the name of the file from which it is taken.
-   
    >**Note**: Each example lists all the required parameters first, followed by the rest - each in alphabetical order.
 
 <h3>Example 1: Base</h3>

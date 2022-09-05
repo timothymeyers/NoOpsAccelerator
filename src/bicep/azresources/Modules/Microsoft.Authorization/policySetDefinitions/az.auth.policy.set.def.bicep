@@ -1,4 +1,3 @@
-/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 targetScope = 'managementGroup'
 
 @sys.description('Required. Specifies the name of the policy Set Definition (Initiative).')

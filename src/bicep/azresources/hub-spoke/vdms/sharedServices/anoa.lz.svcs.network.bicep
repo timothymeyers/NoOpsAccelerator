@@ -1,4 +1,3 @@
-/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 /*
 SUMMARY: Module to deploy the Shared Services Network and it's components based on the Azure Mission Landing Zone conceptual architecture 
 DESCRIPTION: The following components will be options in this deployment
@@ -11,6 +10,11 @@ DESCRIPTION: The following components will be options in this deployment
               Private DNS Zones - Details of all the Azure Private DNS zones can be found here --> https://docs.microsoft.com/en-us/azure/private-link/private-endpoint-dns#azure-services-dns-zone-configuration     
 AUTHOR/S: jspinella
 VERSION: 1.x.x
+*/
+
+/*
+Copyright (c) Microsoft Corporation.
+Licensed under the MIT License.
 */
 
 targetScope = 'subscription'
@@ -168,7 +172,7 @@ var varRouteTableName = '${varSharedServicesSubnetName}-routetable'
 
 @description('Resource group tags')
 module modTags '../../../Modules/Microsoft.Resources/tags/az.resources.tags.bicep' = {
-  name: 'deploy-${varSharedServicesShortName}-tags-${parDeploymentNameSuffix}'
+  name: 'deploy-${varSharedServicesShortName}-tags-${parLocation}-${parDeploymentNameSuffix}'
   params: {
     tags: parTags
   }

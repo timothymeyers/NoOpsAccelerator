@@ -1,4 +1,3 @@
-/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 /*
 SUMMARY: Module Example to deploy the Full Hub/ 3 Spoke Enclave with AKS Workload
 DESCRIPTION: The following components will be options in this deployment
@@ -22,6 +21,11 @@ DESCRIPTION: The following components will be options in this deployment
             * Workload: (Tier 3) - Azure Kubernetes Service
 AUTHOR/S: jspinella
 VERSION: 1.x.x
+*/
+
+/*
+Copyright (c) Microsoft Corporation.
+Licensed under the MIT License.
 */
 
 /*
@@ -520,6 +524,73 @@ param parRemoteAccess object
 // Management Groups
 // Example (JSON)
 // -----------------------------
+// "parManagementGroups": {
+//   "value": [
+//     {
+//       "name": "anoa",
+//       "displayName": "ANOA",
+//       "parentMGName": "xxxxxxx-xxxx-xxxx-xxxx-xxxxxxx"
+//     },
+//     {
+//       "name": "anoa-lzs",
+//       "displayName": "anoa-lzs",
+//       "parentMGName": "anoa"
+//     },
+//     {
+//       "name": "anoa-lzs-sandbox",
+//       "displayName": "anoa-lzs-sandbox",
+//       "parentMGName": "anoa-lzs"
+//     },
+//     {
+//       "name": "anoa-lzs-workloads",
+//       "displayName": "anoa-lzs-workloads",
+//       "parentMGName": "anoa-lzs"
+//     },
+//     {
+//       "name": "anoa-lzs-internal",
+//       "displayName": "anoa-lzs-internal",
+//       "parentMGName": "anoa-lzs-workloads"
+//     },
+//     {
+//       "name": "anoa-lzs-internal-dev",
+//       "displayName": "anoa-lzs-internal-nonprod",
+//       "parentMGName": "anoa-lzs-internal"
+//     },
+//     {
+//       "name": "anoa-lzs-internal-prod",
+//       "displayName": "anoa-lzs-internal-prod",
+//       "parentMGName": "anoa-lzs-internal"
+//     },
+//     {
+//       "name": "anoa-platform",
+//       "displayName": "anoa-platform",
+//       "parentMGName": "anoa"
+//     },
+//     {
+//       "name": "anoa-transport",
+//       "displayName": "anoa-transport",
+//       "parentMGName": "anoa-platform"
+//     },
+//     {
+//       "name": "anoa-management",
+//       "displayName": "anoa-management",
+//       "parentMGName": "anoa-platform"
+//     },
+//     {
+//       "name": "anoa-identity",
+//       "displayName": "anoa-identity",
+//       "parentMGName": "anoa-platform"
+//     }
+//   ]
+// },
+// "parSubscriptions": {
+//   "value": [
+//     {
+//       "subscriptionId": "xxxxxxx-xxxx-xxxx-xxxx-xxxxxxx",
+//       "managementGroupName": "anoa-management"
+//     }
+//   ]
+// }
 @description('These are the landing zone management groups.')
 param parManagementGroups object
 

@@ -54,7 +54,7 @@ param parBastionHostSku string
 param parBastionHostSubnetAddressPrefix string = '10.0.100.160/27'
 
 @description('Optional. This property can be used by user in the request to enable or disable the Host Encryption for the virtual machine. This will enable the encryption for all the disks including Resource/Temp disk at host itself. For security reasons, it is recommended to set encryptionAtHost to True. Restrictions: Cannot be enabled if Azure Disk Encryption (guest-VM encryption using bitlocker/DM-Crypt) is enabled on your VMs.')
-param parEncryptionAtHost bool = true
+param parEncryptionAtHost bool = false
 
 // Linux VIRTUAL MACHINE PARAMETERS
 
@@ -62,6 +62,9 @@ param parEncryptionAtHost bool = true
 param parEnableLinux bool = true
 
 param parLinuxNetworkInterfacePrivateIPAddressAllocationMethod string
+
+@description('The name of the Linux Virtual Machine to Azure Bastion remote into.')
+param parLinuxVmName string
 
 @description('The size of the Linux Virtual Machine to Azure Bastion remote into. It defaults to "Standard_DS1_v2".')
 param parLinuxVmSize string = 'Standard_DS1_v2'
@@ -89,16 +92,19 @@ param parLinuxVmAdminUsername string
 
 @description('[sshPublicKey/password] The authentication type for the Linux Virtual Machine to Azure Bastion remote into. It defaults to "password".')
 #disable-next-line secure-secrets-in-params
-param parEnableLinuxVmPasswordAuthentication bool
+param parDisableLinuxVmPasswordAuthentication bool
 
 @secure()
 @description('The administrator password or public SSH key for the Linux Virtual Machine to Azure Bastion remote into. See https://docs.microsoft.com/en-us/azure/virtual-machines/linux/faq#what-are-the-password-requirements-when-creating-a-vm- for password requirements.')
-param parLinuxVmAdminPasswordOrKey string = parEnableLinuxVmPasswordAuthentication ? '' : newGuid()
+param parLinuxVmAdminPasswordOrKey string = parDisableLinuxVmPasswordAuthentication ? '' : newGuid()
 
 // WINDOWS VIRTUAL MACHINE PARAMETERS
 
 @description('Switch which allows Windows VM to be deployed. Default: true')
 param parEnableWindows bool = true
+
+@description('The name for the Windows Virtual Machine to Azure Bastion remote into.')
+param parWindowsVmName string
 
 @description('The administrator username for the Windows Virtual Machine to Azure Bastion remote into. It defaults to "azureuser".')
 param parWindowsVmAdminUsername string = 'azureuser'
@@ -162,10 +168,8 @@ var varBastionHostName = replace(varBastionHostNamingConvention, varNameToken, '
 var varBastionHostPublicIPAddressName = replace(varPublicIpAddressNamingConvention, varNameToken, 'bas')
 var varLinuxNetworkInterfaceName = replace(varNetworkInterfaceNamingConvention, varNameToken, 'bas-linux')
 var varLinuxNetworkInterfaceIpConfigurationName = replace(varIpConfigurationNamingConvention, varNameToken, 'bas-linux')
-var varLinuxVmName = 'bas-linux-vm'
 var varWindowsNetworkInterfaceName = replace(varNetworkInterfaceNamingConvention, varNameToken, 'bas-windows')
 var varWindowsNetworkInterfaceIpConfigurationName = replace(varIpConfigurationNamingConvention, varNameToken, 'bas-windows')
-var varWindowsVmName = 'bas-windows-vm'
 
 // BASTION VALUES
 
@@ -250,14 +254,14 @@ module modLinuxNetworkInterface '../../../azresources/Modules/Microsoft.Network/
 module modLinuxVirtualMachine '../../../azresources/Modules/Microsoft.Compute/virtualmachines/az.com.virtual.machine.bicep' = if (parEnableLinux) {
   name: 'deploy-ra-linux-vm-${parLocation}-${parDeploymentNameSuffix}'
   params: {
-    name: varLinuxVmName
+    name: parLinuxVmName
     location: parLocation
     tags: (empty(parTags)) ? modTags : parTags
 
-    disablePasswordAuthentication: parEnableLinuxVmPasswordAuthentication
+    disablePasswordAuthentication: parDisableLinuxVmPasswordAuthentication
     adminUsername: parLinuxVmAdminUsername    
     adminPassword: parLinuxVmAdminPasswordOrKey
-    publicKeys: !parEnableLinuxVmPasswordAuthentication ? [
+    publicKeys: !parDisableLinuxVmPasswordAuthentication ? [
       {
         path: '/home/${parLinuxVmAdminUsername}/.ssh/authorized_keys'
         keyData: parLinuxVmAdminPasswordOrKey
@@ -318,7 +322,7 @@ module modWindowsNetworkInterface '../../../azresources/Modules/Microsoft.Networ
 module modAvSet '../../../azresources/Modules/Microsoft.Compute/availabilitySets/az.com.availabilty.set.bicep' = {
   name: 'deploy-ra-win-avset-${parLocation}-${parDeploymentNameSuffix}'
   params: {
-    name: '${varWindowsVmName}-avset'
+    name: '${parWindowsVmName}-avset'
     location: parLocation
     availabilitySetSku: 'Aligned'
   }
@@ -327,7 +331,7 @@ module modAvSet '../../../azresources/Modules/Microsoft.Compute/availabilitySets
 module windowsVirtualMachine '../../../azresources/Modules/Microsoft.Compute/virtualmachines/az.com.virtual.machine.bicep' = if (parEnableWindows) {
   name: 'deploy-ra-windows-vm-${parLocation}-${parDeploymentNameSuffix}'
   params: {
-    name: varWindowsVmName
+    name: parWindowsVmName
     location: parLocation
     tags: (empty(parTags)) ? modTags : parTags
 

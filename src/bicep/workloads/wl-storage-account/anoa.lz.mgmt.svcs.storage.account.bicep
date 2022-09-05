@@ -1,10 +1,14 @@
-/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 /*
 SUMMARY: Workload Module to deploy premium storage account to support hardware backed secrets and certificates storage to an target sub and RG.
 DESCRIPTION: The following components will be options in this deployment
               Azure Storage Account 
 AUTHOR/S: jspinella
 VERSION: 1.x.x
+*/
+
+/*
+Copyright (c) Microsoft Corporation.
+Licensed under the MIT License.
 */
 
 // === PARAMETERS ===
@@ -95,6 +99,7 @@ module modDeployAzureStorageAccount '../../azresources/Modules/Microsoft.Storage
     name: sharedServicesStorageAccountName
     storageAccountSku: parSkuName
     tags: tags
+     
     roleAssignments: (parAddRoleAssignmentForStorageAccount) ? [
       {
         principalIds: [

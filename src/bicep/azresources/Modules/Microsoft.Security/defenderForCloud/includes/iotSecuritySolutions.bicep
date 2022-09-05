@@ -1,4 +1,3 @@
-/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 @description('Optional. Security Solution data')
 param ioTSecuritySolutionProperties object = {}
 

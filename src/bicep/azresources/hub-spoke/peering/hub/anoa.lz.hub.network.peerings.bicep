@@ -1,10 +1,14 @@
-/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 /*
 SUMMARY: Module to deploy the Hub Network Peering to Spokes based on the Azure Mission Landing Zone conceptual architecture 
 DESCRIPTION: The following components will be options in this deployment
               hubToSpokePeering
 AUTHOR/S: jspinella
 VERSION: 1.x.x
+*/
+
+/*
+Copyright (c) Microsoft Corporation.
+Licensed under the MIT License.
 */
 
 // REQUIRED PARAMETERS

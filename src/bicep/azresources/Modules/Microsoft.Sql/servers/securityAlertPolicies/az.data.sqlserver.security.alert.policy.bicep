@@ -1,4 +1,3 @@
-/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 @description('Required. The name of the Security Alert Policy.')
 param name string
 

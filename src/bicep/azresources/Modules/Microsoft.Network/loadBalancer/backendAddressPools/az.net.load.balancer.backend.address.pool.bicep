@@ -1,4 +1,3 @@
-/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 @description('Conditional. The name of the parent load balancer. Required if the template is used in a standalone deployment.')
 param loadBalancerName string
 

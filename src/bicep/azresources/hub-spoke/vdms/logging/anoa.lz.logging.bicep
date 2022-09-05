@@ -1,4 +1,3 @@
-/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 /*
 SUMMARY: Module to deploy the Logging based on the Azure Mission Landing Zone conceptual architecture 
 DESCRIPTION: The following components will be options in this deployment
@@ -9,7 +8,10 @@ AUTHOR/S: jrspinella
 VERSION: 1.x.x
 */
 
-
+/*
+Copyright (c) Microsoft Corporation.
+Licensed under the MIT License.
+*/
 
 targetScope = 'subscription'
 
@@ -268,7 +270,7 @@ module modLogAnalyticsWorkspace '../../../Modules/Microsoft.OperationalInsights/
 // LOG ANALYTICS WORKSPACE SOLUTIONS
 
 module modLogAnalyticsWorkspaceSolutions '../../../Modules/Microsoft.OperationsManagement/solutions/az.operational.insights.solutions.bicep' = [for solution in varSolutions: if (solution.deploy) {
-  name: 'deploy-laws-${solution.name}-${parDeploymentNameSuffix}'
+  name: 'deploy-laws-${solution.name}-${parLocation}-${parDeploymentNameSuffix}'
   scope: resourceGroup(varLoggingResourceGroupName)
   params: {
     location: parLocation

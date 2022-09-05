@@ -1,4 +1,3 @@
-/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 @description('Required. The name of the frontDoor.')
 @minLength(1)
 @maxLength(64)
@@ -146,7 +145,7 @@ resource frontDoor_diagnosticSettingName 'Microsoft.Insights/diagnosticSettings@
   scope: frontDoor
 }
 
-module frontDoor_roleAssignments './nested/roleAssignments.bicep' = [for (roleAssignment, index) in roleAssignments: {
+module frontDoor_roleAssignments './rbac/roleAssignments.bicep' = [for (roleAssignment, index) in roleAssignments: {
   name: '${uniqueString(deployment().name, location)}-AppGateway-Rbac-${index}'
   params: {
     description: contains(roleAssignment, 'description') ? roleAssignment.description : ''

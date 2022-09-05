@@ -1,4 +1,3 @@
-/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 @description('Optional. Name of the User Assigned Identity.')
 param name string = guid(resourceGroup().id)
 

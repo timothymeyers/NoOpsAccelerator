@@ -1,5 +1,7 @@
-/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 // ----------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+//
 // THIS CODE AND INFORMATION ARE PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, 
 // EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
 // OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.
@@ -22,6 +24,13 @@ param parEnforcementMode string = 'Default'
 
 @description('Log Analytics Workspace Data Retention in days.')
 param parRequiredRetentionDays string
+
+// Telemetry - Azure customer usage attribution
+// Reference:  https://docs.microsoft.com/azure/marketplace/azure-partner-customer-usage-attribution
+var telemetry = json(loadTextContent('../../../../azresources/Modules/Global/telemetry.json'))
+module telemetryCustomerUsageAttribution '../../../../azresources//Modules/Global/partnerUsageAttribution/customer-usage-attribution-management-group.bicep' = if (telemetry.customerUsageAttribution.enabled) {
+  name: 'pid-${telemetry.customerUsageAttribution.modules.policy}-nist'
+}
 
 var varPolicyId = '179d1daa-458f-4e47-8086-2a68d0d6c38f' // NIST SP 800-53 R5 
 var varAssignmentName = 'NIST SP 800-53 R5'

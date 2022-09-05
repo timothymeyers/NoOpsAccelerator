@@ -1,4 +1,3 @@
-/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 @description('Required. Name of the static site.')
 @minLength(1)
 @maxLength(40)

@@ -1,0 +1,40 @@
+{
+    "analyzers": {
+        "core": {
+            "verbose": false,
+            "enabled": true,
+            "rules": {
+                "adminusername-should-not-be-literal": {
+                    "level": "error"
+                },
+                "no-hardcoded-env-urls": {
+                    "level": "error"
+                },
+                "no-unnecessary-dependson": {
+                    "level": "error"
+                },
+                "no-unused-params": {
+                    "level": "warning"
+                },
+                "no-unused-vars": {
+                    "level": "warning"
+                },
+                "prefer-interpolation": {
+                    "level": "error"
+                },
+                "secure-parameter-default": {
+                    "level": "error"
+                },
+                "simplify-interpolation": {
+                    "level": "error"
+                },
+                "no-loc-expr-outside-params": {
+                    "level": "error"
+                },
+                "explicit-values-for-loc-params": {
+                    "level": "error"
+                }
+            }
+        }
+    }
+}

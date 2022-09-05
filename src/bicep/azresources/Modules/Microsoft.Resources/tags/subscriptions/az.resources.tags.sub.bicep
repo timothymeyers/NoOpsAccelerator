@@ -1,4 +1,3 @@
-/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 targetScope = 'subscription'
 
 @description('Optional. Tags for the resource group. If not provided, removes existing tags.')

@@ -1,4 +1,3 @@
-/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 /*
 SUMMARY: Module to deploy the Operations Network and it's components based on the Azure Mission Landing Zone conceptual architecture 
 DESCRIPTION: The following components will be options in this deployment
@@ -11,6 +10,11 @@ DESCRIPTION: The following components will be options in this deployment
               Private DNS Zones - Details of all the Azure Private DNS zones can be found here --> https://docs.microsoft.com/en-us/azure/private-link/private-endpoint-dns#azure-services-dns-zone-configuration     
 AUTHOR/S: jspinella
 VERSION: 1.x.x
+*/
+
+/*
+Copyright (c) Microsoft Corporation.
+Licensed under the MIT License.
 */
 
 targetScope = 'subscription'
@@ -47,6 +51,9 @@ param parOperationsVirtualNetworkAddressPrefix string = '10.0.115.0/26'
 @description('The CIDR Subnet Address Prefix for the default Operations subnet. It must be in the Operations Virtual Network space.')
 param parOperationsSubnetAddressPrefix string = '10.0.115.0/27'
 
+@description('Array of Subnet Address Prefix for the default Operations network. These will be Spoke Subnet Address Prefixes, if exists.')
+param parOperationsSourceAddressPrefixes array = []
+
 @description('The Storage Account SKU to use for log storage. It defaults to "Standard_GRS". See https://docs.microsoft.com/en-us/rest/api/storagerp/srp_sku_types for valid settings.')
 param parLogStorageSkuName string = 'Standard_GRS'
 
@@ -75,10 +82,7 @@ param parOperationsNetworkSecurityGroupRules array = [
     direction: 'Inbound'
     priority: 200
     protocol: '*'
-    sourceAddressPrefixes: [
-      '10.0.110.0/26'
-      '10.0.120.0/26'
-    ]
+    sourceAddressPrefixes: parOperationsSourceAddressPrefixes
     sourcePortRange: '*'
   }
   type: 'string'
@@ -174,7 +178,7 @@ var opsddosName = replace(varDdosNamingConvention, varNameToken, varOperationsNa
 
 @description('Resource group tags')
 module modTags '../../../Modules/Microsoft.Resources/tags/az.resources.tags.bicep' = {
-  name: 'deploy-${varOperationsShortName}-tags-${parDeploymentNameSuffix}'
+  name: 'deploy-${varOperationsShortName}-tags-${parLocation}-${parDeploymentNameSuffix}'
   params: {
     onlyUpdate: true
     tags: parTags

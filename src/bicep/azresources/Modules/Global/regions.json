@@ -1,0 +1,28 @@
+{
+    "il2": {
+      "centralus": "centralus",
+      "eastus": "eastus",
+      "eastus2": "eastus2",
+      "global": "global",
+      "northcentralus": "ncentralus",
+      "southcentralus": "scentralus",
+      "unitedstates": "unitedstates",
+      "westcentralus": "wcentralus",
+      "westus": "westus",
+      "westus2": "westus2",
+      "westus3": "westus3"
+    },
+    "il4": {
+      "usgovarizona": "usgovaz",
+      "usgovtexas": "usgovtx",
+      "usgovvirgina": "usgovva"
+    },
+    "il5": {
+      "usdodcentral": "usdodcentral",
+      "usdodeast": "usdodeast"
+    },
+    "il6": {
+      "usseceast": "usseceast",
+      "ussecwest": "ussecwest"
+    }
+  }

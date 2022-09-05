@@ -1,4 +1,4 @@
-# NoOps Accelerator - Enclave - SCCA Compliant Hub - 3 Spoke landing zone with a Azure Kubernetes Service
+# NoOps Accelerator - Enclave - SCCA Compliant Hub - 1 Spoke landing zone with a Azure Kubernetes Service
 
 ## Authored & Tested With
 

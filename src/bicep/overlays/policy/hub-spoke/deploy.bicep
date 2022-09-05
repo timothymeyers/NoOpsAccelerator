@@ -33,6 +33,14 @@ param parLocation string = deployment().location
 @description('A suffix to use for naming deployments uniquely. It defaults to the Bicep resolution of the "utcNow()" function.')
 param parDeploymentNameSuffix string = utcNow()
 
+// Telemetry - Azure customer usage attribution
+// Reference:  https://docs.microsoft.com/azure/marketplace/azure-partner-customer-usage-attribution
+var telemetry = json(loadTextContent('../../../azresources/Modules/Global/telemetry.json'))
+module telemetryCustomerUsageAttribution '../../../azresources//Modules/Global/partnerUsageAttribution/customer-usage-attribution-management-group.bicep' = if (telemetry.customerUsageAttribution.enabled) {
+  name: 'pid-${telemetry.customerUsageAttribution.modules.policy}-${uniqueString(parLocation)}'
+}
+
+
 // BUILT-IN POLICIES
 //Location Policy
 module polLocation '../../../azresources/Policy/builtin/assignments/location.bicep' = if (parPolicy.bulitInPolicy.policies[0].enabled) {

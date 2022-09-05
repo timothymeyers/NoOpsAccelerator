@@ -99,6 +99,7 @@ module modDeployAzureStorageAccount '../../azresources/Modules/Microsoft.Storage
     name: sharedServicesStorageAccountName
     storageAccountSku: parSkuName
     tags: tags
+     
     roleAssignments: (parAddRoleAssignmentForStorageAccount) ? [
       {
         principalIds: [

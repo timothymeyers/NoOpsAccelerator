@@ -274,16 +274,6 @@ param parHubSubnetServiceEndpoints array = [
 ]
 
 // ROUTETABLE PARAMETERS
-@description(' An Array of Routes to be established within the hub route table.')
-param parRouteTableRoutes array = [
-  {
-    name: 'default_route'
-    properties: {
-      addressPrefix: '0.0.0.0/0'      
-      nextHopType: 'VirtualAppliance'
-    }
-  }
-]
 param parDisableBgpRoutePropagation bool = false
 
 // LOGGING PARAMETERS
@@ -479,7 +469,16 @@ module modHubRouteTable '../../../Modules/Microsoft.Network/routeTable/az.net.ro
     location: parLocation
     tags: modTags.outputs.tags
 
-    routes: parRouteTableRoutes
+    routes: [
+      {
+        name: 'default_route'
+        properties: {
+          addressPrefix: '0.0.0.0/0'    
+          nextHopIpAddress: modAzureFirewall.outputs.privateIp
+          nextHopType: 'VirtualAppliance'
+        }
+      }
+    ]
     disableBgpRoutePropagation: parDisableBgpRoutePropagation
   }
   dependsOn: [

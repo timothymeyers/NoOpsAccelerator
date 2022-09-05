@@ -1,7 +1,7 @@
 
 # AZ CLI
 # Hub/Spoke - Change variables to match your deployment
-az deployment sub create --name deploy-hubspoke-network --location EastUS --template-file anoa.hubspoke.bicep  --parameters @parameters/anoa.hubspoke.parameters.example.json --subscription xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx
+az deployment sub create --name deploy-hubspoke-network --location EastUS --template-file deploy.bicep  --parameters @parameters/deploy.parameters.json --subscription xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx
 
 # Clean Up
 # Delete Resource Locks - Change variables to match your deployment
@@ -27,7 +27,7 @@ az deployment sub delete -n deploy-hubspoke-network
 
 # AZ PowerShell
 # Hub/Spoke - Change variables to match your deployment
-New-AzSubscriptionDeployment -TemplateFile .\anoa.hubspoke.bicep -TemplateParameterFile .\parameters\anoa.hubspoke.parameters.example.json -Location "EastUS" -Name deploy-hubspoke-network
+New-AzSubscriptionDeployment -TemplateFile .\deploy.bicep -TemplateParameterFile .\parameters\deploy.parameters.json -Location "EastUS" -Name deploy-hubspoke-network
 
 # Clean Up
 # Delete Resource Groups - Change variables to match your deployment

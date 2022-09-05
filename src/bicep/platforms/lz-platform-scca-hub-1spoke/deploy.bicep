@@ -241,28 +241,10 @@ param parOperationsVirtualNetworkDiagnosticsLogs array = []
 param parOperationsVirtualNetworkDiagnosticsMetrics array = []
 
 @description('An array of Network Security Group rules to apply to the Operations Virtual Network. See https://docs.microsoft.com/en-us/azure/templates/microsoft.network/networksecuritygroups/securityrules?tabs=bicep#securityrulepropertiesformat for valid settings.')
-param parOperationsNetworkSecurityGroupRules array = [
-  {
-    name: 'Allow-Traffic-From-Spokes'
-    properties: {
-      access: 'Allow'
-      description: 'Allow traffic from spokes'
-      destinationAddressPrefix: parOperationsVirtualNetworkAddressPrefix
-      destinationPortRanges: [
-        '22'
-        '80'
-        '443'
-        '3389'
-      ]
-      direction: 'Inbound'
-      priority: 200
-      protocol: '*'
-      sourceAddressPrefixes: []
-      sourcePortRange: '*'
-    }
-    type: 'string'
-  }
-]
+param parOperationsNetworkSecurityGroupRules array = []
+
+@description('Array of Subnet Address Prefix for the default Operations network. These will be Spoke Subnet Address Prefixes, if exists.')
+param parOperationsSourceAddressPrefixes array = []
 
 @description('An array of Network Security Group diagnostic logs to apply to the Operations Virtual Network. See https://docs.microsoft.com/en-us/azure/virtual-network/virtual-network-nsg-manage-log#log-categories for valid settings.')
 param parOperationsNetworkSecurityGroupDiagnosticsLogs array = [
@@ -332,18 +314,19 @@ param parSecurityCenter object
 // -----------------------------
 // "parRemoteAccess": {
 //   "value": {
-//     "enable": true,
-//     "enableJumpBoxes": true,
+//     "enable": true,        
 //     "bastion": {
 //       "sku": "Standard",
 //       "subnetAddressPrefix": "10.0.100.160/27",
 //       "publicIPAddressAvailabilityZones": [],
+//       "encryptionAtHost": false,
 //       "linux": {
+//         "enable": true,
+//         "vmName": "bastion-linux",
 //         "vmAdminUsername": "azureuser",
-//         "enableVmPasswordAuthentication": true,
-//         "vmAuthenticationType": "password",
-//         "vmAdminPasswordOrKey": "Rem0te@2020246",
-//         "vmSize": "Standard_B2s",
+//         "disablePasswordAuthentication": false,
+//         "vmAdminPasswordOrKey": "Rem0te@2020246",          
+//         "vmSize": "Standard_DS1_v2",
 //         "vmOsDiskCreateOption": "FromImage",
 //         "vmOsDiskType": "Standard_LRS",
 //         "vmImagePublisher": "Canonical",
@@ -353,16 +336,22 @@ param parSecurityCenter object
 //         "networkInterfacePrivateIPAddressAllocationMethod": "Dynamic"
 //       },
 //       "windows": {
+//         "enable": true,
+//         "vmName": "bastion-windows",
 //         "vmAdminUsername": "azureuser",
-//         "VmAdminPassword": "Rem0te@2020246",
+//         "vmAdminPassword": "Rem0te@2020246",
 //         "vmSize": "Standard_DS1_v2",
 //         "vmOsDiskCreateOption": "FromImage",
-//         "VmStorageAccountType": "StandardSSD_LRS",
+//         "vmStorageAccountType": "StandardSSD_LRS",
 //         "vmImagePublisher": "MicrosoftWindowsServer",
 //         "vmImageOffer": "WindowsServer",
 //         "vmImageSku": "2019-datacenter",
 //         "vmImageVersion": "latest",
 //         "networkInterfacePrivateIPAddressAllocationMethod": "Dynamic"
+//       },
+//       "customScriptExtension": {
+//         "install": false,
+//         "script64": ""
 //       }
 //     }
 //   }
@@ -370,10 +359,17 @@ param parSecurityCenter object
 @description('When set to "true", provisions Azure Bastion Host. It defaults to "false".')
 param parRemoteAccess object
 
+// Telemetry - Azure customer usage attribution
+// Reference:  https://docs.microsoft.com/azure/marketplace/azure-partner-customer-usage-attribution
+var telemetry = json(loadTextContent('../../azresources/Modules/Global/telemetry.json'))
+module telemetryCustomerUsageAttribution '../../azresources/Modules/Global/partnerUsageAttribution/customer-usage-attribution-subscription.bicep' = if (telemetry.customerUsageAttribution.enabled) {
+  name: 'pid-${telemetry.customerUsageAttribution.modules.platforms.hubspoke1}-${uniqueString(parLocation)}'
+}
+
 /*
   NAMING CONVENTION
   Here we define a naming conventions for resources.
-  First, we take `parDeployEnvironment` and `parDeployEnvironment` by params.
+  First, we take `parRequired.orgPrefix`, `parLocation`, and `parRequired.deployEnvironment` by params.
   Then, using string interpolation "${}", we insert those values into a naming convention.
 */
 
@@ -465,7 +461,7 @@ module modArtifacts '../../azresources/hub-spoke/vdss/networkArtifacts/anoa.lz.a
 // HUB
 
 module modHubNetwork '../../azresources/hub-spoke/vdss/hub/anoa.lz.hub.network.bicep' = {
-  name: 'deploy-vnet-hub-${parLocation}-${parDeploymentNameSuffix}'
+  name: 'deploy-hub-${parLocation}-${parDeploymentNameSuffix}'
   scope: subscription(parHubSubscriptionId)
   params: {
     // Required Parameters
@@ -516,6 +512,7 @@ module modHubNetwork '../../azresources/hub-spoke/vdss/hub/anoa.lz.hub.network.b
     // Log Analytics Parameters
     parLogAnalyticsWorkspaceResourceId: modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceResourceId
     parLogAnalyticsWorkspaceName: modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceName
+
   }
 }
 
@@ -534,6 +531,7 @@ module modOperationsNetwork '../../azresources/hub-spoke/vdms/operations/anoa.lz
     // Operations Network Parameters
     parOperationsNetworkSecurityGroupDiagnosticsLogs: parOperationsNetworkSecurityGroupDiagnosticsLogs
     parOperationsSubnetAddressPrefix: parOperationsSubnetAddressPrefix
+    parOperationsSourceAddressPrefixes: parOperationsSourceAddressPrefixes
     parOperationsNetworkSecurityGroupRules: parOperationsNetworkSecurityGroupRules
     parOperationsSubnetServiceEndpoints: parOperationsSubnetServiceEndpoints
     parOperationsVirtualNetworkAddressPrefix: parOperationsVirtualNetworkAddressPrefix
@@ -605,9 +603,11 @@ module modRemoteAccess '../../overlays/management-services/bastion/anoa.lz.mgmt.
     // Bastion Host Parameters   
     parBastionHostSku: parRemoteAccess.bastion.sku    
     parBastionHostSubnetAddressPrefix: parRemoteAccess.bastion.subnetAddressPrefix
+    parEncryptionAtHost: parRemoteAccess.bastion.encryptionAtHost
 
     // Linux Parameters
     parEnableLinux:  parRemoteAccess.bastion.linux.enable
+    parLinuxVmName: parRemoteAccess.bastion.linux.vmName
     parLinuxVmSize: parRemoteAccess.bastion.linux.vmSize
     parLinuxVmOsDiskCreateOption: parRemoteAccess.bastion.linux.vmOsDiskCreateOption
     parLinuxVmOsDiskType: parRemoteAccess.bastion.linux.vmOsDiskType
@@ -618,9 +618,11 @@ module modRemoteAccess '../../overlays/management-services/bastion/anoa.lz.mgmt.
     parLinuxVmAdminUsername: parRemoteAccess.bastion.linux.vmAdminUsername
     parLinuxVmAdminPasswordOrKey: parRemoteAccess.bastion.linux.vmAdminPasswordOrKey
     parLinuxNetworkInterfacePrivateIPAddressAllocationMethod: parRemoteAccess.bastion.linux.networkInterfacePrivateIPAddressAllocationMethod
-
+    parDisableLinuxVmPasswordAuthentication: parRemoteAccess.bastion.linux.disablePasswordAuthentication
+    
     // Windows Parameters 
     parEnableWindows: parRemoteAccess.bastion.windows.enable
+    parWindowsVmName: parRemoteAccess.bastion.windows.vmName
     parWindowsVmSize: parRemoteAccess.bastion.windows.vmSize
     parWindowsVmAdminUsername: parRemoteAccess.bastion.windows.vmAdminUsername
     parWindowsVmAdminPassword: parRemoteAccess.bastion.windows.vmAdminPassword
@@ -633,8 +635,7 @@ module modRemoteAccess '../../overlays/management-services/bastion/anoa.lz.mgmt.
     parWindowsNetworkInterfacePrivateIPAddressAllocationMethod: parRemoteAccess.bastion.windows.networkInterfacePrivateIPAddressAllocationMethod
 
     // Log Analytics Parameters
-    parLogAnalyticsWorkspaceId: modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceId
-    parEnableLinuxVmPasswordAuthentication: parRemoteAccess.bastion.linux.enableVmPasswordAuthentication
+    parLogAnalyticsWorkspaceId: modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceResourceId    
   }
 }
 

@@ -58,7 +58,6 @@ param parStorageAccountAccess object
 
 // VM KEYS
 @secure()
-@minLength(12)
 param parLinuxVmAdminPasswordOrKey string
 
 @secure()

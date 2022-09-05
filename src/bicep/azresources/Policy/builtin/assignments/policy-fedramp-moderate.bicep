@@ -25,6 +25,13 @@ param parEnforcementMode string = 'Default'
 @description('Log Analytics Workspace Data Retention in days.')
 param parRequiredRetentionDays string
 
+// Telemetry - Azure customer usage attribution
+// Reference:  https://docs.microsoft.com/azure/marketplace/azure-partner-customer-usage-attribution
+var telemetry = json(loadTextContent('../../../../azresources/Modules/Global/telemetry.json'))
+module telemetryCustomerUsageAttribution '../../../../azresources//Modules/Global/partnerUsageAttribution/customer-usage-attribution-management-group.bicep' = if (telemetry.customerUsageAttribution.enabled) {
+  name: 'pid-${telemetry.customerUsageAttribution.modules.policy}-fedramp'
+}
+
 var varPolicyId = 'e95f5a9f-57ad-4d03-bb0b-b1d16db93693' // FedRAMP Moderate
 var varAssignmentName = 'FedRAMP Moderate'
 

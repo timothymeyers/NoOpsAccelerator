@@ -53,6 +53,9 @@ param parBastionHostSku string
 @description('The CIDR Subnet Address Prefix for the Azure Bastion Subnet. It must be in the Hub Virtual Network space "hubVirtualNetworkAddressPrefix" parameter value. It must be /27 or larger.')
 param parBastionHostSubnetAddressPrefix string = '10.0.100.160/27'
 
+@description('Optional. This property can be used by user in the request to enable or disable the Host Encryption for the virtual machine. This will enable the encryption for all the disks including Resource/Temp disk at host itself. For security reasons, it is recommended to set encryptionAtHost to True. Restrictions: Cannot be enabled if Azure Disk Encryption (guest-VM encryption using bitlocker/DM-Crypt) is enabled on your VMs.')
+param parEncryptionAtHost bool = false
+
 // Linux VIRTUAL MACHINE PARAMETERS
 
 @description('Switch which allows Linux VM to be deployed. Default: true')
@@ -60,8 +63,11 @@ param parEnableLinux bool = true
 
 param parLinuxNetworkInterfacePrivateIPAddressAllocationMethod string
 
-@description('The size of the Linux Virtual Machine to Azure Bastion remote into. It defaults to "Standard_B2s".')
-param parLinuxVmSize string = 'Standard_B2s'
+@description('The name of the Linux Virtual Machine to Azure Bastion remote into.')
+param parLinuxVmName string
+
+@description('The size of the Linux Virtual Machine to Azure Bastion remote into. It defaults to "Standard_DS1_v2".')
+param parLinuxVmSize string = 'Standard_DS1_v2'
 
 @description('The disk creation option of the Linux Virtual Machine to Azure Bastion remote into. It defaults to "FromImage".')
 param parLinuxVmOsDiskCreateOption string = 'FromImage'
@@ -86,17 +92,19 @@ param parLinuxVmAdminUsername string
 
 @description('[sshPublicKey/password] The authentication type for the Linux Virtual Machine to Azure Bastion remote into. It defaults to "password".')
 #disable-next-line secure-secrets-in-params
-param parEnableLinuxVmPasswordAuthentication bool
+param parDisableLinuxVmPasswordAuthentication bool
 
 @secure()
-@minLength(12)
 @description('The administrator password or public SSH key for the Linux Virtual Machine to Azure Bastion remote into. See https://docs.microsoft.com/en-us/azure/virtual-machines/linux/faq#what-are-the-password-requirements-when-creating-a-vm- for password requirements.')
-param parLinuxVmAdminPasswordOrKey string
+param parLinuxVmAdminPasswordOrKey string = parDisableLinuxVmPasswordAuthentication ? '' : newGuid()
 
 // WINDOWS VIRTUAL MACHINE PARAMETERS
 
 @description('Switch which allows Windows VM to be deployed. Default: true')
 param parEnableWindows bool = true
+
+@description('The name for the Windows Virtual Machine to Azure Bastion remote into.')
+param parWindowsVmName string
 
 @description('The administrator username for the Windows Virtual Machine to Azure Bastion remote into. It defaults to "azureuser".')
 param parWindowsVmAdminUsername string = 'azureuser'
@@ -150,7 +158,6 @@ var varNamingConvention = '${toLower(parOrgPrefix)}-${toLower(parLocation)}-${to
 // RESOURCE NAME CONVENTIONS WITH ABBREVIATIONS
 
 var varBastionHostNamingConvention = replace(varNamingConvention, varResourceToken, 'bas')
-var varVirtualMachineNamingConvention = replace(varNamingConvention, varResourceToken, 'vm')
 var varPublicIpAddressNamingConvention = replace(varNamingConvention, varResourceToken, 'pip')
 var varIpConfigurationNamingConvention = replace(varNamingConvention, varResourceToken, 'ipconf')
 var varNetworkInterfaceNamingConvention = replace(varNamingConvention, varResourceToken, 'nic')
@@ -161,10 +168,8 @@ var varBastionHostName = replace(varBastionHostNamingConvention, varNameToken, '
 var varBastionHostPublicIPAddressName = replace(varPublicIpAddressNamingConvention, varNameToken, 'bas')
 var varLinuxNetworkInterfaceName = replace(varNetworkInterfaceNamingConvention, varNameToken, 'bas-linux')
 var varLinuxNetworkInterfaceIpConfigurationName = replace(varIpConfigurationNamingConvention, varNameToken, 'bas-linux')
-var varLinuxVmName = replace(varVirtualMachineNamingConvention, varNameToken, 'bas-linux')
 var varWindowsNetworkInterfaceName = replace(varNetworkInterfaceNamingConvention, varNameToken, 'bas-windows')
 var varWindowsNetworkInterfaceIpConfigurationName = replace(varIpConfigurationNamingConvention, varNameToken, 'bas-windows')
-var varWindowsVmName = replace(varVirtualMachineNamingConvention, varNameToken, 'bas-windows')
 
 // BASTION VALUES
 
@@ -213,12 +218,11 @@ module modBastionHost '../../../azresources/Modules/Microsoft.Network/bastionHos
         'AllMetrics'
       ]
       name: varBastionHostPublicIPAddressName
-      publicIPAllocationMethod: varBastionHostPublicIPAddressAllocationMethod
-      publicIPPrefixResourceId: ''
+      publicIPAllocationMethod: varBastionHostPublicIPAddressAllocationMethod     
       skuName: varBastionHostPublicIPAddressSkuName
       skuTier: 'Regional'
     }
-    skuType: parBastionHostSku
+    skuType: parBastionHostSku    
   }
   dependsOn: [
     resBastionSubnet
@@ -250,16 +254,23 @@ module modLinuxNetworkInterface '../../../azresources/Modules/Microsoft.Network/
 module modLinuxVirtualMachine '../../../azresources/Modules/Microsoft.Compute/virtualmachines/az.com.virtual.machine.bicep' = if (parEnableLinux) {
   name: 'deploy-ra-linux-vm-${parLocation}-${parDeploymentNameSuffix}'
   params: {
-    name: varLinuxVmName
+    name: parLinuxVmName
     location: parLocation
     tags: (empty(parTags)) ? modTags : parTags
 
-    disablePasswordAuthentication: parEnableLinuxVmPasswordAuthentication
-    adminUsername: parLinuxVmAdminUsername
-    adminPassword: parLinuxVmAdminPasswordOrKey //kv.getSecret('LinuxVmAdminPasswordOrKey')
+    disablePasswordAuthentication: parDisableLinuxVmPasswordAuthentication
+    adminUsername: parLinuxVmAdminUsername    
+    adminPassword: parLinuxVmAdminPasswordOrKey
+    publicKeys: !parDisableLinuxVmPasswordAuthentication ? [
+      {
+        path: '/home/${parLinuxVmAdminUsername}/.ssh/authorized_keys'
+        keyData: parLinuxVmAdminPasswordOrKey
+      }
+    ] : []
 
     diagnosticWorkspaceId: parLogAnalyticsWorkspaceId
     availabilitySetName: modAvSet.outputs.name
+    encryptionAtHost: parEncryptionAtHost
     imageReference: {
       offer: parLinuxVmImageOffer
       publisher: parLinuxVmImagePublisher
@@ -270,8 +281,8 @@ module modLinuxVirtualMachine '../../../azresources/Modules/Microsoft.Compute/vi
       {
         ipConfigurations: [
           {
-            name: 'win-ipconfig01'
-            subnetResourceId: modBastionHost.outputs.ipConfAzureBastionSubnetResourceId
+            name: 'linux-ipconfig01'
+            subnetResourceId: parHubSubnetResourceId
           }
         ]
         nicSuffix: '-nic-01'
@@ -311,7 +322,7 @@ module modWindowsNetworkInterface '../../../azresources/Modules/Microsoft.Networ
 module modAvSet '../../../azresources/Modules/Microsoft.Compute/availabilitySets/az.com.availabilty.set.bicep' = {
   name: 'deploy-ra-win-avset-${parLocation}-${parDeploymentNameSuffix}'
   params: {
-    name: '${varWindowsVmName}-avset'
+    name: '${parWindowsVmName}-avset'
     location: parLocation
     availabilitySetSku: 'Aligned'
   }
@@ -320,7 +331,7 @@ module modAvSet '../../../azresources/Modules/Microsoft.Compute/availabilitySets
 module windowsVirtualMachine '../../../azresources/Modules/Microsoft.Compute/virtualmachines/az.com.virtual.machine.bicep' = if (parEnableWindows) {
   name: 'deploy-ra-windows-vm-${parLocation}-${parDeploymentNameSuffix}'
   params: {
-    name: varWindowsVmName
+    name: parWindowsVmName
     location: parLocation
     tags: (empty(parTags)) ? modTags : parTags
 
@@ -328,6 +339,7 @@ module windowsVirtualMachine '../../../azresources/Modules/Microsoft.Compute/vir
     adminPassword: parWindowsVmAdminPassword //kv.getSecret('WindowsVmAdminPassword')
     diagnosticWorkspaceId: parLogAnalyticsWorkspaceId
     availabilitySetName: modAvSet.outputs.name
+    encryptionAtHost: parEncryptionAtHost
     imageReference: {
       offer: parWindowsVmOffer
       publisher: parWindowsVmPublisher
@@ -339,7 +351,7 @@ module windowsVirtualMachine '../../../azresources/Modules/Microsoft.Compute/vir
         ipConfigurations: [
           {
             name: 'win-ipconfig01'
-            subnetResourceId: modBastionHost.outputs.ipConfAzureBastionSubnetResourceId
+            subnetResourceId: parHubSubnetResourceId
           }
         ]
         nicSuffix: '-nic-01'

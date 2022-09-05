@@ -51,6 +51,9 @@ param parOperationsVirtualNetworkAddressPrefix string = '10.0.115.0/26'
 @description('The CIDR Subnet Address Prefix for the default Operations subnet. It must be in the Operations Virtual Network space.')
 param parOperationsSubnetAddressPrefix string = '10.0.115.0/27'
 
+@description('Array of Subnet Address Prefix for the default Operations network. These will be Spoke Subnet Address Prefixes, if exists.')
+param parOperationsSourceAddressPrefixes array = []
+
 @description('The Storage Account SKU to use for log storage. It defaults to "Standard_GRS". See https://docs.microsoft.com/en-us/rest/api/storagerp/srp_sku_types for valid settings.')
 param parLogStorageSkuName string = 'Standard_GRS'
 
@@ -79,10 +82,7 @@ param parOperationsNetworkSecurityGroupRules array = [
     direction: 'Inbound'
     priority: 200
     protocol: '*'
-    sourceAddressPrefixes: [
-      '10.0.110.0/26'
-      '10.0.120.0/26'
-    ]
+    sourceAddressPrefixes: parOperationsSourceAddressPrefixes
     sourcePortRange: '*'
   }
   type: 'string'

@@ -37,6 +37,13 @@ param parTenantId string
 @description('A suffix to use for naming deployments uniquely. It defaults to the Bicep resolution of the "utcNow()" function.')
 param parDeploymentNameSuffix string = utcNow()
 
+// Telemetry - Azure customer usage attribution
+// Reference:  https://docs.microsoft.com/azure/marketplace/azure-partner-customer-usage-attribution
+var telemetry = json(loadTextContent('../../azresources/Modules/Global/telemetry.json'))
+module telemetryCustomerUsageAttribution '../../azresources/Modules/Global//partnerUsageAttribution/customer-usage-attribution-management-group.bicep' = if (telemetry.customerUsageAttribution.enabled) {
+  name: 'pid-${telemetry.customerUsageAttribution.modules.managementGroups}-${parTenantId}'
+}
+
 // Create Management Groups
 @batchSize(1)
 module resource_managementGroups '../../azresources/Modules/Microsoft.Management/managementGroups/az.mgmt.groups.bicep' = [for managementGroup in parManagementGroups: {

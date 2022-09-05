@@ -1,3 +1,4 @@
+/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 /*
 SUMMARY: Module Example to deploy an SCCA Compliant Platform Hub/Spoke Landing Zone
 DESCRIPTION: The following components will be options in this deployment
@@ -19,11 +20,6 @@ DESCRIPTION: The following components will be options in this deployment
             * Private DNS Zones - Details of all the Azure Private DNS zones can be found here --> [https://docs.microsoft.com/en-us/azure/private-link/private-endpoint-dns#azure-services-dns-zone-configuration](https://docs.microsoft.com/en-us/azure/private-link/private-endpoint-dns#azure-services-dns-zone-configuration)  
 AUTHOR/S: jspinella
 VERSION: 1.x.x
-*/
-
-/*
-Copyright (c) Microsoft Corporation.
-Licensed under the MIT License.
 */
 
 /*
@@ -224,6 +220,12 @@ param parPublicIPAddressDiagnosticsMetrics array = [
   'AllMetrics'
 ]
 
+@description('Application Rule Collection')
+param parApplicationRuleCollections array = []
+
+@description('Network Rule Collection')
+param parNetworkRuleCollections array = []
+
 // HUB NETWORK PARAMETERS
 
 @description('An array of Network Diagnostic Logs to enable for the Hub Virtual Network. See https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/diagnostic-settings?tabs=CMD#logs for valid settings.')
@@ -281,10 +283,7 @@ param parIdentityNetworkSecurityGroupRules array = [
 ]
 
 @description('An array of')
-param parIdentitySourceAddressPrefixes array = [
-  parOperationsVirtualNetworkAddressPrefix
-  parSharedServicesVirtualNetworkAddressPrefix
-]
+param parIdentitySourceAddressPrefixes array = []
 
 @description('An array of Network Security Group diagnostic logs to apply to the Identity Virtual Network. See https://docs.microsoft.com/en-us/azure/virtual-network/virtual-network-nsg-manage-log#log-categories for valid settings.')
 param parIdentityNetworkSecurityGroupDiagnosticsLogs array = [
@@ -324,15 +323,15 @@ param parOperationsNetworkSecurityGroupRules array = [
       direction: 'Inbound'
       priority: 200
       protocol: '*'
-      sourceAddressPrefixes: [
-        parIdentityVirtualNetworkAddressPrefix
-        parSharedServicesVirtualNetworkAddressPrefix
-      ]
+      sourceAddressPrefixes: parOperationsSourceAddressPrefixes
       sourcePortRange: '*'
     }
     type: 'string'
   }
 ]
+
+@description('An array of')
+param parOperationsSourceAddressPrefixes array = []
 
 @description('An array of Network Security Group diagnostic logs to apply to the Operations Virtual Network. See https://docs.microsoft.com/en-us/azure/virtual-network/virtual-network-nsg-manage-log#log-categories for valid settings.')
 param parOperationsNetworkSecurityGroupDiagnosticsLogs array = [
@@ -372,15 +371,15 @@ param parSharedServicesNetworkSecurityGroupRules array = [
       direction: 'Inbound'
       priority: 200
       protocol: '*'
-      sourceAddressPrefixes: [
-        parOperationsVirtualNetworkAddressPrefix
-        parIdentityVirtualNetworkAddressPrefix
-      ]
+      sourceAddressPrefixes: parSharedServicesSourceAddressPrefixes
       sourcePortRange: '*'
     }
     type: 'string'
   }
 ]
+
+@description('An array of')
+param parSharedServicesSourceAddressPrefixes array = []
 
 @description('An array of Network Security Group diagnostic logs to apply to the SharedServices Virtual Network. See https://docs.microsoft.com/en-us/azure/virtual-network/virtual-network-nsg-manage-log#log-categories for valid settings.')
 param parSharedServicesNetworkSecurityGroupDiagnosticsLogs array = [
@@ -451,12 +450,12 @@ param parSecurityCenter object
 // "parRemoteAccess": {
 //   "value": {
 //     "enable": true,
-//     "enableJumpBoxes": true,
 //     "bastion": {
 //       "sku": "Standard",
 //       "subnetAddressPrefix": "10.0.100.160/27",
 //       "publicIPAddressAvailabilityZones": [],
 //       "linux": {
+//         "enable": true,
 //         "vmAdminUsername": "azureuser",
 //         "enableVmPasswordAuthentication": true,
 //         "vmAuthenticationType": "password",
@@ -471,6 +470,7 @@ param parSecurityCenter object
 //         "networkInterfacePrivateIPAddressAllocationMethod": "Dynamic"
 //       },
 //       "windows": {
+//         "enable": true,
 //         "vmAdminUsername": "azureuser",
 //         "VmAdminPassword": "Rem0te@2020246",
 //         "vmSize": "Standard_DS1_v2",
@@ -488,10 +488,17 @@ param parSecurityCenter object
 @description('When set to "true", provisions Azure Bastion Host. It defaults to "false".')
 param parRemoteAccess object
 
+// Telemetry - Azure customer usage attribution
+// Reference:  https://docs.microsoft.com/azure/marketplace/azure-partner-customer-usage-attribution
+var telemetry = json(loadTextContent('../../azresources/Modules/Global/telemetry.json'))
+module telemetryCustomerUsageAttribution '../../azresources/Modules/Global/partnerUsageAttribution/customer-usage-attribution-subscription.bicep' = if (telemetry.customerUsageAttribution.enabled) {
+  name: 'pid-${telemetry.customerUsageAttribution.modules.platforms.hubspoke3}'
+}
+
 /*
   NAMING CONVENTION
   Here we define a naming conventions for resources.
-  First, we take `parRequired.deployEnvironment` and `parRequired.deployEnvironment` by params.
+  First, we take `parRequired.orgPrefix`, `parLocation`, and `parRequired.deployEnvironment` by params.
   Then, using string interpolation "${}", we insert those values into a naming convention.
 */
 
@@ -635,6 +642,8 @@ module modHubNetwork '../../azresources/hub-spoke/vdss/hub/anoa.lz.hub.network.b
     parFirewallManagementPublicIPAddressAvailabilityZones: parFirewallManagementPublicIPAddressAvailabilityZones
     parFirewallManagementSubnetName: parFirewallManagementSubnetName
     parFirewallManagementSubnetServiceEndpoints: parFirewallManagementSubnetServiceEndpoints
+    parApplicationRuleCollections: parApplicationRuleCollections
+    parNetworkRuleCollections: parNetworkRuleCollections
 
     // RBAC for Storage Parameters
     parStorageAccountAccess: parStorageAccountAccess
@@ -696,6 +705,7 @@ module modOperationsNetwork '../../azresources/hub-spoke/vdms/operations/anoa.lz
     // Operations Network Parameters
     parOperationsNetworkSecurityGroupDiagnosticsLogs: parOperationsNetworkSecurityGroupDiagnosticsLogs
     parOperationsSubnetAddressPrefix: parOperationsSubnetAddressPrefix
+    parOperationsSourceAddressPrefixes: parOperationsSourceAddressPrefixes
     parOperationsNetworkSecurityGroupRules: parOperationsNetworkSecurityGroupRules
     parOperationsSubnetServiceEndpoints: parOperationsSubnetServiceEndpoints
     parOperationsVirtualNetworkAddressPrefix: parOperationsVirtualNetworkAddressPrefix
@@ -840,9 +850,11 @@ module modRemoteAccess '../../overlays/management-services/bastion/anoa.lz.mgmt.
     // Bastion Host Parameters   
     parBastionHostSku: parRemoteAccess.bastion.sku    
     parBastionHostSubnetAddressPrefix: parRemoteAccess.bastion.subnetAddressPrefix
+    parEncryptionAtHost: parRemoteAccess.bastion.encryptionAtHost
 
     // Linux Parameters 
     parEnableLinux:  parRemoteAccess.bastion.linux.enable
+    parLinuxVmName: parRemoteAccess.bastion.linux.vmName
     parLinuxVmSize: parRemoteAccess.bastion.linux.vmSize
     parLinuxVmOsDiskCreateOption: parRemoteAccess.bastion.linux.vmOsDiskCreateOption
     parLinuxVmOsDiskType: parRemoteAccess.bastion.linux.vmOsDiskType
@@ -851,11 +863,12 @@ module modRemoteAccess '../../overlays/management-services/bastion/anoa.lz.mgmt.
     parLinuxVmImageSku: parRemoteAccess.bastion.linux.vmImageSku
     parLinuxVmImageVersion: parRemoteAccess.bastion.linux.vmImageVersion
     parLinuxVmAdminUsername: parRemoteAccess.bastion.linux.vmAdminUsername
-    parLinuxVmAdminPasswordOrKey: parRemoteAccess.bastion.linux.vmAdminPasswordOrKey
     parLinuxNetworkInterfacePrivateIPAddressAllocationMethod: parRemoteAccess.bastion.linux.networkInterfacePrivateIPAddressAllocationMethod
+    parDisableLinuxVmPasswordAuthentication: parRemoteAccess.bastion.linux.disablePasswordAuthentication
 
     // Windows Parameters 
     parEnableWindows: parRemoteAccess.bastion.windows.enable
+    parWindowsVmName: parRemoteAccess.bastion.windows.vmName
     parWindowsVmSize: parRemoteAccess.bastion.windows.vmSize
     parWindowsVmAdminUsername: parRemoteAccess.bastion.windows.vmAdminUsername
     parWindowsVmAdminPassword: parRemoteAccess.bastion.windows.vmAdminPassword
@@ -868,9 +881,25 @@ module modRemoteAccess '../../overlays/management-services/bastion/anoa.lz.mgmt.
     parWindowsNetworkInterfacePrivateIPAddressAllocationMethod: parRemoteAccess.bastion.windows.networkInterfacePrivateIPAddressAllocationMethod
 
     // Log Analytics Parameters
-    parLogAnalyticsWorkspaceId: modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceId
-    parEnableLinuxVmPasswordAuthentication: parRemoteAccess.bastion.linux.enableVmPasswordAuthentication
+    parLogAnalyticsWorkspaceId: modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceResourceId
+  }
+}
 
+module modVMExt '../../azresources/Modules/Microsoft.Compute/virtualmachines/extensions/az.com.virtual.machine.extensions.bicep' = if (parRemoteAccess.enable && parRemoteAccess.bastion.customScriptExtension.install) {
+  name: 'deploy-vmext-${parLocation}-${parDeploymentNameSuffix}'
+  scope: resourceGroup(parHubSubscriptionId, varHubResourceGroupName)
+  params: {
+    location: parLocation
+    type: 'CustomScript'
+    name: 'Script Definition'
+    publisher: 'Microsoft.Azure.Extensions'
+    enableAutomaticUpgrade: true 
+    autoUpgradeMinorVersion: true 
+    typeHandlerVersion: '2.1'
+    virtualMachineName: modRemoteAccess.outputs.linuxVMName
+    protectedSettings: {
+      script: parRemoteAccess.bastion.customScriptExtension.script64
+     }
   }
 }
 

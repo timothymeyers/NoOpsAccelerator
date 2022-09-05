@@ -24,6 +24,13 @@ param parEnforcementMode string = 'Default'
 @description('An array of allowed Azure Regions.')
 param allowedLocations array
 
+// Telemetry - Azure customer usage attribution
+// Reference:  https://docs.microsoft.com/azure/marketplace/azure-partner-customer-usage-attribution
+var telemetry = json(loadTextContent('../../../../azresources/Modules/Global/telemetry.json'))
+module telemetryCustomerUsageAttribution '../../../../azresources//Modules/Global/partnerUsageAttribution/customer-usage-attribution-management-group.bicep' = if (telemetry.customerUsageAttribution.enabled) {
+  name: 'pid-${telemetry.customerUsageAttribution.modules.policy}-location'
+}
+
 var scope = tenantResourceId('Microsoft.Management/managementGroups', parPolicyAssignmentManagementGroupId)
 
 resource resRgLocationAssignment 'Microsoft.Authorization/policyAssignments@2020-03-01' = {

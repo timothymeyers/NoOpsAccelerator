@@ -268,6 +268,7 @@ param sasTokenValidityLength string = 'PT8H'
 param osType string
 
 @description('Optional. Specifies whether password authentication should be disabled.')
+#disable-next-line secure-secrets-in-params
 param disablePasswordAuthentication bool = false
 
 @description('Optional. Indicates whether virtual machine agent should be provisioned on the virtual machine. When this property is not specified in the request body, default behavior is to set it to true. This will ensure that VM Agent is installed on the VM so that extensions can be added to the VM later.')
@@ -301,7 +302,7 @@ var publicKeysFormatted = [for publicKey in publicKeys: {
 }]
 
 var linuxConfiguration = {
-  disablePasswordAuthentication: disablePasswordAuthentication
+  disablePasswordAuthentication: !disablePasswordAuthentication
   ssh: {
     publicKeys: publicKeysFormatted
   }
@@ -411,7 +412,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2021-07-01' = {
       ultraSSDEnabled: ultraSSDEnabled
     }
     osProfile: {
-      computerName: vmComputerNameTransformed
+      computerName: take(vmComputerNameTransformed, 15)
       adminUsername: adminUsername
       adminPassword: adminPassword
       customData: !empty(customData) ? base64(customData) : null

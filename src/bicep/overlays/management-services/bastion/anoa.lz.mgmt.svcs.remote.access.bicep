@@ -90,9 +90,9 @@ param parLinuxVmImageVersion string = 'latest'
 @description('The administrator username for the Linux Virtual Machine to Azure Bastion remote into. It defaults to "azureuser".')
 param parLinuxVmAdminUsername string
 
-@description('[sshPublicKey/password] The authentication type for the Linux Virtual Machine to Azure Bastion remote into. It defaults to "password".')
+@description('Optional. Specifies whether password authentication should be disabled.')
 #disable-next-line secure-secrets-in-params
-param parDisableLinuxVmPasswordAuthentication bool
+param parDisableLinuxVmPasswordAuthentication bool = false
 
 @secure()
 @description('The administrator password or public SSH key for the Linux Virtual Machine to Azure Bastion remote into. See https://docs.microsoft.com/en-us/azure/virtual-machines/linux/faq#what-are-the-password-requirements-when-creating-a-vm- for password requirements.')
@@ -261,13 +261,7 @@ module modLinuxVirtualMachine '../../../azresources/Modules/Microsoft.Compute/vi
     disablePasswordAuthentication: parDisableLinuxVmPasswordAuthentication
     adminUsername: parLinuxVmAdminUsername    
     adminPassword: parLinuxVmAdminPasswordOrKey
-    publicKeys: !parDisableLinuxVmPasswordAuthentication ? [
-      {
-        path: '/home/${parLinuxVmAdminUsername}/.ssh/authorized_keys'
-        keyData: parLinuxVmAdminPasswordOrKey
-      }
-    ] : []
-
+ 
     diagnosticWorkspaceId: parLogAnalyticsWorkspaceId
     availabilitySetName: modAvSet.outputs.name
     encryptionAtHost: parEncryptionAtHost

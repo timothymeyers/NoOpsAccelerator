@@ -302,7 +302,7 @@ var publicKeysFormatted = [for publicKey in publicKeys: {
 }]
 
 var linuxConfiguration = {
-  disablePasswordAuthentication: !disablePasswordAuthentication
+  disablePasswordAuthentication: disablePasswordAuthentication
   ssh: {
     publicKeys: publicKeysFormatted
   }

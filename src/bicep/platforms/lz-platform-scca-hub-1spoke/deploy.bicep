@@ -583,6 +583,8 @@ module modSpokeOpsToHubVirtualNetworkPeerings '../../azresources/hub-spoke/peeri
   }
 }
 
+// POLICY ASSIGNMENTS
+
 // REMOTE ACCESS
 
 module modRemoteAccess '../../overlays/management-services/bastion/anoa.lz.mgmt.svcs.remote.access.bicep' = if (parRemoteAccess.enable) {

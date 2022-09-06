@@ -261,7 +261,7 @@ module modLinuxVirtualMachine '../../../azresources/Modules/Microsoft.Compute/vi
     disablePasswordAuthentication: parDisableLinuxVmPasswordAuthentication
     adminUsername: parLinuxVmAdminUsername    
     adminPassword: parLinuxVmAdminPasswordOrKey
- 
+
     diagnosticWorkspaceId: parLogAnalyticsWorkspaceId
     availabilitySetName: modAvSet.outputs.name
     encryptionAtHost: parEncryptionAtHost

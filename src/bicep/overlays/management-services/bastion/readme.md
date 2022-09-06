@@ -36,7 +36,7 @@ The docs on Virtual Machines: <https://docs.microsoft.com/en-us/azure/templates/
 
 ## Pre-requisites
 
-* A Mission LZ deployment (a deployment of anoa.mlz.bicep)
+* A Platform LZ deployment (a deployment of Hub/Spoke)
 
 The output from that deployment described below:
 

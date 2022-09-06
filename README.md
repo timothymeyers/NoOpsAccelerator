@@ -5,15 +5,12 @@
 * [What's New?](https://github.com/Azure/NoOpsAccelerator/wiki/Whats-new)
 * [Community Calls](https://github.com/Azure/NoOpsAccelerator/wiki/Community-Calls)
 * [Azure NoOps Accelerator - User Guide](https://github.com/Azure/NoOpsAccelerator/wiki#noops-accelerator-user-guide)
-* [NoOps Accelerator - Architecture](./docs/NoOpsAccelerator-Architecture.md)
 * [Telemetry Tracking Using Customer Usage Attribution (PID)](https://github.com/Azure/NoOpsAccelerator/wiki/Deploying-NoOps-Accelerator-CustomerUsage)
-* [Configure Azure permission for ARM Template deployments](./docs/NoOpsAccelerator-Setup-azure.md)
-* [Deploy Reference Implementation](./docs/NoOpsAccelerator-Deploy-reference-implentations.md)
-  * [Hub/Spoke with Web App Reference - Scope and Design](./docs/reference/Enclave-Hub-Spoke-WebApp/README.md)  
-* [Known Issues](./docs/NoOpsAccelerator-Known-Issues.md)
-* [How Do I Contribute?](./docs/NoOpsAccelerator-Contribution.md)
+* [Configure Azure permission for ARM Template deployments](https://github.com/Azure/NoOpsAccelerator/wiki/NoOpsAccelerator-Setup-azure)
+* [Known Issues](https://github.com/Azure/NoOpsAccelerator/wiki/NoOpsAccelerator-Known-Issues)
+* [How Do I Contribute?](https://github.com/Azure/NoOpsAccelerator/wiki/NoOpsAccelerator-Contribution)
 * [Frequently Asked Questions (FAQ)](https://github.com/Azure/NoOpsAccelerator/wiki/FAQ)
-* [Roadmap](./docs/NoOpsAccelerator-Roadmap.md)
+* [Roadmap](https://github.com/Azure/NoOpsAccelerator/wiki/NoOpsAccelerator-Roadmap)
 * [Microsoft Support Policy](./SUPPORT.md)
 
 NoOps Accelerator is an reference implementation to guide DOD/Public Sector customers on building self-service infrastucture in their Azure environment. The reference implementation is a flexible foundation that enables users to develop/maintain an opinionated self-service infrastructure. These templates are created to help organizations move to a continious deployment of self-healing infrastructure.
@@ -132,7 +129,11 @@ This is still a work in progress. We wanted to concentrate on the bicep modules 
 
 ## Telemetry
 
->NOTE: The NoOps Accelerator does not collect any telemetry at this time. We are looking to use this feature in the future. Project Bicep [collects telemetry in some scenarios](https://github.com/Azure/bicep/blob/main/README.md#telemetry) as part of improving the product.
+Microsoft can identify the deployments of the Azure Resource Manager and Bicep templates with the deployed Azure resources. Microsoft can correlate these resources used to support the deployments. Microsoft collects this information to provide the best experiences with their products and to operate their business.  The telemetry is collected through [customer usage attribution](https://docs.microsoft.com/azure/marketplace/azure-partner-customer-usage-attribution). The data is collected and governed by Microsoft's privacy policies, located at [https://www.microsoft.com/trustcenter](https://www.microsoft.com/trustcenter).
+
+If you don't wish to send usage data to Microsoft, you can set the `customerUsageAttribution.enabled` setting to `false` in `global/telemetry.json`.
+
+Project Bicep [collects telemetry in some scenarios](https://github.com/Azure/bicep/blob/main/README.md#telemetry) as part of improving the product.
 
 ## Product Roadmap
 
@@ -165,7 +166,6 @@ Please see the [Support and Feedback Guide](https://github.com/Azure/NoOpsAccele
 * [Common Azure Resource Modules Library](aka.ms/carml)
 * [Azure Landing Zones for Canadian Public Sector](https://github.com/azure/canadapubsecalz)
 * [Mission Landing Zone](https://github.com/Azure/missionlz)
-* [Enterprise Scale](https://github.com/Azure/Enterprise-Scale)
 
 ## Trademarks
 
@@ -179,4 +179,3 @@ Any use of third-party trademarks or logos are subject to those third-party's po
  [//]: # (************************)
 
 [mlz_architecture]:                            https://github.com/Azure/missionlz "MLZ Accelerator"
-[wiki_deployment_flow]:                        https://github.com/Azure/NoOpsStarter/wiki/DeploymentFlow "Wiki - Deployment Flow"

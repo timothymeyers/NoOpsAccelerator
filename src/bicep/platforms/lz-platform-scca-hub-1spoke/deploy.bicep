@@ -1,7 +1,7 @@
 /*
 SUMMARY: Module Example to deploy an AKS Platform Hub/Spoke Landing Zone
 DESCRIPTION: The following components will be options in this deployment
-              * Hub Virtual Network (VNet)
+            * Hub Virtual Network (VNet)
               * Operations Artifacts (Optional)
               * Bastion Host (Optional)
               * Microsoft Defender for Cloud (Optional)              
@@ -582,6 +582,8 @@ module modSpokeOpsToHubVirtualNetworkPeerings '../../azresources/hub-spoke/peeri
     parHubVirtualNetworkResourceId: modHubNetwork.outputs.virtualNetworkResourceId
   }
 }
+
+// POLICY ASSIGNMENTS
 
 // REMOTE ACCESS
 

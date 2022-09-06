@@ -12,14 +12,14 @@
     "parTags": {
       "value": {
         "organization": "anoa",
-        "region": "usgovvirginia",
+        "region": "eastus",
         "templateVersion": "v1.0",
         "deployEnvironment": "dev",
         "deploymentType": "NoOpsBicep"
       }
     },
     "parHubSubscriptionId": {
-      "value": "a3ad3fff-f3c5-46cf-ac18-d384307648f8"
+      "value": "896f5276-df9a-4317-a791-469396bef7fa"
     },
     "parHubVirtualNetworkAddressPrefix": {
       "value": "10.0.100.0/24"
@@ -28,7 +28,7 @@
       "value": "10.0.100.128/27"
     },    
     "parOperationsSubscriptionId": {
-      "value": "a3ad3fff-f3c5-46cf-ac18-d384307648f8"
+      "value": "896f5276-df9a-4317-a791-469396bef7fa"
     },
     "parOperationsVirtualNetworkAddressPrefix": {
       "value": "10.0.115.0/26"

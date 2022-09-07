@@ -280,6 +280,7 @@ module modLinuxVirtualMachine '../../../azresources/Modules/Microsoft.Compute/vi
           }
         ]
         nicSuffix: '-nic-01'
+        enableAcceleratedNetworking: false
       }
     ]
     osDisk: {

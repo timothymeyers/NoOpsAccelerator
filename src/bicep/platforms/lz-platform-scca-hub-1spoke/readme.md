@@ -31,7 +31,7 @@ Module Tested on:
 
 ## Overview
 
-This platform module deploys Hub/Spoke landing zone.
+This platform module deploys Hub 1 Spoke landing zone.
 
 > NOTE: This is only the landing zone. The workloads will be deployed with the enclave or can be deployed after the landing zone is created.
 
@@ -39,7 +39,7 @@ Read on to understand what this landing zone does, and when you're ready, collec
 
 ## Architecture
 
- ![Hub/Spoke landing zone Architecture](../../../bicep/)
+ ![Hub 1 Spoke landing zone Architecture](../../../bicep/)
 
 ## Pre-requisites
 

@@ -246,11 +246,6 @@ module modLinuxNetworkInterface '../../../azresources/Modules/Microsoft.Network/
   }
 }
 
-/* resource kv 'Microsoft.KeyVault/vaults@2019-09-01' existing = {
-  name: kvName
-  scope: resourceGroup(subscriptionId, kvResourceGroup )
-} */
-
 module modLinuxVirtualMachine '../../../azresources/Modules/Microsoft.Compute/virtualmachines/az.com.virtual.machine.bicep' = if (parEnableLinux) {
   name: 'deploy-ra-linux-vm-${parLocation}-${parDeploymentNameSuffix}'
   params: {
@@ -277,9 +272,9 @@ module modLinuxVirtualMachine '../../../azresources/Modules/Microsoft.Compute/vi
           {
             name: 'linux-ipconfig01'
             subnetResourceId: parHubSubnetResourceId
-          }
-        ]
-        nicSuffix: '-nic-01'
+          }          
+        ]        
+        nicSuffix: '-nic-01'        
       }
     ]
     osDisk: {

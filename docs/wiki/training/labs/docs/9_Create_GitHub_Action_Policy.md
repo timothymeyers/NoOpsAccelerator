@@ -1,5 +1,5 @@
 # NoOps Accelerator Labs
-## Module: NoOps - Lab - Create Management Groups Structure with NoOps
+## Module: NoOps - Lab - Create GitHub Action for NoOps Policy
 ### Lab Manual
 **Conditions and Terms of Use**  
 
@@ -23,8 +23,7 @@ Microsoft®, Internet Explorer®, and Windows® are either registered trademarks
 
 ## Contents
 [**Introduction**](#introduction)  
-[**Objectives**](#objectives)  
-[**Prerequisites**](#prerequisites)
+[**Prerequisites**](#prerequisites)  
 
 <div style="page-break-after: always;"></div>
 
@@ -32,51 +31,8 @@ Microsoft®, Internet Explorer®, and Windows® are either registered trademarks
 
 ## Introduction ##
 
-The Enclave Management Groups module deploys a management group hierarchy in a tenant under the Tenant Root Group. This is accomplished through a tenant-scoped Azure Resource Manager (ARM) deployment.
-
-In this lab, you will create a Enclave Management Groups structure and deploy it to your tenant.
-
-> NOTE: In later labs, you will build out a full Enclave deployment that you will use this module to deploy management groups.
-
-Module deploys the following resources:
-
-* Enclave Management Groups
-
-The hierarchy created by the deployment (`deploy.enclave.mg.parameters.json`) is:
-
-* Tenant Root Group
-  * Intermediate Level Management Group (defined by parameter in `parRootMg`)
-    * Platform
-      * Management
-      * Transport
-      * Identity
-    * Landing Zones
-      * Workloads
-        * Internal
-          * NonProd
-          * Prod
-    * Sandbox
-
-<a name="Objectives"></a>
-### Objectives ###
-
-Upon completion of this lab, you will be able to:
-
-- Understand the benefits of authoring templates in the Bicep language over JSON-based ARM Templates
-- Understand the basic principles of Infrastructure-as-Code
-- Understand the relationship between Bicep and the Azure Resource Manager
-- Add relevant resources to Bicep templates
-
 <a name="Prerequisites"></a>
 ### Prerequisites ###
-
-Familiarity with the following will be beneficial, but is not required:
-
-- Managment Groups concepts
-- A basic understanding of JSON
-- Familiarity with the Azure CLI
-
-Installation required:
 
 - [Visual Studio Code](https://code.visualstudio.com/) with the [Bicep](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csharp) extension installed.
 
@@ -88,20 +44,3 @@ Installation required:
 60 minutes
 
 <div style="page-break-after: always;"></div>
-
-<a name="Exercise1"></a>
-## Exercise 1: Cloning the NoOps repository ##
-
-<a name="Ex1Task1"></a>
-### Task 1: Cloning NoOps repository ###
-
-1. If you caready cloned the repo, then you can skip to Exercise
-2. To clone the repo, please look at lab: [Create Lab Environment](3_Create_Lab_Environment.md).
-
-<a name="Ex1Task2"></a>
-### Task 2: Create a Dev Branch ###
-
-1. 
-
-<a name="Exercise2"></a>
-## Exercise 2: Creating Management Groups ##

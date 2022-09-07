@@ -180,7 +180,6 @@ var opsddosName = replace(varDdosNamingConvention, varNameToken, varOperationsNa
 module modTags '../../../Modules/Microsoft.Resources/tags/az.resources.tags.bicep' = {
   name: 'deploy-${varOperationsShortName}-tags-${parLocation}-${parDeploymentNameSuffix}'
   params: {
-    onlyUpdate: true
     tags: parTags
   }
 }

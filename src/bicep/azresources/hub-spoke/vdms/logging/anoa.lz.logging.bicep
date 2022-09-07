@@ -270,7 +270,7 @@ module modLogAnalyticsWorkspace '../../../Modules/Microsoft.OperationalInsights/
 // LOG ANALYTICS WORKSPACE SOLUTIONS
 
 module modLogAnalyticsWorkspaceSolutions '../../../Modules/Microsoft.OperationsManagement/solutions/az.operational.insights.solutions.bicep' = [for solution in varSolutions: if (solution.deploy) {
-  name: 'deploy-laws-${solution.name}-${parLocation}-${parDeploymentNameSuffix}'
+  name: 'deploy-laws-${solution.name}-${parDeploymentNameSuffix}'
   scope: resourceGroup(varLoggingResourceGroupName)
   params: {
     location: parLocation

@@ -13,8 +13,13 @@ targetScope = 'managementGroup'
 param policySource string = 'ANOA'
 param policyCategory string = 'Network'
 
+@description('Management Group scope for the policy definition.')
+param policyDefinitionManagementGroupId string
+
 // VARAIBLES
-var builtinPolicies_network = json(loadTextContent('../../../policy_id_library/network.json'))
+var builtinPolicies_network = json(loadTextContent('../../../builtin/definitions/network.json'))
+
+var customPolicyDefinitionMgScope = tenantResourceId('Microsoft.Management/managementGroups', policyDefinitionManagementGroupId)
 
 resource computePolicySet 'Microsoft.Authorization/policySetDefinitions@2020-03-01' = {
   name: 'custom-keyVault'
@@ -48,7 +53,23 @@ resource computePolicySet 'Microsoft.Authorization/policySetDefinitions@2020-03-
         policyDefinitionId: builtinPolicies_network.NetworkWatcherShouldBeEnabled
         policyDefinitionReferenceId: toLower(replace('Network Watcher Should Be Enabled', ' ', '-'))
         parameters: {}
-      }      
+      }   
+      {
+        groupNames: [
+          'Network'
+        ]
+        policyDefinitionId: builtinPolicies_network.NetworkInterfacesShouldNotHavePublicIps
+        policyDefinitionReferenceId: toLower(replace('Network interfaces should not have public IPs', ' ', '-'))
+        parameters: {}
+      } 
+      {
+        groupNames: [
+          'Network'
+        ]
+        policyDefinitionId: extensionResourceId(customPolicyDefinitionMgScope, 'Microsoft.Authorization/policyDefinitions', 'Network-Audit-Missing-UDR')
+        policyDefinitionReferenceId: toLower(replace('Audit for missing UDR on subnets', ' ', '-'))
+        parameters: {}
+      }     
     ]
   }
 }

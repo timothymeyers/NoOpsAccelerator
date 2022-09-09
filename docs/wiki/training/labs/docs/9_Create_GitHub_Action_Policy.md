@@ -1,5 +1,5 @@
 # NoOps Accelerator Labs
-## Module: NoOps - Lab - Create GitHub Action for NoOps Policy
+## Module: NoOps - Lab - Create GitHub Action for NoOps Policy as Code
 ### Lab Manual
 **Conditions and Terms of Use**  
 

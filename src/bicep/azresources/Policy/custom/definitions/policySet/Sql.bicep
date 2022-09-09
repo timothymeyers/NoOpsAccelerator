@@ -14,7 +14,7 @@ param policySource string = 'ANOA'
 param policyCategory string = 'SQL'
 
 // VARAIBLES
-var builtinPolicies_sql = json(loadTextContent('../../../policy_id_library/sql.json'))
+var builtinPolicies_sql = json(loadTextContent('../../../builtin/definitions/sql.json'))
 
 resource computePolicySet 'Microsoft.Authorization/policySetDefinitions@2020-03-01' = {
   name: 'custom-keyVault'
@@ -45,8 +45,8 @@ resource computePolicySet 'Microsoft.Authorization/policySetDefinitions@2020-03-
         groupNames: [
           'SQL'
         ]
-        policyDefinitionId: builtinPolicies_sql.
-        policyDefinitionReferenceId: toLower(replace('All Network Ports Should Be Restricted On Network Security Groups Associated To Your Virtual Machine', ' ', '-'))
+        policyDefinitionId: builtinPolicies_sql.SQL_DeployAdvancedDataSecurityOnSQLServers
+        policyDefinitionReferenceId: toLower(replace('Deploy Advanced Data Security on SQL servers', ' ', '-'))
         parameters: {}
       }      
     ]

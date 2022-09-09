@@ -272,16 +272,10 @@ module modLinuxVirtualMachine '../../../azresources/Modules/Microsoft.Compute/vi
           {
             name: 'linux-ipconfig01'
             subnetResourceId: parHubSubnetResourceId
-<<<<<<< HEAD
-          }          
-        ]        
-        nicSuffix: '-nic-01'        
-=======
           }
         ]
         nicSuffix: '-nic-01'
         enableAcceleratedNetworking: false
->>>>>>> 3bbc4a51424ee5822ac3322dd2d64a926e6abdf2
       }
     ]
     osDisk: {

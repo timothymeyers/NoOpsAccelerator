@@ -105,8 +105,11 @@ param aadProfileAdminGroupObjectIDs array = []
 @description('Optional. Specifies whether to enable managed AAD integration.')
 param aadProfileManaged bool = true
 
+@description('Optional. Whether to enable Kubernetes Role-Based Access Control.')
+param enableRBAC bool = true
+
 @description('Optional. Specifies whether to enable Azure RBAC for Kubernetes authorization.')
-param aadProfileEnableAzureRBAC bool = true
+param aadProfileEnableAzureRBAC bool = enableRBAC
 
 @description('Optional. If set to true, getting static credentials will be disabled for this cluster. This must only be used on Managed Clusters that are AAD enabled.')
 param disableLocalAccounts bool = false
@@ -427,7 +430,7 @@ resource managedCluster 'Microsoft.ContainerService/managedClusters@2022-04-02-p
     oidcIssuerProfile: enableOidcIssuerProfile ? {
       enabled: enableOidcIssuerProfile
     } : null
-    enableRBAC: aadProfileEnableAzureRBAC
+    enableRBAC: enableRBAC
     disableLocalAccounts: disableLocalAccounts
     nodeResourceGroup: nodeResourceGroup
     enablePodSecurityPolicy: enablePodSecurityPolicy

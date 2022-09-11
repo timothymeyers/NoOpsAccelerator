@@ -78,20 +78,8 @@ param parLogAnalyticsWorkspaceName string
 @description('The name of the workload. Default: workload')
 param parWorkloadName string = 'workload'
 
-@description('Optional. Version of Kubernetes specified when creating the managed cluster.')
-param parAksClusterKubernetesVersion string = ''
-
-@description('Specifies the CIDR notation IP range assigned to the Docker bridge network. It must not overlap with any Subnet IP ranges or the Kubernetes service address range.')
-param parAksClusterDockerBridgeCidr string = '172.17.0.1/16'
-
-@description('Specifies the sku of the load balancer used by the virtual machine scale sets used by nodepools.')
-param parAksClusterLoadBalancerSku string = 'standard'
-
-@description('Specifies whether to create the cluster as a private cluster or not.')
-param parEnablePrivateCluster bool = false
-
-@description('Whether to enable Azure Defender.')
-param parEnableAzureDefender bool = false
+@description('Parmaters Object of Azure Kubernetes specified when creating the managed cluster.')
+param parAzureKubernetes object
 
 // === VARIABLES ===
 /*
@@ -124,7 +112,7 @@ var referential = {
 
 @description('Resource group tags')
 module modTags '../../azresources/Modules/Microsoft.Resources/tags/az.resources.tags.bicep' = {
-  name: 'Web-App-Resource-Tags-${parDeploymentNameSuffix}'
+  name: 'AKS-Resource-Tags-${parDeploymentNameSuffix}'
   params: {
     tags: union(parTags, referential)
   }
@@ -135,6 +123,8 @@ module modTier3 '../../azresources/hub-spoke/tier3/anoa.lz.workload.network.bice
   name: 'deploy-wl-vnet-${parLocation}-${parDeploymentNameSuffix}'
   params: {
     //Required Parameters
+    parWorkloadName: parWorkloadName
+    parWorkloadShortName: parWorkloadName
     parDeployEnvironment: parDeployEnvironment
     parLocation: parLocation
     parTags: modTags.outputs.tags
@@ -144,11 +134,11 @@ module modTier3 '../../azresources/hub-spoke/tier3/anoa.lz.workload.network.bice
     parHubVirtualNetworkResourceId: parHubVirtualNetworkResourceId
     parHubVirtualNetworkName: parHubVirtualNetworkName
     parHubResourceGroupName: parHubResourceGroupName
-     
+
     //WorkLoad Parameters
     parWorkloadSubscriptionId: parWorkloadSubscriptionId
     parWorkloadVirtualNetworkAddressPrefix: parWorkloadVirtualNetworkAddressPrefix
-    parWorkloadSubnetAddressPrefix: parWorkloadSubnetAddressPrefix 
+    parWorkloadSubnetAddressPrefix: parWorkloadSubnetAddressPrefix
 
     //Firewall Parameters
     parFirewallPrivateIPAddress: parFirewallPrivateIPAddress
@@ -161,31 +151,19 @@ module modTier3 '../../azresources/hub-spoke/tier3/anoa.lz.workload.network.bice
     parStorageAccountAccess: {
 
     }
-
+ 
   }
 }
 
 //=== End Workload Tier 3 Buildout === 
 
-//=== Azure Kubernetes Service Buildout === 
+//=== Azure Kubernetes Service Workload Buildout === 
 
-module modAksRg '../../azresources/Modules/Microsoft.Resources/resourceGroups/az.resource.groups.bicep' = {
-  name: 'deploy-aks-rg-${parLocation}-${parDeploymentNameSuffix}'
-  scope: subscription(parWorkloadSubscriptionId)
-  params: {
-    // Required parameters
-    name: varAKSResourceGroupName
-    location: parLocation
-    tags: modTags.outputs.tags
-  }
-  dependsOn:[ 
-    modTier3
-  ]
-}
+
 
 module modAcrDeploy '../../azresources/Modules/Microsoft.ContainerRegistry/registries/az.container.registry.bicep' = {
   name: 'deploy-aks-acr-${parLocation}-${parDeploymentNameSuffix}'
-  scope: resourceGroup(parWorkloadSubscriptionId, modAksRg.name)
+  scope: resourceGroup(parWorkloadSubscriptionId, modTier3.)
   params: {
     // Required parameters
     name: varACRName
@@ -204,8 +182,8 @@ module modAcrDeploy '../../azresources/Modules/Microsoft.ContainerRegistry/regis
       }
     ]
   }
-  dependsOn:[ 
-    modAksRg
+  dependsOn: [
+    modTier3
   ]
 }
 
@@ -218,20 +196,8 @@ module modPrivateDNS '../../azresources/Modules/Microsoft.Network/privateDnsZone
     location: parLocation
     tags: modTags.outputs.tags
   }
-  dependsOn:[
-    modAksRg
-  ]
-}
-
-module aksIdentity '../../azresources/Modules/Microsoft.ManagedIdentity/userAssignedIdentities/az.managed.identity.user.assigned.bicep' = {
-  scope: resourceGroup(parWorkloadSubscriptionId, modAksRg.name)
-  name: 'aksIdentity'
-  params: {
-     name: 'baseName'
-     location: parLocation
-  }
-  dependsOn:[ 
-    modAksRg
+  dependsOn: [
+    modTier3
   ]
 }
 
@@ -242,79 +208,86 @@ module modDeployAzureKS '../../azresources/Modules/Microsoft.ContainerService/ma
     // Required parameters
     location: parLocation
     name: varAKSName
-    userAssignedIdentities: {
-      '${aksIdentity.outputs.resourceId}' : {}
-    }  
-
-    // Non-Required parameters
-    aksClusterKubernetesVersion: parAksClusterKubernetesVersion
-    nodeResourceGroup: '${varAKSName}-aksInfraRG'
-    aksClusterDnsPrefix: '${varAKSName}aksInfra'
 
     //agentPoolProfiles
     primaryAgentPoolProfile: [
       {
+        availabilityZones: parAzureKubernetes.primaryAgentPoolProfile.availabilityZones
+        count: parAzureKubernetes.primaryAgentPoolProfile.count
+        enableAutoScaling: parAzureKubernetes.primaryAgentPoolProfile.enableAutoScaling
+        maxCount: parAzureKubernetes.primaryAgentPoolProfile.maxCount
+        maxPods: parAzureKubernetes.primaryAgentPoolProfile.maxPods
+        minCount: parAzureKubernetes.primaryAgentPoolProfile.minCount
+        mode: parAzureKubernetes.primaryAgentPoolProfile.mode
+        name: parAzureKubernetes.primaryAgentPoolProfile.name
+        osDiskSizeGB: parAzureKubernetes.primaryAgentPoolProfile.osDiskSizeGB
+        osType: parAzureKubernetes.primaryAgentPoolProfile.osType
+        storageProfile: parAzureKubernetes.primaryAgentPoolProfile.storageProfile
+        type: parAzureKubernetes.primaryAgentPoolProfile.type
+        vmSize: parAzureKubernetes.primaryAgentPoolProfile.vmSize
+        vnetSubnetID: modTier3.outputs.subnetResourceIds[0]
+      }
+    ]
+    // Non-required parameters
+    agentPools: [
+      {
         availabilityZones: [
           '1'
         ]
-        count: 1
+        count: 2
         enableAutoScaling: true
         maxCount: 3
         maxPods: 30
         minCount: 1
-        mode: 'System'
-        name: 'systempool'
-        osDiskSizeGB: 0
-        osType: 'Linux'       
+        minPods: 2
+        mode: 'User'
+        name: 'userpool1'
+        nodeLabels: {}
+        nodeTaints: [
+          'CriticalAddonsOnly=true:NoSchedule'
+        ]
+        osDiskSizeGB: 128
+        osType: 'Linux'
+        scaleSetEvictionPolicy: 'Delete'
+        scaleSetPriority: 'Regular'
         storageProfile: 'ManagedDisks'
         type: 'VirtualMachineScaleSets'
         vmSize: 'Standard_DS2_v2'
-        vnetSubnetID: modTier3.outputs.subnetResourceIds[0]
+        vnetSubnetID: '/subscriptions/<<subscriptionId>>/resourceGroups/validation-rg/providers/Microsoft.Network/virtualNetworks/adp-<<namePrefix>>-az-vnet-x-aks/subnets/Secondary'
       }
-    ]  
-  
-    //NetworkProfile
-    aksClusterLoadBalancerSku: parAksClusterLoadBalancerSku
-    aksClusterNetworkPlugin: 'azure'
-    aksClusterOutboundType: 'userDefinedRouting'
-    aksClusterDockerBridgeCidr: parAksClusterDockerBridgeCidr
-    aksClusterDnsServiceIP: '10.2.0.10'
-    aksClusterServiceCidr: '10.2.0.0/24'
-    aksClusterNetworkPolicy: 'azure'
-  
-    //ApiServerAccessProfile
-    enablePrivateCluster: parEnablePrivateCluster
-    usePrivateDNSZone: true
-    enablePrivateClusterPublicFQDN: true
-
-    //AadProfile
-    aadProfileEnableAzureRBAC: true  
-    aadProfileManaged: true
-    aadProfileAdminGroupObjectIDs: [
-      
     ]
-    aadProfileTenantId: ''
-    systemAssignedIdentity: true
+    aksClusterNetworkPlugin: 'azure'
+
+    //ApiServerAccessProfile
+    enablePrivateCluster: parAzureKubernetes.apiServerAccessProfile.enablePrivateCluster
 
     //AddonProfiles
     omsAgentEnabled: true 
     monitoringWorkspaceId: parLogAnalyticsWorkspaceName
 
-    //Azure policy
-    azurePolicyEnabled: true
-
     // Logging
     enableAzureDefender: parEnableAzureDefender         
     diagnosticLogsRetentionInDays: 7
     diagnosticStorageAccountId: modTier3.outputs.workloadLogStorageAccountResourceId
-    diagnosticWorkspaceId: parLogAnalyticsWorkspaceName       
+    diagnosticWorkspaceId: parLogAnalyticsWorkspaceName     
+    
+    lock: 'CanNotDelete'
+    roleAssignments: [
+      {
+        principalIds: [
+          '<<deploymentSpId>>'
+        ]
+        roleDefinitionIdOrName: 'Reader'
+      }
+    ]
+    systemAssignedIdentity: true  
   }
-  dependsOn:[ 
-    modAksRg
+  dependsOn: [
+    modTier3
   ]
 }
 
-//=== End Azure Kubernetes Service Buildout === 
+//=== End Azure Kubernetes Service Workload Buildout === 
 
 output azureKubernetesName string = varAKSName
 output azureKubernetesResourceId string = modDeployAzureKS.outputs.resourceId

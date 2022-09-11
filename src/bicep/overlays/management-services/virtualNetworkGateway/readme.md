@@ -31,7 +31,7 @@ Some particulars about Virtual Network Gateway:
 * A Hub/Spoke LZ deployment (a deployment of anoa.hubspoke.bicep)
 * A AKS Hub/Spoke LZ deployment (a deployment of anoa.hubspoke.aks.bicep)
 
-The output from that deployment described below:
+See below for information on how to use the appropriate deployment parameters for use with this overlay:
 
 Deployment Output Name | Description
 -----------------------| -----------

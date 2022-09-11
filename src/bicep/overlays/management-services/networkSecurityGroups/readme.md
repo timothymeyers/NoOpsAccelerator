@@ -26,7 +26,7 @@ The docs on Microsoft Service Health Alerts: <https://docs.microsoft.com/en-us/a
 
 * A Platforms (Landing Zones) deployment (a deployment of anoa.hubspoke.bicep)
 
-The output from that deployment described below:
+See below for information on how to use the appropriate deployment parameters for use with this overlay:
 
 Deployment Output Name | Description
 -----------------------| -----------

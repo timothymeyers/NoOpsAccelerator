@@ -172,11 +172,11 @@ var upgradeSettings = {
   maxSurge: maxSurge
 }
 
-resource managedCluster 'Microsoft.ContainerService/managedClusters@2021-08-01' existing = {
+resource managedCluster 'Microsoft.ContainerService/managedClusters@2022-06-01' existing = {
   name: managedClusterName
 }
 
-resource agentPool 'Microsoft.ContainerService/managedClusters/agentPools@2021-08-01' = {
+resource agentPool 'Microsoft.ContainerService/managedClusters/agentPools@2022-06-01' = {
   name: name
   parent: managedCluster
   properties: {

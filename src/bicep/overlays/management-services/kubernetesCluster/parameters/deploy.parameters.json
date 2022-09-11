@@ -1,0 +1,60 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "parRequired": {
+      "value": {
+        "orgPrefix": "anoa",
+        "templateVersion": "v1.0",
+        "deployEnvironment": "appsvcsplan"
+      }
+    },
+    "parTags": {
+      "value": {
+        "organization": "anoa",
+        "templateVersion": "v1.0",
+        "deployEnvironment": "appsvcsplan",
+        "deploymentType": "NoOpsBicep"
+      }
+    },
+    "parTargetSubscriptionId": {
+      "value": "<<subscriptionId>>"
+    },
+    "parTargetResourceGroup": {
+      "value": "<<example-rg>>"
+    },
+    "parKubernetesCluster": {
+      "value": {
+        "name": "<<namePrefix>>-az-aks-azure-001",
+        "primaryAgentPoolProfile": [
+          {
+            "name": "poolname",
+            "vmSize": "Standard_DS3_v2",
+            "osDiskSizeGB": 128,
+            "count": 2,
+            "osType": "Linux",
+            "maxCount": 5,
+            "minCount": 1,
+            "enableAutoScaling": true,
+            "scaleSetPriority": "Regular",
+            "scaleSetEvictionPolicy": "Delete",
+            "nodeLabels": {},
+            "nodeTaints": [
+              "CriticalAddonsOnly=true:NoSchedule"
+            ],
+            "type": "VirtualMachineScaleSets",
+            "availabilityZones": [
+                "1",
+                "2",
+                "3"
+            ],
+            "maxPods": 30,
+            "storageProfile": "ManagedDisks",
+            "mode": "System",
+            "vnetSubnetID": "/subscriptions/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX/resourceGroups/myRg/providers/Microsoft.Network/virtualNetworks/myVnet/subnets/mySubnet"
+          }
+        ]
+      }
+    }
+  }
+}

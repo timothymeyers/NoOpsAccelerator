@@ -1,4 +1,4 @@
-# Module:   NoOps Accelerator - Microsoft Service Health Alerts
+# Module:   NoOps Accelerator - App Service Plan
 
 ## Authored & Tested With
 
@@ -16,41 +16,55 @@
 
 ## Overview
 
-This add-on module adds
+This overlay module deploys an App Service Plan (AKA: Web Server Cluster) to support simple web accessible linux docker containers.  It also optionally supports the use of dynamic (up and down) scale settings based on CPU percentage up to a max of 10 compute instances.
 
-## Deploy Microsoft Service Health Alerts
+Read on to understand what this overlay does, and when you're ready, collect all of the pre-requisites, then deploy the overlay
 
-The docs on Microsoft Service Health Alerts: <https://docs.microsoft.com/en-us/azure/service-health/overview>
+## Deploy App Service Plan
 
-[Service health notifications](https://docs.microsoft.com/azure/service-health/service-health-notifications-properties) are published by Azure, and contain information about the resources under your subscription.  Service health notifications can be informational or actionable, depending on the category.
+The docs on Azure App Service Plans: <https://docs.microsoft.com/en-us/azure/app-service/overview-hosting-plans>. By default, this overlay will deploy resources into standard default hub/spoke subscriptions and resource groups.  
 
-Our examples configure service health alerts for `Security` and `Incident`. However, these categories can be customized based on your need. Please review the possible options in [Azure Docs](https://docs.microsoft.com/azure/service-health/service-health-notifications-properties#details-on-service-health-level-information).
+The subscription and resource group can be changed by providing the resource group name (Param: parTargetSubscriptionId/parTargetResourceGroup) and ensuring that the Azure context is set the proper subscription.  
 
 ## Pre-requisites
 
-* A Mission LZ deployment (a deployment of mlz.bicep)
+* A hub/spoke LZ deployment (a deployment of [deploy.bicep](../../../../bicep/platforms/lz-platform-scca-hub-3spoke/deploy.bicep))
 
 See below for information on how to use the appropriate deployment parameters for use with this overlay:
 
 Deployment Output Name | Description
 -----------------------| -----------
-parTargetResourceGroupName | The resource group that contains the Hub Virtual Network and deploy the virtual machines into
+parAppServicePlanName | The name of the App Service Plan.  If not specified, the name will default to the Hub/Spoke default naming pattern.  
+parTargetResourceGroupName | The name of the resource group where the App Service Plan will be deployed.   If not specified, the resource group name will default to the shared services resource group name and subscription.
 
-## Deploy the Service
+## Deploy the Overlay
 
-Once you have the Mission LZ output values, you can pass those in as parameters to this deployment.
+Connect to the appropriate Azure Environment and set appropriate context, see getting started with Azure PowerShell or Azure CLI for help if needed. The commands below assume you are deploying in Azure Commercial and show the entire process from deploying Platform Hub/Spoke Design and then adding an Azure App Service Plan post-deployment.
 
-For example, deploying using the `az deployment group create` command in the Azure CLI:
+Once you have the hub/spoke output values, you can pass those in as parameters to this deployment.
+
+For example, deploying using the `az deployment sub create` command in the Azure CLI:
 
 ### Azure CLI
 
 ```bash
 # For Azure global regions
-az deployment group create \
-   --template-file overlays/management-groups/anoa.lz.mgmt.svcs.service.health.bicep \
-   --parameters @overlays/management-groups/anoa.lz.mgmt.svcs.service.health.parameters.example.json \
+az login
+cd src/bicep
+cd platforms/lz-platform-scca-hub-3spoke
+az deployment sub create \ 
+--name contoso \
+--subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx \
+--template-file deploy.bicep \
+--location eastus \
+--parameters @parameters/deploy.parameters.json
+cd overlays
+cd app-service-plan
+az deployment sub create \
+   --name deployAppServicePlan
+   --template-file overlays/management-groups/deploy.bicep \
+   --parameters @overlays/management-groups/deploy.parameters.json \
    --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx \
-   --resource-group anoa-eastus-platforms-hub-rg \
    --location 'eastus'
 ```
 
@@ -91,6 +105,10 @@ New-AzGroupDeployment `
   -ResourceGroup anoa-usgovvirginia-platforms-hub-rg `
   -Location  'usgovvirginia'
 ```
+
+## Extending the Overlay
+
+By default, this overlay has the minium parmeters needed to deploy the service. If you like to add addtional parmeters to the service, please refer to the module description located in AzResources here: [App Service Plans `[Microsoft.Web/serverfarms]`](D:\source\repos\NoOpsAccelerator\src\bicep\azresources\Modules\Microsoft.Web\serverfarms\readme.md)
 
 ## Air-Gapped Clouds
 

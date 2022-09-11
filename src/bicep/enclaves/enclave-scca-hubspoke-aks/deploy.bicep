@@ -555,8 +555,13 @@ var referential = {
 
 @description('Resource group tags')
 module modTags '../../azresources/Modules/Microsoft.Resources/tags/az.resources.tags.bicep' = {
+<<<<<<< HEAD
   name: 'deploy-hubspoke-tags--${parLocation}-${parDeploymentNameSuffix}'
   scope: subscription(parHub.subscriptionId)
+=======
+  name: 'deploy-hubspoke-tags-${parLocation}-${parDeploymentNameSuffix}'
+  scope: subscription(parHubSubscriptionId)
+>>>>>>> c2f51711f707d73843eac6a55a799848aad8b662
   params: {
     tags: union(parTags, referential)
   }

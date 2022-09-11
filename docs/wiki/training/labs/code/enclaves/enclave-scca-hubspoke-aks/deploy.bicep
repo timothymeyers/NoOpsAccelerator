@@ -1,35 +1,42 @@
-/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 /*
-SUMMARY: Module Example to deploy an SCCA Compliant Platform Hub/Spoke Landing Zone
+SUMMARY: Module Example to deploy the Full Hub/ 3 Spoke Enclave with AKS Workload
 DESCRIPTION: The following components will be options in this deployment
-              * Hub Virtual Network (VNet)
-              * Virual Network Gateway (Optional)
+            * Managment Groups
+            * Policy
+            * Roles
+            * Hub Virtual Network (VNet)              
               * Operations Artifacts (Optional)
               * Bastion Host (Optional)
               * DDos Standard Plan (Optional)
-              * Microsoft Defender for Cloud (Optional)
-              * Automation Account (Optional)
+              * Microsoft Defender for Cloud (Optional)              
             * Spokes
               * Identity (Tier 0)
               * Operations (Tier 1)
               * Shared Services (Tier 2)
             * Logging
               * Azure Sentinel
-              * Azure Log Analytics
+              * Azure Log Analytics            
             * Azure Firewall
-            * Private DNS Zones - Details of all the Azure Private DNS zones can be found here --> [https://docs.microsoft.com/en-us/azure/private-link/private-endpoint-dns#azure-services-dns-zone-configuration](https://docs.microsoft.com/en-us/azure/private-link/private-endpoint-dns#azure-services-dns-zone-configuration)  
+            * Private DNS Zones - Details of all the Azure Private DNS zones can be found here --> [https://docs.microsoft.com/en-us/azure/private-link/private-endpoint-dns#azure-services-dns-zone-configuration](https://docs.microsoft.com/en-us/azure/private-link/private-endpoint-dns#azure-services-dns-zone-configuration) 
+            * Workload: (Tier 3) - Azure Kubernetes Service
 AUTHOR/S: jspinella
 VERSION: 1.x.x
+*/
+
+/*
+Copyright (c) Microsoft Corporation.
+Licensed under the MIT License.
 */
 
 /*
   PARAMETERS
   Here are all the parameters a user can override.
   These are the required parameters that Network does not provide a default for:    
-    - parRequired.deployEnvironment
+    - parDeployEnvironment
 */
 
-targetScope = 'subscription' //Deploying at Subscription scope to allow resource groups to be created and resources in one deployment
+// **Scope**
+targetScope = 'tenant'
 
 // REQUIRED PARAMETERS
 // Example (JSON)
@@ -65,16 +72,16 @@ param parLocation string = deployment().location
 // SUBSCRIPTIONS PARAMETERS
 
 @description('The subscription ID for the Hub Network and resources. It defaults to the deployment subscription.')
-param parHubSubscriptionId string = subscription().subscriptionId
+param parHubSubscriptionId string
 
 @description('The subscription ID for the Identity Network and resources. It defaults to the deployment subscription.')
-param parIdentitySubscriptionId string = subscription().subscriptionId
+param parIdentitySubscriptionId string
 
 @description('The subscription ID for the Operations Network and resources. It defaults to the deployment subscription.')
-param parOperationsSubscriptionId string = subscription().subscriptionId
+param parOperationsSubscriptionId string
 
 @description('The subscription ID for the Shared Services Network and resources. It defaults to the deployment subscription.')
-param parSharedServicesSubscriptionId string = subscription().subscriptionId
+param parSharedServicesSubscriptionId string
 
 // OPERATIONS NETWORK ARTIFACTS
 // Example (JSON)
@@ -187,7 +194,7 @@ param parFirewallDiagnosticsLogs array = [
 
 @description('An array of Firewall Diagnostic Metrics categories to collect. See "https://docs.microsoft.com/en-us/azure/firewall/firewall-diagnostics#enable-diagnostic-logging-through-the-azure-portal" for valid values.')
 param parFirewallDiagnosticsMetrics array = [
-  'AllMetrics'   
+  'AllMetrics'
 ]
 
 @description('Subnet name for the Firewall Default is "AzureFirewallSubnet"')
@@ -210,21 +217,27 @@ param parFirewallManagementPublicIPAddressAvailabilityZones array = []
 
 @description('An array of Public IP Address Diagnostic Logs for the Azure Firewall. See https://docs.microsoft.com/en-us/azure/ddos-protection/diagnostic-logging?tabs=DDoSProtectionNotifications#configure-ddos-diagnostic-logs for valid settings.')
 param parPublicIPAddressDiagnosticsLogs array = [
-  'DDoSProtectionNotifications'
-  'DDoSMitigationFlowLogs'
-  'DDoSMitigationReports'
+  {
+    category: 'DDoSProtectionNotifications'
+    enabled: true
+  }
+  {
+    category: 'DDoSMitigationFlowLogs'
+    enabled: true
+  }
+  {
+    category: 'DDoSMitigationReports'
+    enabled: true
+  }
 ]
 
 @description('An array of Public IP Address Diagnostic Metrics for the Azure Firewall. See https://docs.microsoft.com/en-us/azure/ddos-protection/diagnostic-logging?tabs=DDoSProtectionNotifications for valid settings.')
 param parPublicIPAddressDiagnosticsMetrics array = [
-  'AllMetrics'
+  {
+    category: 'AllMetrics'
+    enabled: true
+  }
 ]
-
-@description('Application Rule Collection')
-param parApplicationRuleCollections array = []
-
-@description('Network Rule Collection')
-param parNetworkRuleCollections array = []
 
 // HUB NETWORK PARAMETERS
 
@@ -239,8 +252,14 @@ param parHubNetworkSecurityGroupRules array = []
 
 @description('An array of Network Security Group diagnostic logs to apply to the Hub Virtual Network. See https://docs.microsoft.com/en-us/azure/virtual-network/virtual-network-nsg-manage-log#log-categories for valid settings.')
 param parHubNetworkSecurityGroupDiagnosticsLogs array = [
-  'NetworkSecurityGroupEvent'
-  'NetworkSecurityGroupRuleCounter'
+  {
+    category: 'NetworkSecurityGroupEvent'
+    enabled: true
+  }
+  {
+    category: 'NetworkSecurityGroupRuleCounter'
+    enabled: true
+  }
 ]
 
 @description('An array of Service Endpoints to enable for the Hub subnet. See https://docs.microsoft.com/en-us/azure/virtual-network/virtual-network-service-endpoints-overview for valid settings.')
@@ -283,7 +302,10 @@ param parIdentityNetworkSecurityGroupRules array = [
 ]
 
 @description('An array of')
-param parIdentitySourceAddressPrefixes array = []
+param parIdentitySourceAddressPrefixes array = [
+  parOperationsVirtualNetworkAddressPrefix
+  parSharedServicesVirtualNetworkAddressPrefix
+]
 
 @description('An array of Network Security Group diagnostic logs to apply to the Identity Virtual Network. See https://docs.microsoft.com/en-us/azure/virtual-network/virtual-network-nsg-manage-log#log-categories for valid settings.')
 param parIdentityNetworkSecurityGroupDiagnosticsLogs array = [
@@ -293,9 +315,7 @@ param parIdentityNetworkSecurityGroupDiagnosticsLogs array = [
 
 @description('An array of Service Endpoints to enable for the Identity subnet. See https://docs.microsoft.com/en-us/azure/virtual-network/virtual-network-service-endpoints-overview for valid settings.')
 param parIdentitySubnetServiceEndpoints array = [
-  {
-    service: 'Microsoft.Storage'
-  }
+  'Microsoft.Storage'
 ]
 
 // OPERATIONS NETWORK PARAMETERS
@@ -323,20 +343,26 @@ param parOperationsNetworkSecurityGroupRules array = [
       direction: 'Inbound'
       priority: 200
       protocol: '*'
-      sourceAddressPrefixes: parOperationsSourceAddressPrefixes
+      sourceAddressPrefixes: [
+        parIdentityVirtualNetworkAddressPrefix
+        parSharedServicesVirtualNetworkAddressPrefix
+      ]
       sourcePortRange: '*'
     }
     type: 'string'
   }
 ]
 
-@description('An array of')
-param parOperationsSourceAddressPrefixes array = []
-
 @description('An array of Network Security Group diagnostic logs to apply to the Operations Virtual Network. See https://docs.microsoft.com/en-us/azure/virtual-network/virtual-network-nsg-manage-log#log-categories for valid settings.')
 param parOperationsNetworkSecurityGroupDiagnosticsLogs array = [
-  'NetworkSecurityGroupEvent'
-  'NetworkSecurityGroupRuleCounter'
+  {
+    category: 'NetworkSecurityGroupEvent'
+    enabled: true
+  }
+  {
+    category: 'NetworkSecurityGroupRuleCounter'
+    enabled: true
+  }
 ]
 
 @description('An array of Service Endpoints to enable for the Operations subnet. See https://docs.microsoft.com/en-us/azure/virtual-network/virtual-network-service-endpoints-overview for valid settings.')
@@ -371,20 +397,26 @@ param parSharedServicesNetworkSecurityGroupRules array = [
       direction: 'Inbound'
       priority: 200
       protocol: '*'
-      sourceAddressPrefixes: parSharedServicesSourceAddressPrefixes
+      sourceAddressPrefixes: [
+        parOperationsVirtualNetworkAddressPrefix
+        parIdentityVirtualNetworkAddressPrefix
+      ]
       sourcePortRange: '*'
     }
     type: 'string'
   }
 ]
 
-@description('An array of')
-param parSharedServicesSourceAddressPrefixes array = []
-
 @description('An array of Network Security Group diagnostic logs to apply to the SharedServices Virtual Network. See https://docs.microsoft.com/en-us/azure/virtual-network/virtual-network-nsg-manage-log#log-categories for valid settings.')
 param parSharedServicesNetworkSecurityGroupDiagnosticsLogs array = [
-  'NetworkSecurityGroupEvent'
-  'NetworkSecurityGroupRuleCounter'
+  {
+    category: 'NetworkSecurityGroupEvent'
+    enabled: true
+  }
+  {
+    category: 'NetworkSecurityGroupRuleCounter'
+    enabled: true
+  }
 ]
 
 @description('An array of Service Endpoints to enable for the SharedServices subnet. See https://docs.microsoft.com/en-us/azure/virtual-network/virtual-network-service-endpoints-overview for valid settings.')
@@ -450,12 +482,12 @@ param parSecurityCenter object
 // "parRemoteAccess": {
 //   "value": {
 //     "enable": true,
+//     "enableJumpBoxes": true,
 //     "bastion": {
 //       "sku": "Standard",
 //       "subnetAddressPrefix": "10.0.100.160/27",
 //       "publicIPAddressAvailabilityZones": [],
 //       "linux": {
-//         "enable": true,
 //         "vmAdminUsername": "azureuser",
 //         "enableVmPasswordAuthentication": true,
 //         "vmAuthenticationType": "password",
@@ -470,7 +502,6 @@ param parSecurityCenter object
 //         "networkInterfacePrivateIPAddressAllocationMethod": "Dynamic"
 //       },
 //       "windows": {
-//         "enable": true,
 //         "vmAdminUsername": "azureuser",
 //         "VmAdminPassword": "Rem0te@2020246",
 //         "vmSize": "Standard_DS1_v2",
@@ -488,49 +519,267 @@ param parSecurityCenter object
 @description('When set to "true", provisions Azure Bastion Host. It defaults to "false".')
 param parRemoteAccess object
 
-// Telemetry - Azure customer usage attribution
-// Reference:  https://docs.microsoft.com/azure/marketplace/azure-partner-customer-usage-attribution
-var telemetry = json(loadTextContent('../../azresources/Modules/Global/telemetry.json'))
-module telemetryCustomerUsageAttribution '../../azresources/Modules/Global/partnerUsageAttribution/customer-usage-attribution-subscription.bicep' = if (telemetry.customerUsageAttribution.enabled) {
-  name: 'pid-${telemetry.customerUsageAttribution.modules.platforms.hubspoke3}'
-}
+// MANAGEMENT GROUPS PARAMETERS
 
-/*
-  NAMING CONVENTION
-  Here we define a naming conventions for resources.
-  First, we take `parRequired.orgPrefix`, `parLocation`, and `parRequired.deployEnvironment` by params.
-  Then, using string interpolation "${}", we insert those values into a naming convention.
-*/
+// Management Groups
+// Example (JSON)
+// -----------------------------
+@description('These are the landing zone management groups.')
+param parManagementGroups object
 
-var varResourceToken = 'resource_token'
-var varNameToken = 'name_token'
-var varNamingConvention = '${toLower(parRequired.orgPrefix)}-${toLower(parLocation)}-${toLower(parRequired.deployEnvironment)}-${varNameToken}-${toLower(varResourceToken)}'
+// POLICY PARAMETERS
 
-// RESOURCE NAME CONVENTIONS WITH ABBREVIATIONS
+// Policy
+// Example (JSON)
+// -----------------------------
+// "parPolicy": {
+//   "value": {
+//       "bulitInPolicy": {
+//           "policies": [
+//               {
+//                   "enabled": false,
+//                   "name": "Location",
+//                   "policyAssignmentManagementGroupId": "anoa",
+//                   "enforcementMode": "Default",
+//                   "allowedLocations": [
+//                       "EastUS"
+//                   ]
+//               },
+//               {
+//                   "enabled": false,
+//                   "name": "NIST SP 800-53 R5",
+//                   "policyAssignmentManagementGroupId": "anoa",
+//                   "enforcementMode": "Default",
+//                   "requiredRetentionDays": "30"
+//               },
+//               {
+//                   "enabled": false,
+//                   "name": "FedRAMP Moderate",
+//                   "policyAssignmentManagementGroupId": "anoa",
+//                   "enforcementMode": "Default",
+//                   "requiredRetentionDays": "30"
+//               }
+//           ]
+//       },
+//       "customPolicy": {
+//           "value": {
+//               "policies": [
+//                   {
+//                       "enabled": true,
+//                       "name": "Custom - Compute Governance Initiative",
+//                       "policyDefinitionManagementGroupId": "anoa",
+//                       "policyAssignmentManagementGroupId": "anoa",
+//                       "policySource": "ANOA",
+//                       "policyCategory": "Compute"
+//                   },
+//                   {
+//                       "enabled": true,
+//                       "name": "Custom - Data Protection Governance Initiative",
+//                       "policyDefinitionManagementGroupId": "anoa",
+//                       "policySource": "ANOA",
+//                       "policyCategory": "Data Protection"
+//                   },
+//                   {
+//                       "enabled": true,
+//                       "name": "Custom - Identity Governance Initiative",
+//                       "policyDefinitionManagementGroupId": "anoa",
+//                       "policySource": "ANOA",
+//                       "policyCategory": "IAM"
+//                   },
+//                   {
+//                       "enabled": true,
+//                       "name": "Custom - Key Vault Governance Initiative",
+//                       "policyDefinitionManagementGroupId": "anoa",
+//                       "policySource": "ANOA",
+//                       "policyCategory": "Key Vault"
+//                   },
+//                   {
+//                       "enabled": true,
+//                       "name": "Custom - Network Governance Initiative",
+//                       "policyDefinitionManagementGroupId": "anoa",
+//                       "policySource": "ANOA",
+//                       "policyCategory": "Network"
+//                   },
+//                   {
+//                       "enabled": true,
+//                       "name": "Custom - Security Governance Initiative",
+//                       "policyDefinitionManagementGroupId": "anoa",
+//                       "policySource": "ANOA",
+//                       "policyCategory": "Security"
+//                   },
+//                   {
+//                       "enabled": true,
+//                       "name": "Custom - SQL Governance Initiative",
+//                       "policyDefinitionManagementGroupId": "anoa",
+//                       "policySource": "ANOA",
+//                       "policyCategory": "SQL"
+//                   },
+//                   {
+//                       "enabled": true,
+//                       "name": "Custom - Storage Governance Initiative",
+//                       "policyDefinitionManagementGroupId": "anoa",
+//                       "policySource": "ANOA",
+//                       "policyCategory": "Storage"
+//                   },
+//                   {
+//                       "enabled": true,
+//                       "name": "Custom - Tagging Governance Initiative",
+//                       "policyDefinitionManagementGroupId": "anoa",
+//                       "policySource": "ANOA",
+//                       "policyCategory": "Tagging"
+//                   }
+//               ]
+//           }
+//       }
+//   }
+// }        
+@description('These are BulitIn/Custom Policies for the landing zone management groups and resources.')
+param parPolicy object
 
-var varResourceGroupNamingConvention = replace(varNamingConvention, varResourceToken, 'rg')
+// ROLES PARAMETERS
 
-// HUB NAMES
+// Bastion Host (Remote Access)
+// Example (JSON)
+// -----------------------------
+// {
+//   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+//   "contentVersion": "1.0.0.0",
+//   "parameters": { 
+//     "parRoleDefinitionInfo": {
+//       "value": {
+//         "definitions": [
+//           {
+//             "roleID": "6f0b9662-992a-523e-a58d-6a91804f2f29",
+//             "roleName": "Custom - VM Operator",
+//             "roleDescription": "Start and Stop Virtual Machines and reader",
+//             "actions": [
+//               "Microsoft.Compute/virtualMachines/read",
+//               "Microsoft.Compute/virtualMachines/start/action",
+//               "Microsoft.Compute/virtualMachines/restart/action",
+//               "Microsoft.Resources/subscriptions/resourceGroups/read",
+//               "Microsoft.Compute/virtualMachines/deallocate/action",
+//               "Microsoft.Compute/virtualMachineScaleSets/deallocate/action",
+//               "Microsoft.Compute/virtualMachineScaleSets/virtualMachines/deallocate/action",
+//               "Microsoft.Compute/virtualMachines/powerOff/action"
+//             ],
+//             "notActions": [],
+//             "dataActions": [],
+//             "notDataActions": [],
+//             "scopeType": "ManagementGroup",
+//             "scopeName": "anoalz"
+//           },
+//           {
+//             "roleID": "72dd118f-5398-5835-8432-ced9ab12a3de",
+//             "roleName": "Custom - Network Operations (NetOps)",
+//             "roleDescription": "Platform-wide global connectivity management: virtual networks, UDRs, NSGs, NVAs, VPN, Azure ExpressRoute, and others.",
+//             "actions": [
+//               "Microsoft.Network/virtualNetworks/read",
+//               "Microsoft.Network/virtualNetworks/virtualNetworkPeerings/read",
+//               "Microsoft.Network/virtualNetworks/virtualNetworkPeerings/write",
+//               "Microsoft.Network/virtualNetworks/virtualNetworkPeerings/delete",
+//               "Microsoft.Network/virtualNetworks/peer/action",
+//               "Microsoft.Resources/deployments/operationStatuses/read",
+//               "Microsoft.Resources/deployments/write",
+//               "Microsoft.Resources/deployments/read"
+//             ],
+//             "notActions": [],
+//             "dataActions": [],
+//             "notDataActions": [],
+//             "scopeType": "ManagementGroup",
+//             "scopeName": "anoalz"
+//           },
+//           {
+//             "roleID": "72dd118f-5398-5835-8432-ced9ab12a3de",
+//             "roleName": "Custom - Security Operations (SecOps)",
+//             "roleDescription": "Security Administrator role with a horizontal view across the entire Azure estate and the Azure Key Vault purge policy.",
+//             "actions": [
+//               "*/read",
+//               "*/register/action",
+//               "Microsoft.KeyVault/locations/deletedVaults/purge/action",
+//               "Microsoft.PolicyInsights/*",
+//               "Microsoft.Authorization/policyAssignments/*",
+//               "Microsoft.Authorization/policyDefinitions/*",
+//               "Microsoft.Authorization/policyExemptions/*",
+//               "Microsoft.Authorization/policySetDefinitions/*",
+//               "Microsoft.Insights/alertRules/*",
+//               "Microsoft.Resources/deployments/*",
+//               "Microsoft.Security/*",
+//               "Microsoft.Support/*"
+//             ],
+//             "notActions": [],
+//             "dataActions": [],
+//             "notDataActions": [],
+//             "scopeType": "ManagementGroup",
+//             "scopeName": "anoalz"
+//           },
+//           {
+//             "roleID": "72dd118f-5398-5835-8432-ced9ab12a3de",
+//             "roleName": "Custom - Landing Zone Application Owner",
+//             "roleDescription": "Contributor role granted for application/operations team at resource group level.",
+//             "actions": [
+//               "*"
+//             ],
+//             "notActions": [
+//               "Microsoft.Authorization/*/write",
+//               "Microsoft.Network/publicIPAddresses/write",
+//               "Microsoft.Network/virtualNetworks/write",
+//               "Microsoft.KeyVault/locations/deletedVaults/purge/action"
+//             ],
+//             "dataActions": [],
+//             "notDataActions": [],
+//             "scopeType": "ManagementGroup",
+//             "scopeName": "anoalz"
+//           },
+//           {
+//             "roleID": "72dd118f-5398-5835-8432-ced9ab12a3de",
+//             "roleName": "Custom - Landing Zone Subscription Owner",
+//             "roleDescription": "Delegated role for subscription owner generated from subscription Owner role.",
+//             "actions": [
+//               "*"
+//             ],
+//             "notActions": [
+//               "Microsoft.Authorization/*/write",
+//               "Microsoft.Network/vpnGateways/*",
+//               "Microsoft.Network/expressRouteCircuits/*",
+//               "Microsoft.Network/routeTables/write",
+//               "Microsoft.Network/vpnSites/*"
+//             ],
+//             "dataActions": [],
+//             "notDataActions": [],
+//             "scopeType": "ManagementGroup",
+//             "scopeName": "anoalz"
+//           },
+//           {
+//             "roleID": "bb465e79-5df0-597b-a848-85006554c065",
+//             "roleName": "Custom - Storage Operator",
+//             "roleDescription": "Custom Storage Operator role for deploying virtual machines.",
+//             "actions": [
+//               "Microsoft.Authorization/*/read",
+//               "Microsoft.Insights/alertRules/*",
+//               "Microsoft.Insights/diagnosticSettings/*",
+//               "Microsoft.Network/virtualNetworks/subnets/joinViaServiceEndpoint/action",
+//               "Microsoft.ResourceHealth/availabilityStatuses/read",
+//               "Microsoft.Resources/deployments/*",
+//               "Microsoft.Resources/subscriptions/resourceGroups/read",
+//               "Microsoft.Storage/storageAccounts/*",
+//               "Microsoft.Support/*",
+//               "Microsoft.Storage/storageAccounts/listkeys/action"
+//             ],
+//             "notActions": [],
+//             "scopeType": "ManagementGroup",
+//             "scopeName": "anoalz"
+//           }
+//         ]
+//       }
+//     }
+//   }
+// }
+@description('These are the custom roles for landing zone management groups and resources..')
+param parRoleDefinitionInfo object
 
-var varHubName = 'hub'
-var varHubResourceGroupName = replace(varResourceGroupNamingConvention, varNameToken, varHubName)
 
-// OPS NAMES
-
-var operationsName = 'operations'
-var varOperationsResourceGroupName = replace(varResourceGroupNamingConvention, varNameToken, operationsName)
-
-// IDENTITY NAMES
-
-var identityName = 'identity'
-var varIdentityResourceGroupName = replace(varResourceGroupNamingConvention, varNameToken, identityName)
-
-// SHARED SERVICES NAMES
-
-var sharedServicesName = 'sharedservices'
-var varSharedServicesResourceGroupName = replace(varResourceGroupNamingConvention, varNameToken, sharedServicesName)
-
-// TAGS
+// Module - TAGS
+// -----------------------------
 
 var referential = {
   region: parLocation
@@ -540,77 +789,88 @@ var referential = {
 @description('Resource group tags')
 module modTags '../../azresources/Modules/Microsoft.Resources/tags/az.resources.tags.bicep' = {
   name: 'deploy-hubspoke-tags-${parLocation}-${parDeploymentNameSuffix}'
+  scope: subscription(parHubSubscriptionId)
   params: {
     tags: union(parTags, referential)
   }
 }
 
-// LOGGING & LOG ANALYTICS WORKSPACE
+// Module - Customer Usage Attribution - Telemetry
+// -----------------------------------------------
 
-module modLogAnalyticsWorkspace '../../azresources/hub-spoke/vdms/logging/anoa.lz.logging.bicep' = {
-  name: 'deploy-hubspoke-laws-${parLocation}-${parDeploymentNameSuffix}'
-  scope: subscription(parOperationsSubscriptionId)
+// Module - Management Groups
+// -----------------------------
+// The Enclave Management Groups module deploys a management group hierarchy in a tenant under the Tenant Root Group. 
+// This is accomplished through a tenant-scoped Azure Resource Manager (ARM) deployment. 
+// NOTE: For more information on Management Groups - go to the overlays/management-group/readme.md
+// -------------------------------------------------------------------------------------------------------------------
+module modManagementGroups '../../overlays/management-groups/deploy.bicep' = {
+  name: 'deploy-MG-${parLocation}-${parDeploymentNameSuffix}'
+  scope: managementGroup(parManagementGroups.tenantId)
   params: {
-    // Required Parameters
-    parOrgPrefix: parRequired.orgPrefix
-    parLocation: parLocation
-    parDeployEnvironment: parRequired.deployEnvironment
-    parTags: modTags.outputs.tags
-
-    // Enable Sentinel
-    parDeploySentinel: parLogging.enableSentinel
-
-    // Log Analytics Parameters
-    parLogAnalyticsWorkspaceSkuName: parLogging.logAnalyticsWorkspaceSkuName
-    parLogAnalyticsWorkspaceRetentionInDays: parLogging.logAnalyticsWorkspaceRetentionInDays
-    parLogAnalyticsWorkspaceCappingDailyQuotaGb: parLogging.logAnalyticsWorkspaceCappingDailyQuotaGb
-
-    // RBAC for Storage Parameters
-    parStorageAccountAccess: parStorageAccountAccess
+    parManagementGroups: parManagementGroups.groups
+    parRequireAuthorizationForGroupCreation: parManagementGroups.requireAuthorizationForGroupCreation
+    parRootMg: parManagementGroups.rootMg
+    parSubscriptions: parManagementGroups.subscriptions
+    parTenantId: parManagementGroups.tenantId
   }
 }
 
-// ARTIFACTS
+// Module - Custom RBAC Role Definitions 
+// --------------------------------------
+// The Enclave Roles overlay module deploys a role definitions in a specific `Management Group`.  
+// This is accomplished through a managmenent-group-scoped Azure Resource Manager (ARM) deployment.
+// --------------------------------------
+module modRoles '../../overlays/roles/deploy.bicep' = {
+  name: 'deploy-Roles-${parLocation}-${parDeploymentNameSuffix}'
+  scope: managementGroup(parManagementGroups.tenantId)
+  params:  {
+    parLocation: parLocation
+    parDefaultManagementGroupIdForRoleDefinitions: ''
+    parRoleDefinitionInfo: parRoleDefinitionInfo
+  }
+}
 
-module modArtifacts '../../azresources/hub-spoke/vdss/networkArtifacts/anoa.lz.artifacts.bicep' = if (parNetworkArtifacts.enable) {
-  name: 'deploy-hubspoke-artifacts-${parLocation}-${parDeploymentNameSuffix}'
+// Bulit-In/Custom Policy Definitions and Initiatives Into Management Group Hierarchy
+// Module - Policy Definitions and Initiatives
+// -----------------------------------------------------------------------------------
+//
+//
+//
+// -----------------------------------------------------------------------------------
+module modPolicy '../../overlays/policy/hub-spoke/deploy.bicep' = {
+  name: 'deploy-Policy-${parLocation}-${parDeploymentNameSuffix}'
+  scope: managementGroup(parManagementGroups.tenantId)
+  params: {
+    parLocation: parLocation
+    parPolicy: parPolicy
+  }
+}
+
+// Module - Hub/ 3 Spoke Design - SCCA Compliant
+// ----------------------------------------------
+//
+// ----------------------------------------------
+module modHubSpoke '../../platforms/lz-platform-scca-hub-3spoke/deploy.bicep' = {
+  name: 'deploy-HubSpoke-${parLocation}-${parDeploymentNameSuffix}'
   scope: subscription(parHubSubscriptionId)
   params: {
     // Required Parameters
-    parOrgPrefix: parRequired.orgPrefix
+    parRequired: parRequired
     parLocation: parLocation
-    parDeployEnvironment: parRequired.deployEnvironment
     parTags: modTags.outputs.tags
+
+    // Subscriptions
+    parHubSubscriptionId: parHubSubscriptionId
+    parIdentitySubscriptionId: parIdentitySubscriptionId
+    parOperationsSubscriptionId: parOperationsSubscriptionId
+    parSharedServicesSubscriptionId: parSharedServicesSubscriptionId
 
     // Artifact Key Vault Parameters
-    parArtifactsKeyVaultPolicies: parNetworkArtifacts.artifactsKeyVault.keyVaultPolicies
+    parNetworkArtifacts: parNetworkArtifacts.artifactsKeyVault.keyVaultPolicies
 
-    // RBAC for Storage Parameters
-    parStorageAccountAccess: parStorageAccountAccess
-
-    // Bastion Secrets Parameters
-    parEnableBastionSecrets: parRemoteAccess.enable
-    parLinuxVmAdminPasswordOrKey: parRemoteAccess.bastion.linux.vmAdminPasswordOrKey
-    parWindowsVmAdminPassword: parRemoteAccess.bastion.windows.vmAdminPassword
-  }
-}
-
-// HUB AND SPOKE NETWORKS
-
-// HUB
-
-module modHubNetwork '../../azresources/hub-spoke/vdss/hub/anoa.lz.hub.network.bicep' = {
-  name: 'deploy-hub-${parLocation}-${parDeploymentNameSuffix}'
-  scope: subscription(parHubSubscriptionId)
-  params: {
-    // Required Parameters
-    parOrgPrefix: parRequired.orgPrefix
-    parLocation: parLocation
-    parDeployEnvironment: parRequired.deployEnvironment
-    parTags: modTags.outputs.tags
-    
     // Enable DDOS Protection Plan
-    parDeployddosProtectionPlan: parDdosStandard.enable
+    parDdosStandard: parDdosStandard
 
     // Hub Network Parameters
     parHubVirtualNetworkAddressPrefix: parHubVirtualNetworkAddressPrefix
@@ -623,11 +883,40 @@ module modHubNetwork '../../azresources/hub-spoke/vdss/hub/anoa.lz.hub.network.b
     parPublicIPAddressDiagnosticsLogs: parPublicIPAddressDiagnosticsLogs
     parPublicIPAddressDiagnosticsMetrics: parPublicIPAddressDiagnosticsMetrics
 
+    // Identity Network Parameters
+    parIdentityNetworkSecurityGroupDiagnosticsLogs: parIdentityNetworkSecurityGroupDiagnosticsLogs
+    parIdentitySubnetAddressPrefix: parIdentitySubnetAddressPrefix
+    parIdentityNetworkSecurityGroupRules: parIdentityNetworkSecurityGroupRules
+    parIdentitySubnetServiceEndpoints: parIdentitySubnetServiceEndpoints
+    parIdentityVirtualNetworkAddressPrefix: parIdentityVirtualNetworkAddressPrefix
+    parIdentityVirtualNetworkDiagnosticsLogs: parIdentityVirtualNetworkDiagnosticsLogs
+    parIdentityVirtualNetworkDiagnosticsMetrics: parIdentityVirtualNetworkDiagnosticsMetrics
+
+    // Operations Network Parameters
+    parOperationsNetworkSecurityGroupDiagnosticsLogs: parOperationsNetworkSecurityGroupDiagnosticsLogs
+    parOperationsSubnetAddressPrefix: parOperationsSubnetAddressPrefix
+    parOperationsNetworkSecurityGroupRules: parOperationsNetworkSecurityGroupRules
+    parOperationsSubnetServiceEndpoints: parOperationsSubnetServiceEndpoints
+    parOperationsVirtualNetworkAddressPrefix: parOperationsVirtualNetworkAddressPrefix
+    parOperationsVirtualNetworkDiagnosticsLogs: parOperationsVirtualNetworkDiagnosticsLogs
+    parOperationsVirtualNetworkDiagnosticsMetrics: parOperationsVirtualNetworkDiagnosticsMetrics
+
+    // Shared Services Network Parameters
+    parSharedServicesNetworkSecurityGroupDiagnosticsLogs: parSharedServicesNetworkSecurityGroupDiagnosticsLogs
+    parSharedServicesSubnetAddressPrefix: parSharedServicesSubnetAddressPrefix
+    parSharedServicesNetworkSecurityGroupRules: parSharedServicesNetworkSecurityGroupRules
+    parSharedServicesSubnetServiceEndpoints: parSharedServicesSubnetServiceEndpoints
+    parSharedServicesVirtualNetworkAddressPrefix: parSharedServicesVirtualNetworkAddressPrefix
+    parSharedServicesVirtualNetworkDiagnosticsLogs: parSharedServicesVirtualNetworkDiagnosticsLogs
+    parSharedServicesVirtualNetworkDiagnosticsMetrics: parSharedServicesVirtualNetworkDiagnosticsMetrics
+
+    // Logging/Sentinel
+    parLogging: parLogging
+
     // Enable Azure FireWall
     parAzureFirewallEnabled: parAzureFirewallEnabled
     parFirewallClientSubnetAddressPrefix: parFirewallClientSubnetAddressPrefix
     parFirewallManagementSubnetAddressPrefix: parFirewallManagementSubnetAddressPrefix
-    parDisableBgpRoutePropagation: false
 
     // Hub Firewall Parameters
     parFirewallSupernetIPAddress: parFirewallSupernetIPAddress
@@ -642,335 +931,16 @@ module modHubNetwork '../../azresources/hub-spoke/vdss/hub/anoa.lz.hub.network.b
     parFirewallManagementPublicIPAddressAvailabilityZones: parFirewallManagementPublicIPAddressAvailabilityZones
     parFirewallManagementSubnetName: parFirewallManagementSubnetName
     parFirewallManagementSubnetServiceEndpoints: parFirewallManagementSubnetServiceEndpoints
-    parApplicationRuleCollections: parApplicationRuleCollections
-    parNetworkRuleCollections: parNetworkRuleCollections
 
     // RBAC for Storage Parameters
     parStorageAccountAccess: parStorageAccountAccess
 
-    // Log Analytics Parameters
-    parLogAnalyticsWorkspaceResourceId: modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceResourceId
-    parLogAnalyticsWorkspaceName: modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceName
+    //
+    parSecurityCenter: parSecurityCenter
 
+    //
+    parRemoteAccess: parRemoteAccess
   }
 }
 
-// TIER 0 - IDENTITY
-
-module modIdentityNetwork '../../azresources/hub-spoke/vdss/identity/anoa.lz.id.network.bicep' = {
-  name: 'deploy-spoke-id-${parLocation}-${parDeploymentNameSuffix}'
-  scope: subscription(parIdentitySubscriptionId)
-  params: {
-    // Required Parameters
-    parOrgPrefix: parRequired.orgPrefix
-    parLocation: parLocation
-    parDeployEnvironment: parRequired.deployEnvironment
-    parTags: modTags.outputs.tags
-
-    // Identity Network Parameters
-    parIdentityNetworkSecurityGroupDiagnosticsLogs: parIdentityNetworkSecurityGroupDiagnosticsLogs
-    parIdentitySubnetAddressPrefix: parIdentitySubnetAddressPrefix
-    parIdentityNetworkSecurityGroupRules: parIdentityNetworkSecurityGroupRules
-    parIdentitySubnetServiceEndpoints: parIdentitySubnetServiceEndpoints
-    parIdentityVirtualNetworkAddressPrefix: parIdentityVirtualNetworkAddressPrefix
-    parIdentityVirtualNetworkDiagnosticsLogs: parIdentityVirtualNetworkDiagnosticsLogs
-    parIdentityVirtualNetworkDiagnosticsMetrics: parIdentityVirtualNetworkDiagnosticsMetrics
-    parFirewallPrivateIPAddress: modHubNetwork.outputs.firewallPrivateIPAddress
-    parDisableBgpRoutePropagation: true
-
-    // Log Storage Sku Parameters
-    parLogStorageSkuName: parLogging.logStorageSkuName
-
-    // RBAC for Storage Parameters
-    parStorageAccountAccess: parStorageAccountAccess
-
-    // Log Analytics Parameters
-    parLogAnalyticsWorkspaceResourceId: modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceResourceId
-    parLogAnalyticsWorkspaceName: modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceName
-  }
-}
-
-// TIER 1 - OPERATIONS
-
-module modOperationsNetwork '../../azresources/hub-spoke/vdms/operations/anoa.lz.ops.network.bicep' = {
-  name: 'deploy-spoke-ops-${parLocation}-${parDeploymentNameSuffix}'
-  scope: subscription(parOperationsSubscriptionId)
-  params: {
-    // Required Parameters
-    parOrgPrefix: parRequired.orgPrefix
-    parLocation: parLocation
-    parDeployEnvironment: parRequired.deployEnvironment
-    parTags: modTags.outputs.tags
-
-    // Operations Network Parameters
-    parOperationsNetworkSecurityGroupDiagnosticsLogs: parOperationsNetworkSecurityGroupDiagnosticsLogs
-    parOperationsSubnetAddressPrefix: parOperationsSubnetAddressPrefix
-    parOperationsSourceAddressPrefixes: parOperationsSourceAddressPrefixes
-    parOperationsNetworkSecurityGroupRules: parOperationsNetworkSecurityGroupRules
-    parOperationsSubnetServiceEndpoints: parOperationsSubnetServiceEndpoints
-    parOperationsVirtualNetworkAddressPrefix: parOperationsVirtualNetworkAddressPrefix
-    parOperationsVirtualNetworkDiagnosticsLogs: parOperationsVirtualNetworkDiagnosticsLogs
-    parOperationsVirtualNetworkDiagnosticsMetrics: parOperationsVirtualNetworkDiagnosticsMetrics
-    parFirewallPrivateIPAddress: modHubNetwork.outputs.firewallPrivateIPAddress
-    parDisableBgpRoutePropagation: true
-
-    // Log Storage Sku Parameters
-    parLogStorageSkuName: parLogging.logStorageSkuName
-
-    // RBAC for Storage Parameters
-    parStorageAccountAccess: parStorageAccountAccess
-
-    // Log Analytics Parameters
-    parLogAnalyticsWorkspaceResourceId: modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceResourceId
-    parLogAnalyticsWorkspaceName: modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceName
-  }
-}
-
-// TIER 2 - SHARED SERVICES
-
-module modSharedServicesNetwork '../../azresources/hub-spoke/vdms/sharedservices/anoa.lz.svcs.network.bicep' = {
-  name: 'deploy-spoke-svcs-${parLocation}-${parDeploymentNameSuffix}'
-  scope: subscription(parSharedServicesSubscriptionId)
-  params: {
-    // Required Parameters
-    parOrgPrefix: parRequired.orgPrefix
-    parLocation: parLocation
-    parDeployEnvironment: parRequired.deployEnvironment
-    parTags: modTags.outputs.tags
-
-    // Shared Services Network Parameters
-    parSharedServicesNetworkSecurityGroupDiagnosticsLogs: parSharedServicesNetworkSecurityGroupDiagnosticsLogs
-    parSharedServicesSubnetAddressPrefix: parSharedServicesSubnetAddressPrefix
-    parSharedServicesNetworkSecurityGroupRules: parSharedServicesNetworkSecurityGroupRules
-    parSharedServicesSubnetServiceEndpoints: parSharedServicesSubnetServiceEndpoints
-    parSharedServicesVirtualNetworkAddressPrefix: parSharedServicesVirtualNetworkAddressPrefix
-    parSharedServicesVirtualNetworkDiagnosticsLogs: parSharedServicesVirtualNetworkDiagnosticsLogs
-    parSharedServicesVirtualNetworkDiagnosticsMetrics: parSharedServicesVirtualNetworkDiagnosticsMetrics
-    parFirewallPrivateIPAddress: modHubNetwork.outputs.firewallPrivateIPAddress
-    parDisableBgpRoutePropagation: true
-
-    // Log Storage Sku Parameters
-    parLogStorageSkuName: parLogging.logStorageSkuName
-
-    // RBAC for Storage Parameters
-    parStorageAccountAccess: parStorageAccountAccess
-
-    // Log Analytics Parameters
-    parLogAnalyticsWorkspaceResourceId: modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceResourceId
-    parLogAnalyticsWorkspaceName: modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceName
-  }
-}
-
-// VIRTUAL NETWORK PEERINGS
-
-module modHubVirtualNetworkPeerings '../../azresources/hub-spoke/peering/hub/anoa.lz.hub.network.peerings.bicep' = {
-  name: 'deploy-vnet-peerings-hub-${parLocation}-${parDeploymentNameSuffix}'
-  scope: resourceGroup(parHubSubscriptionId, varHubResourceGroupName)
-  params: {
-    parHubVirtualNetworkName: modHubNetwork.outputs.virtualNetworkName
-    parSpokes: [
-      {
-        name: 'operations'
-        virtualNetworkName: modOperationsNetwork.outputs.virtualNetworkName
-        virtualNetworkResourceId: modOperationsNetwork.outputs.virtualNetworkResourceId
-      }
-      {
-        name: 'identity'
-        virtualNetworkName: modIdentityNetwork.outputs.virtualNetworkName
-        virtualNetworkResourceId: modIdentityNetwork.outputs.virtualNetworkResourceId
-      }
-      {
-        name: 'sharedservices'
-        virtualNetworkName: modSharedServicesNetwork.outputs.virtualNetworkName
-        virtualNetworkResourceId: modSharedServicesNetwork.outputs.virtualNetworkResourceId
-      }
-    ]
-  }
-}
-
-module modSpokeOpsToHubVirtualNetworkPeerings '../../azresources/hub-spoke/peering/spoke/anoa.lz.spoke.network.peering.bicep' = {
-  name: 'deploy-vnet-spoke-peerings-ops-${parLocation}-${parDeploymentNameSuffix}'
-  scope: resourceGroup(parOperationsSubscriptionId, varOperationsResourceGroupName)
-  params: {
-    parSpokeName: 'operations'
-    parSpokeResourceGroupName: varOperationsResourceGroupName
-    parSpokeVirtualNetworkName: modOperationsNetwork.outputs.virtualNetworkName
-
-    // Hub Paramters
-    parHubVirtualNetworkName: modHubNetwork.outputs.virtualNetworkName
-    parHubVirtualNetworkResourceId: modHubNetwork.outputs.virtualNetworkResourceId
-  }
-}
-
-module modSpokeIdToHubVirtualNetworkPeerings '../../azresources/hub-spoke/peering/spoke/anoa.lz.spoke.network.peering.bicep' = {
-  name: 'deploy-vnet-spoke-peerings-id-${parLocation}-${parDeploymentNameSuffix}'
-  scope: resourceGroup(parIdentitySubscriptionId, varIdentityResourceGroupName)
-  params: {
-    parSpokeName: 'identity'
-    parSpokeResourceGroupName: varIdentityResourceGroupName
-    parSpokeVirtualNetworkName: modIdentityNetwork.outputs.virtualNetworkName
-
-    // Hub Paramters
-    parHubVirtualNetworkName: modHubNetwork.outputs.virtualNetworkName
-    parHubVirtualNetworkResourceId: modHubNetwork.outputs.virtualNetworkResourceId
-  }
-}
-
-module modSpokeSharedServicesToHubVirtualNetworkPeerings '../../azresources/hub-spoke/peering/spoke/anoa.lz.spoke.network.peering.bicep' = {
-  name: 'deploy-vnet-spoke-peerings-svcs-${parLocation}-${parDeploymentNameSuffix}'
-  scope: resourceGroup(parSharedServicesSubscriptionId, varSharedServicesResourceGroupName)
-  params: {
-    parSpokeName: 'sharedservices'
-    parSpokeResourceGroupName: varSharedServicesResourceGroupName
-    parSpokeVirtualNetworkName: modSharedServicesNetwork.outputs.virtualNetworkName
-
-    // Hub Parameters
-    parHubVirtualNetworkName: modHubNetwork.outputs.virtualNetworkName
-    parHubVirtualNetworkResourceId: modHubNetwork.outputs.virtualNetworkResourceId
-  }
-}
-
-// REMOTE ACCESS
-
-module modRemoteAccess '../../overlays/management-services/bastion/deploy.bicep' = if (parRemoteAccess.enable) {
-  name: 'deploy-remote-access-hub-${parLocation}-${parDeploymentNameSuffix}'
-  scope: resourceGroup(parHubSubscriptionId, varHubResourceGroupName)
-  params: {
-    // Required Parameters
-    parOrgPrefix: parRequired.orgPrefix
-    parLocation: parLocation
-    parDeployEnvironment: parRequired.deployEnvironment
-    parTags: modTags.outputs.tags
-
-    // Hub Virtual Network Parameters    
-    parHubVirtualNetworkName: modHubNetwork.outputs.virtualNetworkName
-    parHubSubnetResourceId: modHubNetwork.outputs.subnetResourceId
-    parHubNetworkSecurityGroupResourceId: modHubNetwork.outputs.networkSecurityGroupResourceId
-
-    // Bastion Host Parameters   
-    parBastionHostSku: parRemoteAccess.bastion.sku    
-    parBastionHostSubnetAddressPrefix: parRemoteAccess.bastion.subnetAddressPrefix
-    parEncryptionAtHost: parRemoteAccess.bastion.encryptionAtHost
-
-    // Linux Parameters 
-    parEnableLinux:  parRemoteAccess.bastion.linux.enable
-    parLinuxVmName: parRemoteAccess.bastion.linux.vmName
-    parLinuxVmSize: parRemoteAccess.bastion.linux.vmSize
-    parLinuxVmOsDiskCreateOption: parRemoteAccess.bastion.linux.vmOsDiskCreateOption
-    parLinuxVmOsDiskType: parRemoteAccess.bastion.linux.vmOsDiskType
-    parLinuxVmImagePublisher: parRemoteAccess.bastion.linux.vmImagePublisher
-    parLinuxVmImageOffer: parRemoteAccess.bastion.linux.vmImageOffer
-    parLinuxVmImageSku: parRemoteAccess.bastion.linux.vmImageSku
-    parLinuxVmImageVersion: parRemoteAccess.bastion.linux.vmImageVersion
-    parLinuxVmAdminUsername: parRemoteAccess.bastion.linux.vmAdminUsername
-    parLinuxNetworkInterfacePrivateIPAddressAllocationMethod: parRemoteAccess.bastion.linux.networkInterfacePrivateIPAddressAllocationMethod
-    parDisableLinuxVmPasswordAuthentication: parRemoteAccess.bastion.linux.disablePasswordAuthentication
-
-    // Windows Parameters 
-    parEnableWindows: parRemoteAccess.bastion.windows.enable
-    parWindowsVmName: parRemoteAccess.bastion.windows.vmName
-    parWindowsVmSize: parRemoteAccess.bastion.windows.vmSize
-    parWindowsVmAdminUsername: parRemoteAccess.bastion.windows.vmAdminUsername
-    parWindowsVmAdminPassword: parRemoteAccess.bastion.windows.vmAdminPassword
-    parWindowsVmPublisher: parRemoteAccess.bastion.windows.vmImagePublisher
-    parWindowsVmOffer: parRemoteAccess.bastion.windows.vmImageOffer
-    parWindowsVmSku: parRemoteAccess.bastion.windows.vmImageSku
-    parWindowsVmVersion: parRemoteAccess.bastion.windows.vmImageVersion
-    parWindowsVmCreateOption: parRemoteAccess.bastion.windows.vmOsDiskCreateOption
-    parWindowsVmStorageAccountType: parRemoteAccess.bastion.windows.vmStorageAccountType
-    parWindowsNetworkInterfacePrivateIPAddressAllocationMethod: parRemoteAccess.bastion.windows.networkInterfacePrivateIPAddressAllocationMethod
-
-    // Log Analytics Parameters
-    parLogAnalyticsWorkspaceId: modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceResourceId
-  }
-}
-
-module modVMExt '../../azresources/Modules/Microsoft.Compute/virtualmachines/extensions/az.com.virtual.machine.extensions.bicep' = if (parRemoteAccess.enable && parRemoteAccess.bastion.customScriptExtension.install) {
-  name: 'deploy-vmext-${parLocation}-${parDeploymentNameSuffix}'
-  scope: resourceGroup(parHubSubscriptionId, varHubResourceGroupName)
-  params: {
-    location: parLocation
-    type: 'CustomScript'
-    name: 'Script Definition'
-    publisher: 'Microsoft.Azure.Extensions'
-    enableAutomaticUpgrade: true 
-    autoUpgradeMinorVersion: true 
-    typeHandlerVersion: '2.1'
-    virtualMachineName: modRemoteAccess.outputs.linuxVMName
-    protectedSettings: {
-      script: parRemoteAccess.bastion.customScriptExtension.script64
-     }
-  }
-}
-
-// MICROSOFT DEFENDER FOR CLOUD FOR HUB
-
-module modDefender '../../overlays/management-services/defender/deploy.bicep' = if (parSecurityCenter.enableDefender) {
-  name: 'deploy-defender-hub-${parLocation}-${parDeploymentNameSuffix}'
-  params: {
-    parLocation: parLocation
-    parLogAnalyticsWorkspaceResourceId: modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceResourceId
-    parEmailSecurityContact: parSecurityCenter.emailSecurityContact
-    parPhoneSecurityContact: parSecurityCenter.phoneSecurityContact
-  }
-}
-
-// MICROSOFT DEFENDER FOR CLOUD FOR SPOKES
-
-module spokeOpsDefender '../../overlays/management-services/defender/deploy.bicep' = if (parSecurityCenter.enableDefender && parOperationsSubscriptionId != parHubSubscriptionId) {
-  name: 'deploy-defender-ops-${parLocation}-${parDeploymentNameSuffix}'
-  scope: subscription(parOperationsSubscriptionId)
-  params: {
-    parLocation: parLocation
-    parLogAnalyticsWorkspaceResourceId: modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceResourceId
-    parEmailSecurityContact: parSecurityCenter.emailSecurityContact
-    parPhoneSecurityContact: parSecurityCenter.phoneSecurityContact
-  }
-}
-
-module spokeIdDefender '../../overlays/management-services/defender/deploy.bicep' = if (parSecurityCenter.enableDefender && parIdentitySubscriptionId != parHubSubscriptionId) {
-  name: 'deploy-defender-id-${parLocation}-${parDeploymentNameSuffix}'
-  scope: subscription(parIdentitySubscriptionId)
-  params: {
-    parLocation: parLocation
-    parLogAnalyticsWorkspaceResourceId: modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceResourceId
-    parEmailSecurityContact: parSecurityCenter.emailSecurityContact
-    parPhoneSecurityContact: parSecurityCenter.phoneSecurityContact
-  }
-}
-
-module spokeSvcsDefender '../../overlays/management-services/defender/deploy.bicep' = if (parSecurityCenter.enableDefender && parSharedServicesSubscriptionId != parHubSubscriptionId) {
-  name: 'deploy-defender-svcs-${parLocation}-${parDeploymentNameSuffix}'
-  scope: subscription(parSharedServicesSubscriptionId)
-  params: {
-    parLocation: parLocation
-    parLogAnalyticsWorkspaceResourceId: modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceResourceId
-    parEmailSecurityContact: parSecurityCenter.emailSecurityContact
-    parPhoneSecurityContact: parSecurityCenter.phoneSecurityContact
-  }
-}
-
-// OUTPUTS
-
-output networkResourcePrefix string = parRequired.deployEnvironment
-
-output firewallPrivateIPAddress string = modHubNetwork.outputs.firewallPrivateIPAddress
-
-output hub object = {
-  subscriptionId: parHubSubscriptionId
-  resourceGroupName: modHubNetwork.outputs.resourceGroupName
-  resourceGroupResourceId: modHubNetwork.outputs.resourceGroupResourceId
-  virtualNetworkName: modHubNetwork.outputs.virtualNetworkName
-  virtualNetworkResourceId: modHubNetwork.outputs.virtualNetworkResourceId
-  subnetName: modHubNetwork.outputs.subnetName
-  subnetResourceId: modHubNetwork.outputs.subnetResourceId
-  subnetAddressPrefix: modHubNetwork.outputs.subnetAddressPrefix
-  networkSecurityGroupName: modHubNetwork.outputs.networkSecurityGroupName
-  networkSecurityGroupResourceId: modHubNetwork.outputs.networkSecurityGroupResourceId
-}
-
-output logAnalyticsWorkspaceName string = modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceName
-
-output logAnalyticsWorkspaceResourceId string = modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceId
-
-output diagnosticStorageAccountName string = modOperationsNetwork.outputs.operationsLogStorageAccountName
+// Module - Front Door

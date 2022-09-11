@@ -13,9 +13,9 @@
 * [Roadmap](https://github.com/Azure/NoOpsAccelerator/wiki/NoOpsAccelerator-Roadmap)
 * [Microsoft Support Policy](./SUPPORT.md)
 
-NoOps Accelerator is an reference implementation to guide DOD/Public Sector customers on building self-service infrastucture in their Azure environment. The reference implementation is a flexible foundation that enables users to develop/maintain an opinionated self-service infrastructure. These templates are created to help organizations move to a continious deployment of self-healing infrastructure.
+Azure NoOps Accelerator is a flexible foundation that enables DOD/Public Sector customers to develop/maintain opinionated self-service infrastructure in their Azure environment. These templates are created to help organizations move to a continious deployment of infrastructure.
 
-NoOps Accelerator Architecture supported up to IL6 (Top Secret) - Cloud Only Applications. This reference implementation is applicable to Infrastructure as a Service (IaaS) and Platform as a Service (PaaS) with characteristics:
+Azure NoOps Accelerator Architecture supported up to IL6 (Top Secret) - Cloud Only Applications. This flexible foundation is applicable to Infrastructure as a Service (IaaS) and Platform as a Service (PaaS) with characteristics:
 
 * Cloud-based services hosting sensitive (up to IL6 (Top Secret)) information
 * No direct system to system network interconnections required with data centers
@@ -38,9 +38,9 @@ This implementation is specific to DOD/Public Sector organizations.
 
 * Compliant on all Azure Policies when the reference implementation is deployed. This is due to the shared responsibility of cloud and customers can choose the Azure Policies to exclude. For example, using Azure Firewall is an Azure Policy that will be non-compliant since majority of the DOD/Public Sector customers use Network Virtual Appliances. Customers must review Microsoft Defender for Cloud Regulatory Compliance dashboard and apply appropriate exemptions.
 
-## How We Define `NoOps` for this Project
+## How We Define `Azure NoOps` for this Project
 
-NoOps is “not about the elimination of ops; it is about the elimination of manual handoffs and low-value, rote administration.” Think of NoOps is the next evolution of DevOps. We want NoOps Accelerator to drive mission success with an outcome-based approach to deliver continuous value to enable the warfighter.
+Azure NoOps is “not about the elimination of ops; it is about the elimination of manual handoffs and low-value, rote administration.” Think of NoOps is the next evolution of DevOps. We want NoOps Accelerator to drive mission success with an outcome-based approach to deliver continuous value to enable the warfighter.
 
 ## Requirements for Successful NoOps
 

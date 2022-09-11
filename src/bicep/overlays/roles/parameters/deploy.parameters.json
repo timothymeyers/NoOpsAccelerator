@@ -47,7 +47,7 @@
           },
           {
             "roleID": "72dd118f-5398-5835-8432-ced9ab12a3de",
-            "roleName": "Custom - Security Operations (SecOps)",
+            "roleName": "Custom - Cyber Security Operations (CyberSecOps)",
             "roleDescription": "Security Administrator role with a horizontal view across the entire Azure estate and the Azure Key Vault purge policy.",
             "actions": [
               "*/read",

@@ -832,7 +832,7 @@ module modSpokeSharedServicesToHubVirtualNetworkPeerings '../../azresources/hub-
 
 // REMOTE ACCESS
 
-module modRemoteAccess '../../overlays/management-services/bastion/anoa.lz.mgmt.svcs.remote.access.bicep' = if (parRemoteAccess.enable) {
+module modRemoteAccess '../../overlays/management-services/bastion/deploy.bicep' = if (parRemoteAccess.enable) {
   name: 'deploy-remote-access-hub-${parLocation}-${parDeploymentNameSuffix}'
   scope: resourceGroup(parHubSubscriptionId, varHubResourceGroupName)
   params: {
@@ -905,7 +905,7 @@ module modVMExt '../../azresources/Modules/Microsoft.Compute/virtualmachines/ext
 
 // MICROSOFT DEFENDER FOR CLOUD FOR HUB
 
-module modDefender '../../overlays/management-services/defender/anoa.lz.mgmt.svcs.defender.bicep' = if (parSecurityCenter.enableDefender) {
+module modDefender '../../overlays/management-services/defender/deploy.bicep' = if (parSecurityCenter.enableDefender) {
   name: 'deploy-defender-hub-${parLocation}-${parDeploymentNameSuffix}'
   params: {
     parLocation: parLocation
@@ -917,7 +917,7 @@ module modDefender '../../overlays/management-services/defender/anoa.lz.mgmt.svc
 
 // MICROSOFT DEFENDER FOR CLOUD FOR SPOKES
 
-module spokeOpsDefender '../../overlays/management-services/defender/anoa.lz.mgmt.svcs.defender.bicep' = if (parSecurityCenter.enableDefender && parOperationsSubscriptionId != parHubSubscriptionId) {
+module spokeOpsDefender '../../overlays/management-services/defender/deploy.bicep' = if (parSecurityCenter.enableDefender && parOperationsSubscriptionId != parHubSubscriptionId) {
   name: 'deploy-defender-ops-${parLocation}-${parDeploymentNameSuffix}'
   scope: subscription(parOperationsSubscriptionId)
   params: {
@@ -928,7 +928,7 @@ module spokeOpsDefender '../../overlays/management-services/defender/anoa.lz.mgm
   }
 }
 
-module spokeIdDefender '../../overlays/management-services/defender/anoa.lz.mgmt.svcs.defender.bicep' = if (parSecurityCenter.enableDefender && parIdentitySubscriptionId != parHubSubscriptionId) {
+module spokeIdDefender '../../overlays/management-services/defender/deploy.bicep' = if (parSecurityCenter.enableDefender && parIdentitySubscriptionId != parHubSubscriptionId) {
   name: 'deploy-defender-id-${parLocation}-${parDeploymentNameSuffix}'
   scope: subscription(parIdentitySubscriptionId)
   params: {
@@ -939,7 +939,7 @@ module spokeIdDefender '../../overlays/management-services/defender/anoa.lz.mgmt
   }
 }
 
-module spokeSvcsDefender '../../overlays/management-services/defender/anoa.lz.mgmt.svcs.defender.bicep' = if (parSecurityCenter.enableDefender && parSharedServicesSubscriptionId != parHubSubscriptionId) {
+module spokeSvcsDefender '../../overlays/management-services/defender/deploy.bicep' = if (parSecurityCenter.enableDefender && parSharedServicesSubscriptionId != parHubSubscriptionId) {
   name: 'deploy-defender-svcs-${parLocation}-${parDeploymentNameSuffix}'
   scope: subscription(parSharedServicesSubscriptionId)
   params: {

@@ -246,11 +246,6 @@ module modLinuxNetworkInterface '../../../azresources/Modules/Microsoft.Network/
   }
 }
 
-/* resource kv 'Microsoft.KeyVault/vaults@2019-09-01' existing = {
-  name: kvName
-  scope: resourceGroup(subscriptionId, kvResourceGroup )
-} */
-
 module modLinuxVirtualMachine '../../../azresources/Modules/Microsoft.Compute/virtualmachines/az.com.virtual.machine.bicep' = if (parEnableLinux) {
   name: 'deploy-ra-linux-vm-${parLocation}-${parDeploymentNameSuffix}'
   params: {
@@ -263,7 +258,7 @@ module modLinuxVirtualMachine '../../../azresources/Modules/Microsoft.Compute/vi
     adminPassword: parLinuxVmAdminPasswordOrKey
 
     diagnosticWorkspaceId: parLogAnalyticsWorkspaceId
-    availabilitySetName: modAvSet.outputs.name
+    availabilitySetResourceId:modAvSet.outputs.resourceId
     encryptionAtHost: parEncryptionAtHost
     imageReference: {
       offer: parLinuxVmImageOffer
@@ -333,7 +328,7 @@ module windowsVirtualMachine '../../../azresources/Modules/Microsoft.Compute/vir
     adminUsername: parWindowsVmAdminUsername
     adminPassword: parWindowsVmAdminPassword //kv.getSecret('WindowsVmAdminPassword')
     diagnosticWorkspaceId: parLogAnalyticsWorkspaceId
-    availabilitySetName: modAvSet.outputs.name
+    availabilitySetResourceId:modAvSet.outputs.resourceId
     encryptionAtHost: parEncryptionAtHost
     imageReference: {
       offer: parWindowsVmOffer

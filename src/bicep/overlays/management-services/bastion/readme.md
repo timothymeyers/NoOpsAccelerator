@@ -38,7 +38,7 @@ The docs on Virtual Machines: <https://docs.microsoft.com/en-us/azure/templates/
 
 * A Platform LZ deployment (a deployment of Hub/Spoke)
 
-The output from that deployment described below:
+See below for information on how to use the appropriate deployment parameters for use with this overlay:
 
 Deployment Output Name | Description
 -----------------------| -----------

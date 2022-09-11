@@ -17,22 +17,22 @@
 
 ## Navigation
 
-* [Overview](#overview)
-* [Architecture](#architecture)
-* [Pre-requisites](#pre-requisites)
-* [Deployment](#deployment)
-* [Parameters](#parameters)
-* [Outputs](#Outputs)
-* [Resource Types](#Resource-Types)
-* [Air-Gapped Clouds](#air-gapped-clouds)
-* [Cleanup](#cleanup)
-* [Example Output](#example-output-in-azure)
+  - [Overview](#overview)
+  - [Prerequisites](#prerequisites)
+  - [Architecture](#architecture)
+  - [Deployment](#deployment)
+  - [Parameters](#parameters)
+  - [Outputs](#outputs)
+  - [Resource types](#resource-types)
+  - [Air-Gapped Clouds](#air-gapped-clouds)
+  - [Cleanup](#cleanup)
+  - [Example Output in Azure](#example-output-in-azure)
 
 ## Overview
 
 The Enclave Management Groups module deploys a management group hierarchy in a tenant under the `Tenant Root Group`.  This is accomplished through a tenant-scoped Azure Resource Manager (ARM) deployment.  The heirarchy can be modifed by editing `deploy.enclave.mg.parameters.json`.
 
->NOTE: This module setups up a enclave management group structure suitable for the Hub/ 3 Spoke Design (MLZ). You can create other parameter files that can be used for other organizational requirement.
+>NOTE: This module setups up a enclave management group structure suitable for the Hub/ 3 Spoke Design. You can create other parameter files that can be used for other organizational requirement.
 
 Module deploys the following resources:
 
@@ -41,7 +41,7 @@ Module deploys the following resources:
 The hierarchy created by the deployment (`deploy.enclave.mg.parameters.json`) is:
 
 * Tenant Root Group
-  * Intermediate Level Management Group (defined by parameter in `parManagementGroups`)
+  * Intermediate Level Management Group (defined by parameter in `parRootMg`)
     * Platform
       * Management
       * Transport
@@ -83,16 +83,16 @@ The following module usage examples are retrieved from the content of the files 
 ```bash
 # For Azure global regions
 az deployment mg create \
-   --template-file overlays/management-groups/anoa.lz.mg.bicep \
-   --parameters @overlays/management-groups/anoa.lz.mg.parameters.json \
+   --template-file overlays/management-groups/deploy.bicep \
+   --parameters @overlays/management-groups/deploy.enclave.mg.parameters.json \
    --location 'eastus'
 ```
 
 ```bash
 # For Azure IL regions
 az deployment mg create \
-  --template-file overlays/management-groups/anoa.lz.mg.bicep \
-  --parameters @overlays/management-groups/anoa.lz.mg.parameters.json \
+  --template-file overlays/management-groups/deploy.bicep \
+  --parameters @overlays/management-groups/deploy.enclave.mg.parameters.json \
   --location 'usgovvirginia'
 ```
 
@@ -107,8 +107,8 @@ az deployment mg create \
 # For Azure global regions
 New-AzManagementGroupDeployment `
   -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
-  -TemplateFile overlays/management-groups/anoa.lz.mg.bicepp `
-  -TemplateParameterFile overlays/management-groups/anoa.lz.mg.parameters.json `
+  -TemplateFile overlays/management-groups/deploy.bicepp `
+  -TemplateParameterFile overlays/management-groups/deploy.enclave.mg.parameters.json `
   -Location 'eastus'
 ```
 
@@ -118,8 +118,8 @@ OR
 # For Azure IL regions
 New-AzManagementGroupDeployment `
   -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
-  -TemplateFile overlays/management-groups/anoa.lz.mg.bicepp `
-  -TemplateParameterFile overlays/management-groups/anoa.lz.mg.parameters.json `
+  -TemplateFile overlays/management-groups/deploy.bicepp `
+  -TemplateParameterFile overlays/management-groups/deploy.enclave.mg.parameters.json.json `
   -Location  'usgovvirginia'
 ```
 </details>
@@ -138,7 +138,7 @@ The module requires the following inputs:
 **Conditional parameters**
 | Parameter Name | Type | Default Value | Description |
 | :-- | :-- | :-- | :-- |
-| `parRequireAuthorizationForGroupCreation` | string | Display name for top level management group.  This name will be applied to the management group prefix defined in `parTopLevelManagementGroupPrefix` parameter. |
+| `parRequireAuthorizationForGroupCreation` | bool | Display name for top level management group.  This name will be applied to the management group prefix defined in `parRootMg` parameter. |
 
 ## Outputs
 

@@ -1,0 +1,44 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "parRequired": {
+      "value": {
+        "orgPrefix": "anoa",
+        "templateVersion": "v1.0",
+        "deployEnvironment": "appsvcsplan"
+      }
+    },
+    "parTags": {
+      "value": {
+        "organization": "anoa",
+        "templateVersion": "v1.0",
+        "deployEnvironment": "appsvcsplan",
+        "deploymentType": "NoOpsBicep"
+      }
+    },
+    "parTargetSubscriptionId": {
+      "value": "<<subscriptionId>>"
+    },
+    "parTargetResourceGroup": {
+      "value": "<<example-rg>>"
+    },
+    "parContainerRegistry": {
+      "value": {
+        "name": "<<namePrefix>>azacrpe001",
+        "acrSku": "Premium",
+        "privateEndpoints": [
+          {
+            "privateDnsZoneGroup": {
+              "privateDNSResourceIds": [
+                "/subscriptions/<<subscriptionId>>/resourceGroups/validation-rg/providers/Microsoft.Network/privateDnsZones/privatelink.azurecr.io"
+              ]
+            },
+            "service": "registry",
+            "subnetResourceId": "/subscriptions/<<subscriptionId>>/resourceGroups/validation-rg/providers/Microsoft.Network/virtualNetworks/adp-<<namePrefix>>-az-vnet-x-001/subnets/<<namePrefix>>-az-subnet-x-005-privateEndpoints"
+          }
+        ]
+      }
+    }
+  }
+}

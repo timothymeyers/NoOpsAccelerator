@@ -93,7 +93,7 @@
           "managementGroupName": "anoa-management"
         }
       ]
-    },    
+    },
     "parBulitInPolicy": {
       "value": {
         "policies": [
@@ -309,41 +309,91 @@
         ]
       }
     },
-    "parHubSubscriptionId": {
-      "value": "xxxxxxx-xxxx-xxxx-xxxx-xxxxxxx"
+    "parHub": {
+      "value": {
+        "subscriptionId": "xxxxxxx-xxxx-xxxx-xxxx-xxxxxxx",
+        "virtualNetworkAddressPrefix": "10.0.100.0/24",
+        "subnetAddressPrefix": "10.0.100.128/27",
+        "virtualNetworkDiagnosticsLogs": [],
+        "virtualNetworkDiagnosticsMetrics": [],
+        "networkSecurityGroupRules": [],
+        "networkSecurityGroupDiagnosticsLogs":[
+          {
+            "category": "NetworkSecurityGroupEvent",
+            "enabled": true
+          },
+          {
+            "category": "NetworkSecurityGroupRuleCounter",
+            "enabled": true
+          }
+        ],
+        "subnetServiceEndpoints": [
+          {
+            "service": "Microsoft.Storage"
+          }
+        ]
+      }
     },
-    "parHubVirtualNetworkAddressPrefix": {
-      "value": "10.0.100.0/24"
-    },
-    "parHubSubnetAddressPrefix": {
-      "value": "10.0.100.128/27"
-    },
-    "parIdentitySubscriptionId": {
-      "value": "xxxxxxx-xxxx-xxxx-xxxx-xxxxxxx"
-    },
-    "parIdentityVirtualNetworkAddressPrefix": {
-      "value": "10.0.110.0/26"
-    },
-    "parIdentitySubnetAddressPrefix": {
-      "value": "10.0.110.0/27"
-    },
-    "parOperationsSubscriptionId": {
-      "value": "xxxxxxx-xxxx-xxxx-xxxx-xxxxxxx"
-    },
-    "parOperationsVirtualNetworkAddressPrefix": {
-      "value": "10.0.115.0/26"
-    },
-    "parOperationsSubnetAddressPrefix": {
-      "value": "10.0.115.0/27"
-    },
-    "parSharedServicesSubscriptionId": {
-      "value": "xxxxxxx-xxxx-xxxx-xxxx-xxxxxxx"
-    },
-    "parSharedServicesVirtualNetworkAddressPrefix": {
-      "value": "10.0.120.0/26"
-    },
-    "parSharedServicesSubnetAddressPrefix": {
-      "value": "10.0.120.0/27"
+    "parOperationsSpoke": {
+      "value": {
+        "subscriptionId": "xxxxxxx-xxxx-xxxx-xxxx-xxxxxxx",
+        "virtualNetworkAddressPrefix": "10.0.115.0/26",
+        "subnetAddressPrefix": "10.0.115.0/27",
+        "sourceAddressPrefixes": [],
+        "virtualNetworkDiagnosticsLogs": [],
+        "virtualNetworkDiagnosticsMetrics": [],
+        "networkSecurityGroupRules": [
+          {
+            "name": "Allow-Traffic-From-Spokes",
+            "properties": {
+              "access": "Allow",
+              "description": "Allow traffic from spokes",
+              "destinationAddressPrefix": "10.0.115.0/26",
+              "destinationPortRanges": [
+                "22",
+                "80",
+                "443",
+                "3389"
+              ],
+              "direction": "Inbound",
+              "priority": 200,
+              "protocol": "*",
+              "sourceAddressPrefixes": [],
+              "sourcePortRange": "*"
+            },
+            "type": "string"
+          }
+        ],
+        "publicIPAddressDiagnosticsLogs": [
+          {
+            "category": "DDoSProtectionNotifications",
+            "enabled": true
+          },
+          {
+            "category": "DDoSMitigationFlowLogs",
+            "enabled": true
+          },
+          {
+            "category": "DDoSMitigationReports",
+            "enabled": true
+          }
+        ],
+        "networkSecurityGroupDiagnosticsLogs":[
+          {
+            "category": "NetworkSecurityGroupEvent",
+            "enabled": true
+          },
+          {
+            "category": "NetworkSecurityGroupRuleCounter",
+            "enabled": true
+          }
+        ],
+        "subnetServiceEndpoints": [
+          {
+            "service": "Microsoft.Storage"
+          }
+        ]
+      }
     },
     "parNetworkArtifacts": {
       "value": {
@@ -371,35 +421,52 @@
         "enabled": false
       }
     },
-    "parAzureFirewallEnabled": {
-      "value": true
-    },
-    "parFirewallClientSubnetAddressPrefix": {
-      "value": "10.0.100.0/26"
-    },
-    "parFirewallManagementSubnetAddressPrefix": {
-      "value": "10.0.100.64/26"
-    },
-    "parFirewallSupernetIPAddress": {
-      "value": "10.0.96.0/19"
-    },
-    "parFirewallClientSubnetName": {
-      "value": "AzureFirewallSubnet"
-    },
-    "parFirewallSkuTier": {
-      "value": "Premium"
-    },
-    "parFirewallThreatIntelMode": {
-      "value": "Alert"
-    },
-    "parFirewallIntrusionDetectionMode": {
-      "value": "Alert"
-    },
-    "parApplicationRuleCollections": {
-      "value": []
-    },
-    "parNetworkRuleCollections": {
-      "value": []
+    "parAzureFirewall": {
+      "value": {
+        "enable": true,
+        "clientSubnetName": "AzureFirewallSubnet",
+        "clientSubnetAddressPrefix": "10.0.100.0/26",
+        "clientSubnetServiceEndpoints": [],
+        "clientPublicIPAddressAvailabilityZones": [],
+        "managementSubnetName": "AzureFirewallManagementSubnet",
+        "managementSubnetAddressPrefix": "10.0.100.64/26",
+        "managementSubnetServiceEndpoints": [],
+        "managementPublicIPAddressAvailabilityZones": [],
+        "supernetIPAddress": "10.0.96.0/19",
+        "skuTier": "Premium",
+        "threatIntelMode": "Alert",
+        "intrusionDetectionMode": "Alert",
+        "publicIPAddressDiagnosticsLogs": [
+          {
+            "category": "DDoSProtectionNotifications",
+            "enabled": true
+          },
+          {
+            "category": "DDoSMitigationFlowLogs",
+            "enabled": true
+          },
+          {
+            "category": "DDoSMitigationReports",
+            "enabled": true
+          }
+        ],
+        "publicIPAddressDiagnosticsMetrics": [
+          {
+            "category": "AllMetrics",
+            "enabled": true
+          }
+        ],
+        "diagnosticsLogs": [
+          "AzureFirewallApplicationRule",
+          "AzureFirewallNetworkRule",
+          "AzureFirewallDnsProxy"
+        ],
+        "diagnosticsMetrics": [
+          "AllMetrics"
+        ],
+        "applicationRuleCollections": [],
+        "networkRuleCollections": []
+      }
     },
     "parStorageAccountAccess": {
       "value": {

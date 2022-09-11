@@ -28,7 +28,7 @@ Licensed under the MIT License.
     - parDeployEnvironment
 */
 
-targetScope = 'subscription' //Deploying at Subscription scope to allow resource groups to be created and resources in one deployment
+targetScope = 'managementGroup' //Deploying at Subscription scope to allow resource groups to be created and resources in one deployment
 
 // REQUIRED PARAMETERS
 // Example (JSON)
@@ -64,10 +64,10 @@ param parLocation string = deployment().location
 // SUBSCRIPTIONS PARAMETERS
 
 @description('The subscription ID for the Hub Network and resources. It defaults to the deployment subscription.')
-param parHubSubscriptionId string = subscription().subscriptionId
+param parHubSubscriptionId string
 
 @description('The subscription ID for the Operations Network and resources. It defaults to the deployment subscription.')
-param parOperationsSubscriptionId string = subscription().subscriptionId
+param parOperationsSubscriptionId string
 
 // OPERATIONS NETWORK ARTIFACTS
 // Example (JSON)
@@ -364,6 +364,7 @@ param parRemoteAccess object
 var telemetry = json(loadTextContent('../../azresources/Modules/Global/telemetry.json'))
 module telemetryCustomerUsageAttribution '../../azresources/Modules/Global/partnerUsageAttribution/customer-usage-attribution-subscription.bicep' = if (telemetry.customerUsageAttribution.enabled) {
   name: 'pid-${telemetry.customerUsageAttribution.modules.platforms.hubspoke1}-${uniqueString(parLocation)}'
+  scope: subscription(parHubSubscriptionId)
 }
 
 /*
@@ -401,6 +402,7 @@ var referential = {
 @description('Resource group tags')
 module modTags '../../azresources/Modules/Microsoft.Resources/tags/az.resources.tags.bicep' = {
   name: 'deploy-hubspoke-tags--${parLocation}-${parDeploymentNameSuffix}'
+  scope: subscription(parHubSubscriptionId)
   params: {
     tags: union(parTags, referential)
   }
@@ -455,6 +457,9 @@ module modArtifacts '../../azresources/hub-spoke/vdss/networkArtifacts/anoa.lz.a
     parWindowsVmAdminPassword: parRemoteAccess.bastion.windows.vmAdminPassword
   }
 }
+
+//POLICY
+
 
 // HUB AND SPOKE NETWORKS
 
@@ -587,7 +592,7 @@ module modSpokeOpsToHubVirtualNetworkPeerings '../../azresources/hub-spoke/peeri
 
 // REMOTE ACCESS
 
-module modRemoteAccess '../../overlays/management-services/bastion/anoa.lz.mgmt.svcs.remote.access.bicep' = if (parRemoteAccess.enable) {
+module modRemoteAccess '../../overlays/management-services/bastion/deploy.bicep' = if (parRemoteAccess.enable) {
   name: 'deploy-remote-access-hub-${parLocation}-${parDeploymentNameSuffix}'
   scope: resourceGroup(parHubSubscriptionId, varHubResourceGroupName)
   params: {
@@ -661,8 +666,9 @@ module modVMExt '../../azresources/Modules/Microsoft.Compute/virtualmachines/ext
 
 // MICROSOFT DEFENDER FOR CLOUD FOR HUB
 
-module modDefender '../../overlays/management-services/defender/anoa.lz.mgmt.svcs.defender.bicep' = if (parSecurityCenter.enableDefender) {
+module modDefender '../../overlays/management-services/defender/deploy.bicep' = if (parSecurityCenter.enableDefender) {
   name: 'deploy-defender-hub-${parLocation}-${parDeploymentNameSuffix}'
+  scope: subscription(parHubSubscriptionId)
   params: {
     parLocation: parLocation
     parLogAnalyticsWorkspaceResourceId: modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceResourceId
@@ -673,7 +679,7 @@ module modDefender '../../overlays/management-services/defender/anoa.lz.mgmt.svc
 
 // MICROSOFT DEFENDER FOR CLOUD FOR SPOKES
 
-module spokeOpsDefender '../../overlays/management-services/defender/anoa.lz.mgmt.svcs.defender.bicep' = if (parSecurityCenter.enableDefender && parOperationsSubscriptionId != parHubSubscriptionId) {
+module spokeOpsDefender '../../overlays/management-services/defender/deploy.bicep' = if (parSecurityCenter.enableDefender && parOperationsSubscriptionId != parHubSubscriptionId) {
   name: 'deploy-defender-ops-${parLocation}-${parDeploymentNameSuffix}'
   scope: subscription(parOperationsSubscriptionId)
   params: {

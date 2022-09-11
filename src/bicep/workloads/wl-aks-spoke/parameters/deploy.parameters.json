@@ -38,26 +38,159 @@
     "parLogAnalyticsWorkspaceName": {
       "value": ""
     },
-    "parAksClusterKubernetesVersion": {
-      "value": ""
-    },
-    "parAppGatewayResourceId": {
-      "value": ""
-    },
-    "parIngressApplicationGatewayEnabled": {
-      "value": false
-    },
-    "parAksClusterDockerBridgeCidr": {
-      "value": ""
-    },
-    "parAksClusterLoadBalancerSku": {
-      "value": ""
-    },
-    "parEnablePrivateCluster": {
-      "value": false
-    },
-    "parEnableAzureDefender": {
-      "value": false
+    "parAzureKubernetes": {
+      "value": {
+        "name": {
+          "value": "<<namePrefix>>-az-aks-azure-001"
+        },
+        "apiServerAccessProfile": {
+          "value": [
+            {
+              "enablePrivateCluster": true,
+              "usePrivateDNSZone": true,
+              "enablePrivateClusterPublicFQDN": true
+            }
+          ]
+        },
+        "aadProfile": {
+          "value": [
+            {
+              "aadProfileEnableAzureRBAC": true,
+              "aadProfileManaged": true
+            }
+          ]
+        },
+        "networkProfile": {
+          "value": [
+            {
+              "aksClusterLoadBalancerSku": "",
+              "aksClusterNetworkPlugin": "azure",
+              "aksClusterOutboundType": "userDefinedRouting",
+              "aksClusterDockerBridgeCidr": "",
+              "aksClusterDnsServiceIP": "10.2.0.10",
+              "aksClusterServiceCidr": "10.2.0.0/24",
+              "aksClusterNetworkPolicy": "azure"
+            }
+          ]
+        },
+        "primaryAgentPoolProfile": {
+          "value": [
+            {
+              "availabilityZones": [
+                "1"
+              ],
+              "count": 1,
+              "enableAutoScaling": true,
+              "maxCount": 3,
+              "maxPods": 30,
+              "minCount": 1,
+              "mode": "System",
+              "name": "systempool",
+              "osDiskSizeGB": 0,
+              "osType": "Linux",
+              "serviceCidr": "",
+              "storageProfile": "ManagedDisks",
+              "type": "VirtualMachineScaleSets",
+              "vmSize": "Standard_DS2_v2",
+              "vnetSubnetID": "/subscriptions/<<subscriptionId>>/resourceGroups/validation-rg/providers/Microsoft.Network/virtualNetworks/adp-<<namePrefix>>-az-vnet-x-aks/subnets/Primary"
+            }
+          ]
+        },
+        "agentPools": {
+          "value": [
+            {
+              "availabilityZones": [
+                "1"
+              ],
+              "count": 2,
+              "enableAutoScaling": true,
+              "maxCount": 3,
+              "maxPods": 30,
+              "minCount": 1,
+              "minPods": 2,
+              "mode": "User",
+              "name": "userpool1",
+              "nodeLabels": {},
+              "nodeTaints": [
+                "CriticalAddonsOnly=true:NoSchedule"
+              ],
+              "osDiskSizeGB": 128,
+              "osType": "Linux",
+              "scaleSetEvictionPolicy": "Delete",
+              "scaleSetPriority": "Regular",
+              "storageProfile": "ManagedDisks",
+              "type": "VirtualMachineScaleSets",
+              "vmSize": "Standard_DS2_v2",
+              "vnetSubnetID": "/subscriptions/<<subscriptionId>>/resourceGroups/validation-rg/providers/Microsoft.Network/virtualNetworks/adp-<<namePrefix>>-az-vnet-x-aks/subnets/Secondary"
+            },
+            {
+              "availabilityZones": [
+                "1"
+              ],
+              "count": 2,
+              "enableAutoScaling": true,
+              "maxCount": 3,
+              "maxPods": 30,
+              "minCount": 1,
+              "minPods": 2,
+              "mode": "User",
+              "name": "userpool2",
+              "nodeLabels": {},
+              "nodeTaints": [
+                "CriticalAddonsOnly=true:NoSchedule"
+              ],
+              "osDiskSizeGB": 128,
+              "osType": "Linux",
+              "scaleSetEvictionPolicy": "Delete",
+              "scaleSetPriority": "Regular",
+              "storageProfile": "ManagedDisks",
+              "type": "VirtualMachineScaleSets",
+              "vmSize": "Standard_DS2_v2",
+              "vnetSubnetID": "/subscriptions/<<subscriptionId>>/resourceGroups/validation-rg/providers/Microsoft.Network/virtualNetworks/adp-<<namePrefix>>-az-vnet-x-aks/subnets/Tertiary"
+            }
+          ]
+        },
+        "clusterKubernetesVersion": {
+          "value": ""
+        },
+        "aksClusterNetworkPlugin": {
+          "value": "azure"
+        },
+        "diagnosticEventHubAuthorizationRuleId": {
+          "value": "/subscriptions/<<subscriptionId>>/resourceGroups/validation-rg/providers/Microsoft.EventHub/namespaces/adp-<<namePrefix>>-az-evhns-x-001/AuthorizationRules/RootManageSharedAccessKey"
+        },
+        "diagnosticEventHubName": {
+          "value": "adp-<<namePrefix>>-az-evh-x-001"
+        },
+        "diagnosticLogsRetentionInDays": {
+          "value": 7
+        },
+        "diagnosticStorageAccountId": {
+          "value": "/subscriptions/<<subscriptionId>>/resourceGroups/validation-rg/providers/Microsoft.Storage/storageAccounts/adp<<namePrefix>>azsax001"
+        },
+        "diagnosticWorkspaceId": {
+          "value": "/subscriptions/<<subscriptionId>>/resourcegroups/validation-rg/providers/microsoft.operationalinsights/workspaces/adp-<<namePrefix>>-az-law-x-001"
+        },
+        "diskEncryptionSetID": {
+          "value": "/subscriptions/<<subscriptionId>>/resourceGroups/validation-rg/providers/Microsoft.Compute/diskEncryptionSets/adp-<<namePrefix>>-az-des-x-001"
+        },
+        "lock": {
+          "value": "CanNotDelete"
+        },
+        "roleAssignments": {
+          "value": [
+            {
+              "principalIds": [
+                "<<deploymentSpId>>"
+              ],
+              "roleDefinitionIdOrName": "Reader"
+            }
+          ]
+        },
+        "systemAssignedIdentity": {
+          "value": true
+        }
+      }
     }
   }
 }

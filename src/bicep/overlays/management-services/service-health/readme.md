@@ -30,7 +30,7 @@ Our examples configure service health alerts for `Security` and `Incident`. Howe
 
 * A Mission LZ deployment (a deployment of mlz.bicep)
 
-The output from that deployment described below:
+See below for information on how to use the appropriate deployment parameters for use with this overlay:
 
 Deployment Output Name | Description
 -----------------------| -----------

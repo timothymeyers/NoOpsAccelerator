@@ -1,6 +1,5 @@
 /*
-Copyright (c) Microsoft Corporation.
-Licensed under the MIT License.
+Copyright (c) Microsoft Corporation. Licensed under the MIT license.
 */
 
 @description('The name of the resource the private endpoint is being created for')

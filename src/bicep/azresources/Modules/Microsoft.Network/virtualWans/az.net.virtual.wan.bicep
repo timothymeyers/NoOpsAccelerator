@@ -1,3 +1,4 @@
+/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 @description('Optional. Location where all resources will be created.')
 param location string = resourceGroup().location
 

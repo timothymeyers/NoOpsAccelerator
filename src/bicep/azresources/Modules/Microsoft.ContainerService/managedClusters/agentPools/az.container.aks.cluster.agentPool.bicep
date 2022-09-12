@@ -1,3 +1,4 @@
+/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 @description('Conditional. The name of the parent managed cluster. Required if the template is used in a standalone deployment.')
 @minLength(1)
 param managedClusterName string

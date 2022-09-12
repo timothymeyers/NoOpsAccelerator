@@ -1,3 +1,4 @@
+/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 @description('Optional. The name of the AADDS resource. Defaults to the domain name specific to the Azure ADDS service.')
 param name string = domainName
 

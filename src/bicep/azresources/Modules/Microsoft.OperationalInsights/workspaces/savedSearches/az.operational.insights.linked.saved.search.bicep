@@ -1,3 +1,4 @@
+/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 @description('Conditional. The name of the parent Log Analytics workspace. Required if the template is used in a standalone deployment.')
 param logAnalyticsWorkspaceName string
 

@@ -1,3 +1,4 @@
+/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 param principalIds array
 param principalType string = ''
 param roleDefinitionIdOrName string

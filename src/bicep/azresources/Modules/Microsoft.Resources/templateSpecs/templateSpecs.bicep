@@ -1,3 +1,4 @@
+/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 param name string
 param version string
 param location string = resourceGroup().location

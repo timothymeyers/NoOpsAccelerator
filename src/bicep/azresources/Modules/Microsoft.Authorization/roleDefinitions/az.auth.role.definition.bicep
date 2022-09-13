@@ -1,3 +1,4 @@
+/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 targetScope = 'managementGroup'
 
 @sys.description('Required. Name of the custom RBAC role to be created.')

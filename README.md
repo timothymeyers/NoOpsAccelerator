@@ -1,19 +1,77 @@
 # Azure NoOps Accelerator
 
-## Navigation Menu
+> "NoOps is not about the elimination of ops; it is about the **elimination of manual handoffs and low-value, rote administration**." - *Forrester*
 
-* [What's New?](https://github.com/Azure/NoOpsAccelerator/wiki/Whats-new)
-* [Community Calls](https://github.com/Azure/NoOpsAccelerator/wiki/Community-Calls)
-* [Azure NoOps Accelerator - User Guide](https://github.com/Azure/NoOpsAccelerator/wiki#noops-accelerator-user-guide)
-* [Telemetry Tracking Using Customer Usage Attribution (PID)](https://github.com/Azure/NoOpsAccelerator/wiki/Deploying-NoOps-Accelerator-CustomerUsage)
-* [Configure Azure permission for ARM Template deployments](https://github.com/Azure/NoOpsAccelerator/wiki/NoOpsAccelerator-Setup-azure)
-* [Known Issues](https://github.com/Azure/NoOpsAccelerator/wiki/NoOpsAccelerator-Known-Issues)
-* [How Do I Contribute?](https://github.com/Azure/NoOpsAccelerator/wiki/NoOpsAccelerator-Contribution)
-* [Frequently Asked Questions (FAQ)](https://github.com/Azure/NoOpsAccelerator/wiki/FAQ)
-* [Roadmap](https://github.com/Azure/NoOpsAccelerator/wiki/NoOpsAccelerator-Roadmap)
+**Azure NoOps Accelerator** is a collection of [modules](https://github.com/Azure/NoOpsAccelerator/tree/main/src/bicep)
+that enables US Department of Defense and other Public Sector customers
+to quickly develop and maintain
+opinionated, policy-driven, self-service
+infrastructure in their Azure environments.
+
+* Designed for US Government mission customers.
+* Implements SCCA controls following [Microsoft's SACA implementation guidance](https://aka.ms/saca)
+* Deployable in Azure Commercial, Azure Government, Azure Government Secret, and Azure Government Top Secret clouds
+* Accelerate the use of Azure in DOD/Public Sector through onboarding multiple types of workloads including App Dev and Data & AI.
+* Simplify compliance management through automated audit, reporting, and remediation.
+* Written as Bicep templates.
+
+## Quickstart
+
+You can use the NoOps Accelerator to deploy [SCCA-compliant landing zones](./src/bicep/platforms/) based on Microsoft's [SACA implementation guidance][saca] and [Mission Landing Zone][mlz_architecture] architecture.
+
+The [NoOps Accelerator - SCCA Compliant Hub/Spoke Design(Referred as Mission Landing Zone)](src/bicep/platforms/lz-platform-scca-hub-3spoke/) is set up in a hub and spoke design with Logging, separated by tiers: T0 (Identity and Authorization), T1 (Infrastructure Operations), T2 (DevSecOps and Shared Services), and multiple T3s (Workloads).
+
+Access control can be configured to allow separation of duties between all tiers.
+
+### Deploy a SCCA-compliant Landing Zone (SCCA Hub with 3 Spokes) using the Azure CLI
+
+1. Clone the repository down and change directory to the `lz-platform-scca-hub-3spoke` directory
+
+    ```plaintext
+    git clone https://github.com/Azure/NoOpsAccelerator.git
+    cd NoOpsAccelerator/src/bicep/platforms/lz-platform-scca-hub-3spoke
+    ```
+
+1. Deploy the landing zone with the `az deployment sub create` command.
+For a quickstart, we suggest a test deployment into the current AZ CLI subscription using these parameters:
+
+    * `--name`: (optional) The deployment name, which is visible in the Azure Portal under Subscription/Deployments.
+    * `--location`: (required) The Azure region to store the deployment metadata.
+    * `--template-file`: The file path to the `deploy.bicep` template.
+    * `--parameters`: The file path to the `parameters/deploy.parameters.json` file, preceeded by `@`.
+        Individual parameters can be overwritten using `<parameter>=<value>` format as well.
+    * `--subscription`: The GUID for the subscription to deploy into.
+        Multiple subscriptions may be configured (*i.e.*, to have separate subscriptions for each 'tier' in the MLZ architecture) in the `parameters/deploy.parameters.json`
+
+    Here is an example that deploys into a single subscription in the EastUS region of Azure Commercial:
+
+    ```plaintext
+    az deployment sub create 
+      --name deploy-scca-hub-with-3-spokes
+      --location EastUS 
+      --template-file deploy.bicep  
+      --parameters @parameters/deploy.parameters.json 
+      --subscription xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx
+    ```
+
+1. After a successful deployment, see our [workloads](.src/bicep/workloads), [platforms](./src/bicep/platforms), [overlays](./src/bicep/overlays), and [enclaves](./src/bicep/enclaves/) folders for more examples of what NoOps can be used to deploy.
+    Don't forget to clean-up your environment when you are done.
+
+> Don't have Azure CLI? Here's how to get started with Azure Cloud Shell in your browser: <https://docs.microsoft.com/en-us/azure/cloud-shell/overview>
+
+<!-- For more detailed deployment instructions, see our deployment guides for [Bicep](docs/deployment-guide-bicep.md) and [Terraform](docs/deployment-guide-terraform.md). -->
+
+## Design your own solutions
+
+NoOps
+
+----
+
+
+
 * [Microsoft Support Policy](./SUPPORT.md)
 
-Azure NoOps Accelerator is a flexible foundation that enables DOD/Public Sector customers to develop/maintain opinionated self-service infrastructure in their Azure environment. These templates are created to help organizations move to a continious deployment of infrastructure.
+These templates are created to help organizations move to a continious deployment of infrastructure.
 
 Azure NoOps Accelerator Architecture supported up to IL6 (Top Secret) - Cloud Only Applications. This flexible foundation is applicable to Infrastructure as a Service (IaaS) and Platform as a Service (PaaS) with characteristics:
 
@@ -24,23 +82,11 @@ This implementation is specific to DOD/Public Sector organizations.
 
 ## Goals
 
-* Designed for US Government mission customers
-* Implements SCCA controls following Microsoft's SACA implementation guidance
-* Deployable in Azure commercial, Azure Government, Azure Government Secret, and Azure Government Top Secret clouds
-* Accelerate the use of Azure in DOD/Public Sector through onboarding multiple types of workloads including App Dev and Data & AI.
-* Simplify compliance management through a single source of compliance, audit reporting and auto remediation.
-* Deployment of DevOps frameworks & business processes to improve agility
-* Written as Bicep and Terraform templates
-
 ## Non-Goals
 
 * Automatic approval for Authority to Operate (ATO). Customers must collect evidence, customize to meet their departmental requirements and submit for Authority to Operate based on their risk profile, requirements and process.
 
 * Compliant on all Azure Policies when the reference implementation is deployed. This is due to the shared responsibility of cloud and customers can choose the Azure Policies to exclude. For example, using Azure Firewall is an Azure Policy that will be non-compliant since majority of the DOD/Public Sector customers use Network Virtual Appliances. Customers must review Microsoft Defender for Cloud Regulatory Compliance dashboard and apply appropriate exemptions.
-
-## How We Define `Azure NoOps` for this Project
-
-Azure NoOps is “not about the elimination of ops; it is about the elimination of manual handoffs and low-value, rote administration.” Think of NoOps is the next evolution of DevOps. We want NoOps Accelerator to drive mission success with an outcome-based approach to deliver continuous value to enable the warfighter.
 
 ## Requirements for Successful NoOps
 
@@ -103,13 +149,8 @@ See the following onboarding guides for setup instructions:
 * GitHub Actions Scripts provides guidance on the scripts available to help simplify the onboarding process to Azure Landing Zones design using GitHub Actions.
 * GitHub Actions provides guidance on the manual steps for onboarding to the Azure Landing Zones design using GitHub Actions.
 
-## SCCA Compliant Hub/Spoke Design(Referred as Mission Landing Zone)
 
-NoOps Accelerator can be used to create a SCCA Compliant Hub/Spoke Design(Referred as Mission Landing Zone) based on the [Azure Mission Landing Zone Conceptual Architecture][mlz_architecture].
 
-The [NoOps Accelerator - SCCA Compliant Hub/Spoke Design(Referred as Mission Landing Zone)](src/bicep/platforms/lz-platform-scca-hub-3spoke/) is set up in a hub and spoke design with Logging, separated by tiers: T0 (Identity and Authorization), T1 (Infrastructure Operations), T2 (DevSecOps and Shared Services), and multiple T3s (Workloads).
-
-Access control can be configured to allow separation of duties between all tiers.
 
 ## Bicep Modules
 
@@ -175,7 +216,8 @@ Use of Microsoft trademarks or logos in modified versions of this project must n
 Any use of third-party trademarks or logos are subject to those third-party's policies.
 
 [//]: # (************************)
- [//]: # (INSERT LINK LABELS BELOW)
- [//]: # (************************)
+[//]: # (INSERT LINK LABELS BELOW)
+[//]: # (************************)
 
-[mlz_architecture]:                            https://github.com/Azure/missionlz "MLZ Accelerator"
+[mlz_architecture]:                            https://github.com/Azure/missionlz "Mission Landing Zone GitHub Repo"
+[saca]:                                        https://aka.ms/saca "Microsoft Secure Azure Computing Architecture (SACA) Guidance"

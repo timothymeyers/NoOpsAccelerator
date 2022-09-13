@@ -32,7 +32,6 @@ This module deploys a Static Web App.
 | `allowConfigFileUpdates` | bool | `True` |  | If config file is locked for this static web app. |
 | `branch` | string | `''` |  | The branch name of the GitHub repository. |
 | `buildProperties` | object | `{object}` |  | Build properties for the static site. |
-| `enableDefaultTelemetry` | bool | `True` |  | Enable telemetry via the Customer Usage Attribution ID (GUID). |
 | `enterpriseGradeCdnStatus` | string | `'Disabled'` | `[Disabled, Disabling, Enabled, Enabling]` | State indicating the status of the enterprise grade CDN serving traffic to the static web app. |
 | `location` | string | `[resourceGroup().location]` |  | Location to deploy static site. The following locations are supported: CentralUS, EastUS2, EastAsia, WestEurope, WestUS2. |
 | `lock` | string | `''` | `['', CanNotDelete, ReadOnly]` | Specify the type of lock. |

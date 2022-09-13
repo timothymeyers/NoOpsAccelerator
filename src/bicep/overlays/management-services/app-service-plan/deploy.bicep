@@ -19,6 +19,7 @@ targetScope = 'subscription' //Deploying at Subscription scope to allow resource
 
 // REQUIRED PARAMETERS
 // Example (JSON)
+// These are the required parameters for the deployment
 // -----------------------------
 // "parRequired": {
 //   "value": {
@@ -32,6 +33,7 @@ param parRequired object
 
 // REQUIRED TAGS
 // Example (JSON)
+// These are the required tags for the deployment
 // -----------------------------
 // "parTags": {
 //   "value": {
@@ -55,11 +57,11 @@ param parAppServicePlan object
 
 // SUBSCRIPTIONS PARAMETERS
 
-@description('The subscription ID for the Hub Network and resources. It defaults to the deployment subscription.')
+@description('The subscription ID for the Target Network and resources. It defaults to the deployment subscription.')
 param parTargetSubscriptionId string = subscription().subscriptionId
 
 @description('The name of the resource group in which the key vault will be deployed. If unchanged or not specified, the NoOps Accelerator shared services resource group is used.')
-param parTargetResourceGroup string
+param parTargetResourceGroup string = ''
 
 // RESOURCE NAMING PARAMETERS
 
@@ -122,7 +124,7 @@ module appServicePlan '../../../azresources/Modules/Microsoft.Web/serverfarms/az
   params: {    
     location: parLocation    
     appServicePlanName: varAppServicePlanName
-    appServicePlanSku:  parAppServicePlan.appServicePlanSku         
+    appServicePlanSku:  parAppServicePlan.appServicePlanSku       
   }
 }
 

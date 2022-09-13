@@ -29,7 +29,6 @@ This module deploys budgets for subscriptions.
 | `category` | string | `'Cost'` | `[Cost, Usage]` | The category of the budget, whether the budget tracks cost or usage. |
 | `contactEmails` | array | `[]` |  | The list of email addresses to send the budget notification to when the thresholds are exceeded. |
 | `contactRoles` | array | `[]` |  | The list of contact roles to send the budget notification to when the thresholds are exceeded. |
-| `enableDefaultTelemetry` | bool | `True` |  | Enable telemetry via the Customer Usage Attribution ID (GUID). |
 | `endDate` | string | `''` |  | The end date for the budget. If not provided, it will default to 10 years from the start date. |
 | `location` | string | `[deployment().location]` |  | Location deployment metadata. |
 | `name` | string | `''` |  | The name of the budget. |

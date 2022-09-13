@@ -318,7 +318,7 @@ module registry_roleAssignments './rbac/roleAssignments.bicep' = [for (roleAssig
   }
 }]
 
-module registry_privateEndpoints '../../Microsoft.Network/privateEndPoint/az.net.private.endpoint.bicep' = [for (privateEndpoint, index) in privateEndpoints: {
+module registry_privateEndpoints '../../Microsoft.Network/privateEndPoints/az.net.private.endpoint.bicep' = [for (privateEndpoint, index) in privateEndpoints: {
   name: '${uniqueString(deployment().name, location)}-ContainerRegistry-PrivateEndpoint-${index}'
   params: {
     groupIds: [

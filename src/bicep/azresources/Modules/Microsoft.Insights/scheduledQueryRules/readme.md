@@ -32,7 +32,6 @@ This module deploys a scheduled query rule.
 | `autoMitigate` | bool | `True` |  | The flag that indicates whether the alert should be automatically resolved or not. Relevant only for rules of the kind LogAlert. |
 | `criterias` | object | `{object}` |  | The rule criteria that defines the conditions of the scheduled query rule. |
 | `enabled` | bool | `True` |  | The flag which indicates whether this scheduled query rule is enabled. |
-| `enableDefaultTelemetry` | bool | `True` |  | Enable telemetry via the Customer Usage Attribution ID (GUID). |
 | `evaluationFrequency` | string | `''` |  | How often the scheduled query rule is evaluated represented in ISO 8601 duration format. Relevant and required only for rules of the kind LogAlert. |
 | `kind` | string | `'LogAlert'` | `[LogAlert, LogToMetric]` | Indicates the type of scheduled query rule. |
 | `location` | string | `[resourceGroup().location]` |  | Location for all resources. |

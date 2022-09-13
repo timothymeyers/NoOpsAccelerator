@@ -210,7 +210,7 @@ module modIdentityLogStorage '../../../Modules/Microsoft.Storage/storageAccounts
   ]
 }
 
-module modIdentityNetworkSecurityGroup '../../../Modules/Microsoft.Network/networkSecurityGroup/az.net.network.security.group.with.diagnostics.bicep' = {
+module modIdentityNetworkSecurityGroup '../../../Modules/Microsoft.Network/networkSecurityGroups/az.net.network.security.group.with.diagnostics.bicep' = {
   name: 'deploy-${varIdentityShortName}-nsg-${parLocation}-${parDeploymentNameSuffix}'
   scope: resourceGroup(varIdentityResourceGroupName)
   params: {

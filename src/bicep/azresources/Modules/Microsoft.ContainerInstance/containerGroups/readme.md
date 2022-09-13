@@ -31,7 +31,6 @@ The top-level resource in Azure Container Instances is the container group. A co
 | Parameter Name | Type | Default Value | Allowed Values | Description |
 | :-- | :-- | :-- | :-- | :-- |
 | `cpuCores` | int | `2` |  | The number of CPU cores to allocate to the container. |
-| `enableDefaultTelemetry` | bool | `True` |  | Enable telemetry via the Customer Usage Attribution ID (GUID). |
 | `environmentVariables` | array | `[]` |  | Environment variables of the container group. |
 | `imageRegistryCredentials` | array | `[]` |  | The image registry credentials by which the container group is created from. |
 | `ipAddressType` | string | `'Public'` |  | Specifies if the IP is exposed to the public internet or private VNET. - Public or Private. |

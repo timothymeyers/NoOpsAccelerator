@@ -1,30 +1,27 @@
-# NoOps Accelerator - Workloads - Tier 3 - Azure Kubernetes Service
-
-## Authored & Tested With
-
-* [azure-cli](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) version 2.38.0
-* bicep cli version v0.9.1
-* [bicep](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-bicep) v0.9.1 vscode extension
+# Workloads: NoOps Accelerator - Tier 3 - Azure Kubernetes Service
 
 ## Navigation
 
-* [Overview](#overview)
-* [Architecture](#architecture)
-* [Pre-requisites](#pre-requisites)
-* [Deployment](#deployment)
-* [Parameters](#add-on-parameters)
-* [Outputs](#Outputs)
-* [Resource Types](#Resource-Types)
+- [Workloads: NoOps Accelerator - Tier 3 - Azure Kubernetes Service](#workloads-noops-accelerator---tier-3---azure-kubernetes-service)
+  - [Navigation](#navigation)
+  - [Overview](#overview)
+  - [Architecture](#architecture)
+  - [Pre-requisites](#pre-requisites)
+  - [About Azure Container Registry](#about-azure-container-registry)
+  - [About Azure Kubernetes Service - Cluster](#about-azure-kubernetes-service---cluster)
+  - [Azure Kubernetes Service Workload Parameters](#azure-kubernetes-service-workload-parameters)
+  - [Outputs](#outputs)
+  - [References](#references)
 
 ## Overview
 
-This workload module creates a Workload (Tier 3) deployment that deploys a Azure Kubernetes Service with RBAC enabled, if required. A Azure Kubernetes Service utilizes hardware security modules to protect key material. Roles for use must be assigned post-deployment, review reference list below for detailed information.
+This workload module creates a Workload [Tier 3 Spoke Network](../tier3/README.md) deployment that deploys a Azure Kubernetes Service with RBAC enabled, if required. A Azure Kubernetes Service utilizes hardware security modules to protect key material. Roles for use must be assigned post-deployment, review reference list below for detailed information.
 
 Read on to understand what this workload does, and when you're ready, collect all of the pre-requisites, then deploy the workload.
 
 ## Architecture
 
- ![Private Azure Kubernetes Service](../../../../docs/media/AKSPrivateClusterTier3.jpg)
+ ![Private Azure Kubernetes Service](./media/AKSPrivateClusterTier3.jpg)
 
 ## Pre-requisites
 
@@ -38,19 +35,17 @@ Read on to understand what this workload does, and when you're ready, collect al
 
 >NOTE: The AZ CLI will automatically install the Bicep tools when a command is run that needs them, or you can manually install them following the instructions here.
 
-## Deployment
+## About Azure Container Registry
 
-The docs on Azure Kubernetes Service: <https://docs.microsoft.com/en-us/azure/key-vault/>.
+The docs on Azure Container Registry: <https://docs.microsoft.com/en-us/azure/container-registry/>. By default, this worload uses the Azure Container Registry overlay to deploy resources into [Tier 3 Spoke Network](../tier3/README.md).  
 
-This workload shows how to deploy using Bicep to support the deployment. By default, this template will deploy resources into standard default Hub/Spoke subscriptions and resource groups.
+The subscription and resource group can be changed by providing the resource group name (Param: parTargetSubscriptionId/parTargetResourceGroup) and ensuring that the Azure context is set the proper subscription.  
 
-The subscription can be changed by providing the subscription Id (Param: parWorkloadSubscriptionId) and ensuring that the Azure context is set the proper subscription.
+## About Azure Kubernetes Service - Cluster
 
-Connect to the appropriate Azure Environment and set appropriate context, see getting started with Azure PowerShell for help if needed. The commands below assume you are deploying in Azure Commercial or Azure Government and shows the entire process of deploying a Azure Kubernetes Service post-deployment of the Hub/Spoke Network.
+The docs on Azure Kubernetes Service: <https://docs.microsoft.com/en-us/azure/aks/>.  this worload uses the Azure Kubernetes Service - Cluster overlay to deploy resources into [Tier 3 Spoke Network](../tier3/README.md).  
 
-```Azure CLI
-
-```
+The subscription and resource group can be changed by providing the resource group name (Param: parTargetSubscriptionId/parTargetResourceGroup) and ensuring that the Azure context is set the proper subscription.  
 
 ## Azure Kubernetes Service Workload Parameters
 

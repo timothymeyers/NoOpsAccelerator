@@ -1,34 +1,20 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
-    "parameters": {
-        "organizationName": {
-            "value": "anoa"
+    "parameters": {        
+        "parTargetSubscriptionId": {
+            "value": "896f5276-df9a-4317-a791-469396bef7fa"
         },
-        "deployEnvironment": {
-            "value": "dev"
-        },
-        "templateVersion": {
-            "value": "v1.0"
-        },
-        "parScopeSubscription": {
-            "value": "/subscriptions/<<subscriptionId>>"
-        },
-        "parAlertNotifications": {
-            "value": "Off"
-        },
-        "parAlertsToAdminsNotifications": {
-            "value": "Off"
-        },
-        "parEmailSecurityContact": {
-            "value": "value"
-        },
-        "parPhoneSecurityContact": {
-            "value": "value"
+        "parSecurityCenter": {
+            "value": {
+                "alertNotifications": "Off",
+                "alertsToAdminsNotifications": "Off",
+                "emailSecurityContact": "anoa@microsoft.com",
+                "phoneSecurityContact": "5555555555"
+            }
         },
         "parLogAnalyticsWorkspaceResourceId": {
             "value": "/subscriptions/<<subscriptionId>>/resourcegroups/validation-rg/providers/microsoft.operationalinsights/workspaces/adp-<<namePrefix>>-az-law-x-001"
         }
-
     }
 }

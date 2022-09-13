@@ -417,7 +417,7 @@ module modHubLogStorage '../../../Modules/Microsoft.Storage/storageAccounts/az.d
 
 // HUB NSG - VDMS
 
-module modHubNetworkSecurityGroup '../../../Modules/Microsoft.Network/networkSecurityGroup/az.net.network.security.group.with.diagnostics.bicep' = {
+module modHubNetworkSecurityGroup '../../../Modules/Microsoft.Network/networkSecurityGroups/az.net.network.security.group.with.diagnostics.bicep' = {
   name: 'deploy-hub-networkSecurityGroup-${parLocation}-${parDeploymentNameSuffix}'
   scope: resourceGroup(parHubSubscriptionId, varHubResourceGroupName)
   params: {
@@ -555,7 +555,7 @@ module modFirewallManagementPublicIPAddress '../../../Modules/Microsoft.Network/
 
 // HUB FW - VDMS
 
-module modAzureFirewall '../../../Modules/Microsoft.Network/firewall/az.net.firewall.with.diagnostics.bicep' = if (parAzureFirewallEnabled) {
+module modAzureFirewall '../../../Modules/Microsoft.Network/firewalls/az.net.firewall.with.diagnostics.bicep' = if (parAzureFirewallEnabled) {
   name: 'deploy-hub-FW-${parLocation}-${parDeploymentNameSuffix}'
   scope: resourceGroup(parHubSubscriptionId, varHubResourceGroupName)
   params: {
@@ -606,7 +606,7 @@ module modAzureFirewallPolicy '../../../Modules/Microsoft.Network/firewallPolici
 
 // HUB PRIVATE LINK - VDMS
 
-module modAzureMonitorPrivateLink '../../../Modules/Microsoft.Network/privateEndPoint/privateLinks/az.net.private.link.bicep' = if (contains(parSupportedClouds, environment().name)) {
+module modAzureMonitorPrivateLink '../../../Modules/Microsoft.Network/privateEndPoints/privateLinks/az.net.private.link.bicep' = if (contains(parSupportedClouds, environment().name)) {
   name: 'deploy-hub-az-monitor-prvt-link-${parLocation}-${parDeploymentNameSuffix}'
   scope: resourceGroup(parHubSubscriptionId, varHubResourceGroupName)
   params: {

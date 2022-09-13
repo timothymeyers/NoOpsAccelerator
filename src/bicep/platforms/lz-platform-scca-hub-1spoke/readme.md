@@ -1,29 +1,15 @@
 # NoOps Accelerator - Platforms - SCCA Compliant Hub - 1 Spoke
 
-## Authored & Tested With
-
-* [azure-cli](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) version 2.38.0
-* bicep cli version v0.9.1
-* [bicep](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-bicep) v0.9.1 vscode extension
-
-Module Tested on:
-
-* Azure Commercial ✔️
-* Azure Government ✔️
-* Azure Government Secret ❔
-* Azure Government Top Secret ❔
-
-> ✔️ = tested,  ❔= currently testing
-
 ## Navigation
 
 - [NoOps Accelerator - Platforms - SCCA Compliant Hub - 1 Spoke](#noops-accelerator---platforms---scca-compliant-hub---1-spoke)
-  - [Authored & Tested With](#authored--tested-with)
   - [Navigation](#navigation)
   - [Overview](#overview)
   - [Architecture](#architecture)
+  - [About Hub/Spoke Landing Zone](#about-hubspoke-landing-zone)
   - [Pre-requisites](#pre-requisites)
-  - [Deployment examples](#deployment-examples)
+  - [Deploy the Landing Zone](#deploy-the-landing-zone)
+    - [Azure CLI](#azure-cli)
   - [Parameters](#parameters)
     - [Parameter Usage: `appSettingsKeyValuePairs`](#parameter-usage-appsettingskeyvaluepairs)
   - [Outputs](#outputs)
@@ -33,13 +19,17 @@ Module Tested on:
 
 This platform module deploys Hub 1 Spoke landing zone.
 
-> NOTE: This is only the landing zone. The workloads will be deployed with the enclave or can be deployed after the landing zone is created.
+> NOTE: This is only the landing zone deployment. The workloads will be deployed with the enclave or can be deployed after the landing zone is created.
 
 Read on to understand what this landing zone does, and when you're ready, collect all of the pre-requisites, then deploy the landing zone.
 
 ## Architecture
 
- ![Hub 1 Spoke landing zone Architecture](../../../bicep/)
+ ![Hub/Spoke landing zone Architecture](../../../bicep/)
+
+## About Hub/Spoke Landing Zone
+
+The docs on Hub/Spoke Landing Zone: <https://docs.microsoft.com/en-us/azure/app-service/overview-hosting-plans>.
 
 ## Pre-requisites
 
@@ -50,18 +40,29 @@ Read on to understand what this landing zone does, and when you're ready, collec
 
 >NOTE: The AZ CLI will automatically install the Bicep tools when a command is run that needs them, or you can manually install them following the instructions here.
 
-## Deployment examples
+Required Parameters | Description
+-----------------------| -----------
+parRequired | Required values used with all resources.
+parTags | Required tags values used with all resources.
+parLocation | The region to deploy resources into. It defaults to the deployment location.
 
-The following module usage examples are retrieved from the content of the files hosted in the module's `lz-platform-scca-hub-1spoke` folder.
+## Deploy the Landing Zone
 
-   >**Note**: The name of each example is based on the name of the file from which it is taken.
-   >**Note**: Each example lists all the required parameters first, followed by the rest - each in alphabetical order.
+Connect to the appropriate Azure Environment and set appropriate context, see getting started with Azure PowerShell or Azure CLI for help if needed. The commands below assume you are deploying in Azure Commercial and show the entire process deploying Platform Hub/Spoke Design.
 
-<h3>Example 1: Base</h3>
+> NOTE: Since you can deploy this overlay post-deployment, you can also build this overlay within other deployment models such as Platforms & Workloads.
+
+Once you have the hub/spoke output values, you can pass those in as parameters to this deployment.
+
+For example, deploying using the `az deployment sub create` command in the Azure CLI:
+
+### Azure CLI
+
+<h3>Example 1: Base Landing Zone</h3>
 
 <details>
 
-<summary>Used in Enclave via Bicep module</summary>
+<summary>via Bicep module</summary>
 
 ```bicep
 module modHub1Spoke '../../platforms/lz-platform-scca-hub-1spoke/deploy.bicep' = {
@@ -189,7 +190,6 @@ module sites './Microsoft.Web/sites/az.web.app.bicep' = {
 | `diagnosticSettingsName` | string | `[format('{0}-diagnosticSettings', parameters('name'))]` |  | The name of the diagnostic setting, if deployed. |
 | `diagnosticStorageAccountId` | string | `''` |  | Resource ID of the diagnostic storage account. |
 | `diagnosticWorkspaceId` | string | `''` |  | Resource ID of log analytics workspace. |
-| `enableDefaultTelemetry` | bool | `True` |  | Enable telemetry via the Customer Usage Attribution ID (GUID). |
 | `httpsOnly` | bool | `True` |  | Configures a site to accept only HTTPS requests. Issues redirect for HTTP requests. |
 | `lock` | string | `''` | `['', CanNotDelete, ReadOnly]` | Specify the type of lock. |
 | `privateEndpoints` | array | `[]` |  | Configuration details for private endpoints. For security reasons, it is recommended to use private endpoints whenever possible. |

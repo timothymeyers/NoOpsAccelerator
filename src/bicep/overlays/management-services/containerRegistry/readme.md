@@ -1,18 +1,4 @@
-# Module:   NoOps Accelerator - Azure Container Registry
-
-## Authored & Tested With
-
-* [azure-cli](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) version 2.38.0
-* bicep cli version v0.9.1
-* [bicep](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-bicep) v0.9.1 vscode extension
-
-## Prerequisites
-
-* For deployments in the Azure Portal you need access to the portal in the cloud you want to deploy to, such as [https://portal.azure.com](https://portal.azure.com) or [https://portal.azure.us](https://portal.azure.us).
-* For deployments in BASH or a Windows shell, then a terminal instance with the AZ CLI installed is required.
-* For PowerShell deployments you need a PowerShell terminal with the [Azure Az PowerShell module](https://docs.microsoft.com/en-us/powershell/azure/what-is-azure-powershell) installed.
-
-> NOTE: The AZ CLI will automatically install the Bicep tools when a command is run that needs them, or you can manually install them following the [instructions here.](https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/install#azure-cli)
+# Overlay: NoOps Accelerator - Azure Container Registry
 
 ## Overview
 
@@ -29,13 +15,24 @@ The subscription and resource group can be changed by providing the resource gro
 ## Pre-requisites
 
 * A hub/spoke LZ deployment (a deployment of [deploy.bicep](../../../../bicep/platforms/lz-platform-scca-hub-3spoke/deploy.bicep))
+* Decide if the optional parameters is appropriate for your deployment. If it needs to change, override one of the optional parameters.
 
 See below for information on how to use the appropriate deployment parameters for use with this overlay:
 
-Deployment Output Name | Description
------------------------| -----------
-contRegistryName | The name of the Container Registry.  If not specified, the name will default to the MLZ default naming pattern.  
-parTargetResourceGroupName | The name of the resource group where the App Service Plan will be deployed.   If not specified, the resource group name will default to the shared services resource group name and subscription.
+Required Parameters | Type | Allowed Values | Description
+| :-- | :-- | :-- | :-- |
+parRequired | object | {object} | Required values used with all resources.
+parTags | object | {object} | Required tags values used with all resources.
+parLocation | string | `[deployment().location]` | The region to deploy resources into. It defaults to the deployment location.
+parContainerRegistry | object | {object} | Defines the Container Registry.
+parTargetSubscriptionId | string | `xxxxxx-xxxx-xxxx-xxxxx-xxxxxx` | The target subscription ID for the target Network and resources. It defaults to the deployment subscription.
+parTargetResourceGroup | string | `anoa-eastus-platforms-hub-rg` | The name of the resource group in which the key vault will be deployed. If unchanged or not specified, the NoOps Accelerator shared services resource group is used.
+parTargetVNetName | string | `anoa-eastus-platforms-hub-vnet` | The name of the VNet in which the aks will be deployed. If unchanged or not specified, the NoOps Accelerator shared services resource group is used.
+parTargetSubnetName | string | `anoa-eastus-platforms-hub-snet` | The name of the Subnet in which the aks will be deployed. If unchanged or not specified, the NoOps Accelerator shared services resource group is used.
+
+Optional Parameters | Description
+------------------- | -----------
+None
 
 ## Deploy the Overlay
 
@@ -57,15 +54,15 @@ cd platforms/lz-platform-scca-hub-3spoke
 az deployment sub create \ 
 --name contoso \
 --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx \
---template-file deploy.bicep \
+--template-file platforms/lz-platform-scca-hub-3spoke/deploy.bicep \
 --location eastus \
---parameters @parameters/deploy.parameters.json
+--parameters @platforms/lz-platform-scca-hub-3spoke/parameters/deploy.parameters.json
 cd overlays
-cd app-service-plan
+cd containerRegistry
 az deployment sub create \
-   --name deployAppServicePlan
-   --template-file overlays/management-groups/deploy.bicep \
-   --parameters @overlays/management-groups/deploy.parameters.json \
+   --name deploy-AppServicePlan
+   --template-file overlays/containerRegistry/deploy.bicep \
+   --parameters @overlays/containerRegistry/deploy.parameters.json \
    --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx \
    --location 'eastus'
 ```
@@ -75,8 +72,8 @@ OR
 ```bash
 # For Azure IL regions
 az deployment group create \
-  --template-file overlays/management-groups/anoa.lz.mgmt.svcs.service.health.bicep \
-  --parameters @overlays/management-groups/anoa.lz.mgmt.svcs.service.health.parameters.example.json \
+  --template-file overlays/containerRegistry/deploy.bicep \
+  --parameters @overlays/containerRegistry/deploy.parameters.json \
   --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx \
   --resource-group anoa-usgovvirginia-platforms-hub-rg \
   --location 'usgovvirginia'
@@ -88,8 +85,8 @@ az deployment group create \
 # For Azure global regions
 New-AzGroupDeployment `
   -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
-  -TemplateFile overlays/management-groups/anoa.lz.mgmt.svcs.service.health.bicepp `
-  -TemplateParameterFile overlays/management-groups/anoa.lz.mgmt.svcs.service.health.parameters.example.json `
+  -TemplateFile overlays/containerRegistry/deploy.bicepp `
+  -TemplateParameterFile overlays/containerRegistry/deploy.parameters.json `
   -Subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx `
   -ResourceGroup anoa-eastus-platforms-hub-rg `
   -Location 'eastus'
@@ -101,8 +98,8 @@ OR
 # For Azure IL regions
 New-AzGroupDeployment `
   -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
-  -TemplateFile overlays/management-groups/anoa.lz.mgmt.svcs.service.health.bicepp `
-  -TemplateParameterFile overlays/management-groups/anoa.lz.mgmt.svcs.service.health.parameters.example.json `
+  -TemplateFile overlays/containerRegistry/deploy.bicepp `
+  -TemplateParameterFile overlays/containerRegistry/deploy.parameters.json `
   -Subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx `
   -ResourceGroup anoa-usgovvirginia-platforms-hub-rg `
   -Location  'usgovvirginia'
@@ -118,14 +115,20 @@ For air-gapped clouds it may be convenient to transfer and deploy the compiled A
 
 ## Cleanup
 
-The Bicep/ARM deployment of NoOps Accelerator - Microsoft Service Health Alerts deployment can be deleted with these steps:
+The Bicep/ARM deployment of NoOps Accelerator - Azure Container Registry deployment can be deleted with these steps:
+
+### Delete Resource Groups
+
+Remove-AzResourceGroup -Name anoa-eastus-workload-aks-rg
+
+### Delete Deployments
+
+Remove-AzSubscriptionDeployment -Name deploy-AKS-Network
 
 ## Example Output in Azure
 
-![Example Deployment Output](images/operationsNetworkExampleDeploymentOutput.png "Example Deployment Output in Azure global regions")
+![Example Deployment Output](media/acrExampleDeploymentOutput.png "Example Deployment Output in Azure global regions")
 
 ### References
 
-* [Introduction to private Docker container registries in Azure](https://docs.microsoft.com/en-us/azure/app-service/overview-hosting-plans)
-* [Bicep Shared Variable File Pattern](https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/patterns-shared-variable-file)
 * [Azure Container Registry service tiers(Sku's)](https://docs.microsoft.com/en-us/azure/container-registry/container-registry-skus)

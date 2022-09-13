@@ -222,7 +222,7 @@ module modOpsLogStorage '../../../Modules/Microsoft.Storage/storageAccounts/az.d
 
 // NETWORK SECURITY GROUP
 
-module modOperationsNetworkSecurityGroup '../../../Modules/Microsoft.Network/networkSecurityGroup/az.net.network.security.group.with.diagnostics.bicep' = {
+module modOperationsNetworkSecurityGroup '../../../Modules/Microsoft.Network/networkSecurityGroups/az.net.network.security.group.with.diagnostics.bicep' = {
   name: 'deploy-${varOperationsShortName}-networkSecurityGroup-${parLocation}-${parDeploymentNameSuffix}' 
   scope: resourceGroup(varOperationsResourceGroupName)  
   params: {

@@ -1,24 +1,12 @@
 # Overlay:   NoOps Accelerator - Microsoft Defender for Cloud
 
-## Authored & Tested With
-
-* [azure-cli](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) version 2.38.0
-* bicep cli version v0.9.1
-* [bicep](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-bicep) v0.9.1 vscode extension
-
-## Prerequisites
-
-* For deployments in the Azure Portal you need access to the portal in the cloud you want to deploy to, such as [https://portal.azure.com](https://portal.azure.com) or [https://portal.azure.us](https://portal.azure.us).
-* For deployments in BASH or a Windows shell, then a terminal instance with the AZ CLI installed is required.
-* For PowerShell deployments you need a PowerShell terminal with the [Azure Az PowerShell module](https://docs.microsoft.com/en-us/powershell/azure/what-is-azure-powershell) installed.
-
-> NOTE: The AZ CLI will automatically install the Bicep tools when a command is run that needs them, or you can manually install them following the [instructions here.](https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/install#azure-cli)
-
 ## Overview
 
 This overlay module adds a standard/defender sku which enables a greater depth of awareness including more recomendations and threat analytics.
 
-## Deploy Microsoft Defender
+Read on to understand what this overlay does, and when you're ready, collect all of the pre-requisites, then deploy the overlay
+
+## About Microsoft Defender
 
 The docs on Microsoft Defender for Cloud: <https://docs.microsoft.com/en-us/azure/defender-for-cloud/defender-for-cloud-introduction>
 
@@ -27,34 +15,58 @@ NOTE:
 Documentation on how to do this can be found
 [here](https://docs.microsoft.com/en-us/azure/defender-for-cloud/enable-enhanced-security)
 
+By default, this overlay will deploy resources into standard default hub/spoke subscriptions and resource groups.  
+
+The subscription and resource group can be changed by providing the resource group name (Param: parTargetSubscriptionId/parTargetResourceGroup) and ensuring that the Azure context is set the proper subscription.  
+
 ## Pre-requisites
 
-* A Mission LZ deployment (a deployment of mlz.bicep)
+* A virtual network and subnet is deployed. (a deployment of [deploy.bicep](../../../../bicep/platforms/lz-platform-scca-hub-3spoke/deploy.bicep))
+* Decide if the optional parameters is appropriate for your deployment. If it needs to change, override one of the optional parameters.
 
 See below for information on how to use the appropriate deployment parameters for use with this overlay:
 
-Deployment Output Name | Description
------------------------| -----------
-parHubResourceGroupName | The resource group that contains the Hub Virtual Network and deploy the virtual machines into
-parHubVirtualNetworkName | The resource to deploy a subnet configured for Bastion Host
-parHubSubnetResourceId | The resource ID of the subnet in the Hub Virtual Network for hosting virtual machines
-parHubNetworkSecurityGroupResourceId | The resource ID of the Network Security Group in the Hub Virtual Network that hosts rules for Hub Subnet traffic
+Required Parameters | Type | Allowed Values | Description
+| :-- | :-- | :-- | :-- |
+parLocation | string | `[deployment().location]` | The region to deploy resources into. It defaults to the deployment location.
+parSecurityCenter | object | {object} | The oject parameters of the Microsoft Bastion Host.
+parTargetSubscriptionId | string | `xxxxxx-xxxx-xxxx-xxxxx-xxxxxx` | The target subscription ID for the target Network and resources. It defaults to the deployment subscription.
+parLogAnalyticsWorkspaceResourceId | string | `/subscriptions/xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx/resourcegroups/anoa-eastus-platforms-logging-rg/providers/microsoft.operationalinsights/workspaces/anoa-eastus-platforms-logging-log` | Log Analytics Workspace Resource Id Needed for Defender
 
-## Deploy the Service
+Optional Parameters | Description
+------------------- | -----------
+None
 
-Once you have the Mission LZ output values, you can pass those in as parameters to this deployment.
+## Deploy the Overlay
 
-For example, deploying using the `az deployment group create` command in the Azure CLI:
+Connect to the appropriate Azure Environment and set appropriate context, see getting started with Azure PowerShell or Azure CLI for help if needed. The commands below assume you are deploying in Azure Commercial and show the entire process from deploying Platform Hub/Spoke Design and then adding an Microsoft Defender post-deployment.
+
+> NOTE: Since you can deploy this overlay post-deployment, you can also build this overlay within other deployment models such as Platforms & Workloads.
+
+Once you have the hub/spoke output values, you can pass those in as parameters to this deployment.
+
+For example, deploying using the `az deployment sub create` command in the Azure CLI:
 
 ### Azure CLI
 
 ```bash
 # For Azure global regions
-az deployment group create \
-   --template-file overlays/management-groups/anoa.lz.mgmt.groups.bicep \
-   --parameters @overlays/management-groups/anoa.lz.mgmt.groups.parameters.example.json \
+az login
+cd src/bicep
+cd platforms/lz-platform-scca-hub-3spoke
+az deployment sub create \ 
+--name contoso \
+--subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx \
+--template-file platforms/lz-platform-scca-hub-3spoke/deploy.bicep \
+--location eastus \
+--parameters @platforms/lz-platform-scca-hub-3spoke/parameters/deploy.parameters.json
+cd overlays
+cd app-service-plan
+az deployment sub create \
+   --name deploy-AppServicePlan
+   --template-file overlays/app-service-plan/deploy.bicep \
+   --parameters @overlays/app-service-plan/deploy.parameters.json \
    --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx \
-   --resource-group anoa-eastus-platforms-hub-rg \
    --location 'eastus'
 ```
 
@@ -62,9 +74,9 @@ OR
 
 ```bash
 # For Azure IL regions
-az deployment group create \
-  --template-file overlays/management-groups/anoa.lz.mgmt.groups.bicep \
-  --parameters @overlays/management-groups/anoa.lz.mgmt.groups.parameters.example.json \
+az deployment sub create \
+  --template-file overlays/app-service-plan/deploy.bicep \
+  --parameters @overlays/app-service-plan/deploy.parameters.json \
   --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx \
   --resource-group anoa-usgovvirginia-platforms-hub-rg \
   --location 'usgovvirginia'
@@ -74,10 +86,10 @@ az deployment group create \
 
 ```powershell
 # For Azure global regions
-New-AzGroupDeployment `
+New-AzSubscriptionDeployment `
   -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
-  -TemplateFile overlays/management-groups/anoa.lz.mgmt.groups.bicepp `
-  -TemplateParameterFile overlays/management-groups/anoa.lz.mgmt.groups.parameters.example.json `
+  -TemplateFile overlays/app-service-plan/deploy.bicepp `
+  -TemplateParameterFile overlays/app-service-plan/deploy.parameters.example.json `
   -Subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx `
   -ResourceGroup anoa-eastus-platforms-hub-rg `
   -Location 'eastus'
@@ -87,14 +99,18 @@ OR
 
 ```powershell
 # For Azure IL regions
-New-AzGroupDeployment `
+New-AzSubscriptionDeployment `
   -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
-  -TemplateFile overlays/management-groups/anoa.lz.mgmt.groups.bicepp `
-  -TemplateParameterFile overlays/management-groups/anoa.lz.mgmt.groups.parameters.example.json `
+  -TemplateFile overlays/app-service-plan/deploy.bicepp `
+  -TemplateParameterFile overlays/app-service-plan/deploy.parameters.example.json `
   -Subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx `
   -ResourceGroup anoa-usgovvirginia-platforms-hub-rg `
   -Location  'usgovvirginia'
 ```
+
+## Extending the Overlay
+
+By default, this overlay has the minium parmeters needed to deploy the service. If you like to add addtional parmeters to the service, please refer to the module description located in AzResources here: [`App Service Plans `[Microsoft.Web/serverfarms]`](D:\source\repos\NoOpsAccelerator\src\bicep\azresources\Modules\Microsoft.Web\serverfarms\readme.md)
 
 ## Air-Gapped Clouds
 
@@ -104,6 +120,14 @@ For air-gapped clouds it may be convenient to transfer and deploy the compiled A
 
 The Bicep/ARM deployment of NoOps Accelerator - Microsoft Defender for Cloud deployment can be deleted with these steps:
 
+### Delete Resource Groups
+
+Remove-AzResourceGroup -Name anoa-eastus-workload-app-service-plan-rg
+
+### Delete Deployments
+
+Remove-AzSubscriptionDeployment -Name deploy-AppServicePlan
+
 ## Example Output in Azure
 
-![Example Deployment Output](images/operationsNetworkExampleDeploymentOutput.png "Example Deployment Output in Azure global regions")
+![Example Deployment Output](media/aspExampleDeploymentOutput.png "Example Deployment Output in Azure global regions")

@@ -23,37 +23,51 @@
     "parTargetResourceGroup": {
       "value": "<<example-rg>>"
     },
+    "parTargetVNetName": {
+      "value": "<<example-vnet>>"
+    },
+    "parTargetSubnetName": {
+      "value": "<<example-subnet>>"
+    },
     "parKubernetesCluster": {
       "value": {
-        "name": "<<namePrefix>>-az-aks-azure-001",
-        "primaryAgentPoolProfile": [
-          {
-            "name": "poolname",
-            "vmSize": "Standard_DS3_v2",
-            "osDiskSizeGB": 128,
-            "count": 2,
-            "osType": "Linux",
-            "maxCount": 5,
-            "minCount": 1,
-            "enableAutoScaling": true,
-            "scaleSetPriority": "Regular",
-            "scaleSetEvictionPolicy": "Delete",
-            "nodeLabels": {},
-            "nodeTaints": [
-              "CriticalAddonsOnly=true:NoSchedule"
-            ],
-            "type": "VirtualMachineScaleSets",
-            "availabilityZones": [
-                "1",
-                "2",
-                "3"
-            ],
-            "maxPods": 30,
-            "storageProfile": "ManagedDisks",
-            "mode": "System",
-            "vnetSubnetID": "/subscriptions/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX/resourceGroups/myRg/providers/Microsoft.Network/virtualNetworks/myVnet/subnets/mySubnet"
-          }
-        ]
+        "name": "Contoso",
+        "enableSystemAssignedIdentity": true,
+        "aksClusterKubernetesVersion": "1.24.3",
+        "enableResourceLock": true,
+        "enableRBAC": true,
+        "enablePrivateCluster": true,
+        "enableAzurePolicy": true,
+        "enableAadProfileEnableAzureRBAC": true,
+        "enableAadProfileManaged": true,
+        "aadProfileAdminGroupObjectIDs": [
+          "xxxxxx-xxxx-xxxx-xxxx-xxxxxx"
+        ],
+        "aksClusterSkuTier": "Free",
+        "primaryAgentPoolProfile": {
+          "name": "default",
+          "vmSize": "Standard_D4s_v3",
+          "osDiskSizeGB": 128,
+          "osDiskType": "Managed",
+          "enableAutoScaling": true,
+          "count": 1,
+          "maxCount": 5,
+          "minCount": 1,
+          "maxPods": 50,
+          "osType": "Linux",
+          "osSKU": "Ubuntu",
+          "type": "VirtualMachineScaleSets",
+          "mode": "System"
+        },
+        "networkProfile": {
+          "aksClusterLoadBalancerSku": "standard",
+          "aksClusterNetworkPlugin": "azure",
+          "aksClusterNetworkPolicy": "azure",
+          "aksClusterServiceCidr": "10.1.0.0/16",
+          "aksClusterDnsServiceIP": "10.1.0.10",
+          "aksClusterDockerBridgeCidr": "170.10.0.1/16",
+          "aksClusterOutboundType": "userDefinedRouting"
+        }
       }
     }
   }

@@ -7,7 +7,7 @@
 // ----------------------------------------------------------------------------------
 
 /*
-SUMMARY: Module to deploy a Application Gateway to the Hub Network
+SUMMARY: Overlay Module Example to deploy a Application Gateway to the Hub Network
 DESCRIPTION: The following components will be options in this deployment
               Application Gateway
 AUTHOR/S: jspinella
@@ -18,9 +18,39 @@ VERSION: 1.x.x
 targetScope = 'resourceGroup'
 
 // REQUIRED PARAMETERS
+// Example (JSON)
+// These are the required parameters for the deployment
+// -----------------------------
+// "parRequired": {
+//   "value": {
+//     "orgPrefix": "anoa",
+//     "templateVersion": "v1.0",
+//     "deployEnvironment": "mlz"
+//   }
+// }
+@description('Required values used with all resources.')
+param parRequired object
 
-@description('Prefix value which will be prepended to all resource names. Default: anoa')
-param parOrgPrefix string = 'anoa'
+// REQUIRED TAGS
+// Example (JSON)
+// These are the required tags for the deployment
+// -----------------------------
+// "parTags": {
+//   "value": {
+//     "organization": "anoa",
+//     "region": "eastus",
+//     "templateVersion": "v1.0",
+//     "deployEnvironment": "platforms",
+//     "deploymentType": "NoOpsBicep"
+//   }
+// }
+@description('Required tags values used with all resources.')
+param parTags object
+
+@description('The region to deploy resources into. It defaults to the deployment location.')
+param parLocation string = resourceGroup().location
+
+// HUB NETWORK PARAMETERS
 
 @description('The resource group name for the Hub Network and resources.')
 param parHubResourceGroupName string
@@ -28,18 +58,9 @@ param parHubResourceGroupName string
 @description('The resource group name for the Hub Network name.')
 param parHubVirtualNetworkName string
 
-@description('The region to deploy resources into. It defaults to the deployment location.')
-param parLocation string = resourceGroup().location
+// LOGGING PARAMETERS
 
-@description('Tags for the Resource')
-param parTags object
-
-@minLength(3)
-@maxLength(15)
-@description('A suffix, 3 to 15 characters in length, to append to resource names (e.g. "dev", "test", "prod", "platforms"). It defaults to "platforms".')
-param parDeployEnvironment string
-
-@description('The resource group name for the Hub Network and resources. It defaults to the deployment resource group.')
+@description('Log Analytics Workspace Resource Id Needed for NSG, VNet and Activity Logging')
 param parLogAnalyticsWorkspaceResourceId string
 
 @description('The resource group name for the Hub Network and resources. It defaults to the deployment resource group.')
@@ -50,12 +71,15 @@ param parHubLogStorageResourceId string
 @description('A suffix to use for naming deployments uniquely. It defaults to the Bicep resolution of the "utcNow()" function.')
 param parDeploymentNameSuffix string = utcNow()
 
-//
+@description('The current date - do not override the default value')
+param dateUtcNow string = utcNow('yyyy-MM-dd HH:mm:ss')
 
-var subnetName = 'AppGWSubnet' // The subnet name for VNG Hosts must be 'AppGWSubnet'
 param subnetAddressPrefix string
 
 // APP GATEWAY PARAMETERS
+
+@description('Application gateway tier')
+param parAppGateway object
 
 @description('Application gateway tier')
 @allowed([
@@ -113,6 +137,10 @@ param parPublicIpAddressName string
 @description('Application gateway subnet name')
 param parSubnetName string
 
+// VARIABLES
+
+var subnetName = 'AppGWSubnet' // The subnet name for VNG Hosts must be 'AppGWSubnet'
+
 /*
   NAMING CONVENTION
   Here we define a naming conventions for resources.
@@ -122,7 +150,7 @@ param parSubnetName string
 
 var varResourceToken = 'resource_token'
 var varNameToken = 'name_token'
-var varNamingConvention = '${toLower(parOrgPrefix)}-${toLower(parLocation)}-${toLower(parDeployEnvironment)}-${varNameToken}-${toLower(varResourceToken)}'
+var varNamingConvention = '${toLower(parRequired.orgPrefix)}-${toLower(parLocation)}-${toLower(parRequired.deployEnvironment)}-${varNameToken}-${toLower(varResourceToken)}'
 
 var varApplicationGatewayNamingConvention = replace(varNamingConvention, varResourceToken, 'agway')
 
@@ -132,6 +160,8 @@ var varHubApplicationGatewayName = replace(varApplicationGatewayNamingConvention
 //=== TAGS === 
 
 var referential = {
+  region: parLocation
+  deploymentDate: dateUtcNow
   workload: 'appGateway'
 }
 
@@ -155,7 +185,6 @@ resource resHubVirtualNetwork 'Microsoft.Network/virtualNetworks@2021-02-01' exi
 
 resource resSubnet 'Microsoft.Network/virtualNetworks/subnets@2021-02-01' = {
   name: '${parHubVirtualNetworkName}/${subnetName}'
-
   properties: {
     addressPrefix: subnetAddressPrefix
     privateEndpointNetworkPolicies: 'Enabled'
@@ -163,7 +192,7 @@ resource resSubnet 'Microsoft.Network/virtualNetworks/subnets@2021-02-01' = {
   }
 }
 
-// HUB VNET GATEWAY - VDMS
+// HUB APP GATEWAY 
 
 module modHubAppGateway '../../../azresources/Modules/Microsoft.Network/applicationGateway/az.net.application.gateway.bicep' = {
   name: 'deploy-${varHubName}-vnet-gateway-${parLocation}-${parDeploymentNameSuffix}'
@@ -182,6 +211,7 @@ module modHubAppGateway '../../../azresources/Modules/Microsoft.Network/applicat
     vNetName: resHubVirtualNetwork.name
     vNetResourceGroup: parHubResourceGroupName
     diagnosticStorageAccountId: parHubLogStorageResourceId
+    logAnalyticsWorkspaceId: parLogAnalyticsWorkspaceResourceId
     enableDiagnostics: true
   }
   dependsOn: [

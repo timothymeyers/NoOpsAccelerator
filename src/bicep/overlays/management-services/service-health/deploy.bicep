@@ -7,7 +7,7 @@
 // ----------------------------------------------------------------------------------
 
 /*
-SUMMARY: Add-on Module Example to deploy the Service Health Alerts.
+SUMMARY: Overlay Module Example to deploy the Service Health Alerts.
 DESCRIPTION: The following components will be options in this deployment
               * Service Health Alert
 AUTHOR/S: jspinella
@@ -45,7 +45,7 @@ param parDeployEnvironment string = 'platforms'
 //     "actionGroupId": '/subscriptions/<<subscriptionId>>/resourceGroups/validation-rg/providers/microsoft.insights/actiongroups/adp-<<namePrefix>>-az-ag-x-001'
 //   }
 // }
-@description('Service Health alerts')
+@description('The object of the Service Health alerts')
 param parServiceHealthAlerts object = {}
 
 // SUBSCRIPTIONS PARAMETERS
@@ -87,9 +87,8 @@ var incidentTypesProperty = [for incidentType in parServiceHealthAlerts.incident
 
 @description('Resource group tags')
 module modTags '../../../azresources/Modules/Microsoft.Resources/tags/az.resources.tags.bicep' = {
-  name: 'Domain-Service-Resource-Tags-${parDeploymentNameSuffix}'
+  name: 'service-health-tags-${parDeploymentNameSuffix}'
   params: {
-    onlyUpdate: true
     resourceGroupName: rgServiceHealth.name
     tags: {
       hostName: parDeployEnvironment

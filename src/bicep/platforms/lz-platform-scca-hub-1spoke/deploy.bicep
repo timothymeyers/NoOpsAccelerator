@@ -27,7 +27,7 @@ Copyright (c) Microsoft Corporation. Licensed under the MIT license.
     - parDeployEnvironment
 */
 
-targetScope = 'managementGroup' //Deploying at Subscription scope to allow resource groups to be created and resources in one deployment
+targetScope = 'subscription' //Deploying at Subscription scope to allow resource groups to be created and resources in one deployment
 
 // REQUIRED PARAMETERS
 // Example (JSON)
@@ -596,9 +596,8 @@ module modRemoteAccess '../../overlays/management-services/bastion/deploy.bicep'
   scope: resourceGroup(parHubSubscriptionId, varHubResourceGroupName)
   params: {
     // Required Parameters
-    parOrgPrefix: parRequired.orgPrefix
-    parLocation: parLocation
-    parDeployEnvironment: parRequired.deployEnvironment
+    parRequired:parRequired
+    parLocation: parLocation     
     parTags: modTags.outputs.tags
 
     // Hub Virtual Network Parameters    
@@ -607,41 +606,10 @@ module modRemoteAccess '../../overlays/management-services/bastion/deploy.bicep'
     parHubNetworkSecurityGroupResourceId: modHubNetwork.outputs.networkSecurityGroupResourceId
 
     // Bastion Host Parameters   
-    parBastionHostSku: parRemoteAccess.bastion.sku    
-    parBastionHostSubnetAddressPrefix: parRemoteAccess.bastion.subnetAddressPrefix
-    parEncryptionAtHost: parRemoteAccess.bastion.encryptionAtHost
-
-    // Linux Parameters
-    parEnableLinux:  parRemoteAccess.bastion.linux.enable
-    parLinuxVmName: parRemoteAccess.bastion.linux.vmName
-    parLinuxVmSize: parRemoteAccess.bastion.linux.vmSize
-    parLinuxVmOsDiskCreateOption: parRemoteAccess.bastion.linux.vmOsDiskCreateOption
-    parLinuxVmOsDiskType: parRemoteAccess.bastion.linux.vmOsDiskType
-    parLinuxVmImagePublisher: parRemoteAccess.bastion.linux.vmImagePublisher
-    parLinuxVmImageOffer: parRemoteAccess.bastion.linux.vmImageOffer
-    parLinuxVmImageSku: parRemoteAccess.bastion.linux.vmImageSku
-    parLinuxVmImageVersion: parRemoteAccess.bastion.linux.vmImageVersion
-    parLinuxVmAdminUsername: parRemoteAccess.bastion.linux.vmAdminUsername
-    parLinuxVmAdminPasswordOrKey: parRemoteAccess.bastion.linux.vmAdminPasswordOrKey
-    parLinuxNetworkInterfacePrivateIPAddressAllocationMethod: parRemoteAccess.bastion.linux.networkInterfacePrivateIPAddressAllocationMethod
-    parDisableLinuxVmPasswordAuthentication: parRemoteAccess.bastion.linux.disablePasswordAuthentication
-    
-    // Windows Parameters 
-    parEnableWindows: parRemoteAccess.bastion.windows.enable
-    parWindowsVmName: parRemoteAccess.bastion.windows.vmName
-    parWindowsVmSize: parRemoteAccess.bastion.windows.vmSize
-    parWindowsVmAdminUsername: parRemoteAccess.bastion.windows.vmAdminUsername
-    parWindowsVmAdminPassword: parRemoteAccess.bastion.windows.vmAdminPassword
-    parWindowsVmPublisher: parRemoteAccess.bastion.windows.vmImagePublisher
-    parWindowsVmOffer: parRemoteAccess.bastion.windows.vmImageOffer
-    parWindowsVmSku: parRemoteAccess.bastion.windows.vmImageSku
-    parWindowsVmVersion: parRemoteAccess.bastion.windows.vmImageVersion
-    parWindowsVmCreateOption: parRemoteAccess.bastion.windows.vmOsDiskCreateOption
-    parWindowsVmStorageAccountType: parRemoteAccess.bastion.windows.vmStorageAccountType
-    parWindowsNetworkInterfacePrivateIPAddressAllocationMethod: parRemoteAccess.bastion.windows.networkInterfacePrivateIPAddressAllocationMethod
+    parRemoteAccess: parRemoteAccess
 
     // Log Analytics Parameters
-    parLogAnalyticsWorkspaceId: modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceResourceId    
+    parLogAnalyticsWorkspaceId: modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceResourceId
   }
 }
 
@@ -671,8 +639,7 @@ module modDefender '../../overlays/management-services/defender/deploy.bicep' = 
   params: {
     parLocation: parLocation
     parLogAnalyticsWorkspaceResourceId: modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceResourceId
-    parEmailSecurityContact: parSecurityCenter.emailSecurityContact
-    parPhoneSecurityContact: parSecurityCenter.phoneSecurityContact
+    parSecurityCenter: parSecurityCenter
   }
 }
 
@@ -684,14 +651,13 @@ module spokeOpsDefender '../../overlays/management-services/defender/deploy.bice
   params: {
     parLocation: parLocation
     parLogAnalyticsWorkspaceResourceId: modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceResourceId
-    parEmailSecurityContact: parSecurityCenter.emailSecurityContact
-    parPhoneSecurityContact: parSecurityCenter.phoneSecurityContact
+    parSecurityCenter: parSecurityCenter
   }
 }
 
 // OUTPUTS
 
-output networkResourcePrefix string = parRequired.deployEnvironment
+output deployEnvironment string = parRequired.deployEnvironment
 
 output firewallPrivateIPAddress string = modHubNetwork.outputs.firewallPrivateIPAddress
 

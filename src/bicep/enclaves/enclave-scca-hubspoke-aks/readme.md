@@ -1,31 +1,20 @@
 # NoOps Accelerator - Enclave - SCCA Compliant Hub - 1 Spoke landing zone with a Azure Kubernetes Service
 
-## Authored & Tested With
-
-* [azure-cli](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) version 2.38.0
-* bicep cli version v0.9.1
-* [bicep](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-bicep) v0.9.1 vscode extension
-
-### Module Tested on
-
-* Azure Commercial ✔️
-* Azure Government ✔️
-* Azure Government Secret ✔️
-* Azure Government Top Secret ❔
-
-> ✔️ = tested,  ❔= currently testing
-
 ## Navigation
 
-* [Overview](#overview)
-* [Architecture](#architecture)
-* [Pre-requisites](#pre-requisites)
-* [Deployment](#deployment)
-* [Parameters](#add-on-parameters)
-* [Outputs](#Outputs)
-* [Air Gapped Clouds](#air-gapped-clouds)
-* [Cleanup](#cleanup)
-* [Resource Types](#Resource-Types)
+- [NoOps Accelerator - Enclave - SCCA Compliant Hub - 1 Spoke landing zone with a Azure Kubernetes Service](#noops-accelerator---enclave---scca-compliant-hub---1-spoke-landing-zone-with-a-azure-kubernetes-service)
+  - [Navigation](#navigation)
+  - [Overview](#overview)
+  - [Architecture](#architecture)
+  - [Pre-requisites](#pre-requisites)
+  - [Deployment examples](#deployment-examples)
+  - [Parameters](#parameters)
+    - [Parameter Usage: `appSettingsKeyValuePairs`](#parameter-usage-appsettingskeyvaluepairs)
+  - [Outputs](#outputs)
+  - [Resource Types](#resource-types)
+  - [Air-Gapped Clouds](#air-gapped-clouds)
+  - [Cleanup](#cleanup)
+  - [Example Output in Azure](#example-output-in-azure)
 
 ## Overview
 
@@ -101,7 +90,6 @@ The following module usage examples are retrieved from the content of the files 
 | `diagnosticSettingsName` | string | `[format('{0}-diagnosticSettings', parameters('name'))]` |  | The name of the diagnostic setting, if deployed. |
 | `diagnosticStorageAccountId` | string | `''` |  | Resource ID of the diagnostic storage account. |
 | `diagnosticWorkspaceId` | string | `''` |  | Resource ID of log analytics workspace. |
-| `enableDefaultTelemetry` | bool | `True` |  | Enable telemetry via the Customer Usage Attribution ID (GUID). |
 | `httpsOnly` | bool | `True` |  | Configures a site to accept only HTTPS requests. Issues redirect for HTTP requests. |
 | `lock` | string | `''` | `['', CanNotDelete, ReadOnly]` | Specify the type of lock. |
 | `privateEndpoints` | array | `[]` |  | Configuration details for private endpoints. For security reasons, it is recommended to use private endpoints whenever possible. |

@@ -26,14 +26,6 @@ Module Tested on:
 
 > ✔️ = tested,  ❔= currently testing
 
-## Prerequisites
-
-* For deployments in the Azure Portal you need access to the portal in the cloud you want to deploy to, such as [https://portal.azure.com](https://portal.azure.com) or [https://portal.azure.us](https://portal.azure.us).
-* For deployments in BASH or a Windows shell, then a terminal instance with the AZ CLI installed is required.
-* For PowerShell deployments you need a PowerShell terminal with the [Azure Az PowerShell module](https://docs.microsoft.com/en-us/powershell/azure/what-is-azure-powershell) installed.
-
-> NOTE: The AZ CLI will automatically install the Bicep tools when a command is run that needs them, or you can manually install them following the [instructions here.](https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/install#azure-cli)
-
 ## Overview
 
 Azure's [Azure Policy](https://docs.microsoft.com/azure/governance/policy/overview) is used to deploy guardrails. Azure Policy supports organizational standards enforcement and at-scale compliance evaluation. With the ability to drill down to the per-resource and per-policy granularity, it offers an aggregated view to assess the overall condition of the environment through its compliance dashboard. Bulk remediation for existing resources and automated remediation for new resources both assist in bringing your resources into compliance.

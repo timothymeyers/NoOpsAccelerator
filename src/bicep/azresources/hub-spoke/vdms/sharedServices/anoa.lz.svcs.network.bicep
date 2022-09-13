@@ -212,7 +212,7 @@ module modSvcsLogStorage '../../../Modules/Microsoft.Storage/storageAccounts/az.
   ]
 }
 
-module modSharedServicesNetworkSecurityGroup '../../../Modules/Microsoft.Network/networkSecurityGroup/az.net.network.security.group.with.diagnostics.bicep' = {
+module modSharedServicesNetworkSecurityGroup '../../../Modules/Microsoft.Network/networkSecurityGroups/az.net.network.security.group.with.diagnostics.bicep' = {
   name: 'deploy-${varSharedServicesShortName}-nsg-${parLocation}-${parDeploymentNameSuffix}'
   scope: resourceGroup(varSharedServicesResourceGroupName)
   params: {

@@ -17,13 +17,20 @@ infrastructure in their Azure environments.
 
 ## Quickstart
 
-You can use the NoOps Accelerator to deploy [SCCA-compliant landing zones](./src/bicep/platforms/) based on Microsoft's [SACA implementation guidance][saca] and [Mission Landing Zone][mlz_architecture] architecture.
-
-The [NoOps Accelerator - SCCA Compliant Hub/Spoke Design(Referred as Mission Landing Zone)](src/bicep/platforms/lz-platform-scca-hub-3spoke/) is set up in a hub and spoke design with Logging, separated by tiers: T0 (Identity and Authorization), T1 (Infrastructure Operations), T2 (DevSecOps and Shared Services), and multiple T3s (Workloads).
-
-Access control can be configured to allow separation of duties between all tiers.
+You can use the NoOps Accelerator to deploy [SCCA-compliant landing zones](./src/bicep/platforms/) based on Microsoft's [SACA implementation guidance][saca] and [Mission Landing Zone][mlz] architecture.
 
 ### Deploy a SCCA-compliant Landing Zone (SCCA Hub with 3 Spokes) using the Azure CLI
+
+These steps walk through how to use NoOps to deploy a hub and spoke architecture. At the conclusion, you will have five resources groups mapped to the following:
+
+* Hub: SCCA-compliant networking hub
+* Tier 0 (T0): Identity
+* Tier 1 (T1a): Operations
+* Tier 1 (T1b): Logging
+* Tier 2 (T2): Shared Services
+* Tier 3s (T3s): *One-to-Many* Workloads or Team Environments
+
+Steps:
 
 1. Clone the repository down and change directory to the `lz-platform-scca-hub-3spoke` directory
 
@@ -66,8 +73,6 @@ For a quickstart, we suggest a test deployment into the current AZ CLI subscript
 NoOps
 
 ----
-
-
 
 * [Microsoft Support Policy](./SUPPORT.md)
 
@@ -149,9 +154,6 @@ See the following onboarding guides for setup instructions:
 * GitHub Actions Scripts provides guidance on the scripts available to help simplify the onboarding process to Azure Landing Zones design using GitHub Actions.
 * GitHub Actions provides guidance on the manual steps for onboarding to the Azure Landing Zones design using GitHub Actions.
 
-
-
-
 ## Bicep Modules
 
 In the [src\bicep](src/bicep) directory contains all of the modules required to deploy NoOps Accelerator components.
@@ -206,7 +208,7 @@ Please see the [Support and Feedback Guide](https://github.com/Azure/NoOpsAccele
 
 * [Common Azure Resource Modules Library](aka.ms/carml)
 * [Azure Landing Zones for Canadian Public Sector](https://github.com/azure/canadapubsecalz)
-* [Mission Landing Zone](https://github.com/Azure/missionlz)
+* [Mission Landing Zone][mlz]
 
 ## Trademarks
 
@@ -219,5 +221,5 @@ Any use of third-party trademarks or logos are subject to those third-party's po
 [//]: # (INSERT LINK LABELS BELOW)
 [//]: # (************************)
 
-[mlz_architecture]:                            https://github.com/Azure/missionlz "Mission Landing Zone GitHub Repo"
+[mlz]:                            https://github.com/Azure/missionlz "Mission Landing Zone GitHub Repo"
 [saca]:                                        https://aka.ms/saca "Microsoft Secure Azure Computing Architecture (SACA) Guidance"

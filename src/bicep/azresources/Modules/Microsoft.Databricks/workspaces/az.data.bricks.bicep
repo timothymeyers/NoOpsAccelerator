@@ -110,6 +110,7 @@ resource workspace 'Microsoft.Databricks/workspaces@2018-04-01' = {
     name: pricingTier
   }
   properties: {
+#disable-next-line use-resource-id-functions
     managedResourceGroupId: (empty(managedResourceGroupId) ? managedResourceGroupId_var : managedResourceGroupId)
     parameters: workspaceParameters
   }

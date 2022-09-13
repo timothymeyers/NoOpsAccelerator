@@ -8,12 +8,14 @@
 // ----------------------------------------------------------------------------------
 
 /*
-SUMMARY: Overlay Example to deploy role defintions to a existing enclave
+SUMMARY: Overlay Example to deploy role defintions to a existing enclave.
 DESCRIPTION: The following components will be options in this deployment
               * Roles
                 * Custom - VM Operator
+                * Custom - Platform Operations (PlatformOps)
                 * Custom - Network Operations (NetOps)
                 * Custom - Security Operations (SecOps)
+                * Custom - Appilcation Operations (AppOps)
                 * Custom - Landing Zone Application Owner
                 * Custom - Landing Zone Subscription Owner
                 * Custom - Storage Operator

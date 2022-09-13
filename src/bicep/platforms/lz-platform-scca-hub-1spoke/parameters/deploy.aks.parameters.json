@@ -332,6 +332,8 @@
     "parSecurityCenter": {
       "value": {
         "enableDefender": true,
+        "alertNotifications": "Off",
+        "alertsToAdminsNotifications": "Off",
         "emailSecurityContact": "anoa@microsoft.com",
         "phoneSecurityContact": "5555555555"
       }

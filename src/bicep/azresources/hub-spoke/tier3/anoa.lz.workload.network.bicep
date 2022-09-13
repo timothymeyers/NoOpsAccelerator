@@ -130,7 +130,7 @@ param parRouteTableRoutes array = [
   {
     name: 'wl-routetable'
     properties: {
-      addressPrefix: '0.0.0.0/0'     
+      addressPrefix: '0.0.0.0/0'
       nextHopIpAddress: parFirewallPrivateIPAddress
       nextHopType: 'VirtualAppliance'
     }
@@ -188,7 +188,7 @@ var varRouteTableName = '${varWorkloadSubnetName}-routetable'
 @description('Workload Resource group tags')
 module modTags '../../Modules/Microsoft.Resources/tags/az.resources.tags.bicep' = {
   name: 'deploy-${varWorkloadShortName}-tags-${parLocation}-${parDeploymentNameSuffix}'
-  params: {   
+  params: {
     tags: parTags
   }
 }
@@ -232,7 +232,7 @@ module modWorkloadLogStorage '../../Modules/Microsoft.Storage/storageAccounts/az
 
 // NETWORK SECURITY GROUP
 
-module modWorkloadNetworkSecurityGroup '../../Modules/Microsoft.Network/networkSecurityGroup/az.net.network.security.group.with.diagnostics.bicep' = {
+module modWorkloadNetworkSecurityGroup '../../Modules/Microsoft.Network/networkSecurityGroups/az.net.network.security.group.with.diagnostics.bicep' = {
   name: 'deploy-${varWorkloadShortName}-nsg-${parLocation}-${parDeploymentNameSuffix}'
   scope: resourceGroup(varWorkloadResourceGroupName)
   params: {
@@ -271,8 +271,8 @@ module modWorkloadVirtualNetwork '../../Modules/Microsoft.Network/virtualNetwork
   params: {
     name: varWorkloadVirtualNetworkName
     location: parLocation
-    tags: modTags.outputs.tags    
-    
+    tags: modTags.outputs.tags
+
     addressPrefixes: [
       parWorkloadVirtualNetworkAddressPrefix
     ]
@@ -281,12 +281,12 @@ module modWorkloadVirtualNetwork '../../Modules/Microsoft.Network/virtualNetwork
       {
         addressPrefix: parWorkloadSubnetAddressPrefix
         name: varWorkloadSubnetName
-        networkSecurityGroupId: modWorkloadNetworkSecurityGroup.outputs.resourceId        
+        networkSecurityGroupId: modWorkloadNetworkSecurityGroup.outputs.resourceId
         routeTableId: modWorkloadRouteTable.outputs.resourceId
         serviceEndpoints: parWorkloadSubnetServiceEndpoints
-      }      
+      }
     ]
-
+    
     diagnosticWorkspaceId: parLogAnalyticsWorkspaceResourceId
     diagnosticStorageAccountId: modWorkloadLogStorage.outputs.resourceId
 
@@ -346,4 +346,3 @@ output networkSecurityGroupResourceId string = modWorkloadNetworkSecurityGroup.o
 output workloadResourceGroupName string = varWorkloadResourceGroupName
 output workloadLogStorageAccountName string = varWorkloadLogStorageAccountName
 output workloadLogStorageAccountResourceId string = modWorkloadLogStorage.outputs.resourceId
-

@@ -2,11 +2,20 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "parOrgPrefix": {
-            "value": "anoa"
+        "parRequired": {
+            "value": {
+                "orgPrefix": "anoa",
+                "templateVersion": "v1.0",
+                "deployEnvironment": "appsvcsplan"
+            }
         },
-        "parDeployEnvironment": {
-            "value": "platforms"
+        "parTags": {
+            "value": {
+                "organization": "anoa",
+                "templateVersion": "v1.0",
+                "deployEnvironment": "appsvcsplan",
+                "deploymentType": "NoOpsBicep"
+            }
         },
         "parHubVirtualNetworkName": {
             "value": "anoa-eastus-platforms-hub-vnet"
@@ -17,77 +26,52 @@
         "parHubNetworkSecurityGroupResourceId": {
             "value": "/subscriptions/xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx/resourceGroups/anoa-eastus-platforms-hub-rg/providers/Microsoft.Network/networkSecurityGroups/anoa-eastus-platforms-hub-nsg"
         },
-        "parBastionHostSubnetAddressPrefix": {
-            "value": "192.168.0.0/16"
-        },
-        "parBastionHostPublicIPAddressAvailabilityZones": {
-            "value": []
-        },
-        "parLinuxVmAdminUsername": {
-            "value": "azureuser"
-        },
-        "parLinuxVmAuthenticationType": {
-            "value": "password"
-        },
-        "parLinuxVmAdminPasswordOrKey": {
-            "value": "Rem0te@2020246"
-        },
-        "parLinuxVmSize": {
-            "value": "Standard_B2s"
-        },
-        "parLinuxVmOsDiskCreateOption": {
-            "value": "FromImage"
-        },
-        "parLinuxVmOsDiskType": {
-            "value": "Standard_LRS"
-        },
-        "parLinuxVmImagePublisher": {
-            "value": "Canonical"
-        },
-        "parLinuxVmImageOffer": {
-            "value": "UbuntuServer"
-        },
-        "parLinuxVmImageSku": {
-            "value": "18.04-LTS"
-        },
-        "parLinuxVmImageVersion": {
-            "value": "latest"
-        },
-        "parLinuxNetworkInterfacePrivateIPAddressAllocationMethod": {
-            "value": "Dynamic"
-        },
-        "parWindowsVmAdminUsername": {
-            "value": "azureuser"
-        },
-        "parWindowsVmAdminPassword": {
-            "value": "Rem0te@2020246"
-        },
-        "parWindowsVmSize": {
-            "value": "Standard_DS1_v2"
-        },
-        "parWindowsVmPublisher": {
-            "value": "MicrosoftWindowsServer"
-        },
-        "parWindowsVmOffer": {
-            "value": "WindowsServer"
-        },
-        "parWindowsVmSku": {
-            "value": "2019-datacenter"
-        },
-        "parWindowsVmVersion": {
-            "value": "latest"
-        },
-        "parWindowsVmCreateOption": {
-            "value": "FromImage"
-        },
-        "parWindowsVmStorageAccountType": {
-            "value": "StandardSSD_LRS"
-        },
-        "parWindowsNetworkInterfacePrivateIPAddressAllocationMethod": {
-            "value": "Dynamic"
-        },
         "parLogAnalyticsWorkspaceId": {
             "value": "/subscriptions/xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx/resourcegroups/anoa-eastus-platforms-logging-rg/providers/microsoft.operationalinsights/workspaces/anoa-eastus-platforms-logging-log"
+        },
+        "parRemoteAccess": {
+            "value": {
+                "enable": true,
+                "bastion": {
+                    "sku": "Standard",
+                    "subnetAddressPrefix": "10.0.100.160/27",
+                    "publicIPAddressAvailabilityZones": [],
+                    "encryptionAtHost": false,
+                    "linux": {
+                        "enable": true,
+                        "vmName": "bastion-linux",
+                        "vmAdminUsername": "azureuser",
+                        "disablePasswordAuthentication": false,
+                        "vmAdminPasswordOrKey": "Rem0te@2020246",
+                        "vmSize": "Standard_DS1_v2",
+                        "vmOsDiskCreateOption": "FromImage",
+                        "vmOsDiskType": "Standard_LRS",
+                        "vmImagePublisher": "Canonical",
+                        "vmImageOffer": "UbuntuServer",
+                        "vmImageSku": "18.04-LTS",
+                        "vmImageVersion": "latest",
+                        "networkInterfacePrivateIPAddressAllocationMethod": "Dynamic"
+                    },
+                    "windows": {
+                        "enable": true,
+                        "vmName": "bastion-windows",
+                        "vmAdminUsername": "azureuser",
+                        "vmAdminPassword": "Rem0te@2020246",
+                        "vmSize": "Standard_DS1_v2",
+                        "vmOsDiskCreateOption": "FromImage",
+                        "vmStorageAccountType": "StandardSSD_LRS",
+                        "vmImagePublisher": "MicrosoftWindowsServer",
+                        "vmImageOffer": "WindowsServer",
+                        "vmImageSku": "2019-datacenter",
+                        "vmImageVersion": "latest",
+                        "networkInterfacePrivateIPAddressAllocationMethod": "Dynamic"
+                    },
+                    "customScriptExtension": {
+                        "install": false,
+                        "script64": ""
+                    }
+                }
+            }
         }
     }
 }

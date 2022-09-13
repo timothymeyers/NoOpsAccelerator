@@ -7,6 +7,9 @@
 // OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.
 // ----------------------------------------------------------------------------------
 
+// ================ //
+// Parameters       //
+// ================ //
 @description('Required. Name of the Key Vault. Must be globally unique.')
 @maxLength(24)
 param name string
@@ -112,6 +115,9 @@ param privateEndpoints array = []
 @description('Optional. Resource tags.')
 param tags object = {}
 
+@description('Optional. Enable telemetry via the Customer Usage Attribution ID (GUID).')
+param enableDefaultTelemetry bool = true
+
 @description('Optional. The name of logs that will be streamed.')
 @allowed([
   'AuditEvent'
@@ -171,9 +177,23 @@ var formattedAccessPolicies = [for accessPolicy in accessPolicies: {
 
 var secretList = !empty(secrets) ? secrets.secureList : []
 
+var enableReferencedModulesTelemetry = false
+
 // =========== //
 // Deployments //
 // =========== //
+resource defaultTelemetry 'Microsoft.Resources/deployments@2021-04-01' = if (enableDefaultTelemetry) {
+  name: 'pid-47ed15a6-730a-4827-bcb4-0fd963ffbd82-${uniqueString(deployment().name, location)}'
+  properties: {
+    mode: 'Incremental'
+    template: {
+      '$schema': 'https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#'
+      contentVersion: '1.0.0.0'
+      resources: []
+    }
+  }
+}
+
 resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
   name: name
   location: location
@@ -220,15 +240,15 @@ resource keyVault_diagnosticSettings 'Microsoft.Insights/diagnosticsettings@2021
   scope: keyVault
 }
 
-module keyVault_accessPolicies 'accessPolicies/az.sec.key.vault.policy.bicep' = if (!empty(accessPolicies)) {
+module keyVault_accessPolicies './accessPolicies/az.sec.key.vault.policy.bicep' = if (!empty(accessPolicies)) {
   name: '${uniqueString(deployment().name, location)}-KeyVault-AccessPolicies'
   params: {
     keyVaultName: keyVault.name
-    accessPolicies: formattedAccessPolicies
+    accessPolicies: formattedAccessPolicies    
   }
 }
 
-module keyVault_secrets 'secrets/az.sec.key.vault.secret.bicep' = [for (secret, index) in secretList: {
+module keyVault_secrets './secrets/az.sec.key.vault.secret.bicep' = [for (secret, index) in secretList: {
   name: '${uniqueString(deployment().name, location)}-KeyVault-Secret-${index}'
   params: {
     name: secret.name
@@ -239,11 +259,11 @@ module keyVault_secrets 'secrets/az.sec.key.vault.secret.bicep' = [for (secret, 
     attributesNbf: contains(secret, 'attributesNbf') ? secret.attributesNbf : -1
     contentType: contains(secret, 'contentType') ? secret.contentType : ''
     tags: contains(secret, 'tags') ? secret.tags : {}
-    roleAssignments: contains(secret, 'roleAssignments') ? secret.roleAssignments : []
+    roleAssignments: contains(secret, 'roleAssignments') ? secret.roleAssignments : []    
   }
 }]
 
-module keyVault_keys 'keys/az.sec.key.vault.key.bicep' = [for (key, index) in keys: {
+module keyVault_keys './keys/az.sec.key.vault.key.bicep' = [for (key, index) in keys: {
   name: '${uniqueString(deployment().name, location)}-KeyVault-Key-${index}'
   params: {
     name: key.name
@@ -260,7 +280,7 @@ module keyVault_keys 'keys/az.sec.key.vault.key.bicep' = [for (key, index) in ke
   }
 }]
 
-module keyVault_privateEndpoints '../../Microsoft.Network/privateEndpoint/az.net.private.endpoint.bicep' = [for (privateEndpoint, index) in privateEndpoints: {
+module keyVault_privateEndpoints '../../Microsoft.Network/privateEndPoints/az.net.private.endpoint.bicep' = [for (privateEndpoint, index) in privateEndpoints: {
   name: '${uniqueString(deployment().name, location)}-KeyVault-PrivateEndpoint-${index}'
   params: {
     groupIds: [
@@ -286,6 +306,8 @@ module keyVault_roleAssignments './rbac/roleAssignments.bicep' = [for (roleAssig
     principalIds: roleAssignment.principalIds
     principalType: contains(roleAssignment, 'principalType') ? roleAssignment.principalType : ''
     roleDefinitionIdOrName: roleAssignment.roleDefinitionIdOrName
+    condition: contains(roleAssignment, 'condition') ? roleAssignment.condition : ''
+    delegatedManagedIdentityResourceId: contains(roleAssignment, 'delegatedManagedIdentityResourceId') ? roleAssignment.delegatedManagedIdentityResourceId : ''
     resourceId: keyVault.id
   }
 }]

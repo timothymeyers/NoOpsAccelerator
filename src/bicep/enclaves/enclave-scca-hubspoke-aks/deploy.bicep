@@ -555,13 +555,8 @@ var referential = {
 
 @description('Resource group tags')
 module modTags '../../azresources/Modules/Microsoft.Resources/tags/az.resources.tags.bicep' = {
-<<<<<<< HEAD
   name: 'deploy-hubspoke-tags--${parLocation}-${parDeploymentNameSuffix}'
   scope: subscription(parHub.subscriptionId)
-=======
-  name: 'deploy-hubspoke-tags-${parLocation}-${parDeploymentNameSuffix}'
-  scope: subscription(parHubSubscriptionId)
->>>>>>> c2f51711f707d73843eac6a55a799848aad8b662
   params: {
     tags: union(parTags, referential)
   }
@@ -705,3 +700,23 @@ module modHubSpoke '../../platforms/lz-platform-scca-hub-1spoke/deploy.bicep' = 
 // ----------------------------------------------
 //
 // ----------------------------------------------
+module modAKSWorkload '../../workloads/wl-aks-spoke/deploy.bicep' = {
+  name: 'deploy-HubSpoke-${parLocation}-${parDeploymentNameSuffix}'
+  scope: subscription(parHub.subscriptionId)
+  params: {
+    parLocation: parLocation
+    parHubVirtualNetworkResourceId: modHubSpoke.outputs.hub.virtualNetworkResourceId
+    parTags: modTags.outputs.tags
+    parLogAnalyticsWorkspaceName: modHubSpoke.outputs.logAnalyticsWorkspaceName
+    parContainerRegistry: {
+    }
+    parKubernetesCluster: {
+    }
+    parHubResourceGroupName: modHubSpoke.outputs.hub.resourceGroupName
+    parHubVirtualNetworkName: modHubSpoke.outputs.hub.virtualNetworkName
+    parRequired: parRequired
+    parFirewallPrivateIPAddress: modHubSpoke.outputs.firewallPrivateIPAddress
+    parLogAnalyticsWorkspaceResourceId: modHubSpoke.outputs.logAnalyticsWorkspaceResourceId
+    parHubSubscriptionId: parHub.subscriptionId
+  }  
+}

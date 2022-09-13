@@ -12,23 +12,38 @@ Licensed under the MIT License.
 */
 
 // === PARAMETERS ===
-targetScope = 'subscription'
+targetScope = 'subscription' //Deploying at Subscription scope to allow resource groups to be created and resources in one deployment
 
 // REQUIRED PARAMETERS
+// Example (JSON)
+// -----------------------------
+// "parRequired": {
+//   "value": {
+//     "orgPrefix": "anoa",
+//     "templateVersion": "v1.0",
+//     "deployEnvironment": "mlz"
+//   }
+// }
+@description('Required values used with all resources.')
+param parRequired object
 
-@description('Prefix value which will be prepended to all resource names. Default: anoa')
-param parOrgPrefix string = 'anoa'
+// REQUIRED TAGS
+// Example (JSON)
+// -----------------------------
+// "parTags": {
+//   "value": {
+//     "organization": "anoa",
+//     "region": "eastus",
+//     "templateVersion": "v1.0",
+//     "deployEnvironment": "platforms",
+//     "deploymentType": "NoOpsBicep"
+//   }
+// }
+@description('Required tags values used with all resources.')
+param parTags object
 
 @description('The region to deploy resources into. It defaults to the deployment location.')
 param parLocation string = deployment().location
-
-@description('Tags for the resource')
-param parTags object
-
-@minLength(3)
-@maxLength(15)
-@description('A suffix, 3 to 15 characters in length, to append to resource names (e.g. "dev", "test", "prod", "platforms"). It defaults to "platforms".')
-param parDeployEnvironment string = 'platforms'
 
 // RESOURCE NAMING PARAMETERS
 
@@ -38,13 +53,7 @@ param parDeploymentNameSuffix string = utcNow()
 // WORKLOAD PARAMETERS
 
 @description('The subscription ID for the Hub Network and resources. It defaults to the deployment subscription.')
-param parWorkloadSubscriptionId string = subscription().subscriptionId
-
-@description('The CIDR Virtual Network Address Prefix for the Workload Virtual Network.')
-param parWorkloadVirtualNetworkAddressPrefix string = '10.8.125.0/26'
-
-@description('The CIDR Subnet Address Prefix for the default Workload subnet. It must be in the Workload Virtual Network space.')
-param parWorkloadSubnetAddressPrefix string = '10.8.125.0/27'
+param parWorkload object
 
 // HUB NETWORK PARAMETERS
 
@@ -62,6 +71,9 @@ param parHubVirtualNetworkResourceId string
 
 // FIREWALL PARAMETERS
 
+@description('The virtual network name for the Hub Network.')
+param parHubFirewallName string
+
 @description('The firewall private IP address for the Hub Network.')
 param parFirewallPrivateIPAddress string
 
@@ -73,46 +85,87 @@ param parLogAnalyticsWorkspaceResourceId string
 @description('Log Analytics Workspace Name Needed Activity Logging')
 param parLogAnalyticsWorkspaceName string
 
-// AKS PARAMETERS
+// Azure Container Registry
+// Example (JSON)
+// -----------------------------
+// "parContainerRegistry": {
+//   "value": {
+//     "name": "anoa-eastus-dev-acr",
+//     "acrSku": "Premium",
+//     "enableResourceLock": true,
+//     "privateEndpoints": [
+//       {
+//         "privateDnsZoneGroup": {
+//           "privateDNSResourceIds": [
+//             "/subscriptions/<<subscriptionId>>/resourceGroups/validation-rg/providers/Microsoft.Network/privateDnsZones/privatelink.azurecr.io"
+//           ]
+//         },
+//         "service": "registry",
+//         "subnetResourceId": "/subscriptions/<<subscriptionId>>/resourceGroups/validation-rg/providers/Microsoft.Network/virtualNetworks/adp-<<namePrefix>>-az-vnet-x-001/subnets/<<namePrefix>>-az-subnet-x-005-privateEndpoints"
+//       }
+//     ]
+//   }
+// }
+@description('Defines the Container Registry.')
+param parContainerRegistry object 
 
-@description('The name of the workload. Default: workload')
-param parWorkloadName string = 'workload'
-
+// Azure Kubernetes Service - Cluster
+// Example (JSON)
+// -----------------------------
+// "parKubernetesCluster": {
+//   "value": {
+//     "name": "anoa-eastus-dev-aks",
+//     "enableSystemAssignedIdentity": true,
+//     "aksClusterKubernetesVersion": "1.21.9",
+//     "enableResourceLock": true,
+//     "primaryAgentPoolProfile": [
+//       {
+//         "name": "aksPoolName",
+//         "vmSize": "Standard_DS3_v2",
+//         "osDiskSizeGB": 128,
+//         "count": 2,
+//         "osType": "Linux",
+//         "type": "VirtualMachineScaleSets",
+//         "mode": "System"
+//       }
+//     ],
+//     "aksClusterLoadBalancerSku": "standard",
+//     "aksClusterNetworkPlugin": "azure",
+//     "aksClusterNetworkPolicy": "azure",
+//     "aksClusterDnsServiceIP": "",
+//     "aksClusterServiceCidr": "",
+//     "aksClusterDockerBridgeCidr": "",
+//     "aksClusterDnsPrefix": "anoaaks"
+//   }
+// }
 @description('Parmaters Object of Azure Kubernetes specified when creating the managed cluster.')
-param parAzureKubernetes object
+param parKubernetesCluster object
 
-// === VARIABLES ===
-/*
-  NAMING CONVENTION
-  Here we define a naming conventions for resources.
-  First, we take `parDeployEnvironment` and `parDeployEnvironment` by params.
-  Then, using string interpolation "${}", we insert those values into a naming convention.
-*/
-@description('The name of the Azure Kubernetes Service which will be created. Must be clobally unique, between 3 and 24 characters and only single hyphens permitted. If unchanged or not specified, the NoOps Accelerator resource prefix + "-akv" will be utilized.')
-var varResourceToken = 'resource_token'
-var varNameToken = 'name_token'
-var varNamingConvention = '${toLower(parOrgPrefix)}-${toLower(parLocation)}-${toLower(parDeployEnvironment)}-${varNameToken}-${toLower(varResourceToken)}'
-
-// RESOURCE NAME CONVENTIONS WITH ABBREVIATIONS
-var varResourceGroupNamingConvention = replace(varNamingConvention, varResourceToken, 'rg')
-var varAKSNamingConvention = replace(varNamingConvention, varResourceToken, 'aks')
-var varACRNamingConvention = replace(varNamingConvention, varResourceToken, 'acr')
-
-var varAKSResourceGroupName = replace(varResourceGroupNamingConvention, varNameToken, parWorkloadName)
-var varACRName = replace(varACRNamingConvention, varNameToken, parWorkloadName)
-var varAKSName = replace(varAKSNamingConvention, varNameToken, parWorkloadName)
-
-//=== RESOURCES ===
+// Storage Account RBAC
+// Example (JSON)
+// -----------------------------
+// "parStorageAccountAccess": {
+//   "value": {
+//     "enableRoleAssignmentForStorageAccount": true,
+//     "principalIds": [
+//       "xxxxxx-xxxxx-xxxxx-xxxx-xxxxxxx"
+//     ],
+//     "roleDefinitionIdOrName": "Group"
+//   }
+// },  
+@description('Account for access to Storage')
+param parStorageAccountAccess object
 
 //=== TAGS === 
 
 var referential = {
-  workload: parWorkloadName
+  workload: parWorkload.name
 }
 
 @description('Resource group tags')
 module modTags '../../azresources/Modules/Microsoft.Resources/tags/az.resources.tags.bicep' = {
   name: 'AKS-Resource-Tags-${parDeploymentNameSuffix}'
+  scope: subscription()
   params: {
     tags: union(parTags, referential)
   }
@@ -121,11 +174,12 @@ module modTags '../../azresources/Modules/Microsoft.Resources/tags/az.resources.
 //=== Workload Tier 3 Buildout === 
 module modTier3 '../../azresources/hub-spoke/tier3/anoa.lz.workload.network.bicep' = {
   name: 'deploy-wl-vnet-${parLocation}-${parDeploymentNameSuffix}'
+  scope: subscription(parWorkload.subscriptionId)
   params: {
     //Required Parameters
-    parWorkloadName: parWorkloadName
-    parWorkloadShortName: parWorkloadName
-    parDeployEnvironment: parDeployEnvironment
+    parWorkloadName: parWorkload.name
+    parWorkloadShortName: parWorkload.shortName
+    parDeployEnvironment: parRequired.deployEnvironment
     parLocation: parLocation
     parTags: modTags.outputs.tags
 
@@ -136,10 +190,10 @@ module modTier3 '../../azresources/hub-spoke/tier3/anoa.lz.workload.network.bice
     parHubResourceGroupName: parHubResourceGroupName
 
     //WorkLoad Parameters
-    parWorkloadSubscriptionId: parWorkloadSubscriptionId
-    parWorkloadVirtualNetworkAddressPrefix: parWorkloadVirtualNetworkAddressPrefix
-    parWorkloadSubnetAddressPrefix: parWorkloadSubnetAddressPrefix
-
+    parWorkloadSubscriptionId: parWorkload.subscriptionId
+    parWorkloadVirtualNetworkAddressPrefix: parWorkload.network.virtualNetworkAddressPrefix
+    parWorkloadSubnetAddressPrefix: parWorkload.network.subnetAddressPrefix
+  
     //Firewall Parameters
     parFirewallPrivateIPAddress: parFirewallPrivateIPAddress
 
@@ -148,9 +202,8 @@ module modTier3 '../../azresources/hub-spoke/tier3/anoa.lz.workload.network.bice
     parLogAnalyticsWorkspaceResourceId: parLogAnalyticsWorkspaceResourceId
 
     //Storage Parameters
-    parStorageAccountAccess: {
-
-    }
+    parStorageAccountAccess: parStorageAccountAccess
+    enableActivityLogging: true     
  
   }
 }
@@ -159,128 +212,39 @@ module modTier3 '../../azresources/hub-spoke/tier3/anoa.lz.workload.network.bice
 
 //=== Azure Kubernetes Service Workload Buildout === 
 
-
-
-module modAcrDeploy '../../azresources/Modules/Microsoft.ContainerRegistry/registries/az.container.registry.bicep' = {
+module modAcrDeploy '../../overlays/management-services/containerRegistry/deploy.bicep' = {
   name: 'deploy-aks-acr-${parLocation}-${parDeploymentNameSuffix}'
-  scope: resourceGroup(parWorkloadSubscriptionId, modTier3.)
+  scope: subscription(parWorkload.subscriptionId)
   params: {
-    // Required parameters
-    name: varACRName
-    location: parLocation
-    tags: modTags.outputs.tags
-    // Non-required parameters
-    acrAdminUserEnabled: false
-    acrSku: 'Premium'
-    privateEndpoints: [
-      {
-        service: 'registry'
-        subnetResourceId: modTier3.outputs.subnetResourceIds[0]
-        privateDnsZoneGroup: {
-
-        }
-      }
-    ]
+    parLocation: parLocation
+    parContainerRegistry: parContainerRegistry
+    parRequired: parRequired
+    parTags: modTags.outputs.tags
+    parTargetResourceGroup:  modTier3.outputs.workloadResourceGroupName
+    parTargetSubscriptionId: parWorkload.subscriptionId
+    parTargetSubnetName: modTier3.outputs.subnetNames[0]
+    parTargetVNetName: modTier3.outputs.virtualNetworkName
   }
   dependsOn: [
     modTier3
   ]
 }
 
-module modPrivateDNS '../../azresources/Modules/Microsoft.Network/privateDnsZones/az.net.private.dns.bicep' = {
-  name: 'deploy-aks-acr-${parLocation}-${parDeploymentNameSuffix}'
-  scope: resourceGroup(parWorkloadSubscriptionId, modAksRg.name)
-  params: {
-    // Required parameters
-    name: ''
-    location: parLocation
-    tags: modTags.outputs.tags
-  }
-  dependsOn: [
-    modTier3
-  ]
-}
-
-module modDeployAzureKS '../../azresources/Modules/Microsoft.ContainerService/managedClusters/az.container.aks.cluster.bicep' = {
-  scope: resourceGroup(parWorkloadSubscriptionId, modAksRg.name)
+// Create a AKS Cluster
+module modDeployAzureKS '../../overlays/management-services/kubernetesCluster/deploy.bicep' = {
+  scope: subscription(parWorkload.subscriptionId)
   name: 'deploy-aks-${parLocation}-${parDeploymentNameSuffix}'
   params: {
-    // Required parameters
-    location: parLocation
-    name: varAKSName
-
-    //agentPoolProfiles
-    primaryAgentPoolProfile: [
-      {
-        availabilityZones: parAzureKubernetes.primaryAgentPoolProfile.availabilityZones
-        count: parAzureKubernetes.primaryAgentPoolProfile.count
-        enableAutoScaling: parAzureKubernetes.primaryAgentPoolProfile.enableAutoScaling
-        maxCount: parAzureKubernetes.primaryAgentPoolProfile.maxCount
-        maxPods: parAzureKubernetes.primaryAgentPoolProfile.maxPods
-        minCount: parAzureKubernetes.primaryAgentPoolProfile.minCount
-        mode: parAzureKubernetes.primaryAgentPoolProfile.mode
-        name: parAzureKubernetes.primaryAgentPoolProfile.name
-        osDiskSizeGB: parAzureKubernetes.primaryAgentPoolProfile.osDiskSizeGB
-        osType: parAzureKubernetes.primaryAgentPoolProfile.osType
-        storageProfile: parAzureKubernetes.primaryAgentPoolProfile.storageProfile
-        type: parAzureKubernetes.primaryAgentPoolProfile.type
-        vmSize: parAzureKubernetes.primaryAgentPoolProfile.vmSize
-        vnetSubnetID: modTier3.outputs.subnetResourceIds[0]
-      }
-    ]
-    // Non-required parameters
-    agentPools: [
-      {
-        availabilityZones: [
-          '1'
-        ]
-        count: 2
-        enableAutoScaling: true
-        maxCount: 3
-        maxPods: 30
-        minCount: 1
-        minPods: 2
-        mode: 'User'
-        name: 'userpool1'
-        nodeLabels: {}
-        nodeTaints: [
-          'CriticalAddonsOnly=true:NoSchedule'
-        ]
-        osDiskSizeGB: 128
-        osType: 'Linux'
-        scaleSetEvictionPolicy: 'Delete'
-        scaleSetPriority: 'Regular'
-        storageProfile: 'ManagedDisks'
-        type: 'VirtualMachineScaleSets'
-        vmSize: 'Standard_DS2_v2'
-        vnetSubnetID: '/subscriptions/<<subscriptionId>>/resourceGroups/validation-rg/providers/Microsoft.Network/virtualNetworks/adp-<<namePrefix>>-az-vnet-x-aks/subnets/Secondary'
-      }
-    ]
-    aksClusterNetworkPlugin: 'azure'
-
-    //ApiServerAccessProfile
-    enablePrivateCluster: parAzureKubernetes.apiServerAccessProfile.enablePrivateCluster
-
-    //AddonProfiles
-    omsAgentEnabled: true 
-    monitoringWorkspaceId: parLogAnalyticsWorkspaceName
-
-    // Logging
-    enableAzureDefender: parEnableAzureDefender         
-    diagnosticLogsRetentionInDays: 7
-    diagnosticStorageAccountId: modTier3.outputs.workloadLogStorageAccountResourceId
-    diagnosticWorkspaceId: parLogAnalyticsWorkspaceName     
-    
-    lock: 'CanNotDelete'
-    roleAssignments: [
-      {
-        principalIds: [
-          '<<deploymentSpId>>'
-        ]
-        roleDefinitionIdOrName: 'Reader'
-      }
-    ]
-    systemAssignedIdentity: true  
+    parLocation: parLocation
+    parKubernetesCluster: parKubernetesCluster
+    parRequired: parRequired
+    parTags: modTags.outputs.tags
+    parTargetResourceGroup: modTier3.outputs.workloadResourceGroupName
+    parTargetSubnetName: modTier3.outputs.subnetNames[0]
+    parTargetVNetName: modTier3.outputs.virtualNetworkName
+    parTargetSubscriptionId: parWorkload.subscriptionId
+    parHubVirtualNetworkResourceId: parHubVirtualNetworkResourceId
+    parLogAnalyticsWorkspaceResourceId: parLogAnalyticsWorkspaceResourceId
   }
   dependsOn: [
     modTier3
@@ -289,8 +253,8 @@ module modDeployAzureKS '../../azresources/Modules/Microsoft.ContainerService/ma
 
 //=== End Azure Kubernetes Service Workload Buildout === 
 
-output azureKubernetesName string = varAKSName
-output azureKubernetesResourceId string = modDeployAzureKS.outputs.resourceId
+output azureKubernetesName string = parKubernetesCluster.name
+output azureKubernetesResourceId string = modDeployAzureKS.outputs.aksResourceId
+output azureContainerRegistryResourceId string = modAcrDeploy.outputs.acrResourceId
 output workloadResourceGroupName string = modTier3.outputs.workloadResourceGroupName
-output aksResourceGroupName string = modAksRg.outputs.name
 output tags object = modTags.outputs.tags

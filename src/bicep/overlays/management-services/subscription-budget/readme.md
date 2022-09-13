@@ -1,52 +1,74 @@
 # Module:   NoOps Accelerator - Subscription Budgets
 
-## Authored & Tested With
-
-* [azure-cli](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) version 2.38.0
-* bicep cli version v0.9.1
-* [bicep](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-bicep) v0.9.1 vscode extension
-
-## Prerequisites
-
-* For deployments in the Azure Portal you need access to the portal in the cloud you want to deploy to, such as [https://portal.azure.com](https://portal.azure.com) or [https://portal.azure.us](https://portal.azure.us).
-* For deployments in BASH or a Windows shell, then a terminal instance with the AZ CLI installed is required.
-* For PowerShell deployments you need a PowerShell terminal with the [Azure Az PowerShell module](https://docs.microsoft.com/en-us/powershell/azure/what-is-azure-powershell) installed.
-
-> NOTE: The AZ CLI will automatically install the Bicep tools when a command is run that needs them, or you can manually install them following the [instructions here.](https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/install#azure-cli)
-
 ## Overview
 
-This add-on module adds
+This overlay module deploys
 
-## Deploy Subscription Budgets
+Read on to understand what this overlay does, and when you're ready, collect all of the pre-requisites, then deploy the overlay
+
+## About Subscription Budgets
 
 The docs on Cost Management & Billing: <https://docs.microsoft.com/en-us/azure/cost-management-billing/cost-management-billing-overview>
 
+> NOTE: If you have a new subscription, you can't immediately create a budget or use other Cost Management features. It might take up to 48 hours before you can use all Cost Management features.
+
+Budgets are supported for the following types of Azure account types and scopes:
+
+* Azure role-based access control (Azure RBAC) scopes
+  * Management groups
+  * Subscription
+* Enterprise Agreement scopes
+  * Billing account
+  * Department
+  * Enrollment account
+* Individual agreements
+  * Billing account
+* Microsoft Customer Agreement scopes
+  * Billing account
+  * Billing profile
+  * Invoice section
+  * Customer
+* AWS scopes
+  * External account
+  * External subscription
+
 ## Pre-requisites
 
-* A Mission LZ deployment (a deployment of mlz.bicep)
+* A virtual network and subnet is deployed. (a deployment of [deploy.bicep](../../../../bicep/platforms/lz-platform-scca-hub-3spoke/deploy.bicep))
+* Decide if the optional parameters is appropriate for your deployment. If it needs to change, override one of the optional parameters.
+
+The following Azure permissions, or scopes, are supported per subscription for budgets by user and group. For more information about scopes, see Understand and work with scopes.
+
+* Owner: Can create, modify, or delete budgets for a subscription.
+* Contributor and Cost Management contributor: Can create, modify, or delete their own budgets. Can modify the budget amount for budgets created by others.
+* Reader and Cost Management reader: Can view budgets that they have permission to.
+For more information about assigning permission to Cost Management data, see [Assign access to Cost Management data](https://docs.microsoft.com/en-us/azure/cost-management-billing/costs/assign-access-acm-data).
 
 See below for information on how to use the appropriate deployment parameters for use with this overlay:
 
-Deployment Output Name | Description
+Required Parameters | Description
 -----------------------| -----------
-parTargetResourceGroupName | The resource group that contains the Hub Virtual Network and deploy the virtual machines into
+parLocation | The region to deploy resources into. It defaults to the deployment location.
+parSubscriptionBudget | The oject parameters of the Subscription Budget
 
-## Deploy the Service
+## Deploy the Overlay
 
-Once you have the Mission LZ output values, you can pass those in as parameters to this deployment.
+Connect to the appropriate Azure Environment and set appropriate context, see getting started with Azure PowerShell or Azure CLI for help if needed. The commands below assume you are deploying in Azure Commercial and show the entire process from deploying Platform Hub/Spoke Design and then adding an Subscription Budgets post-deployment.
 
-For example, deploying using the `az deployment group create` command in the Azure CLI:
+> NOTE: Since you can deploy this overlay post-deployment, you can also build this overlay within other deployment models such as Platforms & Workloads.
+
+Once you have the hub/spoke output values, you can pass those in as parameters to this deployment.
+
+For example, deploying using the `az deployment sub create` command in the Azure CLI:
 
 ### Azure CLI
 
 ```bash
 # For Azure global regions
-az deployment group create \
-   --template-file overlays/management-groups/anoa.lz.mgmt.svcs.sub.budget.bicep \
-   --parameters @overlays/management-groups/anoa.lz.mgmt.svcs.sub.budget.parameters.example.json \
+az deployment sub create \
+   --template-file overlays/subscription-budget/deploy.bicep \
+   --parameters @overlays/subscription-budget/deploy.parameters.json \
    --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx \
-   --resource-group anoa-eastus-platforms-hub-rg \
    --location 'eastus'
 ```
 
@@ -54,11 +76,10 @@ OR
 
 ```bash
 # For Azure IL regions
-az deployment group create \
-  --template-file overlays/management-groups/anoa.lz.mgmt.svcs.sub.budget.bicep \
-  --parameters @overlays/management-groups/anoa.lz.mgmt.svcs.sub.budget.parameters.example.json \
+az deployment sub create \
+  --template-file overlays/subscription-budget/deploy.bicep \
+  --parameters @overlays/subscription-budget/deploy.parameters.json \
   --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx \
-  --resource-group anoa-usgovvirginia-platforms-hub-rg \
   --location 'usgovvirginia'
 ```
 
@@ -66,12 +87,10 @@ az deployment group create \
 
 ```powershell
 # For Azure global regions
-New-AzGroupDeployment `
-  -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
-  -TemplateFile overlays/management-groups/anoa.lz.mgmt.svcs.sub.budget.bicepp `
-  -TemplateParameterFile overlays/management-groups/anoa.lz.mgmt.svcs.sub.budget.parameters.example.json `
+New-AzSubscriptionDeployment `
+  -TemplateFile overlays/subscription-budget/deploy.bicepp `
+  -TemplateParameterFile overlays/subscription-budget/deploy.parameters.json `
   -Subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx `
-  -ResourceGroup anoa-eastus-platforms-hub-rg `
   -Location 'eastus'
 ```
 
@@ -79,23 +98,47 @@ OR
 
 ```powershell
 # For Azure IL regions
-New-AzGroupDeployment `
-  -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
-  -TemplateFile overlays/management-groups/anoa.lz.mgmt.svcs.sub.budget.bicepp `
-  -TemplateParameterFile overlays/management-groups/anoa.lz.mgmt.svcs.sub.budget.parameters.example.json `
+New-AzSubscriptionDeployment `
+  -TemplateFile overlays/subscription-budget/deploy.bicepp `
+  -TemplateParameterFile overlays/subscription-budget/deploy.parameters.json `
   -Subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx `
-  -ResourceGroup anoa-usgovvirginia-platforms-hub-rg `
   -Location  'usgovvirginia'
 ```
+
+## Extending the Overlay
+
+By default, this overlay has the minium parmeters needed to deploy the service. If you like to add addtional parmeters to the service, please refer to the module description located in AzResources here: [`App Service Plans `[Microsoft.Web/serverfarms]`](D:\source\repos\NoOpsAccelerator\src\bicep\azresources\Modules\Microsoft.Web\serverfarms\readme.md)
 
 ## Air-Gapped Clouds
 
 For air-gapped clouds it may be convenient to transfer and deploy the compiled ARM template instead of the Bicep template if the Bicep CLI tools are not available or if it is desirable to transfer only one file into the air gap.
 
+## Review Deployed Resources
+
+Use the Azure portal, Azure CLI, or Azure PowerShell to list the deployed resources in the resource group.
+
+```bash
+az consumption budget list
+```
+
+```powershell
+Get-AzConsumptionBudget
+```
+
 ## Cleanup
 
 The Bicep/ARM deployment of NoOps Accelerator - Subscription Budgets deployment can be deleted with these steps:
 
+### Delete Resources
+
+```bash
+az consumption budget delete --budget-name MyBudget
+```
+
+```powershell
+Remove-AzConsumptionBudget -Name MyBudget
+```
+
 ## Example Output in Azure
 
-![Example Deployment Output](images/operationsNetworkExampleDeploymentOutput.png "Example Deployment Output in Azure global regions")
+![Example Deployment Output](media/aspExampleDeploymentOutput.png "Example Deployment Output in Azure global regions")

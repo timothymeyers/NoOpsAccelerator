@@ -19,24 +19,86 @@ VERSION: 1.x.x
 
 // REQUIRED PARAMETERS
 
-@description('Prefix value which will be prepended to all resource names. Default: anoa')
-param parOrgPrefix string = 'anoa'
+// REQUIRED PARAMETERS
+// Example (JSON)
+// These are the required parameters for the deployment
+// -----------------------------
+// "parRequired": {
+//   "value": {
+//     "orgPrefix": "anoa",
+//     "templateVersion": "v1.0",
+//     "deployEnvironment": "mlz"
+//   }
+// }
+@description('Required values used with all resources.')
+param parRequired object
+
+// REQUIRED TAGS
+// Example (JSON)
+// These are the required tags for the deployment
+// -----------------------------
+// "parTags": {
+//   "value": {
+//     "organization": "anoa",
+//     "region": "eastus",
+//     "templateVersion": "v1.0",
+//     "deployEnvironment": "platforms",
+//     "deploymentType": "NoOpsBicep"
+//   }
+// }
+@description('Required tags values used with all resources.')
+param parTags object
 
 @description('The region to deploy resources into. It defaults to the deployment location.')
 param parLocation string = resourceGroup().location
 
-@minLength(3)
-@maxLength(15)
-@description('A suffix, 3 to 15 characters in length, to append to resource names (e.g. "dev", "test", "prod", "platforms"). It defaults to "platforms".')
-param parDeployEnvironment string = 'platforms'
+// REMOTE ACCESS PARAMETERS
 
-// RESOURCE NAMING PARAMETERS
+// Bastion Host (Remote Access)
+// Example (JSON)
+// -----------------------------
+// "parRemoteAccess": {
+//   "value": {
+//     "enable": true,
+//     "bastion": {
+//       "sku": "Standard",
+//       "subnetAddressPrefix": "10.0.100.160/27",
+//       "publicIPAddressAvailabilityZones": [],
+//       "linux": {
+//         "enable": true,
+//         "vmAdminUsername": "azureuser",
+//         "enableVmPasswordAuthentication": true,
+//         "vmAuthenticationType": "password",
+//         "vmAdminPasswordOrKey": "Rem0te@2020246",
+//         "vmSize": "Standard_B2s",
+//         "vmOsDiskCreateOption": "FromImage",
+//         "vmOsDiskType": "Standard_LRS",
+//         "vmImagePublisher": "Canonical",
+//         "vmImageOffer": "UbuntuServer",
+//         "vmImageSku": "18.04-LTS",
+//         "vmImageVersion": "latest",
+//         "networkInterfacePrivateIPAddressAllocationMethod": "Dynamic"
+//       },
+//       "windows": {
+//         "enable": true,
+//         "vmAdminUsername": "azureuser",
+//         "VmAdminPassword": "Rem0te@2020246",
+//         "vmSize": "Standard_DS1_v2",
+//         "vmOsDiskCreateOption": "FromImage",
+//         "VmStorageAccountType": "StandardSSD_LRS",
+//         "vmImagePublisher": "MicrosoftWindowsServer",
+//         "vmImageOffer": "WindowsServer",
+//         "vmImageSku": "2019-datacenter",
+//         "vmImageVersion": "latest",
+//         "networkInterfacePrivateIPAddressAllocationMethod": "Dynamic"
+//       }
+//     }
+//   }
+// }
+@description('When set to "true", provisions Azure Bastion Host. It defaults to "false".')
+param parRemoteAccess object
 
-@description('A suffix to use for naming deployments uniquely. It defaults to the Bicep resolution of the "utcNow()" function.')
-param parDeploymentNameSuffix string = utcNow()
-
-@description('Tags')
-param parTags object = {}
+// HUB NETWORK PARAMETERS
 
 @description('The Hub Virtual Network Name')
 param parHubVirtualNetworkName string
@@ -47,102 +109,18 @@ param parHubSubnetResourceId string
 @description('The Hub Network Security Group Resource Id')
 param parHubNetworkSecurityGroupResourceId string
 
-@description('The SKU of this Bastion Host.')
-param parBastionHostSku string
+// LOGGING PARAMETERS
 
-@description('The CIDR Subnet Address Prefix for the Azure Bastion Subnet. It must be in the Hub Virtual Network space "hubVirtualNetworkAddressPrefix" parameter value. It must be /27 or larger.')
-param parBastionHostSubnetAddressPrefix string = '10.0.100.160/27'
-
-@description('Optional. This property can be used by user in the request to enable or disable the Host Encryption for the virtual machine. This will enable the encryption for all the disks including Resource/Temp disk at host itself. For security reasons, it is recommended to set encryptionAtHost to True. Restrictions: Cannot be enabled if Azure Disk Encryption (guest-VM encryption using bitlocker/DM-Crypt) is enabled on your VMs.')
-param parEncryptionAtHost bool = false
-
-// Linux VIRTUAL MACHINE PARAMETERS
-
-@description('Switch which allows Linux VM to be deployed. Default: true')
-param parEnableLinux bool = true
-
-param parLinuxNetworkInterfacePrivateIPAddressAllocationMethod string
-
-@description('The name of the Linux Virtual Machine to Azure Bastion remote into.')
-param parLinuxVmName string
-
-@description('The size of the Linux Virtual Machine to Azure Bastion remote into. It defaults to "Standard_DS1_v2".')
-param parLinuxVmSize string = 'Standard_DS1_v2'
-
-@description('The disk creation option of the Linux Virtual Machine to Azure Bastion remote into. It defaults to "FromImage".')
-param parLinuxVmOsDiskCreateOption string = 'FromImage'
-
-@description('The disk type of the Linux Virtual Machine to Azure Bastion remote into. It defaults to "Standard_LRS".')
-param parLinuxVmOsDiskType string = 'Standard_LRS'
-
-@description('The image publisher of the Linux Virtual Machine to Azure Bastion remote into. It defaults to "Canonical".')
-param parLinuxVmImagePublisher string = 'Canonical'
-
-@description('The image offer of the Linux Virtual Machine to Azure Bastion remote into. It defaults to "UbuntuServer".')
-param parLinuxVmImageOffer string = 'UbuntuServer'
-
-@description('The image SKU of the Linux Virtual Machine to Azure Bastion remote into. It defaults to "18.04-LTS".')
-param parLinuxVmImageSku string = '18.04-LTS'
-
-@description('The image version of the Linux Virtual Machine to Azure Bastion remote into. It defaults to "latest".')
-param parLinuxVmImageVersion string = 'latest'
-
-@description('The administrator username for the Linux Virtual Machine to Azure Bastion remote into. It defaults to "azureuser".')
-param parLinuxVmAdminUsername string
-
-@description('Optional. Specifies whether password authentication should be disabled.')
-#disable-next-line secure-secrets-in-params
-param parDisableLinuxVmPasswordAuthentication bool = false
-
-@secure()
-@description('The administrator password or public SSH key for the Linux Virtual Machine to Azure Bastion remote into. See https://docs.microsoft.com/en-us/azure/virtual-machines/linux/faq#what-are-the-password-requirements-when-creating-a-vm- for password requirements.')
-param parLinuxVmAdminPasswordOrKey string = parDisableLinuxVmPasswordAuthentication ? '' : newGuid()
-
-// WINDOWS VIRTUAL MACHINE PARAMETERS
-
-@description('Switch which allows Windows VM to be deployed. Default: true')
-param parEnableWindows bool = true
-
-@description('The name for the Windows Virtual Machine to Azure Bastion remote into.')
-param parWindowsVmName string
-
-@description('The administrator username for the Windows Virtual Machine to Azure Bastion remote into. It defaults to "azureuser".')
-param parWindowsVmAdminUsername string = 'azureuser'
-
-@description('The administrator password the Windows Virtual Machine to Azure Bastion remote into. It must be > 12 characters in length. See https://docs.microsoft.com/en-us/azure/virtual-machines/windows/faq#what-are-the-password-requirements-when-creating-a-vm- for password requirements.')
-@secure()
-@minLength(12)
-param parWindowsVmAdminPassword string
-
-@description('The size of the Windows Virtual Machine to Azure Bastion remote into. It defaults to "Standard_DS1_v2".')
-param parWindowsVmSize string = 'Standard_DS1_v2'
-
-@description('The publisher of the Windows Virtual Machine to Azure Bastion remote into. It defaults to "MicrosoftWindowsServer".')
-param parWindowsVmPublisher string = 'MicrosoftWindowsServer'
-
-@description('The offer of the Windows Virtual Machine to Azure Bastion remote into. It defaults to "WindowsServer".')
-param parWindowsVmOffer string = 'WindowsServer'
-
-@description('The SKU of the Windows Virtual Machine to Azure Bastion remote into. It defaults to "2019-datacenter".')
-param parWindowsVmSku string = '2019-datacenter'
-
-@description('The version of the Windows Virtual Machine to Azure Bastion remote into. It defaults to "latest".')
-param parWindowsVmVersion string = 'latest'
-
-@description('The disk creation option of the Windows Virtual Machine to Azure Bastion remote into. It defaults to "FromImage".')
-param parWindowsVmCreateOption string = 'FromImage'
-
-@description('The storage account type of the Windows Virtual Machine to Azure Bastion remote into. It defaults to "StandardSSD_LRS".')
-param parWindowsVmStorageAccountType string = 'StandardSSD_LRS'
-
-@allowed([
-  'Static'
-  'Dynamic'
-])
-@description('[Static/Dynamic] The public IP Address allocation method for the Windows virtual machine. It defaults to "Dynamic".')
-param parWindowsNetworkInterfacePrivateIPAddressAllocationMethod string = 'Dynamic'
-
+@description('Log Analytics Workspace Id Needed for NSG, VNet and Activity Logging')
 param parLogAnalyticsWorkspaceId string
+
+// RESOURCE NAMING PARAMETERS
+
+@description('A suffix to use for naming deployments uniquely. It defaults to the Bicep resolution of the "utcNow()" function.')
+param parDeploymentNameSuffix string = utcNow()
+
+@description('The current date - do not override the default value')
+param dateUtcNow string = utcNow('yyyy-MM-dd HH:mm:ss')
 
 /*
   NAMING CONVENTION
@@ -153,7 +131,7 @@ param parLogAnalyticsWorkspaceId string
 
 var varResourceToken = 'resource_token'
 var varNameToken = 'name_token'
-var varNamingConvention = '${toLower(parOrgPrefix)}-${toLower(parLocation)}-${toLower(parDeployEnvironment)}-${varNameToken}-${toLower(varResourceToken)}'
+var varNamingConvention = '${toLower(parRequired.orgPrefix)}-${toLower(parLocation)}-${toLower(parRequired.deployEnvironment)}-${varNameToken}-${toLower(varResourceToken)}'
 
 // RESOURCE NAME CONVENTIONS WITH ABBREVIATIONS
 
@@ -161,6 +139,7 @@ var varBastionHostNamingConvention = replace(varNamingConvention, varResourceTok
 var varPublicIpAddressNamingConvention = replace(varNamingConvention, varResourceToken, 'pip')
 var varIpConfigurationNamingConvention = replace(varNamingConvention, varResourceToken, 'ipconf')
 var varNetworkInterfaceNamingConvention = replace(varNamingConvention, varResourceToken, 'nic')
+var varNetworkSecurityGroupNamingConvention = replace(varNamingConvention, varResourceToken, 'nsg')
 
 // BASTION NAMES
 
@@ -170,18 +149,24 @@ var varLinuxNetworkInterfaceName = replace(varNetworkInterfaceNamingConvention, 
 var varLinuxNetworkInterfaceIpConfigurationName = replace(varIpConfigurationNamingConvention, varNameToken, 'bas-linux')
 var varWindowsNetworkInterfaceName = replace(varNetworkInterfaceNamingConvention, varNameToken, 'bas-windows')
 var varWindowsNetworkInterfaceIpConfigurationName = replace(varIpConfigurationNamingConvention, varNameToken, 'bas-windows')
+var varBastionHostNetworkSecurityGroupName = replace(varNetworkSecurityGroupNamingConvention, varNameToken, 'bas')
 
 // BASTION VALUES
 
 var varBastionHostPublicIPAddressSkuName = 'Standard'
 var varBastionHostPublicIPAddressAllocationMethod = 'Static'
 
+var referential = {
+  region: parLocation
+  deploymentDate: dateUtcNow
+}
+
 @description('Resource group tags')
 module modTags '../../../azresources/Modules/Microsoft.Resources/tags/az.resources.tags.bicep' = if (empty(parTags)) {
   name: 'deploy-ra-tags--${parLocation}-${parDeploymentNameSuffix}'
   scope: subscription()
   params: {
-    tags: parTags
+    tags: union(parTags, referential)
   }
 }
 
@@ -193,7 +178,7 @@ resource resBastionSubnet 'Microsoft.Network/virtualNetworks/subnets@2021-02-01'
   name: '${parHubVirtualNetworkName}/AzureBastionSubnet'
 
   properties: {
-    addressPrefix: parBastionHostSubnetAddressPrefix
+    addressPrefix: parRemoteAccess.bastion.subnetAddressPrefix
   }
 }
 
@@ -222,14 +207,80 @@ module modBastionHost '../../../azresources/Modules/Microsoft.Network/bastionHos
       skuName: varBastionHostPublicIPAddressSkuName
       skuTier: 'Regional'
     }
-    skuType: parBastionHostSku    
+    skuType: parRemoteAccess.bastion.sku    
   }
   dependsOn: [
     resBastionSubnet
   ]
 }
 
-module modLinuxNetworkInterface '../../../azresources/Modules/Microsoft.Network/networkInterfaces/az.net.network.interface.bicep' = if (parEnableLinux) {
+module modNetworkSecurityGroupBastion '../../../azresources/Modules/Microsoft.Network/networkSecurityGroups/az.net.network.security.group.with.diagnostics.bicep' = {
+  name: 'deploy-nsg-bastion-${parLocation}-${parDeploymentNameSuffix}'
+  params: {
+    name: varBastionHostNetworkSecurityGroupName
+    location: parLocation
+    tags: (empty(parTags)) ? modTags : parTags
+    securityRules: [
+      {
+        name: 'AllowHttpsInbound'
+        properties: {
+          priority: 120
+          direction: 'Inbound'
+          access: 'Allow'
+          protocol: 'Tcp'
+          sourceAddressPrefix: 'Internet'
+          sourcePortRange: '*'
+          destinationAddressPrefix: '*'
+          destinationPortRange: '443'
+        }
+      }
+      {
+        name: 'AllowGatewayManagerInbound'
+        properties: {
+          priority: 130
+          direction: 'Inbound'
+          access: 'Allow'
+          protocol: 'Tcp'
+          sourceAddressPrefix: 'GatewayManager'
+          sourcePortRange: '*'
+          destinationAddressPrefix: '*'
+          destinationPortRange: '443'
+        }
+      }
+      {
+        name: 'AllowSshRdpOutbound'
+        properties: {
+          priority: 100
+          direction: 'Outbound'
+          access: 'Allow'
+          protocol: '*'
+          sourceAddressPrefix: '*'
+          sourcePortRange: '*'
+          destinationAddressPrefix: 'VirtualNetwork'
+          destinationPortRanges: [
+            '22'
+            '3389'
+          ]
+        }
+      }
+      {
+        name: 'AllowAzureCloudOutbound'
+        properties: {
+          priority: 110
+          direction: 'Outbound'
+          access: 'Allow'
+          protocol: 'Tcp'
+          sourceAddressPrefix: '*'
+          sourcePortRange: '*'
+          destinationAddressPrefix: 'AzureCloud'
+          destinationPortRange: '443'
+        }
+      }
+    ]
+  }
+}
+
+module modLinuxNetworkInterface '../../../azresources/Modules/Microsoft.Network/networkInterfaces/az.net.network.interface.bicep' = if (parRemoteAccess.bastion.linux.enable) {
   name: 'deploy-ra-linux-net-interface-${parLocation}-${parDeploymentNameSuffix}'
   params: {
     name: varLinuxNetworkInterfaceName
@@ -240,31 +291,31 @@ module modLinuxNetworkInterface '../../../azresources/Modules/Microsoft.Network/
       {
         name: varLinuxNetworkInterfaceIpConfigurationName
         subnetResourceId: parHubSubnetResourceId
-        privateIPAllocationMethod: parLinuxNetworkInterfacePrivateIPAddressAllocationMethod
+        privateIPAllocationMethod: parRemoteAccess.bastion.linux.networkInterfacePrivateIPAddressAllocationMethod
       }
     ]
   }
 }
 
-module modLinuxVirtualMachine '../../../azresources/Modules/Microsoft.Compute/virtualmachines/az.com.virtual.machine.bicep' = if (parEnableLinux) {
+module modLinuxVirtualMachine '../../../azresources/Modules/Microsoft.Compute/virtualmachines/az.com.virtual.machine.bicep' = if (parRemoteAccess.bastion.linux.enable) {
   name: 'deploy-ra-linux-vm-${parLocation}-${parDeploymentNameSuffix}'
   params: {
-    name: parLinuxVmName
+    name: parRemoteAccess.bastion.linux.vmName
     location: parLocation
     tags: (empty(parTags)) ? modTags : parTags
 
-    disablePasswordAuthentication: parDisableLinuxVmPasswordAuthentication
-    adminUsername: parLinuxVmAdminUsername    
-    adminPassword: parLinuxVmAdminPasswordOrKey
+    disablePasswordAuthentication: parRemoteAccess.bastion.linux.disablePasswordAuthentication
+    adminUsername: parRemoteAccess.bastion.linux.vmAdminUsername    
+    adminPassword: parRemoteAccess.bastion.linux.vmAdminPasswordOrKey
 
     diagnosticWorkspaceId: parLogAnalyticsWorkspaceId
     availabilitySetResourceId:modAvSet.outputs.resourceId
-    encryptionAtHost: parEncryptionAtHost
+    encryptionAtHost: parRemoteAccess.bastion.encryptionAtHost
     imageReference: {
-      offer: parLinuxVmImageOffer
-      publisher: parLinuxVmImagePublisher
-      sku: parLinuxVmImageSku
-      version: parLinuxVmImageVersion
+      offer: parRemoteAccess.bastion.linux.vmImageOffer
+      publisher: parRemoteAccess.bastion.linux.vmImagePublisher
+      sku: parRemoteAccess.bastion.linux.vmImageSku
+      version: parRemoteAccess.bastion.linux.vmImageVersion
     }
     nicConfigurations: [
       {
@@ -280,17 +331,17 @@ module modLinuxVirtualMachine '../../../azresources/Modules/Microsoft.Compute/vi
     ]
     osDisk: {
       diskSizeGB: '128'
-      createOption: parLinuxVmOsDiskCreateOption
+      createOption: parRemoteAccess.bastion.linux.vmOsDiskCreateOption
       managedDisk: {
-        storageAccountType: parLinuxVmOsDiskType
+        storageAccountType: parRemoteAccess.bastion.linux.vmOsDiskType
       }
     }
     osType: 'Linux'
-    vmSize: parLinuxVmSize
+    vmSize: parRemoteAccess.bastion.linux.vmSize
   }
 }
 
-module modWindowsNetworkInterface '../../../azresources/Modules/Microsoft.Network/networkInterfaces/az.net.network.interface.bicep' = if (parEnableWindows) {
+module modWindowsNetworkInterface '../../../azresources/Modules/Microsoft.Network/networkInterfaces/az.net.network.interface.bicep' = if (parRemoteAccess.bastion.windows.enable) {
   name: 'deploy-ra-win-net-interface-${parLocation}-${parDeploymentNameSuffix}'
   params: {
     name: varWindowsNetworkInterfaceName
@@ -302,7 +353,7 @@ module modWindowsNetworkInterface '../../../azresources/Modules/Microsoft.Networ
       {
         name: varWindowsNetworkInterfaceIpConfigurationName
         subnetResourceId: parHubSubnetResourceId
-        privateIPAllocationMethod: parWindowsNetworkInterfacePrivateIPAddressAllocationMethod
+        privateIPAllocationMethod: parRemoteAccess.bastion.windows.networkInterfacePrivateIPAddressAllocationMethod
       }
     ]
 
@@ -312,29 +363,29 @@ module modWindowsNetworkInterface '../../../azresources/Modules/Microsoft.Networ
 module modAvSet '../../../azresources/Modules/Microsoft.Compute/availabilitySets/az.com.availabilty.set.bicep' = {
   name: 'deploy-ra-win-avset-${parLocation}-${parDeploymentNameSuffix}'
   params: {
-    name: '${parWindowsVmName}-avset'
+    name: '${parRemoteAccess.bastion.windows.vmName}-avset'
     location: parLocation
     availabilitySetSku: 'Aligned'
   }
 }
 
-module windowsVirtualMachine '../../../azresources/Modules/Microsoft.Compute/virtualmachines/az.com.virtual.machine.bicep' = if (parEnableWindows) {
+module modWindowsVirtualMachine '../../../azresources/Modules/Microsoft.Compute/virtualmachines/az.com.virtual.machine.bicep' = if (parRemoteAccess.bastion.windows.enable) {
   name: 'deploy-ra-windows-vm-${parLocation}-${parDeploymentNameSuffix}'
   params: {
-    name: parWindowsVmName
+    name: parRemoteAccess.bastion.windows.vmName
     location: parLocation
     tags: (empty(parTags)) ? modTags : parTags
 
-    adminUsername: parWindowsVmAdminUsername
-    adminPassword: parWindowsVmAdminPassword //kv.getSecret('WindowsVmAdminPassword')
+    adminUsername: parRemoteAccess.bastion.windows.vmAdminUsername
+    adminPassword: parRemoteAccess.bastion.windows.vmAdminPassword //kv.getSecret('WindowsVmAdminPassword')
     diagnosticWorkspaceId: parLogAnalyticsWorkspaceId
     availabilitySetResourceId:modAvSet.outputs.resourceId
-    encryptionAtHost: parEncryptionAtHost
+    encryptionAtHost: parRemoteAccess.bastion.encryptionAtHost
     imageReference: {
-      offer: parWindowsVmOffer
-      publisher: parWindowsVmPublisher
-      sku: parWindowsVmSku
-      version: parWindowsVmVersion
+      offer: parRemoteAccess.bastion.windows.vmOffer
+      publisher: parRemoteAccess.bastion.windows.vmPublisher
+      sku: parRemoteAccess.bastion.windows.vmSku
+      version: parRemoteAccess.bastion.windows.vmVersion
     }
     nicConfigurations: [
       {
@@ -349,14 +400,15 @@ module windowsVirtualMachine '../../../azresources/Modules/Microsoft.Compute/vir
     ]
     osDisk: {
       diskSizeGB: '128'
-      createOption: parWindowsVmCreateOption
+      createOption: parRemoteAccess.bastion.windows.vmCreateOption
       managedDisk: {
-        storageAccountType: parWindowsVmStorageAccountType
+        storageAccountType: parRemoteAccess.bastion.windows.vmStorageAccountType
       }
     }
     osType: 'Windows'
-    vmSize: parWindowsVmSize
+    vmSize: parRemoteAccess.bastion.windows.vmSize
   }
 }
 
 output linuxVMName string = modLinuxVirtualMachine.outputs.name
+output windowsVMName string = modWindowsVirtualMachine.outputs.name

@@ -41,7 +41,7 @@ param parDeploymentNameSuffix string = utcNow()
 // Reference:  https://docs.microsoft.com/azure/marketplace/azure-partner-customer-usage-attribution
 var telemetry = json(loadTextContent('../../azresources/Modules/Global/telemetry.json'))
 module telemetryCustomerUsageAttribution '../../azresources/Modules/Global//partnerUsageAttribution/customer-usage-attribution-management-group.bicep' = if (telemetry.customerUsageAttribution.enabled) {
-  name: 'pid-${telemetry.customerUsageAttribution.modules.managementGroups}-${parTenantId}'
+  name: 'pid-${telemetry.customerUsageAttribution.modules.managementGroups}'
 }
 
 // Create Management Groups

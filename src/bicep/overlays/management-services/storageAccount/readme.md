@@ -1,26 +1,12 @@
 # Module:   NoOps Accelerator - Azure Storage Account
 
-## Authored & Tested With
-
-* [azure-cli](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) version 2.38.0
-* bicep cli version v0.9.1
-* [bicep](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-bicep) v0.9.1 vscode extension
-
-## Prerequisites
-
-* For deployments in the Azure Portal you need access to the portal in the cloud you want to deploy to, such as [https://portal.azure.com](https://portal.azure.com) or [https://portal.azure.us](https://portal.azure.us).
-* For deployments in BASH or a Windows shell, then a terminal instance with the AZ CLI installed is required.
-* For PowerShell deployments you need a PowerShell terminal with the [Azure Az PowerShell module](https://docs.microsoft.com/en-us/powershell/azure/what-is-azure-powershell) installed.
-
-> NOTE: The AZ CLI will automatically install the Bicep tools when a command is run that needs them, or you can manually install them following the [instructions here.](https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/install#azure-cli)
-
 ## Overview
 
 This overlay module deploys a premium Azure Storage Account with RBAC enabled to support secret, key, and certificate management. A premium Storage Account utilizes hardware security modules to protect key material. Roles for use must be assigned post-deployment, review reference list below for detailed information.
 
 Read on to understand what this overlay does, and when you're ready, collect all of the pre-requisites, then deploy the overlay.
 
-## Deploy Azure Storage Account
+## About Azure Storage Account
 
 The docs on Azure Storage Account: https://docs.microsoft.com/en-us/azure/key-vault/. By default, this overlay will deploy resources into standard default hub/spoke subscriptions and resource groups.  
 
@@ -28,7 +14,8 @@ The subscription and resource group can be changed by providing the resource gro
 
 ## Pre-requisites
 
-* A hub/spoke LZ deployment (a deployment of [deploy.bicep](../../../../bicep/platforms/lz-platform-scca-hub-3spoke/deploy.bicep))
+* A virtual network and subnet is deployed. (a deployment of [deploy.bicep](../../../../bicep/platforms/lz-platform-scca-hub-3spoke/deploy.bicep))
+* Decide if the optional parameters is appropriate for your deployment. If it needs to change, override one of the optional parameters.
 
 See below for information on how to use the appropriate deployment parameters for use with this overlay:
 
@@ -37,9 +24,13 @@ Deployment Output Name | Description
 parStorageAccountName | The name of the storage account.  If not specified, the name will default to the Hub/Spoke default naming pattern.  
 parTargetResourceGroupName | The name of the resource group where the App Service Plan will be deployed.   If not specified, the resource group name will default to the shared services resource group name and subscription.
 
+Optional Parameters | Description
+------------------- | -----------
+None
+
 ## Deploy the Overlay
 
-Connect to the appropriate Azure Environment and set appropriate context, see getting started with Azure PowerShell or Azure CLI for help if needed. The commands below assume you are deploying in Azure Commercial and show the entire process from deploying Platform Hub/Spoke Design and then adding an Azure Key Vault post-deployment.
+Connect to the appropriate Azure Environment and set appropriate context, see getting started with Azure PowerShell or Azure CLI for help if needed. The commands below assume you are deploying in Azure Commercial and show the entire process from deploying Platform Hub/Spoke Design and then adding an Azure Storage Account post-deployment.
 
 Once you have the hub/spoke output values, you can pass those in as parameters to this deployment.
 
@@ -116,7 +107,7 @@ For air-gapped clouds it may be convenient to transfer and deploy the compiled A
 
 ## Cleanup
 
-The Bicep/ARM deployment of NoOps Accelerator - Microsoft Service Health Alerts deployment can be deleted with these steps:
+The Bicep/ARM deployment of NoOps Accelerator - Azure Storage Account deployment can be deleted with these steps:
 
 ## Example Output in Azure
 
@@ -124,6 +115,6 @@ The Bicep/ARM deployment of NoOps Accelerator - Microsoft Service Health Alerts 
 
 ### References
 
-* [Azure Key Vault Documentation](https://docs.microsoft.com/en-us/azure/key-vault/)
-* [Azure Key Vault Overview](https://docs.microsoft.com/en-us/azure/key-vault/general/overview)
+* [Azure Storage Account Documentation](https://docs.microsoft.com/en-us/azure/key-vault/)
+* [Azure Storage Account Overview](https://docs.microsoft.com/en-us/azure/key-vault/general/overview)
 * [Provide access to Key Vault via RBAC](https://docs.microsoft.com/en-us/azure/key-vault/general/rbac-guide?tabs=azure-cli)

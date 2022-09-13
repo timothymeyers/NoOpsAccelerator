@@ -2,16 +2,25 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-      "parOrgPrefix": {
-        "value": "anoa"
+      "parRequired": {
+        "value": {
+          "orgPrefix": "anoa",
+          "templateVersion": "v1.0",
+          "deployEnvironment": "serviceHealthAlerts"
+        }
       },
-      "parDeployEnvironment": {
-          "value": "platforms"
+      "parTags": {
+        "value": {
+          "organization": "anoa",
+          "templateVersion": "v1.0",
+          "deployEnvironment": "serviceHealthAlerts",
+          "deploymentType": "NoOpsBicep"
+        }
       },
       "parTargetResourceGroup": {
         "value": "example-rg"
       },
-      "serviceHealthAlerts": {
+      "parServiceHealthAlerts": {
         "value": {
             "incidentTypes": [ "Incident", "Security" ],
             "regions": [ "Global", "EastUS", "WestUS" ],                        

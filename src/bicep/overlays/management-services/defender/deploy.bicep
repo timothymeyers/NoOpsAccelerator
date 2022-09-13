@@ -23,28 +23,21 @@ targetScope = 'subscription'
 @description('The region to deploy resources into. It defaults to the deployment location.')
 param parLocation string = deployment().location
 
-
 // MICROSOFT DEFENDER PARAMETERS
 
-@allowed([
-  'On'
-  'Off'
-])
-@description('Send all notifications in this scope.')
-param parAlertNotifications string = 'Off'
-
-@allowed([
-  'On'
-  'Off'
-])
-@description('Send all notifications in this scope to all admins.')
-param parAlertsToAdminsNotifications string = 'Off'
-
-@description('Email address of the contact, in the form of john@doe.com')
-param parEmailSecurityContact string = ''
-
-@description('Phone of the contact, in the form of 555-555-5555')
-param parPhoneSecurityContact string = ''
+// Microsoft Defender for Cloud
+// Example (JSON)
+// -----------------------------
+// "parSecurityCenter": {
+//   "value": {
+//       "alertNotifications": "Off",
+//       "alertsToAdminsNotifications": "Off",
+//       "emailSecurityContact": "anoa@microsoft.com",
+//       "phoneSecurityContact": "5555555555"
+//   }
+// }
+@description('Microsoft Defender for Cloud.  It includes email and phone.')
+param parSecurityCenter object
 
 // LOGGING PARAMETERS
 
@@ -56,17 +49,17 @@ param parLogAnalyticsWorkspaceResourceId string
 @description('A suffix to use for naming deployments uniquely. It defaults to the Bicep resolution of the "utcNow()" function.')
 param parDeploymentNameSuffix string = utcNow()
 
-module defender '../../../azresources/Modules/Microsoft.Security/defenderForCloud/az.sec.defender.bicep' = {
+module modDefender '../../../azresources/Modules/Microsoft.Security/defenderForCloud/az.sec.defender.bicep' = {
   name: 'set-sub-defender-${parLocation}-${parDeploymentNameSuffix}'
   params: {
     // Required parameters
     workspaceId: parLogAnalyticsWorkspaceResourceId
     // Non-required parameters
     securityContactProperties: {
-      alertNotifications: parAlertNotifications
-      alertsToAdmins: parAlertsToAdminsNotifications
-      email: parEmailSecurityContact
-      phone:  parPhoneSecurityContact 
+      alertNotifications: parSecurityCenter.alertNotifications
+      alertsToAdmins: parSecurityCenter.alertsToAdminsNotifications
+      email: parSecurityCenter.emailSecurityContact
+      phone:  parSecurityCenter.phoneSecurityContact 
     }
   }
 }

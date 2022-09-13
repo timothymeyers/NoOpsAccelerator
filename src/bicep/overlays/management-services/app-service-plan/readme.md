@@ -1,18 +1,4 @@
-# Module:   NoOps Accelerator - App Service Plan
-
-## Authored & Tested With
-
-* [azure-cli](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) version 2.38.0
-* bicep cli version v0.9.1
-* [bicep](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-bicep) v0.9.1 vscode extension
-
-## Prerequisites
-
-* For deployments in the Azure Portal you need access to the portal in the cloud you want to deploy to, such as [https://portal.azure.com](https://portal.azure.com) or [https://portal.azure.us](https://portal.azure.us).
-* For deployments in BASH or a Windows shell, then a terminal instance with the AZ CLI installed is required.
-* For PowerShell deployments you need a PowerShell terminal with the [Azure Az PowerShell module](https://docs.microsoft.com/en-us/powershell/azure/what-is-azure-powershell) installed.
-
-> NOTE: The AZ CLI will automatically install the Bicep tools when a command is run that needs them, or you can manually install them following the [instructions here.](https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/install#azure-cli)
+# Overlays: NoOps Accelerator - App Service Plan
 
 ## Overview
 
@@ -20,7 +6,7 @@ This overlay module deploys an App Service Plan (AKA: Web Server Cluster) to sup
 
 Read on to understand what this overlay does, and when you're ready, collect all of the pre-requisites, then deploy the overlay
 
-## Deploy App Service Plan
+## About App Service Plan
 
 The docs on Azure App Service Plans: <https://docs.microsoft.com/en-us/azure/app-service/overview-hosting-plans>. By default, this overlay will deploy resources into standard default hub/spoke subscriptions and resource groups.  
 
@@ -28,18 +14,29 @@ The subscription and resource group can be changed by providing the resource gro
 
 ## Pre-requisites
 
-* A hub/spoke LZ deployment (a deployment of [deploy.bicep](../../../../bicep/platforms/lz-platform-scca-hub-3spoke/deploy.bicep))
+* A virtual network and subnet is deployed. (a deployment of [deploy.bicep](../../../../bicep/platforms/lz-platform-scca-hub-3spoke/deploy.bicep))
+* Decide if the optional parameters is appropriate for your deployment. If it needs to change, override one of the optional parameters.
 
 See below for information on how to use the appropriate deployment parameters for use with this overlay:
 
-Deployment Output Name | Description
------------------------| -----------
-parAppServicePlanName | The name of the App Service Plan.  If not specified, the name will default to the Hub/Spoke default naming pattern.  
-parTargetResourceGroupName | The name of the resource group where the App Service Plan will be deployed.   If not specified, the resource group name will default to the shared services resource group name and subscription.
+Required Parameters | Type | Allowed Values | Description
+| :-- | :-- | :-- | :-- |
+parRequired | object | {object} | Required values used with all resources.
+parTags | object | {object} | Required tags values used with all resources.
+parLocation | string | `[deployment().location]` | The region to deploy resources into. It defaults to the deployment location.
+parAppServicePlan | object | {object} | The oject parameters of the App Service Plan.
+parTargetSubscriptionId | string | xxxxx-xxxx-xxxx-xxxx-xxxxxx |  The subscription ID for the Target Network and resources. It defaults to the deployment subscription.
+parTargetResourceGroupName | string | '' | The name of the resource group where the App Service Plan will be deployed.   If not specified, the resource group name will default to the shared services resource group name and subscription.
+
+Optional Parameters | Type | Allowed Values | Description
+| :-- | :-- | :-- | :-- |
+None
 
 ## Deploy the Overlay
 
 Connect to the appropriate Azure Environment and set appropriate context, see getting started with Azure PowerShell or Azure CLI for help if needed. The commands below assume you are deploying in Azure Commercial and show the entire process from deploying Platform Hub/Spoke Design and then adding an Azure App Service Plan post-deployment.
+
+> NOTE: Since you can deploy this overlay post-deployment, you can also build this overlay within other deployment models such as Platforms & Workloads.
 
 Once you have the hub/spoke output values, you can pass those in as parameters to this deployment.
 
@@ -55,15 +52,15 @@ cd platforms/lz-platform-scca-hub-3spoke
 az deployment sub create \ 
 --name contoso \
 --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx \
---template-file deploy.bicep \
+--template-file platforms/lz-platform-scca-hub-3spoke/deploy.bicep \
 --location eastus \
---parameters @parameters/deploy.parameters.json
+--parameters @platforms/lz-platform-scca-hub-3spoke/parameters/deploy.parameters.json
 cd overlays
 cd app-service-plan
 az deployment sub create \
-   --name deployAppServicePlan
-   --template-file overlays/management-groups/deploy.bicep \
-   --parameters @overlays/management-groups/deploy.parameters.json \
+   --name deploy-AppServicePlan
+   --template-file overlays/app-service-plan/deploy.bicep \
+   --parameters @overlays/app-service-plan/deploy.parameters.json \
    --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx \
    --location 'eastus'
 ```
@@ -72,9 +69,9 @@ OR
 
 ```bash
 # For Azure IL regions
-az deployment group create \
-  --template-file overlays/management-groups/anoa.lz.mgmt.svcs.service.health.bicep \
-  --parameters @overlays/management-groups/anoa.lz.mgmt.svcs.service.health.parameters.example.json \
+az deployment sub create \
+  --template-file overlays/app-service-plan/deploy.bicep \
+  --parameters @overlays/app-service-plan/deploy.parameters.json \
   --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx \
   --resource-group anoa-usgovvirginia-platforms-hub-rg \
   --location 'usgovvirginia'
@@ -84,10 +81,10 @@ az deployment group create \
 
 ```powershell
 # For Azure global regions
-New-AzGroupDeployment `
+New-AzSubscriptionDeployment `
   -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
-  -TemplateFile overlays/management-groups/anoa.lz.mgmt.svcs.service.health.bicepp `
-  -TemplateParameterFile overlays/management-groups/anoa.lz.mgmt.svcs.service.health.parameters.example.json `
+  -TemplateFile overlays/app-service-plan/deploy.bicepp `
+  -TemplateParameterFile overlays/app-service-plan/deploy.parameters.example.json `
   -Subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx `
   -ResourceGroup anoa-eastus-platforms-hub-rg `
   -Location 'eastus'
@@ -97,10 +94,10 @@ OR
 
 ```powershell
 # For Azure IL regions
-New-AzGroupDeployment `
+New-AzSubscriptionDeployment `
   -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
-  -TemplateFile overlays/management-groups/anoa.lz.mgmt.svcs.service.health.bicepp `
-  -TemplateParameterFile overlays/management-groups/anoa.lz.mgmt.svcs.service.health.parameters.example.json `
+  -TemplateFile overlays/app-service-plan/deploy.bicepp `
+  -TemplateParameterFile overlays/app-service-plan/deploy.parameters.example.json `
   -Subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx `
   -ResourceGroup anoa-usgovvirginia-platforms-hub-rg `
   -Location  'usgovvirginia'
@@ -108,16 +105,50 @@ New-AzGroupDeployment `
 
 ## Extending the Overlay
 
-By default, this overlay has the minium parmeters needed to deploy the service. If you like to add addtional parmeters to the service, please refer to the module description located in AzResources here: [App Service Plans `[Microsoft.Web/serverfarms]`](D:\source\repos\NoOpsAccelerator\src\bicep\azresources\Modules\Microsoft.Web\serverfarms\readme.md)
+By default, this overlay has the minium parmeters needed to deploy the service. If you like to add addtional parmeters to the service, please refer to the module description located in AzResources here: [`App Service Plans `[Microsoft.Web/serverfarms]`](D:\source\repos\NoOpsAccelerator\src\bicep\azresources\Modules\Microsoft.Web\serverfarms\readme.md)
 
 ## Air-Gapped Clouds
 
 For air-gapped clouds it may be convenient to transfer and deploy the compiled ARM template instead of the Bicep template if the Bicep CLI tools are not available or if it is desirable to transfer only one file into the air gap.
 
+## Validate the deployment
+
+Use the Azure portal, Azure CLI, or Azure PowerShell to list the deployed resources in the resource group.
+
+```bash
+az resource list --resource-group anoa-eastus-dev-appplan-rg
+```
+
+```powershell
+Get-AzResource -ResourceGroupName anoa-eastus-dev-appplan-rg
+```
+
 ## Cleanup
 
-The Bicep/ARM deployment of NoOps Accelerator - Microsoft Service Health Alerts deployment can be deleted with these steps:
+The Bicep/ARM deployment of NoOps Accelerator - Azure App Service Plan deployment can be deleted with these steps:
+
+### Delete Resource Groups
+
+```bash
+az group delete --name anoa-eastus-dev-appplan-rg
+```
+
+```powershell
+Remove-AzResourceGroup -Name anoa-eastus-dev-appplan-rg
+```
+
+### Delete Deployments
+
+```bash
+az deployment delete --name deploy-AppServicePlan
+```
+
+```powershell
+Remove-AzSubscriptionDeployment -Name deploy-AppServicePlan
+```
+
+
 
 ## Example Output in Azure
 
-![Example Deployment Output](images/operationsNetworkExampleDeploymentOutput.png "Example Deployment Output in Azure global regions")
+![Example Deployment Output](media/aspExampleDeploymentOutput.png "Example Deployment Output in Azure global regions")

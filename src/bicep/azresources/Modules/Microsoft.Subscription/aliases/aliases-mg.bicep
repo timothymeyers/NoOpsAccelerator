@@ -1,3 +1,4 @@
+/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 targetScope = 'tenant'
 param subscriptionAliasName string
 param billingScope string

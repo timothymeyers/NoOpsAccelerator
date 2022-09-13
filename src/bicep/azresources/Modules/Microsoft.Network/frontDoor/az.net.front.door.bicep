@@ -1,3 +1,4 @@
+/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 @description('Required. The name of the frontDoor.')
 @minLength(1)
 @maxLength(64)

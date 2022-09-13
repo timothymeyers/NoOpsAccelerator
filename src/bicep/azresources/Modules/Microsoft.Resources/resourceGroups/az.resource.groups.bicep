@@ -1,3 +1,4 @@
+/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 targetScope = 'subscription'
 
 @description('Required. The name of the Resource Group.')

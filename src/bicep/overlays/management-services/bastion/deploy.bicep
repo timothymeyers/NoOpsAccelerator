@@ -381,7 +381,7 @@ module modWindowsVirtualMachine '../../../azresources/Modules/Microsoft.Compute/
     availabilitySetResourceId:modAvSet.outputs.resourceId
     encryptionAtHost: parRemoteAccess.bastion.encryptionAtHost
     imageReference: {
-      offer: parRemoteAccess.bastion.windows.vmOffer
+      offer: parRemoteAccess.bastion.windows.vmImageOffer
       publisher: parRemoteAccess.bastion.windows.vmPublisher
       sku: parRemoteAccess.bastion.windows.vmSku
       version: parRemoteAccess.bastion.windows.vmVersion

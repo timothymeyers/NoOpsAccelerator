@@ -399,7 +399,7 @@ module modWindowsVirtualMachine '../../../azresources/Modules/Microsoft.Compute/
     ]
     osDisk: {
       diskSizeGB: '128'
-      createOption: parRemoteAccess.bastion.windows.vmCreateOption
+      createOption: parRemoteAccess.bastion.windows.vmOsDiskCreateOption
       managedDisk: {
         storageAccountType: parRemoteAccess.bastion.windows.vmStorageAccountType
       }

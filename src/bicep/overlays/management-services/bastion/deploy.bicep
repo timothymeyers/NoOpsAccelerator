@@ -382,9 +382,9 @@ module modWindowsVirtualMachine '../../../azresources/Modules/Microsoft.Compute/
     encryptionAtHost: parRemoteAccess.bastion.encryptionAtHost
     imageReference: {
       offer: parRemoteAccess.bastion.windows.vmImageOffer
-      publisher: parRemoteAccess.bastion.windows.vmPublisher
-      sku: parRemoteAccess.bastion.windows.vmSku
-      version: parRemoteAccess.bastion.windows.vmVersion
+      publisher: parRemoteAccess.bastion.windows.vmImagePublisher
+      sku: parRemoteAccess.bastion.windows.vmImageSku
+      version: parRemoteAccess.bastion.windows.vmImageVersion
     }
     nicConfigurations: [
       {

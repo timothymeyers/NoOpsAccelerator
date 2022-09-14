@@ -29,7 +29,7 @@
     "parTargetSubnetName": {
       "value": "<<example-subnet>>"
     },
-    "parContainerRegistry": {
+    "parDataBricksWorkspace": {
       "value": {
         "name": "anoaeastusdevacr",
         "acrSku": "Premium",

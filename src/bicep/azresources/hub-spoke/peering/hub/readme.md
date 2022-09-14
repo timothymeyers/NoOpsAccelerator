@@ -30,7 +30,7 @@ Parameters file located in the [Deployments](../../../../deployments/HubSpoke/ne
 ### Manual Deployment - Azure CLI
 
 ```bash
-# For Azure global regions
+# For Azure Commerical regions
 
 # Set Platform connectivity subscription ID as the the current subscription 
 
@@ -47,7 +47,7 @@ OR
 
 ```bash
 
-# For Azure IL regions
+# For Azure Government regions
 
 # Set Platform connectivity subscription ID as the the current subscription 
 
@@ -63,7 +63,7 @@ az deployment group create \
 ### Manual Deployment - PowerShell
 
 ```powershell
-# For Azure global regions
+# For Azure Commerical regions
 # Set Platform connectivity subscription ID as the the current subscription 
 $ConnectivitySubscriptionId = "[your platform management subscription ID]"
 
@@ -79,7 +79,7 @@ OR
 
 ```powershell
 
-# For Azure IL regions
+# For Azure Government regions
 # Set Platform connectivity subscription ID as the the current subscription 
 $ConnectivitySubscriptionId = "[your platform management subscription ID]"
 
@@ -112,7 +112,7 @@ The Bicep/ARM deployment of NoOps Accelerator Hub Network Peering deployment can
 > Note: Before deleting a peering, ensure your account has the necessary permissions. When a peering is deleted, traffic can no longer flow between two virtual networks. When deleting a virtual networking peering, the corresponding peering will also be removed.
 
 ```bash
-# For Azure IL regions
+# For Azure Government regions
 
 # Set Platform connectivity subscription ID as the the current subscription 
 

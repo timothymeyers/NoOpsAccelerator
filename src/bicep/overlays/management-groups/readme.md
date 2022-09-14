@@ -67,7 +67,7 @@ The following module usage examples are retrieved from the content of the files 
 <summary>via Bash</summary>
 
 ```bash
-# For Azure global regions
+# For Azure Commerical regions
 az deployment mg create \
    --template-file overlays/management-groups/deploy.bicep \
    --parameters @overlays/management-groups/deploy.enclave.mg.parameters.json \
@@ -75,7 +75,7 @@ az deployment mg create \
 ```
 
 ```bash
-# For Azure IL regions
+# For Azure Government regions
 az deployment mg create \
   --template-file overlays/management-groups/deploy.bicep \
   --parameters @overlays/management-groups/deploy.enclave.mg.parameters.json \
@@ -90,7 +90,7 @@ az deployment mg create \
 <summary>via Powershell</summary>
 
 ```powershell
-# For Azure global regions
+# For Azure Commerical regions
 New-AzManagementGroupDeployment `
   -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
   -TemplateFile overlays/management-groups/deploy.bicepp `
@@ -101,7 +101,7 @@ New-AzManagementGroupDeployment `
 OR
 
 ```powershell
-# For Azure IL regions
+# For Azure Government regions
 New-AzManagementGroupDeployment `
   -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
   -TemplateFile overlays/management-groups/deploy.bicepp `

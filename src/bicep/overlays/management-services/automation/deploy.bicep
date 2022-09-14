@@ -34,12 +34,14 @@ param parTemplateVersion string = '1.0'
 @description('The region to deploy resources into. It defaults to the deployment location.')
 param parLocation string = deployment().location
 
-//
-@description('The subscription ID for the Automation Account. It defaults to the deployment subscription.')
-param parOperationsSubscriptionId string = subscription().subscriptionId
-
-@description('The resource group ID for the Automation Account. It defaults to the deployment subscription.')
-param parOperationsResourceGroupName string = ''
+// Target Virtual Network Name
+// (JSON Parameter)
+// ---------------------------
+// "parTargetSubscriptionId": {
+//   "value": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxx"
+// }
+@description('The subscription ID for the Target Network and resources. It defaults to the deployment subscription.')
+param parTargetSubscriptionId string = subscription().subscriptionId
 
 param parDiagnosticStorageAccountName string
 //
@@ -63,7 +65,7 @@ module modTags '../../../azresources/Modules/Microsoft.Resources/tags/az.resourc
   name: 'Automation-Acct-Tags-${parDeploymentNameSuffix}'
  params: {  
     onlyUpdate: true
-    subscriptionId: parOperationsSubscriptionId
+    subscriptionId: parTargetSubscriptionId
     tags: {
       applicationName: 'automationAccount'
       organizationName: parOrgPrefix
@@ -76,7 +78,7 @@ module modTags '../../../azresources/Modules/Microsoft.Resources/tags/az.resourc
 
 module automationAccountResourceGroup '../../../azresources/Modules/Microsoft.Resources/resourceGroups/az.resource.groups.bicep' = {
   name: 'deploy-rg-aa-${parDeploymentNameSuffix}'
-  scope: subscription(parOperationsSubscriptionId)
+  scope: subscription(parTargetSubscriptionId)
   params: {
     name: '${parOrgPrefix}-${parLocation}-${parDeployEnvironment}-automation-rg'
     location: parLocation
@@ -85,7 +87,7 @@ module automationAccountResourceGroup '../../../azresources/Modules/Microsoft.Re
 }
 
 module modAutomationAccount '../../../azresources/Modules/Microsoft.Automation/automationAccounts/az.automation.account.bicep' = {
-  scope: resourceGroup(parOperationsSubscriptionId, '${parOrgPrefix}-${parLocation}-${parDeployEnvironment}-automation-rg')
+  scope: resourceGroup(parTargetSubscriptionId, '${parOrgPrefix}-${parLocation}-${parDeployEnvironment}-automation-rg')
   name: 'deploy-aa-${parDeploymentNameSuffix}'
   params: {
     name: '${parOrgPrefix}-${parLocation}-${parDeployEnvironment}-automation-aa'

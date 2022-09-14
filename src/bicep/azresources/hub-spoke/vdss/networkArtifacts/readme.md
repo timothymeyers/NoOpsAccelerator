@@ -71,7 +71,7 @@ table
 ### Azure CLI
 
 ```bash
-# For Azure global regions
+# For Azure Commerical regions
 
 # Set Platform connectivity subscription ID as the the current subscription 
 
@@ -88,7 +88,7 @@ OR
 
 ```bash
 
-# For Azure IL regions
+# For Azure Government regions
 
 # Set Platform connectivity subscription ID as the the current subscription 
 
@@ -104,7 +104,7 @@ az deployment sub create \
 ### PowerShell
 
 ```powershell
-# For Azure global regions
+# For Azure Commerical regions
 # Set Platform connectivity subscription ID as the the current subscription 
 $ConnectivitySubscriptionId = "[your platform connectivity subscription ID]"
 
@@ -120,7 +120,7 @@ OR
 
 ```powershell
 
-# For Azure IL regions
+# For Azure Government regions
 # Set Platform connectivity subscription ID as the the current subscription 
 $ConnectivitySubscriptionId = "[your platform connectivity subscription ID]"
 

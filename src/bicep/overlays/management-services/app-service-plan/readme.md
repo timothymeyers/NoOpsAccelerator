@@ -45,7 +45,7 @@ For example, deploying using the `az deployment sub create` command in the Azure
 ### Azure CLI
 
 ```bash
-# For Azure global regions
+# For Azure Commerical regions
 az login
 cd src/bicep
 cd platforms/lz-platform-scca-hub-3spoke
@@ -60,7 +60,7 @@ cd app-service-plan
 az deployment sub create \
    --name deploy-AppServicePlan
    --template-file overlays/app-service-plan/deploy.bicep \
-   --parameters @overlays/app-service-plan/deploy.parameters.json \
+   --parameters @overlays/app-service-plan/parameters/deploy.parameters.json \
    --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx \
    --location 'eastus'
 ```
@@ -68,10 +68,10 @@ az deployment sub create \
 OR
 
 ```bash
-# For Azure IL regions
+# For Azure Government regions
 az deployment sub create \
   --template-file overlays/app-service-plan/deploy.bicep \
-  --parameters @overlays/app-service-plan/deploy.parameters.json \
+  --parameters @overlays/app-service-plan/parameters/deploy.parameters.json \
   --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx \
   --resource-group anoa-usgovvirginia-platforms-hub-rg \
   --location 'usgovvirginia'
@@ -80,11 +80,11 @@ az deployment sub create \
 ### PowerShell
 
 ```powershell
-# For Azure global regions
+# For Azure Commerical regions
 New-AzSubscriptionDeployment `
   -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
   -TemplateFile overlays/app-service-plan/deploy.bicepp `
-  -TemplateParameterFile overlays/app-service-plan/deploy.parameters.example.json `
+  -TemplateParameterFile overlays/app-service-plan/parameters/deploy.parameters.example.json `
   -Subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx `
   -ResourceGroup anoa-eastus-platforms-hub-rg `
   -Location 'eastus'
@@ -93,11 +93,11 @@ New-AzSubscriptionDeployment `
 OR
 
 ```powershell
-# For Azure IL regions
+# For Azure Government regions
 New-AzSubscriptionDeployment `
   -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
   -TemplateFile overlays/app-service-plan/deploy.bicepp `
-  -TemplateParameterFile overlays/app-service-plan/deploy.parameters.example.json `
+  -TemplateParameterFile overlays/app-service-plan/parameters/deploy.parameters.example.json `
   -Subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx `
   -ResourceGroup anoa-usgovvirginia-platforms-hub-rg `
   -Location  'usgovvirginia'
@@ -147,8 +147,12 @@ az deployment delete --name deploy-AppServicePlan
 Remove-AzSubscriptionDeployment -Name deploy-AppServicePlan
 ```
 
-
-
 ## Example Output in Azure
 
 ![Example Deployment Output](media/aspExampleDeploymentOutput.png "Example Deployment Output in Azure global regions")
+
+### References
+
+* [Azure App Service plan Documentation](https://docs.microsoft.com/en-us/azure/app-service/overview-hosting-plans/)
+* [Azure App Service Overview](https://docs.microsoft.com/en-us/azure/app-service/overview)
+* [Manage an App Service plan in Azure](https://docs.microsoft.com/en-us/azure/app-service/app-service-plan-manage)

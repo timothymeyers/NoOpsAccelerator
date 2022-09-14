@@ -99,17 +99,41 @@ param parRemoteAccess object
 
 // HUB NETWORK PARAMETERS
 
-@description('The Hub Virtual Network Name')
+// Hub Subnet Resource Id
+// (JSON Parameter)
+// ---------------------------
+// "parHubSubnetResourceId": {
+//   "value": "/subscriptions/xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx/resourceGroups/anoa-eastus-platforms-hub-rg/providers/Microsoft.Network/virtualNetworks/anoa-eastus-platforms-hub-vnet/subnets/anoa-eastus-platforms-hub-snet"
+// }
+@description('The name of the The Hub Subnet Resource Id')
+param parHubSubnetResourceId string = ''
+
+// Hub Virtual Network Name
+// (JSON Parameter)
+// ---------------------------
+// "parHubVirtualNetworkName": {
+//   "value": "anoa-eastus-platforms-hub-vnet"
+// }
+@description('The Hub Virtual Network Name for the Hub Network.')
 param parHubVirtualNetworkName string
 
-@description('The Hub Subnet Resource Id')
-param parHubSubnetResourceId string
-
+// Hub Network Security Group Resource Id
+// (JSON Parameter)
+// ---------------------------
+// "parHubNetworkSecurityGroupResourceId": {
+//   "value": "/subscriptions/xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx/resourceGroups/anoa-eastus-platforms-hub-rg/providers/Microsoft.Network/networkSecurityGroups/anoa-eastus-platforms-hub-nsg"
+// }
 @description('The Hub Network Security Group Resource Id')
 param parHubNetworkSecurityGroupResourceId string
 
 // LOGGING PARAMETERS
 
+// Logging Log Analytics Workspace Id
+// (JSON Parameter)
+// ---------------------------
+// "parLogAnalyticsWorkspaceId": {
+//   "value": "/subscriptions/xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx/resourcegroups/anoa-eastus-platforms-logging-rg/providers/microsoft.operationalinsights/workspaces/anoa-eastus-platforms-logging-log"
+// }
 @description('Log Analytics Workspace Id Needed for NSG, VNet and Activity Logging')
 param parLogAnalyticsWorkspaceId string
 

@@ -26,7 +26,7 @@ parTags | object | {object} | Required tags values used with all resources.
 parLocation | string | `[deployment().location]` | The region to deploy resources into. It defaults to the deployment location.
 parDataBricksWorkspace | object | {object} | Defines the Data Bricks Workspace.
 parTargetSubscriptionId | string | `xxxxxx-xxxx-xxxx-xxxxx-xxxxxx` | The target subscription ID for the target Network and resources. It defaults to the deployment subscription.
-parTargetResourceGroup | string | `anoa-eastus-platforms-hub-rg` | The name of the resource group in which the key vault will be deployed. If unchanged or not specified, the NoOps Accelerator shared services resource group is used.
+parTargetResourceGroup | string | `anoa-eastus-platforms-hub-rg` | The name of the resource group in which the Data Bricks Workspace will be deployed. If unchanged or not specified, the NoOps Accelerator shared services resource group is used.
 parTargetVNetName | string | `anoa-eastus-platforms-hub-vnet` | The name of the VNet in which the aks will be deployed. If unchanged or not specified, the NoOps Accelerator shared services resource group is used.
 parTargetSubnetName | string | `anoa-eastus-platforms-hub-snet` | The name of the Subnet in which the aks will be deployed. If unchanged or not specified, the NoOps Accelerator shared services resource group is used.
 
@@ -47,7 +47,7 @@ For example, deploying using the `az deployment sub create` command in the Azure
 ### Azure CLI
 
 ```bash
-# For Azure global regions
+# For Azure Commerical regions
 az login
 cd src/bicep
 cd platforms/lz-platform-scca-hub-3spoke
@@ -70,7 +70,7 @@ az deployment sub create \
 OR
 
 ```bash
-# For Azure IL regions
+# For Azure Government regions
 az deployment group create \
   --template-file overlays/containerRegistry/deploy.bicep \
   --parameters @overlays/containerRegistry/deploy.parameters.json \
@@ -82,7 +82,7 @@ az deployment group create \
 ### PowerShell
 
 ```powershell
-# For Azure global regions
+# For Azure Commerical regions
 New-AzGroupDeployment `
   -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
   -TemplateFile overlays/containerRegistry/deploy.bicepp `
@@ -95,7 +95,7 @@ New-AzGroupDeployment `
 OR
 
 ```powershell
-# For Azure IL regions
+# For Azure Government regions
 New-AzGroupDeployment `
   -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
   -TemplateFile overlays/containerRegistry/deploy.bicepp `

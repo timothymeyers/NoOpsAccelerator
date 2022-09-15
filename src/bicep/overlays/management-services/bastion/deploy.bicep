@@ -381,10 +381,10 @@ module modWindowsVirtualMachine '../../../azresources/Modules/Microsoft.Compute/
     availabilitySetResourceId:modAvSet.outputs.resourceId
     encryptionAtHost: parRemoteAccess.bastion.encryptionAtHost
     imageReference: {
-      offer: parRemoteAccess.bastion.windows.vmOffer
-      publisher: parRemoteAccess.bastion.windows.vmPublisher
-      sku: parRemoteAccess.bastion.windows.vmSku
-      version: parRemoteAccess.bastion.windows.vmVersion
+      offer: parRemoteAccess.bastion.windows.vmImageOffer
+      publisher: parRemoteAccess.bastion.windows.vmImagePublisher
+      sku: parRemoteAccess.bastion.windows.vmImageSku
+      version: parRemoteAccess.bastion.windows.vmImageVersion
     }
     nicConfigurations: [
       {
@@ -399,7 +399,7 @@ module modWindowsVirtualMachine '../../../azresources/Modules/Microsoft.Compute/
     ]
     osDisk: {
       diskSizeGB: '128'
-      createOption: parRemoteAccess.bastion.windows.vmCreateOption
+      createOption: parRemoteAccess.bastion.windows.vmOsDiskCreateOption
       managedDisk: {
         storageAccountType: parRemoteAccess.bastion.windows.vmStorageAccountType
       }

@@ -55,6 +55,7 @@ For a quickstart, we suggest a test deployment into the current AZ CLI subscript
     Here is an example that deploys into a single subscription in the EastUS region of Azure Commercial:
 
     ```plaintext
+    az login
     az deployment sub create 
       --name deploy-scca-hub-with-3-spokes
       --location EastUS 
@@ -122,7 +123,7 @@ Any use of third-party trademarks or logos are subject to those third-party's po
 
 ## Special Thanks and Liner Notes
 
-This project is greatly influenced by and owes a debt of graititue to the following:
+This project is greatly influenced by and owes a debt of graititude to the following:
 
 * [Common Azure Resource Modules Library](aka.ms/carml)
 * [Azure Landing Zones for Canadian Public Sector](https://github.com/azure/canadapubsecalz)

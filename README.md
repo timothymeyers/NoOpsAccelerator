@@ -95,6 +95,25 @@ For a quickstart, we suggest a test deployment into the current AZ CLI subscript
 
 NoOps is amaze. Definitions of NoOps primitives. @matross-ghes
 
+| Primitive | Definition |
+| :---------------| :--------- |
+| **AzResources** | Wrap [Azure Resource Providers](https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/azure-services-resource-providers) so that they understand how to fit and work together. The most basic building blocks in NoOps. |
+| **Overlays** | Extend *AzResources* with specific configurations. For example, one could use the `kubernetesCluster` overlay to deploy a Private AKS Cluster rather than using the `Microsoft.ContainerService/managedClusters` AzResource to deploy a vanilla AKS cluster. |
+| **Platforms** | Combine *Overlays* and *AzResources* to lay the networking required to support mission workloads. NoOps is provided with two SCCA-compliant hub-and-spoke landing zone platforms. The [Quickstart](#quickstart) above walks through the deployment of a SCCA-compliant hub-and-3-spoke platform.
+| **Workloads** | Combine *Overlays* and *AzResources* to create solutions that achieve mission and operational goals. For example, one could mix a `kubernetesCluster` overlay (Private AKS Cluster) with a `Microsoft.ContainerRegistry` AzResource to create a **Dev Environment** Workload.<BR/>Workloads can be deployed into either a new or an existing hub-peered virtual network.|
+| **Enclaves** | Bring it all together -- combining a single *Platform* with one or more *Workloads*, and mixing in Zero Trust governance and RBAC -- to enable the rapid, repeatable, auditible, and authorizable deployment of outcome-driven infrastructure. |
+
+<!--
+
+
+
+Full deployment of a workload that is Secure Cloud Computing
+Architecture, SCCA compliant Monitoring, policy, governance, a
+workload, and role based access control (RBAC) will be
+im plemented.
+
+-->
+
 ### Architecture
 
 a few useful pictures here.

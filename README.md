@@ -128,6 +128,8 @@ Project Bicep [collects telemetry in some scenarios](https://github.com/Azure/bi
 
 ## Product Roadmap
 
+We have one.
+
 ## Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a

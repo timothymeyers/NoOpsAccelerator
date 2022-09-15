@@ -2,18 +2,23 @@
 
 > "NoOps is not about the elimination of ops; it is about the **elimination of manual handoffs and low-value, rote administration**." - *Forrester*
 
-**Azure NoOps Accelerator** is a collection of [modules](https://github.com/Azure/NoOpsAccelerator/tree/main/src/bicep)
+**Azure NoOps Accelerator** is a flexible foundation
 that enables US Department of Defense and other Public Sector customers
 to quickly develop and maintain
-opinionated, policy-driven, self-service
-infrastructure in their Azure environments.
+opinionated, policy-driven, and self-service
+encalves in their Azure environments.
 
+Delivered as a collection of infrastructure as code (IaC) [module templates](https://github.com/Azure/NoOpsAccelerator/tree/main/src/bicep) written in Bicep, the NoOps Accelerator is intended to empower organizations on their journey to a continuous deployment model for their cloud infrastructure.
+
+<!-- 
 * Designed for US Government mission customers.
 * Implements SCCA controls following [Microsoft's SACA implementation guidance](https://aka.ms/saca)
 * Deployable in Azure Commercial, Azure Government, Azure Government Secret, and Azure Government Top Secret clouds
 * Accelerate the use of Azure in DOD/Public Sector through onboarding multiple types of workloads including App Dev and Data & AI.
 * Simplify compliance management through automated audit, reporting, and remediation.
 * Written as Bicep templates.
+-->
+
 
 ## Quickstart
 
@@ -23,12 +28,10 @@ You can use the NoOps Accelerator to deploy [SCCA-compliant landing zones](./src
 
 These steps walk through how to use NoOps to deploy a hub and spoke architecture. At the conclusion, you will have five resources groups mapped to the following:
 
-* Hub: SCCA-compliant networking hub
-* Tier 0 (T0): Identity
-* Tier 1 (T1a): Operations
-* Tier 1 (T1b): Logging
-* Tier 2 (T2): Shared Services
-* Tier 3s (T3s): *One-to-Many* Workloads or Team Environments
+* Hub: SCCA-compliant networking hub (1 vnet, 1 resource group)
+* Tier 0 (T0): Identity & Authorization (1 vnet, 1 resource group)
+* Tier 1 (T1): Infrastrcture Operations, and Logging (1 vnet, 2 resource groups)
+* Tier 2 (T2): DevSecOps & Shared Services (1 vnet, 1 resource group)
 
 Steps:
 
@@ -61,8 +64,9 @@ For a quickstart, we suggest a test deployment into the current AZ CLI subscript
       --subscription xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx
     ```
 
-1. After a successful deployment, see our [workloads](.src/bicep/workloads), [platforms](./src/bicep/platforms), [overlays](./src/bicep/overlays), and [enclaves](./src/bicep/enclaves/) folders for more examples of what NoOps can be used to deploy.
-    Don't forget to clean-up your environment when you are done.
+1. After a successful deployment, see the **[enclaves](./src/bicep/enclaves/)** folder for examples of complete, outcome-driven solutions built using the NoOps Accelerator. Also, be sure to take a look through our **[workloads](.src/bicep/workloads)** and **[overlays](./src/bicep/overlays)** folders to get a sense of the available pieces you can put together with the **platform** you just deployed to solve your mission challenges.
+
+1. Don't forget to **clean-up your environment** by removing all of the resource groups created by the deployment when you are done with this Quickstart.
 
 > Don't have Azure CLI? Here's how to get started with Azure Cloud Shell in your browser: <https://docs.microsoft.com/en-us/azure/cloud-shell/overview>
 
@@ -70,9 +74,11 @@ For a quickstart, we suggest a test deployment into the current AZ CLI subscript
 
 ## Design your own solutions
 
-NoOps
+NoOps is amaze
 
-----
+<!-- Below this line is old content for salvaging
+
+-------------------------------------------------------------------------------------------
 
 * [Microsoft Support Policy](./SUPPORT.md)
 
@@ -146,29 +152,9 @@ Deployment to Azure is supported using GitHub Actions and can be adopted for oth
 
 The automation is built with Azure Bicep and Azure Resource Manager template.
 
-## Onboarding to GitHub Actions
-
-See the following onboarding guides for setup instructions:
-
-* GitHub Actions Setup provides guidance on considerations and recommended practices when creating and configuring your GitHub environment.
-* GitHub Actions Scripts provides guidance on the scripts available to help simplify the onboarding process to Azure Landing Zones design using GitHub Actions.
-* GitHub Actions provides guidance on the manual steps for onboarding to the Azure Landing Zones design using GitHub Actions.
-
 ## Bicep Modules
 
 In the [src\bicep](src/bicep) directory contains all of the modules required to deploy NoOps Accelerator components.
-
-## Terraform Modules
-
-> NOTE: Currently Terraform modules are not complete. We are working on the Bicep modules first, as this is native to Azure ARM.
-
-In the [src\terraform](src/terraform) directory contains all of the modules required to deploy NoOps Accelerator components.
-
-This is still a work in progress. We wanted to concentrate on the bicep modules first as there is native support in Azure.
-
-## Self-Service Website
-
->NOTE: This is still a work in progress.
 
 ## Telemetry
 
@@ -216,6 +202,8 @@ This project may contain trademarks or logos for projects, products, or services
 [Microsoft's Trademark & Brand Guidelines](https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks/usage/general).
 Use of Microsoft trademarks or logos in modified versions of this project must not cause confusion or imply Microsoft sponsorship.
 Any use of third-party trademarks or logos are subject to those third-party's policies.
+
+-->
 
 [//]: # (************************)
 [//]: # (INSERT LINK LABELS BELOW)

@@ -55,13 +55,26 @@ For a quickstart, we suggest a test deployment into the current AZ CLI subscript
     Here is an example that deploys into a single subscription in the EastUS region of Azure Commercial:
 
     ```plaintext
+    # These will be used in the naming of your resources
+    # e.g., anoa-eastus-dev-hub-rg
+    ORG_PREFIX="anoa"
+    DEPLOY_ENV="dev"
+
+    # Replace with your test Azure Subscription ID
+    AZ_SUBSCRIPTION="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+
     az login
-    az deployment sub create 
-      --name deploy-scca-hub-with-3-spokes
-      --location EastUS 
-      --template-file deploy.bicep  
-      --parameters @parameters/deploy.parameters.json 
-      --subscription xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx
+    az deployment sub create \
+        --name deploy-scca-hub-with-3-spokes \
+        --location EastUS \
+        --template-file deploy.bicep \
+        --parameters @parameters/deploy.parameters.json \
+        --parameters parRequired="{ \"orgPrefix\":\"$ORG_PREFIX\", \"templateVersion\":\"v1.0\", \"deployEnvironment\":\"$DEPLOY_ENV\" }" \
+        --parameters parHubSubscriptionId=$AZ_SUBSCRIPTION \
+        --parameters parIdentitySubscriptionId=$AZ_SUBSCRIPTION \
+        --parameters parOperationsSubscriptionId=$AZ_SUBSCRIPTION \
+        --parameters parSharedServicesSubscriptionId=$AZ_SUBSCRIPTION \
+        --subscription $AZ_SUBSCRIPTION
     ```
 
 1. After a successful deployment, see the **[enclaves](./src/bicep/enclaves/)** folder for examples of complete, outcome-driven solutions built using the NoOps Accelerator. Also, be sure to take a look through our **[workloads](.src/bicep/workloads)** and **[overlays](./src/bicep/overlays)** folders to get a sense of the available pieces you can put together with the **platform** you just deployed to solve your mission challenges.

@@ -475,7 +475,7 @@ module modHubNetwork '../../azresources/hub-spoke/vdss/hub/anoa.lz.hub.network.b
     parTags: modTags.outputs.tags
     
     // Enable DDOS Protection Plan
-    parDeployddosProtectionPlan: parDdosStandard.enable
+    parDeployddosProtectionPlan: parDdosStandard.enabled
 
     // Hub Network Parameters
     parHubVirtualNetworkAddressPrefix: parHubVirtualNetworkAddressPrefix

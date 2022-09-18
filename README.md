@@ -14,6 +14,7 @@ Learn more about the NoOps movement and philosphy here - *[What is NoOps?](TBD)*
 
 ## Quickstart
 
+While the NoOps Accelerator can be used to build all sorts of useful solutions, a simple place to start is deploying a workload platform.
 You can use the NoOps Accelerator to deploy [SCCA-compliant landing zones](./src/bicep/platforms/) based on Microsoft's [SACA implementation guidance][saca] and [Mission Landing Zone][mlz] architecture.
 
 ### Deploy a SCCA-compliant Landing Zone (SCCA Hub with 3 Spokes) using the Azure CLI

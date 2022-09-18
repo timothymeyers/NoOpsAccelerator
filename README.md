@@ -123,7 +123,7 @@ im plemented.
 
 <!-- markdownlint-disable MD033 -->
 <!-- allow html for images so that they can be sized -->
-<img src="docs/media/NoOpsPrimitives.png" alt="A diagram that depicts the relationships between the NoOps Primitives, with AzResources on the bottom, flowing through Overlays into both Platforms and Workloads, and finally Enclaves on top." width="600" />
+<img src="docs/media/NoOpsPrimitives.png" alt="A diagram that depicts the relationships between the NoOps Primitives, with AzResources on the bottom, flowing through Overlays into both Platforms and Workloads, and finally Enclaves on top." width="800" />
 <!-- markdownlint-enable MD033 -->
 
 ### Telemetry

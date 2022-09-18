@@ -8,16 +8,9 @@ to quickly develop and maintain
 opinionated, policy-driven, and self-service
 encalves in their Azure environments.
 
-Delivered as a collection of infrastructure as code (IaC) [module templates](https://github.com/Azure/NoOpsAccelerator/tree/main/src/bicep) written in Bicep, the NoOps Accelerator is intended to empower organizations on their journey to a continuous deployment model for their cloud infrastructure.
+Delivered as a collection of infrastructure as code (IaC) [module templates](https://github.com/Azure/NoOpsAccelerator/tree/main/src/bicep) written in Bicep, the NoOps Accelerator is intended to empower organizations on their journey towards a continuous deployment and governance model for their cloud infrastructure.
 
-<!-- 
-* Designed for US Government mission customers.
-* Implements SCCA controls following [Microsoft's SACA implementation guidance](https://aka.ms/saca)
-* Deployable in Azure Commercial, Azure Government, Azure Government Secret, and Azure Government Top Secret clouds
-* Accelerate the use of Azure in DOD/Public Sector through onboarding multiple types of workloads including App Dev and Data & AI.
-* Simplify compliance management through automated audit, reporting, and remediation.
-* Written as Bicep templates.
--->
+Learn more about the NoOps movement and philosphy here - *[What is NoOps?](TBD)*.
 
 ## Quickstart
 
@@ -85,27 +78,31 @@ For a quickstart, we suggest a test deployment into the current AZ CLI subscript
 
 <!-- For more detailed deployment instructions, see our deployment guides for [Bicep](docs/deployment-guide-bicep.md) and [Terraform](docs/deployment-guide-terraform.md). -->
 
+## Goals and Non-Goals of the Azure NoOps Accelerator Project
 
-## Goals and Non-Goals of the NoOps Project
+### Goals
 
-- be amazing
+* Design for US Government mission customers, with a specific focus on the US Department of Defense and Military Departments.
+* Provide reusable and composable IaC modules that hyper-automate infrastructure deployment using Microsoft's best practices.
+* Simplify compliance management through automated audit, reporting, and remediation.
+* Deliver example [Platform modules](./src/bicep/platforms/) that implement SCCA controls and  follow [Microsoft's SACA implementation guidance](https://aka.ms/saca).
+* Support deployment to Azure Commercial, Azure Government, Azure Government Secret, and Azure Government Top Secret clouds.
+* Accelerate the US Government's use of Azure by easing the onboarding of mission workloads, spanning mission applications, data, artificial intelligence, and machine learning.
 
+### Non-Goals
+
+* The NoOps Accelerator cannot automate the approval for Authority to Operate (ATO), though it will enable Customers to collect, customize, and submit for ATO based on their departmental requirements.
+* The NoOps Accelerator will not strive for 100% compliance on all deployed Azure Policies for reference implementations. Customers must review [Microsoft Defender for Cloud Regulatory Compliance dashboard](TBD) and apply appropriate exemptions.
+
+<!--
+* Compliant on all Azure Policies when the reference implementation is deployed. This is due to the shared responsibility of cloud and customers can choose the Azure Policies to exclude. For example, using Azure Firewall is an Azure Policy that will be non-compliant since majority of the DOD/Public Sector customers use Network Virtual Appliances. 
+-->
 
 ## Getting Started
 
-NoOps is amaze. Definitions of NoOps primitives. @matross-ghes
-
-| Primitive | Definition |
-| :---------------| :--------- |
-| **AzResources** | Wrap [Azure Resource Providers](https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/azure-services-resource-providers) so that they understand how to fit and work together. The most basic building blocks in NoOps. |
-| **Overlays** | Extend *AzResources* with specific configurations or combine them to create more useful objects.<BR/><BR/>For example, one could use the `kubernetesCluster` overlay to deploy a Private AKS Cluster rather than using the `Microsoft.ContainerService/managedClusters` AzResource to deploy a vanilla AKS cluster.<BR/><BR/>Similarly, one could create a `virtualMachine` overlay that combines the deployment of a `Microsoft.Network/networkInterfaces` with a `Microsoft.Compute/virtualmachine` since you will rarely if ever deploy a VM without an associated NIC. |
-| **Platforms** | Combine *Overlays* and *AzResources* to lay the networking required to support mission workloads. NoOps is provided with two SCCA-compliant hub-and-spoke landing zone platforms. The [Quickstart](#quickstart) above walks through the deployment of a SCCA-compliant hub-and-3-spoke platform.
-| **Workloads** | Combine *Overlays* and *AzResources* to create solutions that achieve mission and operational goals. For example, one could mix a `kubernetesCluster` overlay (Private AKS Cluster) with a `Microsoft.ContainerRegistry` AzResource to create a **Dev Environment** Workload.<BR/><BR/>Workloads can be deployed into either a new or an existing hub-peered virtual network.|
-| **Enclaves** | Bring it all together -- combining a single *Platform* with one or more *Workloads*, and mixing in Zero Trust governance and RBAC -- to enable the rapid, repeatable, auditible, and authorizable deployment of outcome-driven infrastructure. |
+NoOps is amaze. Definitions of NoOps primitives.
 
 <!--
-
-
 
 Full deployment of a workload that is Secure Cloud Computing
 Architecture, SCCA compliant Monitoring, policy, governance, a
@@ -116,7 +113,18 @@ im plemented.
 
 ### Architecture
 
-a few useful pictures here.
+| Primitive | Definition |
+| :---------------| :--------- |
+| **AzResources** | Wrap [Azure Resource Providers](https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/azure-services-resource-providers) so that they understand how to fit and work together. The most basic building blocks in NoOps. |
+| **Overlays** | Extend *AzResources* with specific configurations or combine them to create more useful objects.<BR/><BR/>For example, one could use the `kubernetesCluster` overlay to deploy a Private AKS Cluster rather than using the `Microsoft.ContainerService/managedClusters` AzResource to deploy a vanilla AKS cluster.<BR/><BR/>Similarly, one could create a `virtualMachine` overlay that combines the deployment of a `Microsoft.Network/networkInterfaces` with a `Microsoft.Compute/virtualmachine` since you will rarely if ever deploy a VM without an associated NIC. |
+| **Platforms** | Combine *Overlays* and *AzResources* to lay the networking required to support mission workloads. NoOps is provided with two SCCA-compliant hub-and-spoke landing zone platforms. The [Quickstart](#quickstart) above walks through the deployment of a SCCA-compliant hub-and-3-spoke platform.
+| **Workloads** | Combine *Overlays* and *AzResources* to create solutions that achieve mission and operational goals. For example, one could mix a `kubernetesCluster` overlay (Private AKS Cluster) with a `Microsoft.ContainerRegistry` AzResource to create a **Dev Environment** Workload.<BR/><BR/>Workloads can be deployed into either a new or an existing hub-peered virtual network.|
+| **Enclaves** | Bring it all together -- combining a single *Platform* with one or more *Workloads*, and mixing in Zero Trust governance and RBAC -- to enable the rapid, repeatable, auditible, and authorizable deployment of outcome-driven infrastructure. |
+
+<!-- markdownlint-disable MD033 -->
+<!-- allow html for images so that they can be sized -->
+<img src="docs/media/NoOpsPrimitives.png" alt="A diagram that depicts the relationships between the NoOps Primitives, with AzResources on the bottom, flowing through Overlays into both Platforms and Workloads, and finally Enclaves on top." width="600" />
+<!-- markdownlint-enable MD033 -->
 
 ### Telemetry
 
@@ -174,13 +182,7 @@ Azure NoOps Accelerator Architecture supported up to IL6 (Top Secret) - Cloud On
 
 This implementation is specific to DOD/Public Sector organizations.
 
-## Goals
 
-## Non-Goals
-
-* Automatic approval for Authority to Operate (ATO). Customers must collect evidence, customize to meet their departmental requirements and submit for Authority to Operate based on their risk profile, requirements and process.
-
-* Compliant on all Azure Policies when the reference implementation is deployed. This is due to the shared responsibility of cloud and customers can choose the Azure Policies to exclude. For example, using Azure Firewall is an Azure Policy that will be non-compliant since majority of the DOD/Public Sector customers use Network Virtual Appliances. Customers must review Microsoft Defender for Cloud Regulatory Compliance dashboard and apply appropriate exemptions.
 
 ## Requirements for Successful NoOps
 

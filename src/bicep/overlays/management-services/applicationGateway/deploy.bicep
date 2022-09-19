@@ -51,7 +51,7 @@ param parLocation string = deployment().location
 
 // SUBSCRIPTIONS PARAMETERS
 
-// Hub Virtual Network Name
+// Hub Subscription Id
 // (JSON Parameter)
 // ---------------------------
 // "parHubSubscriptionId": {

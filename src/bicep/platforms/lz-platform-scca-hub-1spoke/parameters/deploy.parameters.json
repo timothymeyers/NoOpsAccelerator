@@ -26,7 +26,7 @@
     },
     "parHubSubnetAddressPrefix": {
       "value": "10.0.100.128/27"
-    },    
+    },
     "parOperationsSubscriptionId": {
       "value": "896f5276-df9a-4317-a791-469396bef7fa"
     },
@@ -35,13 +35,13 @@
     },
     "parOperationsSubnetAddressPrefix": {
       "value": "10.0.115.0/27"
-    },  
+    },
     "parOperationsNetworkSecurityGroupRules": {
       "value": []
     },
     "parOperationsSourceAddressPrefixes": {
       "value": []
-    },  
+    },
     "parNetworkArtifacts": {
       "value": {
         "enable": false,
@@ -93,10 +93,98 @@
       "value": "Alert"
     },
     "parApplicationRuleCollections": {
-      "value": []
+      "value": [
+        {
+          "name": "AzureAuth",
+          "properties": {
+            "priority": 110,
+            "action": {
+              "type": "Allow"
+            },
+            "rules": [
+              {
+                "name": "msftauth",
+                "protocols": [
+                  {
+                    "port": 443,
+                    "protocolType": "Https"
+                  }
+                ],
+                "targetFqdns": [
+                  "aadcdn.msftauth.net",
+                  "aadcdn.msauth.net"
+                ],
+                "terminateTLS": false,
+                "sourceAddresses": [
+                  "*"
+                ]
+              }
+            ]
+          }
+        }
+      ]
     },
     "parNetworkRuleCollections": {
-      "value": []
+      "value": [
+        {
+          "name": "AllowAzureCloud",
+          "properties": {
+            "priority": 100,
+            "action": {
+              "type": "Allow"
+            },
+            "rules": [
+              {
+                "name": "AzureCloud",
+                "ipProtocols": [
+                  "Any"
+                ],
+                "sourceAddresses": [
+                  "*"
+                ],
+                "sourceIpGroups": [],
+                "destinationAddresses": [
+                  "AzureCloud"
+                ],
+                "destinationIpGroups": [],
+                "destinationFqdns": [],
+                "destinationPorts": [
+                  "*"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "AllowTrafficBetweenSpokes",
+          "properties": {
+            "priority": 200,
+            "action": {
+              "type": "Allow"
+            },
+            "rules": [
+              {
+                "name": "AllSpokeTraffic",
+                "ipProtocols": [
+                  "Any"
+                ],
+                "sourceAddresses": [
+                  "10.0.69.1"
+                ],
+                "sourceIpGroups": [],
+                "destinationAddresses": [
+                  "10.0.69.1"
+                ],
+                "destinationIpGroups": [],
+                "destinationFqdns": [],
+                "destinationPorts": [
+                  "*"
+                ]
+              }
+            ]
+          }
+        }
+      ]
     },
     "parStorageAccountAccess": {
       "value": {
@@ -118,7 +206,7 @@
     },
     "parRemoteAccess": {
       "value": {
-        "enable": true,        
+        "enable": true,
         "bastion": {
           "sku": "Standard",
           "subnetAddressPrefix": "10.0.100.160/27",
@@ -129,7 +217,7 @@
             "vmName": "bastion-linux",
             "vmAdminUsername": "azureuser",
             "disablePasswordAuthentication": false,
-            "vmAdminPasswordOrKey": "Rem0te@2020246",          
+            "vmAdminPasswordOrKey": "Rem0te@2020246",
             "vmSize": "Standard_DS1_v2",
             "vmOsDiskCreateOption": "FromImage",
             "vmOsDiskType": "Standard_LRS",

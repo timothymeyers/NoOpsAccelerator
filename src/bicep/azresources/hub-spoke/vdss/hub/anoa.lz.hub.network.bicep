@@ -569,12 +569,17 @@ module modAzureFirewall '../../../Modules/Microsoft.Network/firewalls/az.net.fir
 
     firewallPolicyId: modAzureFirewallPolicy.outputs.resourceId
     threatIntelMode: parFirewallThreatIntelMode
-    azureFirewallClientSubnetPublicIpId: modFirewallClientPublicIPAddress.outputs.resourceId
-    firewallClientIpConfigurationName: varFirewallClientIpConfigurationName
+    additionalPublicIpConfigurations: [
+      {
+        name: varFirewallClientIpConfigurationName
+        publicIPAddressResourceId: modFirewallClientPublicIPAddress.outputs.resourceId
+      }
+      {
+        name: varFirewallManagementIpConfigurationName
+        publicIPAddressResourceId: modFirewallManagementPublicIPAddress.outputs.resourceId
+      }
+    ]
     vNetId: modHubVirtualNetwork.outputs.resourceId
-
-    azureFirewallManagementSubnetPublicIpId: modFirewallManagementPublicIPAddress.outputs.resourceId
-    firewallManagementIpConfigurationName: varFirewallManagementIpConfigurationName
     diagnosticWorkspaceId: parLogAnalyticsWorkspaceResourceId
     diagnosticStorageAccountId: modHubLogStorage.outputs.resourceId
 

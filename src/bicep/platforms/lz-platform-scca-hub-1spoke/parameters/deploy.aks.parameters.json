@@ -25,7 +25,7 @@
     },
     "parHubSubnetAddressPrefix": {
       "value": "10.0.100.128/27"
-    },    
+    },
     "parOperationsSubscriptionId": {
       "value": "c24647bf-0c86-4408-8d29-6a67262a2701"
     },
@@ -34,7 +34,7 @@
     },
     "parOperationsSubnetAddressPrefix": {
       "value": "10.0.115.0/27"
-    },    
+    },
     "parNetworkArtifacts": {
       "value": {
         "enable": false,
@@ -61,281 +61,298 @@
         "enabled": false
       }
     },
-    "parAzureFirewallEnabled": {
-      "value": true
-    },
-    "parFirewallClientSubnetAddressPrefix": {
-      "value": "10.0.100.0/26"
-    },
-    "parFirewallManagementSubnetAddressPrefix": {
-      "value": "10.0.100.64/26"
-    },
-    "parFirewallSupernetIPAddress": {
-      "value": "10.0.96.0/19"
-    },
-    "parFirewallClientSubnetName": {
-      "value": "AzureFirewallSubnet"
-    },
-    "parFirewallSkuTier": {
-      "value": "Premium"
-    },
-    "parFirewallThreatIntelMode": {
-      "value": "Alert"
-    },
-    "parFirewallIntrusionDetectionMode": {
-      "value": "Alert"
-    },
-    "parApplicationRuleCollections": {
-      "value": [
-        {
-          "name": "Helper-tools",
-          "properties": {
-            "priority": 101,
-            "action": {
-              "type": "Allow"
-            },
-            "rules": [
-              {
-                "name": "Allow-ifconfig",
-                "protocols": [
-                  {
-                    "port": 80,
-                    "protocolType": "Http"
-                  },
-                  {
-                    "port": 443,
-                    "protocolType": "Https"
-                  }
-                ],
-                "targetFqdns": [
-                  "ifconfig.co",
-                  "api.snapcraft.io",
-                  "jsonip.com",
-                  "kubernaut.io",
-                  "motd.ubuntu.com"
-                ],
-                "sourceAddresses": [
-                  "10.0.100.0/24",
-                  "10.1.0.0/16"
-                ]
-              }
-            ]
-          }
-        },
-        {
-          "name": "AKS-egress-application",
-          "properties": {
-            "priority": 102,
-            "action": {
-              "type": "Allow"
-            },
-            "rules": [
-              {
-                "name": "Egress",
-                "protocols": [
-                  {
-                    "port": 443,
-                    "protocolType": "Https"
-                  }
-                ],
-                "targetFqdns": [
-                  "*.azmk8s.io",
-                  "aksrepos.azurecr.io",
-                  "*.blob.core.windows.net",
-                  "mcr.microsoft.com",
-                  "*.cdn.mscr.io",
-                  "management.azure.com",
-                  "login.microsoftonline.com",
-                  "packages.azure.com",
-                  "acs-mirror.azureedge.net",
-                  "*.opinsights.azure.com",
-                  "*.monitoring.azure.com",
-                  "dc.services.visualstudio.com"
-                ],
-                "sourceAddresses": [
-                  "10.0.0.0/16",
-                  "10.1.0.0/16"
-                ]
-              },
-              {
-                "name": "Registries",
-                "protocols": [
-                  {
-                    "port": 443,
-                    "protocolType": "Https"
-                  }
-                ],
-                "targetFqdns": [
-                  "*.data.mcr.microsoft.com",
-                  "*.azurecr.io",
-                  "*.gcr.io",
-                  "gcr.io",
-                  "storage.googleapis.com",
-                  "*.docker.io",
-                  "quay.io",
-                  "*.quay.io",
-                  "*.cloudfront.net",
-                  "production.cloudflare.docker.com"
-                ],
-                "sourceAddresses": [
-                  "10.0.0.0/16",
-                  "10.1.0.0/16"
-                ]
-              },
-              {
-                "name": "Additional-Usefull-Address",
-                "protocols": [
-                  {
-                    "port": 443,
-                    "protocolType": "Https"
-                  }
-                ],
-                "targetFqdns": [
-                  "grafana.net",
-                  "grafana.com",
-                  "stats.grafana.org",
-                  "github.com",
-                  "raw.githubusercontent.com",
-                  "security.ubuntu.com",
-                  "security.ubuntu.com",
-                  "packages.microsoft.com",
-                  "azure.archive.ubuntu.com",
-                  "security.ubuntu.com",
-                  "hack32003.vault.azure.net",
-                  "*.letsencrypt.org",
-                  "usage.projectcalico.org",
-                  "gov-prod-policy-data.trafficmanager.net",
-                  "vortex.data.microsoft.com"
-                ],
-                "sourceAddresses": [
-                  "10.0.0.0/16",
-                  "10.1.0.0/16"
-                ]
-              },
-              {
-                "name": "AKS-FQDN-TAG",
-                "protocols": [
-                  {
-                    "port": 80,
-                    "protocolType": "Http"
-                  },
-                  {
-                    "port": 443,
-                    "protocolType": "Https"
-                  }
-                ],
-                "targetFqdns": [],
-                "fqdnTags": [
-                  "AzureKubernetesService"
-                ],
-                "sourceAddresses": [
-                  "10.0.0.0/16",
-                  "10.1.0.0/16"
-                ]
-              }
-            ]
-          }
-        }
-      ]
-    },
-    "parNetworkRuleCollections": {
-      "value": [
-        {
-          "name": "AKS-egress",
-          "properties": {
-            "priority": 200,
-            "action": {
-              "type": "Allow"
-            },
-            "rules": [
-              {
-                "name": "NTP",
-                "protocols": [
-                  "UDP"
-                ],
-                "sourceAddresses": [
-                  "10.0.0.0/16",
-                  "10.1.0.0/16"
-                ],
-                "destinationAddresses": [
-                  "*"
-                ],
-                "destinationPorts": [
-                  "123"
-                ]
-              }
-            ]
-          }
-        }
-      ]
-    },
-    "parStorageAccountAccess": {
+    "parHub": {
       "value": {
-        "enableRoleAssignmentForStorageAccount": false,
-        "principalIds": [
-          "7bc6bc45-b256-407c-9d79-bde13dfb5639"
+        "subscriptionId": "xxxxxxx-xxxx-xxxx-xxxx-xxxxxxx",
+        "virtualNetworkAddressPrefix": "10.0.100.0/24",
+        "subnetAddressPrefix": "10.0.100.128/27",
+        "virtualNetworkDiagnosticsLogs": [],
+        "virtualNetworkDiagnosticsMetrics": [],
+        "networkSecurityGroupRules": [],
+        "networkSecurityGroupDiagnosticsLogs": [
+          {
+            "category": "NetworkSecurityGroupEvent",
+            "enabled": true
+          },
+          {
+            "category": "NetworkSecurityGroupRuleCounter",
+            "enabled": true
+          }
         ],
-        "roleDefinitionIdOrName": "Contributor"
+        "subnetServiceEndpoints": [
+          {
+            "service": "Microsoft.Storage"
+          }
+        ]
       }
     },
-    "parLogging": {
+    "parOperationsSpoke": {
       "value": {
-        "enableSentinel": "true",
-        "logAnalyticsWorkspaceCappingDailyQuotaGb": -1,
-        "logAnalyticsWorkspaceRetentionInDays": 30,
-        "logAnalyticsWorkspaceSkuName": "PerGB2018",
-        "logStorageSkuName": "Standard_GRS"
+        "subscriptionId": "xxxxxxx-xxxx-xxxx-xxxx-xxxxxxx",
+        "virtualNetworkAddressPrefix": "10.0.115.0/26",
+        "subnetAddressPrefix": "10.0.115.0/27",
+        "sourceAddressPrefixes": [],
+        "virtualNetworkDiagnosticsLogs": [],
+        "virtualNetworkDiagnosticsMetrics": [],
+        "networkSecurityGroupRules": [
+          {
+            "name": "Allow-Traffic-From-Spokes",
+            "properties": {
+              "access": "Allow",
+              "description": "Allow traffic from spokes",
+              "destinationAddressPrefix": "10.0.115.0/26",
+              "destinationPortRanges": [
+                "22",
+                "80",
+                "443",
+                "3389"
+              ],
+              "direction": "Inbound",
+              "priority": 200,
+              "protocol": "*",
+              "sourceAddressPrefixes": [],
+              "sourcePortRange": "*"
+            },
+            "type": "string"
+          }
+        ],
+        "publicIPAddressDiagnosticsLogs": [
+          {
+            "category": "DDoSProtectionNotifications",
+            "enabled": true
+          },
+          {
+            "category": "DDoSMitigationFlowLogs",
+            "enabled": true
+          },
+          {
+            "category": "DDoSMitigationReports",
+            "enabled": true
+          }
+        ],
+        "networkSecurityGroupDiagnosticsLogs": [
+          {
+            "category": "NetworkSecurityGroupEvent",
+            "enabled": true
+          },
+          {
+            "category": "NetworkSecurityGroupRuleCounter",
+            "enabled": true
+          }
+        ],
+        "subnetServiceEndpoints": [
+          {
+            "service": "Microsoft.Storage"
+          }
+        ]
       }
     },
-    "parRemoteAccess": {
+    "parAzureFirewall": {
       "value": {
         "enable": true,
-        "bastion": {
-          "sku": "Standard",
-          "subnetAddressPrefix": "172.16.100.160/27",
-          "publicIPAddressAvailabilityZones": [],
-          "linux": {
+        "clientSubnetName": "AzureFirewallSubnet",
+        "clientSubnetAddressPrefix": "10.0.100.0/26",
+        "clientSubnetServiceEndpoints": [],
+        "clientPublicIPAddressAvailabilityZones": [],
+        "managementSubnetName": "AzureFirewallManagementSubnet",
+        "managementSubnetAddressPrefix": "10.0.100.64/26",
+        "managementSubnetServiceEndpoints": [],
+        "managementPublicIPAddressAvailabilityZones": [],
+        "supernetIPAddress": "10.0.96.0/19",
+        "skuTier": "Premium",
+        "threatIntelMode": "Alert",
+        "intrusionDetectionMode": "Alert",
+        "publicIPAddressDiagnosticsLogs": [
+          {
+            "category": "DDoSProtectionNotifications",
+            "enabled": true
+          },
+          {
+            "category": "DDoSMitigationFlowLogs",
+            "enabled": true
+          },
+          {
+            "category": "DDoSMitigationReports",
+            "enabled": true
+          }
+        ],
+        "publicIPAddressDiagnosticsMetrics": [
+          {
+            "category": "AllMetrics",
+            "enabled": true
+          }
+        ],
+        "diagnosticsLogs": [
+          "AzureFirewallApplicationRule",
+          "AzureFirewallNetworkRule",
+          "AzureFirewallDnsProxy"
+        ],
+        "diagnosticsMetrics": [
+          "AllMetrics"
+        ],
+        "parApplicationRuleCollections": {
+          "value": [
+            {
+              "name": "AzureAuth",
+              "properties": {
+                "priority": 110,
+                "action": {
+                  "type": "Allow"
+                },
+                "rules": [
+                  {
+                    "name": "msftauth",
+                    "protocols": [
+                      {
+                        "port": 443,
+                        "protocolType": "Https"
+                      }
+                    ],
+                    "targetFqdns": [
+                      "aadcdn.msftauth.net",
+                      "aadcdn.msauth.net"
+                    ],
+                    "terminateTLS": false,
+                    "sourceAddresses": [
+                      "*"
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "parNetworkRuleCollections": {
+          "value": [
+            {
+              "name": "AllowAzureCloud",
+              "properties": {
+                "priority": 100,
+                "action": {
+                  "type": "Allow"
+                },
+                "rules": [
+                  {
+                    "name": "AzureCloud",
+                    "ipProtocols": [
+                      "Any"
+                    ],
+                    "sourceAddresses": [
+                      "*"
+                    ],
+                    "sourceIpGroups": [],
+                    "destinationAddresses": [
+                      "AzureCloud"
+                    ],
+                    "destinationIpGroups": [],
+                    "destinationFqdns": [],
+                    "destinationPorts": [
+                      "*"
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "name": "AllowTrafficBetweenSpokes",
+              "properties": {
+                "priority": 200,
+                "action": {
+                  "type": "Allow"
+                },
+                "rules": [
+                  {
+                    "name": "AllSpokeTraffic",
+                    "ipProtocols": [
+                      "Any"
+                    ],
+                    "sourceAddresses": [
+                      "10.0.69.1"
+                    ],
+                    "sourceIpGroups": [],
+                    "destinationAddresses": [
+                      "*"
+                    ],
+                    "destinationIpGroups": [],
+                    "destinationFqdns": [],
+                    "destinationPorts": [
+                      "*"
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "parStorageAccountAccess": {
+          "value": {
+            "enableRoleAssignmentForStorageAccount": false,
+            "principalIds": [
+              "7bc6bc45-b256-407c-9d79-bde13dfb5639"
+            ],
+            "roleDefinitionIdOrName": "Contributor"
+          }
+        },
+        "parLogging": {
+          "value": {
+            "enableSentinel": "true",
+            "logAnalyticsWorkspaceCappingDailyQuotaGb": -1,
+            "logAnalyticsWorkspaceRetentionInDays": 30,
+            "logAnalyticsWorkspaceSkuName": "PerGB2018",
+            "logStorageSkuName": "Standard_GRS"
+          }
+        },
+        "parRemoteAccess": {
+          "value": {
             "enable": true,
-            "vmAdminUsername": "azureuser",
-            "enableVmPasswordAuthentication": true,
-            "vmAuthenticationType": "password",
-            "vmAdminPasswordOrKey": "Rem0te@2020246",
-            "vmSize": "Standard_B2s",
-            "vmOsDiskCreateOption": "FromImage",
-            "vmOsDiskType": "Standard_LRS",
-            "vmImagePublisher": "Canonical",
-            "vmImageOffer": "UbuntuServer",
-            "vmImageSku": "18.04-LTS",
-            "vmImageVersion": "latest",
-            "networkInterfacePrivateIPAddressAllocationMethod": "Dynamic"
-          },
-          "windows": {
-            "enable": false,
-            "vmAdminUsername": "azureuser",
-            "VmAdminPassword": "Rem0te@2020246",
-            "vmSize": "Standard_DS1_v2",
-            "vmOsDiskCreateOption": "FromImage",
-            "VmStorageAccountType": "StandardSSD_LRS",
-            "vmImagePublisher": "MicrosoftWindowsServer",
-            "vmImageOffer": "WindowsServer",
-            "vmImageSku": "2019-datacenter",
-            "vmImageVersion": "latest",
-            "networkInterfacePrivateIPAddressAllocationMethod": "Dynamic"
-          },
-          "customScriptExtension": {
-            "install": false,
-            "script64": "$(cat script.sh | base64)"
+            "bastion": {
+              "sku": "Standard",
+              "subnetAddressPrefix": "172.16.100.160/27",
+              "publicIPAddressAvailabilityZones": [],
+              "linux": {
+                "enable": true,
+                "vmAdminUsername": "azureuser",
+                "enableVmPasswordAuthentication": true,
+                "vmAuthenticationType": "password",
+                "vmAdminPasswordOrKey": "Rem0te@2020246",
+                "vmSize": "Standard_B2s",
+                "vmOsDiskCreateOption": "FromImage",
+                "vmOsDiskType": "Standard_LRS",
+                "vmImagePublisher": "Canonical",
+                "vmImageOffer": "UbuntuServer",
+                "vmImageSku": "18.04-LTS",
+                "vmImageVersion": "latest",
+                "networkInterfacePrivateIPAddressAllocationMethod": "Dynamic"
+              },
+              "windows": {
+                "enable": false,
+                "vmAdminUsername": "azureuser",
+                "VmAdminPassword": "Rem0te@2020246",
+                "vmSize": "Standard_DS1_v2",
+                "vmOsDiskCreateOption": "FromImage",
+                "VmStorageAccountType": "StandardSSD_LRS",
+                "vmImagePublisher": "MicrosoftWindowsServer",
+                "vmImageOffer": "WindowsServer",
+                "vmImageSku": "2019-datacenter",
+                "vmImageVersion": "latest",
+                "networkInterfacePrivateIPAddressAllocationMethod": "Dynamic"
+              },
+              "customScriptExtension": {
+                "install": false,
+                "script64": "$(cat script.sh | base64)"
+              }
+            }
+          }
+        },
+        "parSecurityCenter": {
+          "value": {
+            "enableDefender": true,
+            "alertNotifications": "Off",
+            "alertsToAdminsNotifications": "Off",
+            "emailSecurityContact": "anoa@microsoft.com",
+            "phoneSecurityContact": "5555555555"
           }
         }
-      }
-    },
-    "parSecurityCenter": {
-      "value": {
-        "enableDefender": true,
-        "alertNotifications": "Off",
-        "alertsToAdminsNotifications": "Off",
-        "emailSecurityContact": "anoa@microsoft.com",
-        "phoneSecurityContact": "5555555555"
       }
     }
   }

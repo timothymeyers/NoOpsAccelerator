@@ -19,7 +19,7 @@
       }
     },
     "parHubSubscriptionId": {
-      "value": "896f5276-df9a-4317-a791-469396bef7fa"
+      "value": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
     },
     "parHubVirtualNetworkAddressPrefix": {
       "value": "10.0.100.0/24"
@@ -28,7 +28,7 @@
       "value": "10.0.100.128/27"
     },
     "parOperationsSubscriptionId": {
-      "value": "896f5276-df9a-4317-a791-469396bef7fa"
+      "value": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
     },
     "parOperationsVirtualNetworkAddressPrefix": {
       "value": "10.0.115.0/26"

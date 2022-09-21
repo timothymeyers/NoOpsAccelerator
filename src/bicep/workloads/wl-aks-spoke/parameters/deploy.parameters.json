@@ -40,6 +40,9 @@
     "parHubVirtualNetworkResourceId": {
       "value": "/subscriptions/896f5276-df9a-4317-a791-469396bef7fa/resourceGroups/anoa-eastus-dev-hub-rg/providers/Microsoft.Network/virtualNetworks/anoa-eastus-dev-hub-vnet"
     },
+    "parHubFirewallPolicyName": {
+      "value": "anoa-eastus-dev-hub-afwp"
+    },
     "parFirewallPrivateIPAddress": {
       "value": "10.0.100.4"
     },
@@ -48,6 +51,12 @@
     },
     "parLogAnalyticsWorkspaceName": {
       "value": "anoa-eastus-dev-logging-log"
+    },
+    "parSourceAddresses": {
+      "value": [
+        "10.0.100.0/24",
+        "10.0.115.0/26"
+      ]
     },
     "parContainerRegistry": {
       "value": {

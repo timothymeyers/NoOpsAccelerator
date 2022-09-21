@@ -2,29 +2,14 @@
 
 ## Table of Contents
 
-* [Overview](#overview)
-* [Built-In Policy Sets Assignments](#built-in-policy-sets-assignments)
-* [Custom Policies and Policy Sets](#custom-policies-and-policy-sets)
-  * [Custom Policy Definitions](#custom-policy-definitions)
-  * [Custom Policy Set Definitions](#custom-policy-set-definitions)
-  * [Custom Policy Set Assignments](#custom-policy-set-assignments)
-* [Templated Parameters](#templated-parameters)
-* [Authoring Guide](#authoring-guide)
-
-## Authored & Tested With
-
-* [azure-cli](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) version 2.38.0
-* bicep cli version 0.6.18
-* [bicep](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-bicep) v0.8.9 vscode extension
-
-Module Tested on:
-
-* Azure Commercial ✔️
-* Azure Government ✔️
-* Azure Government Secret ✔️
-* Azure Government Top Secret ❔
-
-> ✔️ = tested,  ❔= currently testing
+  - [Overview](#overview)
+  - [Built-In Policy Sets Assignments](#built-in-policy-sets-assignments)
+  - [Custom Policies and Policy Sets](#custom-policies-and-policy-sets)
+    - [Custom Policy Definitions](#custom-policy-definitions)
+    - [Custom Policy Set Definitions](#custom-policy-set-definitions)
+    - [Custom Policy Set Assignments](#custom-policy-set-assignments)
+  - [Templated Parameters](#templated-parameters)
+  - [Authoring Guide](#authoring-guide)
 
 ## Overview
 
@@ -80,7 +65,7 @@ GitHub Actions ([.pipelines/policy.yml](../../.pipelines/policy.yml)) is used fo
 **Action Step**
 
 ```yml
-    - template: templates/steps/define-policy.yml
+    - template: actions/steps/define-policy.yml
       parameters:
         description: 'Define Policies'
         workingDir: $(System.DefaultWorkingDirectory)/policy/custom/definitions/policy
@@ -95,7 +80,7 @@ GitHub Actions ([.pipelines/policy.yml](../../.pipelines/policy.yml)) is used fo
 **Action Step**
 
 ```yml
-    - template: templates/steps/define-policyset.yml
+    - template: actions/steps/define-policyset.yml
       parameters:
         description: 'Define Policy Set'
         deployTemplates: [AKS, DefenderForCloud, LogAnalytics, Network, DNSPrivateEndpoints, Tags]
@@ -126,7 +111,7 @@ GitHub Actions ([.pipelines/policy.yml](../../.pipelines/policy.yml)) is used fo
 
 **Action Step**
 ```yml
-    - template: templates/steps/assign-policy.yml
+    - template: actions/steps/assign-policy.yml
       parameters:
         description: 'Assign Policy Set'
         deployTemplates: [AKS, DefenderForCloud, LogAnalytics, Network, Tags]

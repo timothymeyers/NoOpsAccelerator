@@ -543,6 +543,66 @@ param parPolicy object
 @description('These are the custom roles for landing zone management groups and resources..')
 param parRoleDefinitionInfo object
 
+// Azure Container Registry
+// Example (JSON)
+// -----------------------------
+// "parContainerRegistry": {
+//   "value": {
+//     "name": "anoa-eastus-dev-acr",
+//     "acrSku": "Premium",
+//     "enableResourceLock": true,
+//     "privateEndpoints": [
+//       {
+//         "privateDnsZoneGroup": {
+//           "privateDNSResourceIds": [
+//             "/subscriptions/<<subscriptionId>>/resourceGroups/validation-rg/providers/Microsoft.Network/privateDnsZones/privatelink.azurecr.io"
+//           ]
+//         },
+//         "service": "registry",
+//         "subnetResourceId": "/subscriptions/<<subscriptionId>>/resourceGroups/validation-rg/providers/Microsoft.Network/virtualNetworks/adp-<<namePrefix>>-az-vnet-x-001/subnets/<<namePrefix>>-az-subnet-x-005-privateEndpoints"
+//       }
+//     ]
+//   }
+// }
+@description('Defines the Container Registry.')
+param parContainerRegistry object
+
+// Azure Kubernetes Service - Cluster
+// Example (JSON)
+// -----------------------------
+// "parKubernetesCluster": {
+//   "value": {
+//     "name": "anoa-eastus-dev-aks",
+//     "enableSystemAssignedIdentity": true,
+//     "aksClusterKubernetesVersion": "1.21.9",
+//     "enableResourceLock": true,
+//     "primaryAgentPoolProfile": [
+//       {
+//         "name": "aksPoolName",
+//         "vmSize": "Standard_DS3_v2",
+//         "osDiskSizeGB": 128,
+//         "count": 2,
+//         "osType": "Linux",
+//         "type": "VirtualMachineScaleSets",
+//         "mode": "System"
+//       }
+//     ],
+//     "aksClusterLoadBalancerSku": "standard",
+//     "aksClusterNetworkPlugin": "azure",
+//     "aksClusterNetworkPolicy": "azure",
+//     "aksClusterDnsServiceIP": "",
+//     "aksClusterServiceCidr": "",
+//     "aksClusterDockerBridgeCidr": "",
+//     "aksClusterDnsPrefix": "anoaaks"
+//   }
+// }
+@description('Parmaters Object of Azure Kubernetes specified when creating the managed cluster.')
+param parKubernetesCluster object
+
+// WORKLOAD PARAMETERS
+
+@description('The subscription ID for the Hub Network and resources. It defaults to the deployment subscription.')
+param parWorkload object
 
 // Module - TAGS
 // -----------------------------
@@ -604,14 +664,14 @@ module modRoles '../../overlays/roles/deploy.bicep' = {
 //
 //
 // -----------------------------------------------------------------------------------
-module modPolicy '../../overlays/policy/hub-spoke/deploy.bicep' = {
-  name: 'deploy-Policy-${parLocation}-${parDeploymentNameSuffix}'
-  scope: managementGroup(parManagementGroups.tenantId)
-  params: {
-    parLocation: parLocation
-    parPolicy: parPolicy
-  }
-}
+//module modPolicy '../../overlays/policy/hub-spoke/deploy.bicep' = {
+ // name: 'deploy-Policy-${parLocation}-${parDeploymentNameSuffix}'
+  //scope: managementGroup(parManagementGroups.tenantId)
+ // params: {
+  //  parLocation: parLocation
+  //  parPolicy: parPolicy
+ // }
+//}
 
 // Module - Hub/ 1 Spoke Design - SCCA Compliant
 // ----------------------------------------------
@@ -625,10 +685,6 @@ module modHubSpoke '../../platforms/lz-platform-scca-hub-1spoke/deploy.bicep' = 
     parRequired: parRequired
     parLocation: parLocation
     parTags: modTags.outputs.tags
-
-    // Subscriptions
-    parHubSubscriptionId: parHub.subscriptionId
-    parOperationsSubscriptionId: parOperationsSpoke.subscriptionId
     
     // Artifact Key Vault Parameters
     parNetworkArtifacts: parNetworkArtifacts.artifactsKeyVault.keyVaultPolicies
@@ -637,61 +693,23 @@ module modHubSpoke '../../platforms/lz-platform-scca-hub-1spoke/deploy.bicep' = 
     parDdosStandard: parDdosStandard
 
     // Hub Network Parameters
-    parHubVirtualNetworkAddressPrefix: parHub.virtualNetworkAddressPrefix
-    parHubSubnetAddressPrefix: parHub.subnetAddressPrefix
-    parHubNetworkSecurityGroupDiagnosticsLogs: parHub.networkSecurityGroupDiagnosticsLogs
-    parHubNetworkSecurityGroupRules: parHub.networkSecurityGroupRules
-    parHubSubnetServiceEndpoints: parHub.subnetServiceEndpoints
-    parHubVirtualNetworkDiagnosticsLogs: parHub.virtualNetworkDiagnosticsLogs
-    parHubVirtualNetworkDiagnosticsMetrics: parHub.virtualNetworkDiagnosticsMetrics
-    
-    
-
+    parHub: parHub  
+      
     // Operations Network Parameters
-    parOperationsNetworkSecurityGroupDiagnosticsLogs: parOperationsSpoke.networkSecurityGroupDiagnosticsLogs
-    parOperationsSubnetAddressPrefix: parOperationsSpoke.subnetAddressPrefix
-    parOperationsNetworkSecurityGroupRules: parOperationsSpoke.networkSecurityGroupRules
-    parOperationsSubnetServiceEndpoints: parOperationsSpoke.subnetServiceEndpoints
-    parOperationsVirtualNetworkAddressPrefix: parOperationsSpoke.virtualNetworkAddressPrefix
-    parOperationsVirtualNetworkDiagnosticsLogs: parOperationsSpoke.virtualNetworkDiagnosticsLogs
-    parOperationsVirtualNetworkDiagnosticsMetrics: parOperationsSpoke.virtualNetworkDiagnosticsMetrics
-    parOperationsSourceAddressPrefixes: parOperationsSpoke.sourceAddressPrefixes
+    parOperationsSpoke: parOperationsSpoke
 
     // Logging/Sentinel
-    parLogging: parLogging
-    
+    parLogging: parLogging    
 
     // Enable Azure FireWall
-    parAzureFirewallEnabled: parAzureFirewall.enable
-    parFirewallClientSubnetAddressPrefix: parAzureFirewall.clientSubnetAddressPrefix
-    parFirewallManagementSubnetAddressPrefix: parAzureFirewall.managementSubnetAddressPrefix
-
-    // Hub Firewall Parameters
-    parFirewallSupernetIPAddress: parAzureFirewall.supernetIPAddress
-    parFirewallSkuTier: parAzureFirewall.skuTier
-    parFirewallThreatIntelMode: parAzureFirewall.threatIntelMode
-    parFirewallIntrusionDetectionMode: parAzureFirewall.intrusionDetectionMode
-    parFirewallClientPublicIPAddressAvailabilityZones: parAzureFirewall.clientPublicIPAddressAvailabilityZones
-    parFirewallClientSubnetName: parAzureFirewall.clientSubnetName
-    parFirewallClientSubnetServiceEndpoints: parAzureFirewall.clientSubnetServiceEndpoints
-    parFirewallDiagnosticsLogs: parAzureFirewall.diagnosticsLogs
-    parFirewallDiagnosticsMetrics: parAzureFirewall.diagnosticsMetrics
-    parFirewallManagementPublicIPAddressAvailabilityZones: parAzureFirewall.managementPublicIPAddressAvailabilityZones
-    parFirewallManagementSubnetName: parAzureFirewall.managementSubnetName
-    parFirewallManagementSubnetServiceEndpoints: parAzureFirewall.managementSubnetServiceEndpoints
-    parPublicIPAddressDiagnosticsLogs: parAzureFirewall.publicIPAddressDiagnosticsLogs
-    parPublicIPAddressDiagnosticsMetrics: parAzureFirewall.publicIPAddressDiagnosticsMetrics
-    parApplicationRuleCollections: []
-    parNetworkRuleCollections: []
-
-    // RBAC for Storage Parameters
-    parStorageAccountAccess: parStorageAccountAccess
+    parAzureFirewall: parAzureFirewall
 
     //
     parSecurityCenter: parSecurityCenter
 
     //
     parRemoteAccess: parRemoteAccess
+    
   }
 }
 
@@ -703,19 +721,21 @@ module modAKSWorkload '../../workloads/wl-aks-spoke/deploy.bicep' = {
   name: 'deploy-HubSpoke-${parLocation}-${parDeploymentNameSuffix}'
   scope: subscription(parHub.subscriptionId)
   params: {
-    parLocation: parLocation
-    parHubVirtualNetworkResourceId: modHubSpoke.outputs.hub.virtualNetworkResourceId
-    parTags: modTags.outputs.tags
-    parLogAnalyticsWorkspaceName: modHubSpoke.outputs.logAnalyticsWorkspaceName
-    parContainerRegistry: {
-    }
-    parKubernetesCluster: {
-    }
-    parHubResourceGroupName: modHubSpoke.outputs.hub.resourceGroupName
-    parHubVirtualNetworkName: modHubSpoke.outputs.hub.virtualNetworkName
+    // Required Parameters
     parRequired: parRequired
+    parLocation: parLocation
+    parContainerRegistry: parContainerRegistry
     parFirewallPrivateIPAddress: modHubSpoke.outputs.firewallPrivateIPAddress
+    parHubFirewallPolicyName: modHubSpoke.outputs.firewallPolicyName
+    parHubResourceGroupName: modHubSpoke.outputs.hub.resourceGroupName
+    parHubSubscriptionId: modHubSpoke.outputs.hub.subscriptionId
+    parHubVirtualNetworkName: modHubSpoke.outputs.hub.virtualNetworkName
+    parHubVirtualNetworkResourceId: modHubSpoke.outputs.hub.virtualNetworkResourceId
+    parKubernetesCluster: parKubernetesCluster
+    parLogAnalyticsWorkspaceName: modHubSpoke.outputs.logAnalyticsWorkspaceName
     parLogAnalyticsWorkspaceResourceId: modHubSpoke.outputs.logAnalyticsWorkspaceResourceId
-    parHubSubscriptionId: parHub.subscriptionId
-  }  
+    parStorageAccountAccess: parStorageAccountAccess
+    parTags: parTags
+    parWorkload: parWorkload
+  }    
 }

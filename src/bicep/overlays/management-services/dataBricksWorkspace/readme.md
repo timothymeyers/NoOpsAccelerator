@@ -97,11 +97,9 @@ OR
 ```powershell
 # For Azure Government regions
 New-AzGroupDeployment `
-  -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
   -TemplateFile overlays/containerRegistry/deploy.bicepp `
   -TemplateParameterFile overlays/containerRegistry/deploy.parameters.json `
   -Subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx `
-  -ResourceGroup anoa-usgovvirginia-platforms-hub-rg `
   -Location  'usgovvirginia'
 ```
 
@@ -113,22 +111,59 @@ By default, this overlay has the minium parmeters needed to deploy the service. 
 
 For air-gapped clouds it may be convenient to transfer and deploy the compiled ARM template instead of the Bicep template if the Bicep CLI tools are not available or if it is desirable to transfer only one file into the air gap.
 
+## Validate the deployment
+
+Use the Azure portal, Azure CLI, or Azure PowerShell to list the deployed resources in the resource group.
+
+Configure the default group using:
+
+```bash
+az configure --defaults group=anoa-eastus-databricks-rg.
+```
+
+```bash
+az resource list --location eastus --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxx --resource-groupanoa-eastus-databricks-rg
+```
+
+OR
+
+```powershell
+Get-AzResource -ResourceGroupName anoa-eastus-databricks-rg
+```
+
 ## Cleanup
 
 The Bicep/ARM deployment of NoOps Accelerator - Azure Data Bricks Workspace deployment can be deleted with these steps:
 
 ### Delete Resource Groups
 
-Remove-AzResourceGroup -Name anoa-eastus-workload-aks-rg
+```bash
+az group delete --name anoa-eastus-databricks-rg
+```
+
+OR
+
+```powershell
+Remove-AzResourceGroup -Name anoa-eastus-databricks-rg
+```
 
 ### Delete Deployments
 
-Remove-AzSubscriptionDeployment -Name deploy-AKS-Network
+```bash
+az deployment delete --name deploy-databricks
+```
+
+OR
+
+```powershell
+Remove-AzSubscriptionDeployment -Name deploy-databricks
+```
 
 ## Example Output in Azure
 
-![Example Deployment Output](media/acrExampleDeploymentOutput.png "Example Deployment Output in Azure global regions")
+![Example Deployment Output](media/databricksExampleDeploymentOutput.png "Example Deployment Output in Azure commerical regions")
 
 ### References
 
-* [Azure Data Bricks Workspace service tiers(Sku's)](https://docs.microsoft.com/en-us/azure/container-registry/container-registry-skus)
+* [What is Azure Databricks?](https://learn.microsoft.com/en-us/azure/databricks/scenarios/what-is-azure-databricks)
+* [What is Databricks Data Science & Engineering?](https://learn.microsoft.com/en-us/azure/databricks/scenarios/what-is-azure-databricks-ws)

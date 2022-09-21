@@ -21,6 +21,9 @@ param vNetId string
 @description('Optional. The public ip resource ID to associate to the AzureFirewallSubnet. If empty, then the public ip that is created as part of this module will be applied to the AzureFirewallSubnet.')
 param azureFirewallSubnetPublicIpId string = ''
 
+@description('Optional. The public ip resource ID to associate to the AzureFirewallSubnet. If empty, then the public ip that is created as part of this module will be applied to the AzureFirewallSubnet.')
+param azureFirewallMgmtSubnetPublicIpId string = ''
+
 @description('Optional. This is to add any additional public ip configurations on top of the public ip with subnet ip configuration.')
 param additionalPublicIpConfigurations array = []
 
@@ -91,8 +94,6 @@ param roleAssignments array = []
 @description('Optional. Tags of the Azure Firewall resource.')
 param tags object = {}
 
-@description('Optional. Enable telemetry via the Customer Usage Attribution ID (GUID).')
-param enableDefaultTelemetry bool = true
 
 @description('Optional. The name of firewall logs that will be streamed.')
 @allowed([
@@ -137,13 +138,33 @@ var subnet_var = {
     id: '${vNetId}/subnets/AzureFirewallSubnet' // The subnet name must be AzureFirewallSubnet
   }
 }
+
+var mgmtSubnet_var = {
+  subnet: {
+    id: '${vNetId}/subnets/AzureFirewallManagementSubnet' // The subnet name must be AzureFirewallManagementSubnet
+  }
+}
+
 var existingPip = {
   publicIPAddress: {
     id: azureFirewallSubnetPublicIpId
   }
 }
+
+var existingMgmtPip = {
+  publicIPAddress: {
+    id: azureFirewallMgmtSubnetPublicIpId
+  }
+}
+
 var newPip = {
   publicIPAddress: (empty(azureFirewallSubnetPublicIpId) && isCreateDefaultPublicIP) ? {
+    id: publicIPAddress.outputs.resourceId
+  } : null
+}
+
+var newMgmtPip = {
+  publicIPAddress: (empty(azureFirewallMgmtSubnetPublicIpId) && isCreateDefaultPublicIP) ? {
     id: publicIPAddress.outputs.resourceId
   } : null
 }
@@ -155,6 +176,12 @@ var ipConfigurations = concat([
       properties: union(subnet_var, !empty(azureFirewallSubnetPublicIpId) ? existingPip : {}, (isCreateDefaultPublicIP ? newPip : {}))
     }
   ], additionalPublicIpConfigurations_var)
+
+var mgmtIpConfigurations = {
+      name: !empty(azureFirewallMgmtSubnetPublicIpId) ? last(split(azureFirewallMgmtSubnetPublicIpId, '/')) : publicIPAddress.outputs.name
+      //Use existing public ip, new public ip created in this module, or none if isCreateDefaultPublicIP is false
+      properties: union(mgmtSubnet_var, !empty(azureFirewallMgmtSubnetPublicIpId) ? existingMgmtPip : {}, (isCreateDefaultPublicIP ? newMgmtPip : {}))
+    }
 
 // ----------------------------------------------------------------------------
 
@@ -177,17 +204,7 @@ var diagnosticsMetrics = [for metric in diagnosticMetricsToEnable: {
   }
 }]
 
-resource defaultTelemetry 'Microsoft.Resources/deployments@2021-04-01' = if (enableDefaultTelemetry) {
-  name: 'pid-47ed15a6-730a-4827-bcb4-0fd963ffbd82-${uniqueString(deployment().name, location)}'
-  properties: {
-    mode: 'Incremental'
-    template: {
-      '$schema': 'https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#'
-      contentVersion: '1.0.0.0'
-      resources: []
-    }
-  }
-}
+
 
 // create a public ip address if one is not provided and the flag is true
 module publicIPAddress '../publicIPAddress/az.net.public.ip.address.bicep' = if (empty(azureFirewallSubnetPublicIpId) && isCreateDefaultPublicIP) {
@@ -236,6 +253,7 @@ resource azureFirewall 'Microsoft.Network/azureFirewalls@2021-08-01' = {
       id: firewallPolicyId
     }
     ipConfigurations: ipConfigurations
+    managementIpConfiguration: mgmtIpConfigurations
     sku: {
       name: azureSkuName
       tier: azureSkuTier

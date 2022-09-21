@@ -1,20 +1,5 @@
 # NoOps Accelerator - Platforms - SCCA Compliant Hub - 1 Spoke
 
-## Navigation
-
-- [NoOps Accelerator - Platforms - SCCA Compliant Hub - 1 Spoke](#noops-accelerator---platforms---scca-compliant-hub---1-spoke)
-  - [Navigation](#navigation)
-  - [Overview](#overview)
-  - [Architecture](#architecture)
-  - [About Hub/Spoke Landing Zone](#about-hubspoke-landing-zone)
-  - [Pre-requisites](#pre-requisites)
-  - [Deploy the Landing Zone](#deploy-the-landing-zone)
-    - [Azure CLI](#azure-cli)
-  - [Parameters](#parameters)
-    - [Parameter Usage: `appSettingsKeyValuePairs`](#parameter-usage-appsettingskeyvaluepairs)
-  - [Outputs](#outputs)
-  - [Resource Types](#resource-types)
-
 ## Overview
 
 This platform module deploys Hub 1 Spoke landing zone.
@@ -27,7 +12,7 @@ Read on to understand what this landing zone does, and when you're ready, collec
 
  ![Hub/Spoke landing zone Architecture](../../../bicep/)
 
-## About Hub/Spoke Landing Zone
+## About Hub 1 Spoke Landing Zone
 
 The docs on Hub/Spoke Landing Zone: <https://docs.microsoft.com/en-us/azure/app-service/overview-hosting-plans>.
 
@@ -40,11 +25,15 @@ The docs on Hub/Spoke Landing Zone: <https://docs.microsoft.com/en-us/azure/app-
 
 >NOTE: The AZ CLI will automatically install the Bicep tools when a command is run that needs them, or you can manually install them following the instructions here.
 
-Required Parameters | Description
------------------------| -----------
-parRequired | Required values used with all resources.
-parTags | Required tags values used with all resources.
-parLocation | The region to deploy resources into. It defaults to the deployment location.
+Required Parameters | Type | Allowed Values | Description
+| :-- | :-- | :-- | :-- |
+parRequired | object | {object} | Required values used with all resources.
+parTags | object | {object} | Required tags values used with all resources.
+parLocation | string | `[deployment().location]` | The region to deploy resources into. It defaults to the deployment location.
+
+Optional Parameters | Type | Allowed Values | Description
+| :-- | :-- | :-- | :-- |
+None
 
 ## Deploy the Landing Zone
 
@@ -58,176 +47,106 @@ For example, deploying using the `az deployment sub create` command in the Azure
 
 ### Azure CLI
 
-<h3>Example 1: Base Landing Zone</h3>
-
-<details>
-
-<summary>via Bicep module</summary>
-
-```bicep
-module modHub1Spoke '../../platforms/lz-platform-scca-hub-1spoke/deploy.bicep' = {
-  name: 'deploy-HubSpoke-${parLocation}-${parDeploymentNameSuffix}'
-  scope: subscription(parHubSubscriptionId)
-  params: {
-    // Required Parameters
-    parRequired: parRequired
-    parLocation: parLocation
-    parTags: modTags.outputs.tags
-
-    // Subscriptions
-    parHubSubscriptionId: parHubSubscriptionId
-    parIdentitySubscriptionId: parIdentitySubscriptionId
-    parOperationsSubscriptionId: parOperationsSubscriptionId
-    parSharedServicesSubscriptionId: parSharedServicesSubscriptionId
-
-    // Artifact Key Vault Parameters
-    parNetworkArtifacts: parNetworkArtifacts.artifactsKeyVault.keyVaultPolicies
-
-    // Enable DDOS Protection Plan
-    parDdosStandard: parDdosStandard
-
-    // Hub Network Parameters
-    parHubVirtualNetworkAddressPrefix: parHubVirtualNetworkAddressPrefix
-    parHubSubnetAddressPrefix: parHubSubnetAddressPrefix
-    parHubNetworkSecurityGroupDiagnosticsLogs: parHubNetworkSecurityGroupDiagnosticsLogs
-    parHubNetworkSecurityGroupRules: parHubNetworkSecurityGroupRules
-    parHubSubnetServiceEndpoints: parHubSubnetServiceEndpoints
-    parHubVirtualNetworkDiagnosticsLogs: parHubVirtualNetworkDiagnosticsLogs
-    parHubVirtualNetworkDiagnosticsMetrics: parHubVirtualNetworkDiagnosticsMetrics
-    parPublicIPAddressDiagnosticsLogs: parPublicIPAddressDiagnosticsLogs
-    parPublicIPAddressDiagnosticsMetrics: parPublicIPAddressDiagnosticsMetrics
-
-    // Operations Network Parameters
-    parOperationsNetworkSecurityGroupDiagnosticsLogs: parOperationsNetworkSecurityGroupDiagnosticsLogs
-    parOperationsSubnetAddressPrefix: parOperationsSubnetAddressPrefix
-    parOperationsNetworkSecurityGroupRules: parOperationsNetworkSecurityGroupRules
-    parOperationsSubnetServiceEndpoints: parOperationsSubnetServiceEndpoints
-    parOperationsVirtualNetworkAddressPrefix: parOperationsVirtualNetworkAddressPrefix
-    parOperationsVirtualNetworkDiagnosticsLogs: parOperationsVirtualNetworkDiagnosticsLogs
-    parOperationsVirtualNetworkDiagnosticsMetrics: parOperationsVirtualNetworkDiagnosticsMetrics
-
-    // Logging/Sentinel
-    parLogging: parLogging
-
-    // Enable Azure FireWall
-    parAzureFirewallEnabled: parAzureFirewallEnabled
-    parFirewallClientSubnetAddressPrefix: parFirewallClientSubnetAddressPrefix
-    parFirewallManagementSubnetAddressPrefix: parFirewallManagementSubnetAddressPrefix
-
-    // Hub Firewall Parameters
-    parFirewallSupernetIPAddress: parFirewallSupernetIPAddress
-    parFirewallSkuTier: parFirewallSkuTier
-    parFirewallThreatIntelMode: parFirewallThreatIntelMode
-    parFirewallIntrusionDetectionMode: parFirewallIntrusionDetectionMode
-    parFirewallClientPublicIPAddressAvailabilityZones: parFirewallClientPublicIPAddressAvailabilityZones
-    parFirewallClientSubnetName: parFirewallClientSubnetName
-    parFirewallClientSubnetServiceEndpoints: parFirewallClientSubnetServiceEndpoints
-    parFirewallDiagnosticsLogs: parFirewallDiagnosticsLogs
-    parFirewallDiagnosticsMetrics: parFirewallDiagnosticsMetrics
-    parFirewallManagementPublicIPAddressAvailabilityZones: parFirewallManagementPublicIPAddressAvailabilityZones
-    parFirewallManagementSubnetName: parFirewallManagementSubnetName
-    parFirewallManagementSubnetServiceEndpoints: parFirewallManagementSubnetServiceEndpoints
-
-    // RBAC for Storage Parameters
-    parStorageAccountAccess: parStorageAccountAccess
-
-    //
-    parSecurityCenter: parSecurityCenter
-
-    //
-    parRemoteAccess: parRemoteAccess
-  }
-}
+```bash
+# For Azure Commerical regions
+az login
+cd src/bicep
+cd platforms/lz-platform-scca-hub-1spoke
+az deployment sub create \ 
+--name contoso \
+--subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx \
+--template-file platforms/lz-platform-scca-hub-1spoke/deploy.bicep \
+--location eastus \
+--parameters @platforms/lz-platform-scca-hub-1spoke/parameters/deploy.parameters.json
 ```
 
-</details>
+OR
 
-<h3>Example 2: Artifacts</h3>
-
-<details>
-
-<summary>via Bicep module</summary>
-
-```bicep
-module sites './Microsoft.Web/sites/az.web.app.bicep' = {
-  name: '${uniqueString(deployment().name)}-sites'
-  params: {
-    // Required parameters
-    kind: 'functionapp'
-    name: '<<namePrefix>>-az-fa-min-001'
-    serverFarmResourceId: '/subscriptions/<<subscriptionId>>/resourceGroups/validation-rg/providers/Microsoft.Web/serverFarms/adp-<<namePrefix>>-az-asp-x-001'
-    // Non-required parameters
-    siteConfig: {
-      alwaysOn: true
-    }
-  }
-}
+```bash
+# For Azure Government regions
+az deployment sub create \
+  --template-file platforms/lz-platform-scca-hub-1spoke/deploy.bicep \
+  --parameters @platforms/lz-platform-scca-hub-1spoke/parameters/deploy.parameters.json \
+  --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx \
+  --resource-group anoa-usgovvirginia-platforms-hub-rg \
+  --location 'usgovvirginia'
 ```
 
-</details>
+### PowerShell
 
-## Parameters
-
-**Required parameters**
-| Parameter Name | Type | Allowed Values | Description |
-| :-- | :-- | :-- | :-- |
-| `name` | string |  | Name of the site. |
-| `location` | string | `[resourceGroup().location]` |  | Location for all Resources. |
-
-**Optional parameters**
-| Parameter Name | Type | Default Value | Allowed Values | Description |
-| :-- | :-- | :-- | :-- | :-- |
-| `appInsightId` | string | `''` |  | Resource ID of the app insight to leverage for this resource. |
-| `appServiceEnvironmentId` | string | `''` |  | The resource ID of the app service environment to use for this resource. |
-| `appSettingsKeyValuePairs` | object | `{object}` |  | The app settings-value pairs except for AzureWebJobsStorage, AzureWebJobsDashboard, APPINSIGHTS_INSTRUMENTATIONKEY and APPLICATIONINSIGHTS_CONNECTION_STRING. |
-| `authSettingV2Configuration` | object | `{object}` |  | The auth settings V2 configuration. |
-| `clientAffinityEnabled` | bool | `True` |  | If client affinity is enabled. |
-| `diagnosticEventHubAuthorizationRuleId` | string | `''` |  | Resource ID of the diagnostic event hub authorization rule for the Event Hubs namespace in which the event hub should be created or streamed to. |
-| `diagnosticEventHubName` | string | `''` |  | Name of the diagnostic event hub within the namespace to which logs are streamed. Without this, an event hub is created for each log category. |
-| `diagnosticLogCategoriesToEnable` | array | `[if(equals(parameters('kind'), 'functionapp'), createArray('FunctionAppLogs'), createArray('AppServiceHTTPLogs', 'AppServiceConsoleLogs', 'AppServiceAppLogs', 'AppServiceAuditLogs', 'AppServiceIPSecAuditLogs', 'AppServicePlatformLogs'))]` | `[AppServiceAppLogs, AppServiceAuditLogs, AppServiceConsoleLogs, AppServiceHTTPLogs, AppServiceIPSecAuditLogs, AppServicePlatformLogs, FunctionAppLogs]` | The name of logs that will be streamed. |
-| `diagnosticLogsRetentionInDays` | int | `365` |  | Specifies the number of days that logs will be kept for; a value of 0 will retain data indefinitely. |
-| `diagnosticMetricsToEnable` | array | `[AllMetrics]` | `[AllMetrics]` | The name of metrics that will be streamed. |
-| `diagnosticSettingsName` | string | `[format('{0}-diagnosticSettings', parameters('name'))]` |  | The name of the diagnostic setting, if deployed. |
-| `diagnosticStorageAccountId` | string | `''` |  | Resource ID of the diagnostic storage account. |
-| `diagnosticWorkspaceId` | string | `''` |  | Resource ID of log analytics workspace. |
-| `httpsOnly` | bool | `True` |  | Configures a site to accept only HTTPS requests. Issues redirect for HTTP requests. |
-| `lock` | string | `''` | `['', CanNotDelete, ReadOnly]` | Specify the type of lock. |
-| `privateEndpoints` | array | `[]` |  | Configuration details for private endpoints. For security reasons, it is recommended to use private endpoints whenever possible. |
-| `roleAssignments` | array | `[]` |  | Array of role assignment objects that contain the 'roleDefinitionIdOrName' and 'principalId' to define RBAC role assignments on this resource. In the roleDefinitionIdOrName attribute, you can provide either the display name of the role definition, or its fully qualified ID in the following format: '/providers/Microsoft.Authorization/roleDefinitions/c2f4ef07-c644-48eb-af81-4b1b4947fb11'. |
-| `setAzureWebJobsDashboard` | bool | `[if(contains(parameters('kind'), 'functionapp'), true(), false())]` |  | For function apps. If true the app settings "AzureWebJobsDashboard" will be set. If false not. In case you use Application Insights it can make sense to not set it for performance reasons. |
-| `siteConfig` | object | `{object}` |  | The site config object. |
-| `storageAccountId` | string | `''` |  | Required if app of kind functionapp. Resource ID of the storage account to manage triggers and logging function executions. |
-| `storageAccountRequired` | bool | `False` |  | Checks if Customer provided storage account is required. |
-| `systemAssignedIdentity` | bool | `False` |  | Enables system assigned managed identity on the resource. |
-| `tags` | object | `{object}` |  | Tags of the resource. |
-| `userAssignedIdentities` | object | `{object}` |  | The ID(s) to assign to the resource. |
-| `virtualNetworkSubnetId` | string | `''` |  | Azure Resource Manager ID of the Virtual network and subnet to be joined by Regional VNET Integration. This must be of the form /subscriptions/{subscriptionName}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{vnetName}/subnets/{subnetName}. |
-
-
-### Parameter Usage: `appSettingsKeyValuePairs`
-
-AzureWebJobsStorage, AzureWebJobsDashboard, APPINSIGHTS_INSTRUMENTATIONKEY and APPLICATIONINSIGHTS_CONNECTION_STRING are set separately (check parameters storageAccountId, setAzureWebJobsDashboard, appInsightId).
-For all other app settings key-value pairs use this object.
-
-<details>
-
-<summary>via Bicep module</summary>
-
-```json
-
+```powershell
+# For Azure Commerical regions
+New-AzSubscriptionDeployment `
+  -TemplateFile platforms/lz-platform-scca-hub-1spoke/deploy.bicepp `
+  -TemplateParameterFile platforms/lz-platform-scca-hub-1spoke/parameters/deploy.parameters.example.json `
+  -Subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx `
+  -Location 'eastus'
 ```
 
-</details>
+OR
 
-## Outputs
+```powershell
+# For Azure Government regions
+New-AzSubscriptionDeployment `
+  -TemplateFile platforms/lz-platform-scca-hub-1spoke/deploy.bicepp `
+  -TemplateParameterFile platforms/lz-platform-scca-hub-1spoke/parameters/deploy.parameters.example.json `
+  -Subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx `
+  -Location  'usgovvirginia'
+```
 
-| Output Name | Type | Description |
-| :-- | :-- | :-- |
-| `location` | string | The location the resource was deployed into. |
-| `name` | string | The name of the site. |
-| `resourceGroupName` | string | The resource group the site was deployed into. |
-| `resourceId` | string | The resource ID of the site. |
-| `systemAssignedPrincipalId` | string | The principal ID of the system assigned identity. |
+## Extending the Landing Zone
+
+By default, this overlay has the minium parmeters needed to deploy the service. If you like to add addtional parmeters to the service, please refer to the module description located in AzResources here: [`App Service Plans `[Microsoft.Web/serverfarms]`](D:\source\repos\NoOpsAccelerator\src\bicep\azresources\Modules\Microsoft.Web\serverfarms\readme.md)
+
+## Air-Gapped Clouds
+
+For air-gapped clouds it may be convenient to transfer and deploy the compiled ARM template instead of the Bicep template if the Bicep CLI tools are not available or if it is desirable to transfer only one file into the air gap.
+
+## Validate the deployment
+
+Use the Azure portal, Azure CLI, or Azure PowerShell to list the deployed resources in the resource group.
+
+Configure the default group using:
+
+```bash
+az configure --defaults group=anoa-eastus-dev-appplan-rg.
+```
+
+```bash
+az resource list --location eastus --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxx --resource-group anoa-eastus-dev-appplan-rg
+```
+
+```powershell
+Get-AzResource -ResourceGroupName anoa-eastus-dev-appplan-rg
+```
+
+## Cleanup
+
+The Bicep/ARM deployment of NoOps Accelerator - Azure App Service Plan deployment can be deleted with these steps:
+
+### Delete Resource Groups
+
+```bash
+az group delete --name anoa-eastus-dev-appplan-rg
+```
+
+```powershell
+Remove-AzResourceGroup -Name anoa-eastus-dev-appplan-rg
+```
+
+### Delete Deployments
+
+```bash
+az deployment delete --name deploy-AppServicePlan
+```
+
+```powershell
+Remove-AzSubscriptionDeployment -Name deploy-AppServicePlan
+```
+
+## Example Output in Azure
+
+![Example Deployment Output](media/aspExampleDeploymentOutput.png "Example Deployment Output in Azure global regions")
 
 ## Resource Types
 
@@ -240,3 +159,9 @@ For all other app settings key-value pairs use this object.
 | `Microsoft.Network/privateEndpoints/privateDnsZoneGroups` | [2021-08-01](https://docs.microsoft.com/en-us/azure/templates/Microsoft.Network/2021-08-01/privateEndpoints/privateDnsZoneGroups) |
 | `Microsoft.App/containerApps` | [2021-03-01](https://docs.microsoft.com/en-us/azure/templates/microsoft.app/2022-03-01/containerapps) |
 | `Microsoft.App/managedEnvironments` | [2021-03-01](https://docs.microsoft.com/en-us/azure/templates/microsoft.app/2022-03-01/managedenvironments) |
+
+### References
+
+* [Azure App Service plan Documentation](https://docs.microsoft.com/en-us/azure/app-service/overview-hosting-plans/)
+* [Azure App Service Overview](https://docs.microsoft.com/en-us/azure/app-service/overview)
+* [Manage an App Service plan in Azure](https://docs.microsoft.com/en-us/azure/app-service/app-service-plan-manage)

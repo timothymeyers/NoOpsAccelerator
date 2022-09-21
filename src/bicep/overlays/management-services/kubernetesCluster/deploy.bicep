@@ -10,6 +10,8 @@
 SUMMARY: Overlay Module Example to deploy the Azure Kubernetes Cluster.
 DESCRIPTION: The following components will be options in this deployment
               * Azure Kubernetes Cluster
+              * Private Endpoints
+              * Private DNS Zones
 AUTHOR/S: jspinella
 VERSION: 1.x.x
 */
@@ -64,7 +66,12 @@ param parKubernetesCluster object
 param parHubVirtualNetworkResourceId string = ''
 
 // LOGGING PARAMETERS
-
+// Log Analytics Workspace Resource Id
+// (JSON Parameter)
+// ---------------------------
+// "parLogAnalyticsWorkspaceResourceId": {
+//   "value": "/subscriptions/xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx/resourceGroups/anoa-eastus-platforms-hub-rg/providers/Microsoft.Network/virtualNetworks/anoa-eastus-platforms-hub-vnet/subnets/anoa-eastus-platforms-hub-vnet"
+// }
 @description('Log Analytics Workspace Resource Id Needed for NSG, VNet and Activity Logging')
 param parLogAnalyticsWorkspaceResourceId string
 

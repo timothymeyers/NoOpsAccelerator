@@ -12,13 +12,6 @@ targetScope = 'managementGroup'
 param parPolicySource string = 'ANOA'
 param parPolicyCategory string = 'Azure Kubernetes Service'
 
-@description('Management Group scope for the policy definition.')
-param parPolicyDefinitionManagementGroupId string
-
-// VARAIBLES
-var builtinPolicies_compute = json(loadTextContent('../../../builtin/definitions/compute.json'))
-var customPolicyDefinitionMgScope = tenantResourceId('Microsoft.Management/managementGroups', parPolicyDefinitionManagementGroupId)
-
 module computePolicySetDefinitions '../../../../Modules/Microsoft.Authorization/policySetDefinitions/az.auth.policy.set.def.bicep' = {
   name: 'compute-${uniqueString(deployment().name)}-policySetDefs'
   params: {
@@ -28,47 +21,19 @@ module computePolicySetDefinitions '../../../../Modules/Microsoft.Authorization/
     policyDefinitions: [
       {
         groupNames: [
-          'Azure Kubernetes Service'
+          'AKS'
         ]
-        parameters: {
-          listOfAllowedSKUs: {
-            type: 'Array' 
-            metadata: {
-              description: 'The list of size SKUs that can be specified for virtual machines.'
-              displayName: 'Allowed Size SKUs'
-              strongType: 'VMSKUs'
-            }       
-            defaultValue: []
-          }  
-          effect: {
-            type: 'String'
-            metadata: {
-              displayName: 'Effect'
-              description: 'Enable or disable the execution of the policy'
-            }
-            allowedValues: [
-              'Modify'
-              'Disabled'
-            ]
-            defaultValue: 'Modify'
-          }      
-        }
-        policyDefinitionId: builtinPolicies_compute.AllowedVirtualMachineSizeSkus
-        policyDefinitionReferenceId: toLower(replace('Allowed Virtual Machine Size Skus', ' ', '-'))
+        policyDefinitionId: '/providers/Microsoft.Authorization/policyDefinitions/a8eff44f-8c92-45c3-a3fb-9880802d67a7'
+        policyDefinitionReferenceId: toLower(replace('Deploy Azure Policy Add-on to Azure Kubernetes Service clusters', ' ', '-'))
+        parameters: {}
       }
       {
         groupNames: [
-          'ARM'
+          'AKS'
         ]
-        parameters: {
-          listOfAllowedLocations: {
-            value: [
-              'eastus'
-            ]
-          }
-        }
-        policyDefinitionId: '/providers/Microsoft.Authorization/policyDefinitions/e765b5de-1225-4ba3-bd56-1ac6695af988'
-        policyDefinitionReferenceId: 'Allowed locations for resource groups_1'
+        policyDefinitionId: '/providers/Microsoft.Authorization/policyDefinitions/3fc4dc25-5baf-40d8-9b05-7fe74c1bc64e'
+        policyDefinitionReferenceId: toLower(replace('Kubernetes clusters should use internal load balancers', ' ', '-'))
+        parameters: {}
       }
     ]
     // Non-required parameters

@@ -129,9 +129,17 @@ For air-gapped clouds it may be convenient to transfer and deploy the compiled A
 
 Use the Azure portal, Azure CLI, or Azure PowerShell to list the deployed resources in the resource group.
 
+Configure the default group using:
+
 ```bash
-az resource list --resource-group anoa-eastus-hub-bastion-rg
+az configure --defaults group=anoa-eastus-hub-bastion-rg.
 ```
+
+```bash
+az resource list --location eastus --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxx --resource-group anoa-eastus-hub-bastion-rg
+```
+
+OR
 
 ```powershell
 Get-AzResource -ResourceGroupName anoa-eastus-hub-bastion-rg
@@ -143,9 +151,11 @@ The Bicep/ARM deployment of NoOps Accelerator - Remote Access - Bastion deployme
 
 ### Delete Resource Groups
 
-``bash
+```bash
 az group delete --name anoa-eastus-hub-bastion-rg
 ```
+
+OR
 
 ```powershell
 Remove-AzResourceGroup -Name anoa-eastus-hub-bastion-rg
@@ -156,6 +166,8 @@ Remove-AzResourceGroup -Name anoa-eastus-hub-bastion-rg
 ```bash
 az deployment delete --name deploy-RemoteAccess
 ```
+
+OR
 
 ```powershell
 Remove-AzSubscriptionDeployment -Name deploy-RemoteAccess

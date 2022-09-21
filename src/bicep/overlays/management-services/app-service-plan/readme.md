@@ -115,9 +115,17 @@ For air-gapped clouds it may be convenient to transfer and deploy the compiled A
 
 Use the Azure portal, Azure CLI, or Azure PowerShell to list the deployed resources in the resource group.
 
+Configure the default group using:
+
 ```bash
-az resource list --resource-group anoa-eastus-dev-appplan-rg
+az configure --defaults group=anoa-eastus-dev-appplan-rg.
 ```
+
+```bash
+az resource list --location eastus --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxx --resource-group anoa-eastus-dev-appplan-rg
+```
+
+OR
 
 ```powershell
 Get-AzResource -ResourceGroupName anoa-eastus-dev-appplan-rg
@@ -133,6 +141,8 @@ The Bicep/ARM deployment of NoOps Accelerator - Azure App Service Plan deploymen
 az group delete --name anoa-eastus-dev-appplan-rg
 ```
 
+OR
+
 ```powershell
 Remove-AzResourceGroup -Name anoa-eastus-dev-appplan-rg
 ```
@@ -142,6 +152,8 @@ Remove-AzResourceGroup -Name anoa-eastus-dev-appplan-rg
 ```bash
 az deployment delete --name deploy-AppServicePlan
 ```
+
+OR
 
 ```powershell
 Remove-AzSubscriptionDeployment -Name deploy-AppServicePlan

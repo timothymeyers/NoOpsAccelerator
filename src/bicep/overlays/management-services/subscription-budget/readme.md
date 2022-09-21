@@ -125,6 +125,8 @@ Use the Azure portal, Azure CLI, or Azure PowerShell to list the deployed resour
 az consumption budget list
 ```
 
+OR
+
 ```powershell
 Get-AzConsumptionBudget
 ```
@@ -138,6 +140,8 @@ The Bicep/ARM deployment of NoOps Accelerator - Subscription Budgets deployment 
 ```bash
 az consumption budget delete --budget-name MyBudget
 ```
+
+OR
 
 ```powershell
 Remove-AzConsumptionBudget -Name MyBudget

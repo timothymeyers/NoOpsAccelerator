@@ -89,8 +89,16 @@ param dateUtcNow string = utcNow('yyyy-MM-dd HH:mm:ss')
 //         },
 //         "tenantId": "xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx"
 //       }
-//     }
-//   }
+//     },
+//     "storageAccountAccess": {
+//        "enableRoleAssignmentForStorageAccount": false,
+//              "principalIds": [
+//                "7bc6bc45-b256-407c-9d79-bde13dfb5639"
+//             ],
+//              "roleDefinitionIdOrName": "Contributor"
+//            }
+//        }
+//    }
 // }
 @description('Optional. Enables Operations Network Artifacts Resource Group with KV and Storage account for the ops subscriptions used in the deployment.')
 param parNetworkArtifacts object
@@ -131,7 +139,15 @@ param parDdosStandard object
 //          {
 //           "service": "Microsoft.Storage"
 //         }
-//        ]
+//        ],
+//       "storageAccountAccess": {
+//          "enableRoleAssignmentForStorageAccount": false,
+//              "principalIds": [
+//                "7bc6bc45-b256-407c-9d79-bde13dfb5639"
+//             ],
+//              "roleDefinitionIdOrName": "Contributor"
+//            }
+//        }
 //      }
 //    }
 param parHub object
@@ -197,7 +213,15 @@ param parHub object
 //          {
 //            "service": "Microsoft.Storage"
 //          }
-//        ]
+//        ],
+//       "storageAccountAccess": {
+//          "enableRoleAssignmentForStorageAccount": false,
+//              "principalIds": [
+//                "7bc6bc45-b256-407c-9d79-bde13dfb5639"
+//             ],
+//              "roleDefinitionIdOrName": "Contributor"
+//            }
+//         }
 //      }
 //    }
 @description('An array of Network Diagnostic Logs to enable for the Operations Virtual Network. See https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/diagnostic-settings?tabs=CMD#logs for valid settings.')
@@ -209,13 +233,7 @@ param parOperationsSpoke object
 //"parAzureFirewall": {
 //      "value": {
 //       "enable": true,
-//        "clientSubnetName": "AzureFirewallSubnet",
-//        "clientSubnetAddressPrefix": "10.0.100.0/26",
-//        "clientSubnetServiceEndpoints": [],
 //        "clientPublicIPAddressAvailabilityZones": [],
-//        "managementSubnetName": "AzureFirewallManagementSubnet",
-//        "managementSubnetAddressPrefix": "10.0.100.64/26",
-//        "managementSubnetServiceEndpoints": [],
 //        "managementPublicIPAddressAvailabilityZones": [],
 //        "supernetIPAddress": "10.0.96.0/19",
 //        "skuTier": "Premium",
@@ -249,8 +267,7 @@ param parOperationsSpoke object
 //        "diagnosticsMetrics": [
 //          "AllMetrics"
 //        ],
-//        "applicationRuleCollections": [],
-//        "networkRuleCollections": []
+//        "ruleCollectionGroups": []
 //      }
 //    }
 @description('Required. The CIDR Subnet Address Prefix for the Azure Firewall Subnet. It must be in the Hub Virtual Network space. It must be /26.')
@@ -266,28 +283,18 @@ param parAzureFirewall object
 //     "logAnalyticsWorkspaceCappingDailyQuotaGb": -1,     The daily quota for Log Analytics Workspace logs in Gigabytes. The default is "-1" for no quota.
 //     "logAnalyticsWorkspaceRetentionInDays": 30,     The number of days to retain Log Analytics Workspace logs. The default is "30"
 //     "logAnalyticsWorkspaceSkuName": "PerGB2018",     [Free/Standard/Premium/PerNode/PerGB2018/Standalone] The SKU for the Log Analytics Workspace.
-//     "logStorageSkuName": "Standard_GRS"      The Storage Account SKU to use for log storage. The default is "Standard_GRS".
+//     "logStorageSkuName": "Standard_GRS"      The Storage Account SKU to use for log storage. The default is "Standard_GRS".,
+//     "storageAccountAccess": {
+//        "enableRoleAssignmentForStorageAccount": false,
+//              "principalIds": [
+//                "7bc6bc45-b256-407c-9d79-bde13dfb5639"
+//             ],
+//              "roleDefinitionIdOrName": "Contributor"
+//            }
 //   }
 // }
 @description('Enables logging parmeters and Microsoft Sentinel within the Log Analytics Workspace created in this deployment.')
 param parLogging object
-
-// STORAGE ACCOUNTS RBAC
-
-// Storage Account RBAC
-// Example (JSON)
-// -----------------------------
-// "parStorageAccountAccess": {
-//   "value": {
-//     "enableRoleAssignmentForStorageAccount": true,
-//     "principalIds": [
-//       "xxxxxx-xxxxx-xxxxx-xxxx-xxxxxxx"
-//     ],
-//     "roleDefinitionIdOrName": "Group"
-//   }
-// },  
-@description('Account for access to Storage')
-param parStorageAccountAccess object
 
 // MICROSOFT DEFENDER PARAMETERS
 
@@ -360,7 +367,7 @@ param parRemoteAccess object
 // Reference:  https://docs.microsoft.com/azure/marketplace/azure-partner-customer-usage-attribution
 var telemetry = json(loadTextContent('../../azresources/Modules/Global/telemetry.json'))
 module telemetryCustomerUsageAttribution '../../azresources/Modules/Global/partnerUsageAttribution/customer-usage-attribution-subscription.bicep' = if (telemetry.customerUsageAttribution.enabled) {
-  name: 'pid-${telemetry.customerUsageAttribution.modules.platforms.hubspoke1}-${uniqueString(parLocation)}'
+  name: 'pid-${telemetry.customerUsageAttribution.modules.platforms.hubspoke1}'
   scope: subscription(parHub.subscriptionId)
 }
 
@@ -407,7 +414,7 @@ module modTags '../../azresources/Modules/Microsoft.Resources/tags/az.resources.
 
 // LOGGING & LOG ANALYTICS WORKSPACE
 
-module modLogAnalyticsWorkspace '../../azresources/hub-spoke/vdms/logging/anoa.lz.logging.bicep' = {
+module modLogAnalyticsWorkspace '../../azresources/hub-spoke-core/vdms/logging/anoa.lz.logging.bicep' = {
   name: 'deploy-laws-${parLocation}-${parDeploymentNameSuffix}'
   scope: subscription(parOperationsSpoke.subscriptionId)
   params: {
@@ -426,13 +433,13 @@ module modLogAnalyticsWorkspace '../../azresources/hub-spoke/vdms/logging/anoa.l
     parLogAnalyticsWorkspaceCappingDailyQuotaGb: parLogging.logAnalyticsWorkspaceCappingDailyQuotaGb
 
     // RBAC for Storage Parameters
-    parStorageAccountAccess: parStorageAccountAccess
+    parLoggingStorageAccountAccess: parLogging.storageAccountAccess
   }
 }
 
 // ARTIFACTS
 
-module modArtifacts '../../azresources/hub-spoke/vdss/networkArtifacts/anoa.lz.artifacts.bicep' = if (parNetworkArtifacts.enable) {
+module modArtifacts '../../azresources/hub-spoke-core/vdss/networkArtifacts/anoa.lz.artifacts.bicep' = if (parNetworkArtifacts.enable) {
   name: 'deploy-hub-artifacts-${parLocation}-${parDeploymentNameSuffix}'
   scope: subscription(parHub.subscriptionId)
   params: {
@@ -446,7 +453,7 @@ module modArtifacts '../../azresources/hub-spoke/vdss/networkArtifacts/anoa.lz.a
     parArtifactsKeyVaultPolicies: parNetworkArtifacts.artifactsKeyVault.keyVaultPolicies
 
     // RBAC for Storage Parameters
-    parStorageAccountAccess: parStorageAccountAccess
+    parArtifactsStorageAccountAccess: parNetworkArtifacts.storageAccountAccess
 
     // Bastion Secrets Parameters
     parEnableBastionSecrets: parRemoteAccess.enable
@@ -461,7 +468,7 @@ module modArtifacts '../../azresources/hub-spoke/vdss/networkArtifacts/anoa.lz.a
 
 // HUB
 
-module modHubNetwork '../../azresources/hub-spoke/vdss/hub/anoa.lz.hub.network.bicep' = {
+module modHubNetwork '../../azresources/hub-spoke-core/vdss/hub/anoa.lz.hub.network.bicep' = {
   name: 'deploy-hub-${parLocation}-${parDeploymentNameSuffix}'
   scope: subscription(parHub.subscriptionId)
   params: {
@@ -472,7 +479,7 @@ module modHubNetwork '../../azresources/hub-spoke/vdss/hub/anoa.lz.hub.network.b
     parTags: modTags.outputs.tags
 
     // Enable DDOS Protection Plan
-    parDeployddosProtectionPlan: parDdosStandard.enabled
+    parDeployddosProtectionPlan: parDdosStandard.enable
 
     // Hub Network Parameters
     parHubVirtualNetworkAddressPrefix: parHub.virtualNetworkAddressPrefix
@@ -482,33 +489,26 @@ module modHubNetwork '../../azresources/hub-spoke/vdss/hub/anoa.lz.hub.network.b
     parHubSubnetServiceEndpoints: parHub.subnetServiceEndpoints
     parHubVirtualNetworkDiagnosticsLogs: parHub.virtualNetworkDiagnosticsLogs
     parHubVirtualNetworkDiagnosticsMetrics: parHub.virtualNetworkDiagnosticsMetrics
-    parPublicIPAddressDiagnosticsLogs: parAzureFirewall.publicIPAddressDiagnosticsLogs
-    parPublicIPAddressDiagnosticsMetrics: parAzureFirewall.parPublicIPAddressDiagnosticsMetrics
+    parHubSubnets: parHub.subnets
 
     // Enable Azure FireWall
     parAzureFirewallEnabled: parAzureFirewall.enable
-    parFirewallClientSubnetAddressPrefix: parAzureFirewall.clientSubnetAddressPrefix
-    parFirewallManagementSubnetAddressPrefix: parAzureFirewall.managementSubnetAddressPrefix
     parDisableBgpRoutePropagation: false
-
+ 
     // Hub Firewall Parameters
     parFirewallSupernetIPAddress: parAzureFirewall.supernetIPAddress
     parFirewallSkuTier: parAzureFirewall.skuTier
     parFirewallThreatIntelMode: parAzureFirewall.threatIntelMode
     parFirewallIntrusionDetectionMode: parAzureFirewall.intrusionDetectionMode
     parFirewallClientPublicIPAddressAvailabilityZones: parAzureFirewall.clientPublicIPAddressAvailabilityZones
-    parFirewallClientSubnetName: parAzureFirewall.clientSubnetName
-    parFirewallClientSubnetServiceEndpoints: parAzureFirewall.clientSubnetServiceEndpoints
     parFirewallDiagnosticsLogs: parAzureFirewall.diagnosticsLogs
     parFirewallDiagnosticsMetrics: parAzureFirewall.diagnosticsMetrics
     parFirewallManagementPublicIPAddressAvailabilityZones: parAzureFirewall.managementPublicIPAddressAvailabilityZones
-    parFirewallManagementSubnetName: parAzureFirewall.managementSubnetName
-    parFirewallManagementSubnetServiceEndpoints: parAzureFirewall.managementSubnetServiceEndpoints
-    parApplicationRuleCollections: parAzureFirewall.applicationRuleCollections
-    parNetworkRuleCollections: parAzureFirewall.NetworkRuleCollections
+    parPublicIPAddressDiagnosticsLogs: parAzureFirewall.publicIPAddressDiagnosticsLogs
+    parPublicIPAddressDiagnosticsMetrics: parAzureFirewall.publicIPAddressDiagnosticsMetrics
 
     // RBAC for Storage Parameters
-    parStorageAccountAccess: parStorageAccountAccess
+    parHubStorageAccountAccess: parHub.storageAccountAccess
 
     // Log Analytics Parameters
     parLogAnalyticsWorkspaceResourceId: modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceResourceId
@@ -519,7 +519,7 @@ module modHubNetwork '../../azresources/hub-spoke/vdss/hub/anoa.lz.hub.network.b
 
 // TIER 1 - OPERATIONS
 
-module modOperationsNetwork '../../azresources/hub-spoke/vdms/operations/anoa.lz.ops.network.bicep' = {
+module modOperationsNetwork '../../azresources/hub-spoke-core/vdms/operations/anoa.lz.ops.network.bicep' = {
   name: 'deploy-vnet-spoke-ops-${parLocation}-${parDeploymentNameSuffix}'
   scope: subscription(parOperationsSpoke.subscriptionId)
   params: {
@@ -532,7 +532,6 @@ module modOperationsNetwork '../../azresources/hub-spoke/vdms/operations/anoa.lz
     // Operations Network Parameters
     parOperationsNetworkSecurityGroupDiagnosticsLogs: parOperationsSpoke.networkSecurityGroupDiagnosticsLogs
     parOperationsSubnetAddressPrefix: parOperationsSpoke.subnetAddressPrefix
-    parOperationsSourceAddressPrefixes: parOperationsSpoke.sourceAddressPrefixes
     parOperationsNetworkSecurityGroupRules: parOperationsSpoke.networkSecurityGroupRules
     parOperationsSubnetServiceEndpoints: parOperationsSpoke.subnetServiceEndpoints
     parOperationsVirtualNetworkAddressPrefix: parOperationsSpoke.virtualNetworkAddressPrefix
@@ -545,7 +544,7 @@ module modOperationsNetwork '../../azresources/hub-spoke/vdms/operations/anoa.lz
     parLogStorageSkuName: parLogging.logStorageSkuName
 
     // RBAC for Storage Parameters
-    parStorageAccountAccess: parStorageAccountAccess
+    parOperationsStorageAccountAccess: parOperationsSpoke.storageAccountAccess
 
     // Log Analytics Parameters
     parLogAnalyticsWorkspaceResourceId: modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceResourceId
@@ -555,7 +554,7 @@ module modOperationsNetwork '../../azresources/hub-spoke/vdms/operations/anoa.lz
 
 // VIRTUAL NETWORK PEERINGS
 
-module modHubVirtualNetworkPeerings '../../azresources/hub-spoke/peering/hub/anoa.lz.hub.network.peerings.bicep' = {
+module modHubVirtualNetworkPeerings '../../azresources/hub-spoke-core/peering/hub/anoa.lz.hub.network.peerings.bicep' = {
   name: 'deploy-vnet-peerings-hub-${parLocation}-${parDeploymentNameSuffix}'
   scope: resourceGroup(parHub.subscriptionId, varHubResourceGroupName)
   params: {
@@ -570,7 +569,7 @@ module modHubVirtualNetworkPeerings '../../azresources/hub-spoke/peering/hub/ano
   }
 }
 
-module modSpokeOpsToHubVirtualNetworkPeerings '../../azresources/hub-spoke/peering/spoke/anoa.lz.spoke.network.peering.bicep' = {
+module modSpokeOpsToHubVirtualNetworkPeerings '../../azresources/hub-spoke-core/peering/spoke/anoa.lz.spoke.network.peering.bicep' = {
   name: 'deploy-vnet-spoke-peerings-ops-${parLocation}-${parDeploymentNameSuffix}'
   scope: resourceGroup(parOperationsSpoke.subscriptionId, varOperationsResourceGroupName)
   params: {
@@ -657,6 +656,7 @@ module spokeOpsDefender '../../overlays/management-services/defender/deploy.bice
 output deployEnvironment string = parRequired.deployEnvironment
 
 output firewallPrivateIPAddress string = modHubNetwork.outputs.firewallPrivateIPAddress
+output firewallPolicyName string = modHubNetwork.outputs.firewallPolicyName
 
 output hub object = {
   subscriptionId: parHub.subscriptionId

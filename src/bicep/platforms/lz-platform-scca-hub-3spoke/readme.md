@@ -1,28 +1,5 @@
 # NoOps Accelerator - Platforms - SCCA Compliant Hub - 3 Spoke
 
-Module Tested on:
-
-* Azure Commercial ✔️
-* Azure Government ✔️
-* Azure Government Secret ❔
-* Azure Government Top Secret ❔
-
-> ✔️ = tested,  ❔= currently testing
-
-## Navigation
-
-- [NoOps Accelerator - Platforms - SCCA Compliant Hub - 3 Spoke](#noops-accelerator---platforms---scca-compliant-hub---3-spoke)
-  - [Authored & Tested With](#authored--tested-with)
-  - [Navigation](#navigation)
-  - [Overview](#overview)
-  - [Architecture](#architecture)
-  - [Pre-requisites](#pre-requisites)
-  - [Deployment examples](#deployment-examples)
-  - [Parameters](#parameters)
-    - [Parameter Usage: `appSettingsKeyValuePairs`](#parameter-usage-appsettingskeyvaluepairs)
-  - [Outputs](#outputs)
-  - [Resource Types](#resource-types)
-
 ## Overview
 
 This platform module deploys Hub/Spoke landing zone.

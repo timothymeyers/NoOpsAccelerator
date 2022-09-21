@@ -18,29 +18,74 @@
         "deploymentType": "NoOpsBicep"
       }
     },
-    "parHubSubscriptionId": {
-      "value": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+    "parHub": {
+      "value": {
+        "subscriptionId": "896f5276-df9a-4317-a791-469396bef7fa",
+        "virtualNetworkAddressPrefix": "10.0.100.0/24",
+        "subnetAddressPrefix": "10.0.100.128/27",
+        "subnets": [
+          {
+            "name": "AzureFirewallSubnet",
+            "addressPrefix": "10.0.100.0/26",
+            "serviceEndpoints": []
+          },
+          {
+            "name": "AzureFirewallManagementSubnet",
+            "addressPrefix": "10.0.100.64/26",
+            "serviceEndpoints": []
+          }
+        ],
+        "virtualNetworkDiagnosticsLogs": [],
+        "virtualNetworkDiagnosticsMetrics": [],
+        "networkSecurityGroupRules": [],
+        "networkSecurityGroupDiagnosticsLogs": [
+          "NetworkSecurityGroupEvent",
+          "NetworkSecurityGroupRuleCounter"
+        ],
+        "subnetServiceEndpoints": [
+          {
+            "service": "Microsoft.Storage"
+          }
+        ],
+        "storageAccountAccess": {
+          "enableRoleAssignmentForStorageAccount": false,
+          "principalIds": [
+            "7bc6bc45-b256-407c-9d79-bde13dfb5639"
+          ],
+          "roleDefinitionIdOrName": "Contributor"
+        }
+      }
     },
-    "parHubVirtualNetworkAddressPrefix": {
-      "value": "10.0.100.0/24"
-    },
-    "parHubSubnetAddressPrefix": {
-      "value": "10.0.100.128/27"
-    },
-    "parOperationsSubscriptionId": {
-      "value": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-    },
-    "parOperationsVirtualNetworkAddressPrefix": {
-      "value": "10.0.115.0/26"
-    },
-    "parOperationsSubnetAddressPrefix": {
-      "value": "10.0.115.0/27"
-    },
-    "parOperationsNetworkSecurityGroupRules": {
-      "value": []
-    },
-    "parOperationsSourceAddressPrefixes": {
-      "value": []
+    "parOperationsSpoke": {
+      "value": {
+        "subscriptionId": "896f5276-df9a-4317-a791-469396bef7fa",
+        "virtualNetworkAddressPrefix": "10.0.115.0/26",
+        "subnetAddressPrefix": "10.0.115.0/27",
+        "virtualNetworkDiagnosticsLogs": [],
+        "virtualNetworkDiagnosticsMetrics": [],
+        "networkSecurityGroupRules": [],
+        "publicIPAddressDiagnosticsLogs": [
+          "DDoSProtectionNotifications",
+          "DDoSMitigationFlowLogs",
+          "DDoSMitigationReports"
+        ],
+        "networkSecurityGroupDiagnosticsLogs": [
+          "NetworkSecurityGroupEvent",
+          "NetworkSecurityGroupRuleCounter"
+        ],
+        "subnetServiceEndpoints": [
+          {
+            "service": "Microsoft.Storage"
+          }
+        ],
+        "storageAccountAccess": {
+          "enableRoleAssignmentForStorageAccount": false,
+          "principalIds": [
+            "7bc6bc45-b256-407c-9d79-bde13dfb5639"
+          ],
+          "roleDefinitionIdOrName": "Contributor"
+        }
+      }
     },
     "parNetworkArtifacts": {
       "value": {
@@ -60,6 +105,13 @@
             },
             "tenantId": "80c5c29b-f6c2-457b-af54-603a8d840878"
           }
+        },
+        "storageAccountAccess": {
+          "enableRoleAssignmentForStorageAccount": false,
+          "principalIds": [
+            "7bc6bc45-b256-407c-9d79-bde13dfb5639"
+          ],
+          "roleDefinitionIdOrName": "Contributor"
         }
       }
     },
@@ -68,131 +120,40 @@
         "enable": false
       }
     },
-    "parAzureFirewallEnabled": {
-      "value": true
-    },
-    "parFirewallClientSubnetAddressPrefix": {
-      "value": "10.0.100.0/26"
-    },
-    "parFirewallManagementSubnetAddressPrefix": {
-      "value": "10.0.100.64/26"
-    },
-    "parFirewallSupernetIPAddress": {
-      "value": "10.0.96.0/19"
-    },
-    "parFirewallClientSubnetName": {
-      "value": "AzureFirewallSubnet"
-    },
-    "parFirewallSkuTier": {
-      "value": "Premium"
-    },
-    "parFirewallThreatIntelMode": {
-      "value": "Alert"
-    },
-    "parFirewallIntrusionDetectionMode": {
-      "value": "Alert"
-    },
-    "parApplicationRuleCollections": {
-      "value": [
-        {
-          "name": "AzureAuth",
-          "properties": {
-            "priority": 110,
-            "action": {
-              "type": "Allow"
-            },
-            "rules": [
-              {
-                "name": "msftauth",
-                "protocols": [
-                  {
-                    "port": 443,
-                    "protocolType": "Https"
-                  }
-                ],
-                "targetFqdns": [
-                  "aadcdn.msftauth.net",
-                  "aadcdn.msauth.net"
-                ],
-                "terminateTLS": false,
-                "sourceAddresses": [
-                  "*"
-                ]
-              }
-            ]
-          }
-        }
-      ]
-    },
-    "parNetworkRuleCollections": {
-      "value": [
-        {
-          "name": "AllowAzureCloud",
-          "properties": {
-            "priority": 100,
-            "action": {
-              "type": "Allow"
-            },
-            "rules": [
-              {
-                "name": "AzureCloud",
-                "ipProtocols": [
-                  "Any"
-                ],
-                "sourceAddresses": [
-                  "*"
-                ],
-                "sourceIpGroups": [],
-                "destinationAddresses": [
-                  "AzureCloud"
-                ],
-                "destinationIpGroups": [],
-                "destinationFqdns": [],
-                "destinationPorts": [
-                  "*"
-                ]
-              }
-            ]
-          }
-        },
-        {
-          "name": "AllowTrafficBetweenSpokes",
-          "properties": {
-            "priority": 200,
-            "action": {
-              "type": "Allow"
-            },
-            "rules": [
-              {
-                "name": "AllSpokeTraffic",
-                "ipProtocols": [
-                  "Any"
-                ],
-                "sourceAddresses": [
-                  "10.0.69.1"
-                ],
-                "sourceIpGroups": [],
-                "destinationAddresses": [
-                  "10.0.69.1"
-                ],
-                "destinationIpGroups": [],
-                "destinationFqdns": [],
-                "destinationPorts": [
-                  "*"
-                ]
-              }
-            ]
-          }
-        }
-      ]
-    },
-    "parStorageAccountAccess": {
+    "parAzureFirewall": {
       "value": {
-        "enableRoleAssignmentForStorageAccount": false,
-        "principalIds": [
-          "7bc6bc45-b256-407c-9d79-bde13dfb5639"
+        "enable": true,
+        "clientPublicIPAddressAvailabilityZones": [],     
+        "managementPublicIPAddressAvailabilityZones": [],
+        "supernetIPAddress": "10.0.96.0/19",
+        "skuTier": "Premium",
+        "threatIntelMode": "Alert",
+        "intrusionDetectionMode": "Alert",
+        "publicIPAddressDiagnosticsLogs": [
+          "DDoSProtectionNotifications",
+          "DDoSMitigationFlowLogs",
+          "DDoSMitigationReports"
         ],
-        "roleDefinitionIdOrName": "Contributor"
+        "publicIPAddressDiagnosticsMetrics": [
+          "AllMetrics"
+        ],
+        "diagnosticsLogs": [
+          "AzureFirewallApplicationRule",
+          "AzureFirewallNetworkRule",
+          "AzureFirewallDnsProxy"
+        ],
+        "diagnosticsMetrics": [
+          "AllMetrics"
+        ],
+        "storageAccountAccess": {
+          "value": {
+            "enableRoleAssignmentForStorageAccount": false,
+            "principalIds": [
+              "7bc6bc45-b256-407c-9d79-bde13dfb5639"
+            ],
+            "roleDefinitionIdOrName": "Contributor"
+          }
+        }
       }
     },
     "parLogging": {
@@ -201,7 +162,14 @@
         "logAnalyticsWorkspaceCappingDailyQuotaGb": -1,
         "logAnalyticsWorkspaceRetentionInDays": 30,
         "logAnalyticsWorkspaceSkuName": "PerGB2018",
-        "logStorageSkuName": "Standard_GRS"
+        "logStorageSkuName": "Standard_GRS",
+        "storageAccountAccess": {
+          "enableRoleAssignmentForStorageAccount": false,
+          "principalIds": [
+            "7bc6bc45-b256-407c-9d79-bde13dfb5639"
+          ],
+          "roleDefinitionIdOrName": "Contributor"
+        }
       }
     },
     "parRemoteAccess": {

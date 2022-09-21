@@ -116,9 +116,17 @@ For air-gapped clouds it may be convenient to transfer and deploy the compiled A
 
 Use the Azure portal, Azure CLI, or Azure PowerShell to list the deployed resources in the resource group.
 
+Configure the default group using:
+
 ```bash
-az resource list --resource-group anoa-eastus-hub-defender-rg
+az configure --defaults group=anoa-eastus-hub-defender-rg.
 ```
+
+```bash
+az resource list --location eastus --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxx --resource-group anoa-eastus-hub-defender-rg
+```
+
+OR
 
 ```powershell
 Get-AzResource -ResourceGroupName anoa-eastus-hub-defender-rg
@@ -130,9 +138,11 @@ The Bicep/ARM deployment of NoOps Accelerator - Microsoft Defender for Cloud dep
 
 ### Delete Resource Groups
 
-``bash
+```bash
 az group delete --name anoa-eastus-hub-defender-rg
 ```
+
+OR
 
 ```powershell
 Remove-AzResourceGroup -Name anoa-eastus-hub-defender-rg
@@ -143,6 +153,8 @@ Remove-AzResourceGroup -Name anoa-eastus-hub-defender-rg
 ```bash
 az deployment delete --name deploy-defender
 ```
+
+OR
 
 ```powershell
 Remove-AzSubscriptionDeployment -Name deploy-defender

@@ -56,11 +56,11 @@ az deployment sub create \
 --location eastus \
 --parameters @parameters/deploy.parameters.json
 cd overlays
-cd app-service-plan
+cd kubernetesCluster
 az deployment sub create \
    --name deploy-AKS-Network
-   --template-file overlays/kubernetesCluster/deploy.bicep \
-   --parameters @overlays/kubernetesCluster/deploy.parameters.json \
+   --template-file deploy.bicep \
+   --parameters @parameters/deploy.parameters.json \
    --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx \
    --location 'eastus'
 ```
@@ -101,7 +101,7 @@ New-AzSubscriptionDeployment `
 
 ## Extending the Overlay
 
-By default, this overlay has the minium parmeters needed to deploy the service. If you like to add addtional parmeters to the service, please refer to the module description located in AzResources here: [Azure Kubernetes Services `[Microsoft.ContainerService/managedClusters]`](../../../azresources/Modules/Microsoft.ContainerRegistry/registries/readmd.md)
+By default, this overlay has the minium parameters needed to deploy the service. If you like to add addtional parmeters to the service, please refer to the module description located in AzResources here: [Azure Kubernetes Services `[Microsoft.ContainerService/managedClusters]`](../../../azresources/Modules/Microsoft.ContainerRegistry/registries/readmd.md)
 
 ## Air-Gapped Clouds
 
@@ -111,9 +111,17 @@ For air-gapped clouds it may be convenient to transfer and deploy the compiled A
 
 Use the Azure portal, Azure CLI, or Azure PowerShell to list the deployed resources in the resource group.
 
+Configure the default group using:
+
 ```bash
-az resource list --resource-group anoa-eastus-workload-aks-rg
+az configure --defaults group=anoa-eastus-workload-aks-rg.
 ```
+
+```bash
+az resource list --location eastus --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxx --resource-group anoa-eastus-workload-aks-rg
+```
+
+OR
 
 ```powershell
 Get-AzResource -ResourceGroupName anoa-eastus-workload-aks-rg
@@ -125,9 +133,11 @@ The Bicep/ARM deployment of NoOps Accelerator - Azure Kubernetes Service - Clust
 
 ### Delete Resource Groups
 
-``bash
+```bash
 az group delete --name anoa-eastus-workload-aks-rg
 ```
+
+OR
 
 ```powershell
 Remove-AzResourceGroup -Name anoa-eastus-workload-aks-rg
@@ -138,6 +148,8 @@ Remove-AzResourceGroup -Name anoa-eastus-workload-aks-rg
 ```bash
 az deployment delete --name deploy-AKS-Network
 ```
+
+OR
 
 ```powershell
 Remove-AzSubscriptionDeployment -Name deploy-AKS-Network

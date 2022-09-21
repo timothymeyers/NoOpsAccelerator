@@ -51,11 +51,11 @@ az deployment sub create \
 --location eastus \
 --parameters @parameters/deploy.parameters.json
 cd overlays
-cd app-service-plan
+cd keyVault
 az deployment sub create \
-   --name deployAppServicePlan
-   --template-file overlays/management-groups/deploy.bicep \
-   --parameters @overlays/management-groups/deploy.parameters.json \
+   --name deploykeyVault
+   --template-file overlays/keyVault/deploy.bicep \
+   --parameters @overlays/keyVault/deploy.parameters.json \
    --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx \
    --location 'eastus'
 ```
@@ -64,11 +64,10 @@ OR
 
 ```bash
 # For Azure Government regions
-az deployment group create \
-  --template-file overlays/management-groups/anoa.lz.mgmt.svcs.service.health.bicep \
-  --parameters @overlays/management-groups/anoa.lz.mgmt.svcs.service.health.parameters.example.json \
+az deployment sub create \
+  --template-file overlays/keyVault/deploy.bicep \
+  --parameters @overlays/keyVault/deploy.parameters.json \
   --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx \
-  --resource-group anoa-usgovvirginia-platforms-hub-rg \
   --location 'usgovvirginia'
 ```
 
@@ -76,12 +75,10 @@ az deployment group create \
 
 ```powershell
 # For Azure Commerical regions
-New-AzGroupDeployment `
-  -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
-  -TemplateFile overlays/management-groups/anoa.lz.mgmt.svcs.service.health.bicepp `
-  -TemplateParameterFile overlays/management-groups/anoa.lz.mgmt.svcs.service.health.parameters.example.json `
+New-AzSubscriptionDeployment `
+  -TemplateFile overlays/keyVault/deploy.bicep `
+  -TemplateParameterFile overlays/keyVault/deploy.parameters.json `
   -Subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx `
-  -ResourceGroup anoa-eastus-platforms-hub-rg `
   -Location 'eastus'
 ```
 
@@ -89,12 +86,10 @@ OR
 
 ```powershell
 # For Azure Government regions
-New-AzGroupDeployment `
-  -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
-  -TemplateFile overlays/management-groups/anoa.lz.mgmt.svcs.service.health.bicepp `
-  -TemplateParameterFile overlays/management-groups/anoa.lz.mgmt.svcs.service.health.parameters.example.json `
+New-AzSubscriptionDeployment `
+  -TemplateFile overlays/keyVault/deploy.bicep `
+  -TemplateParameterFile overlays/keyVault/deploy.parameters.json `
   -Subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx `
-  -ResourceGroup anoa-usgovvirginia-platforms-hub-rg `
   -Location  'usgovvirginia'
 ```
 

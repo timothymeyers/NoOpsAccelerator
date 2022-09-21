@@ -674,7 +674,7 @@ module modIdentityNetwork '../../azresources/hub-spoke-core/vdss/identity/anoa.l
     parIdentityVirtualNetworkDiagnosticsLogs: parIdentitySpoke.virtualNetworkDiagnosticsLogs
     parIdentityVirtualNetworkDiagnosticsMetrics: parIdentitySpoke.virtualNetworkDiagnosticsMetrics
     parFirewallPrivateIPAddress: modHubNetwork.outputs.firewallPrivateIPAddress
-    parDisableBgpRoutePropagation: true
+    parDisableBgpRoutePropagation: true // Enable BGP Route Propagation for Identity Spoke
 
     // Log Storage Sku Parameters
     parLogStorageSkuName: parLogging.logStorageSkuName
@@ -709,7 +709,7 @@ module modOperationsNetwork '../../azresources/hub-spoke-core/vdms/operations/an
     parOperationsVirtualNetworkDiagnosticsLogs: parOperationsSpoke.virtualNetworkDiagnosticsLogs
     parOperationsVirtualNetworkDiagnosticsMetrics: parOperationsSpoke.virtualNetworkDiagnosticsMetrics
     parFirewallPrivateIPAddress: modHubNetwork.outputs.firewallPrivateIPAddress
-    parDisableBgpRoutePropagation: true
+    parDisableBgpRoutePropagation: true // Enable BGP Route Propagation for Operations Spoke
 
     // Log Storage Sku Parameters
     parLogStorageSkuName: parLogging.logStorageSkuName
@@ -745,7 +745,7 @@ module modSharedServicesNetwork '../../azresources/hub-spoke-core/vdms/sharedser
     parSharedServicesVirtualNetworkDiagnosticsLogs: parSharedServicesSpoke.virtualNetworkDiagnosticsLogs
     parSharedServicesVirtualNetworkDiagnosticsMetrics: parSharedServicesSpoke.virtualNetworkDiagnosticsMetrics
     parFirewallPrivateIPAddress: modHubNetwork.outputs.firewallPrivateIPAddress
-    parDisableBgpRoutePropagation: true
+    parDisableBgpRoutePropagation: true // Enable BGP Route Propagation for SharedServices Spoke
 
     // Log Storage Sku Parameters
     parLogStorageSkuName: parLogging.logStorageSkuName

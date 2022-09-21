@@ -89,7 +89,7 @@
     "parSubscriptions": {
       "value": [
         {
-          "subscriptionId": "896f5276-df9a-4317-a791-469396bef7fa",
+          "subscriptionId": "<<subscriptionId>>",
           "managementGroupName": "anoa-management"
         }
       ]
@@ -223,7 +223,7 @@
     },
     "parHub": {
       "value": {
-        "subscriptionId": "896f5276-df9a-4317-a791-469396bef7fa",
+        "subscriptionId": "<<subscriptionId>>",
         "virtualNetworkAddressPrefix": "10.0.100.0/24",
         "subnetAddressPrefix": "10.0.100.128/27",
         "subnets": [
@@ -261,7 +261,7 @@
     },
     "parOperationsSpoke": {
       "value": {
-        "subscriptionId": "896f5276-df9a-4317-a791-469396bef7fa",
+        "subscriptionId": "<<subscriptionId>>",
         "virtualNetworkAddressPrefix": "10.0.115.0/26",
         "subnetAddressPrefix": "10.0.115.0/27",
         "virtualNetworkDiagnosticsLogs": [],
@@ -306,7 +306,7 @@
                 "all"
               ]
             },
-            "tenantId": "80c5c29b-f6c2-457b-af54-603a8d840878"
+            "tenantId": "<<tenantId>>"
           }
         },
         "storageAccountAccess": {

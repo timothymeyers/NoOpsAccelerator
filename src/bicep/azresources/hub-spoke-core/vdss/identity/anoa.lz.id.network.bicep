@@ -103,7 +103,7 @@ param parFirewallPrivateIPAddress string
 param parRouteTableRouteAddressPrefix string = '0.0.0.0/0'
 param parRouteTableRouteNextHopIpAddress string = parFirewallPrivateIPAddress
 param parRouteTableRouteNextHopType string = 'VirtualAppliance'
-param parDisableBgpRoutePropagation bool
+param parDisableBgpRoutePropagation bool = true
 
 //DDOS PARAMETERS
 

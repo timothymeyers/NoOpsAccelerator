@@ -26,7 +26,7 @@ parTags | object | {object} | Required tags values used with all resources.
 parLocation | string | `[deployment().location]` | The region to deploy resources into. It defaults to the deployment location.
 parKubernetesCluster | object | {object} | The object parameters of the Azure Kubernetes Cluster.
 parTargetSubscriptionId | string | `xxxxxx-xxxx-xxxx-xxxxx-xxxxxx` | The target subscription ID for the target Network and resources. It defaults to the deployment subscription.
-parTargetResourceGroup | string | `anoa-eastus-platforms-hub-rg` | The name of the resource group in which the key vault will be deployed. If unchanged or not specified, the NoOps Accelerator shared services resource group is used.
+parTargetResourceGroup | string | `anoa-eastus-platforms-hub-rg` | The name of the resource group in which the Azure Kubernetes Cluster will be deployed. If unchanged or not specified, the NoOps Accelerator will create an resource group to be used.
 parTargetVNetName | string | `anoa-eastus-platforms-hub-vnet` | The name of the VNet in which the aks will be deployed. If unchanged or not specified, the NoOps Accelerator shared services resource group is used.
 parTargetSubnetName | string | `anoa-eastus-platforms-hub-snet` | The name of the Subnet in which the aks will be deployed. If unchanged or not specified, the NoOps Accelerator shared services resource group is used.
 
@@ -45,7 +45,7 @@ For example, deploying using the `az deployment group create` command in the Azu
 ### Azure CLI
 
 ```bash
-# For Azure global regions
+# For Azure Commerical regions
 az login
 cd src/bicep
 cd platforms/lz-platform-scca-hub-3spoke
@@ -56,11 +56,11 @@ az deployment sub create \
 --location eastus \
 --parameters @parameters/deploy.parameters.json
 cd overlays
-cd app-service-plan
+cd kubernetesCluster
 az deployment sub create \
    --name deploy-AKS-Network
-   --template-file overlays/kubernetesCluster/deploy.bicep \
-   --parameters @overlays/kubernetesCluster/deploy.parameters.json \
+   --template-file deploy.bicep \
+   --parameters @parameters/deploy.parameters.json \
    --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx \
    --location 'eastus'
 ```
@@ -68,11 +68,11 @@ az deployment sub create \
 OR
 
 ```bash
-# For Azure IL regions
+# For Azure Government regions
 az deployment group create \
   --name deploy-AKS-Network
    --template-file overlays/kubernetesCluster/deploy.bicep \
-   --parameters @overlays/kubernetesCluster/deploy.parameters.json \
+   --parameters @overlays/kubernetesCluster/parameters/deploy.parameters.json \
    --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx \
    --location 'usgovvirginia'
 ```
@@ -80,10 +80,10 @@ az deployment group create \
 ### PowerShell
 
 ```powershell
-# For Azure global regions
+# For Azure Commerical regions
 New-AzSubscriptionDeployment `
   -TemplateFile overlays/kubernetesCluster/deploy.bicepp `
-  -TemplateParameterFile overlays/kubernetesCluster/deploy.parameters.json `
+  -TemplateParameterFile overlays/kubernetesCluster/parameters/deploy.parameters.json `
   -Subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx `
   -Location 'eastus'
 ```
@@ -91,21 +91,41 @@ New-AzSubscriptionDeployment `
 OR
 
 ```powershell
-# For Azure IL regions
+# For Azure Government regions
 New-AzSubscriptionDeployment `
   -TemplateFile overlays/kubernetesCluster/deploy.bicepp `
-  -TemplateParameterFile overlays/kubernetesCluster/deploy.parameters.json `
+  -TemplateParameterFile overlays/kubernetesCluster/parameters/deploy.parameters.json `
   -Subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx `
   -Location  'usgovvirginia'
 ```
 
 ## Extending the Overlay
 
-By default, this overlay has the minium parmeters needed to deploy the service. If you like to add addtional parmeters to the service, please refer to the module description located in AzResources here: [Azure Kubernetes Services `[Microsoft.ContainerService/managedClusters]`](../../../azresources/Modules/Microsoft.ContainerRegistry/registries/readmd.md)
+By default, this overlay has the minium parameters needed to deploy the service. If you like to add addtional parmeters to the service, please refer to the module description located in AzResources here: [Azure Kubernetes Services `[Microsoft.ContainerService/managedClusters]`](../../../azresources/Modules/Microsoft.ContainerRegistry/registries/readmd.md)
 
 ## Air-Gapped Clouds
 
 For air-gapped clouds it may be convenient to transfer and deploy the compiled ARM template instead of the Bicep template if the Bicep CLI tools are not available or if it is desirable to transfer only one file into the air gap.
+
+## Validate the deployment
+
+Use the Azure portal, Azure CLI, or Azure PowerShell to list the deployed resources in the resource group.
+
+Configure the default group using:
+
+```bash
+az configure --defaults group=anoa-eastus-workload-aks-rg.
+```
+
+```bash
+az resource list --location eastus --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxx --resource-group anoa-eastus-workload-aks-rg
+```
+
+OR
+
+```powershell
+Get-AzResource -ResourceGroupName anoa-eastus-workload-aks-rg
+```
 
 ## Cleanup
 
@@ -113,11 +133,27 @@ The Bicep/ARM deployment of NoOps Accelerator - Azure Kubernetes Service - Clust
 
 ### Delete Resource Groups
 
+```bash
+az group delete --name anoa-eastus-workload-aks-rg
+```
+
+OR
+
+```powershell
 Remove-AzResourceGroup -Name anoa-eastus-workload-aks-rg
+```
 
 ### Delete Deployments
 
+```bash
+az deployment delete --name deploy-AKS-Network
+```
+
+OR
+
+```powershell
 Remove-AzSubscriptionDeployment -Name deploy-AKS-Network
+```
 
 ## Example Output in Azure
 

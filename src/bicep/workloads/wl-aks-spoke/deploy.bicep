@@ -71,10 +71,13 @@ param parHubVirtualNetworkResourceId string
 // FIREWALL PARAMETERS
 
 @description('The virtual network name for the Hub Network.')
-param parHubFirewallName string
+param parHubFirewallPolicyName string
 
 @description('The firewall private IP address for the Hub Network.')
 param parFirewallPrivateIPAddress string
+
+@description('The firewall source addresses for the Rule Collection Groups, Must be Hub/Spoke addresses.')
+param parSourceAddresses array = []
 
 // LOGGING PARAMETERS
 
@@ -106,7 +109,7 @@ param parLogAnalyticsWorkspaceName string
 //   }
 // }
 @description('Defines the Container Registry.')
-param parContainerRegistry object 
+param parContainerRegistry object
 
 // Azure Kubernetes Service - Cluster
 // Example (JSON)
@@ -155,6 +158,13 @@ param parKubernetesCluster object
 @description('Account for access to Storage')
 param parStorageAccountAccess object
 
+// SUPPORTED CLOUDS PARAMETERS
+
+param parSupportedClouds array = [
+  'AzureCloud'
+  'AzureUSGovernment'
+]
+
 //=== TAGS === 
 
 var referential = {
@@ -171,7 +181,7 @@ module modTags '../../azresources/Modules/Microsoft.Resources/tags/az.resources.
 }
 
 //=== Workload Tier 3 Buildout === 
-module modTier3 '../../azresources/hub-spoke/tier3/anoa.lz.workload.network.bicep' = {
+module modTier3 '../../azresources/hub-spoke-core/tier3/anoa.lz.workload.network.bicep' = {
   name: 'deploy-wl-vnet-${parLocation}-${parDeploymentNameSuffix}'
   scope: subscription(parWorkload.subscriptionId)
   params: {
@@ -192,7 +202,7 @@ module modTier3 '../../azresources/hub-spoke/tier3/anoa.lz.workload.network.bice
     parWorkloadSubscriptionId: parWorkload.subscriptionId
     parWorkloadVirtualNetworkAddressPrefix: parWorkload.network.virtualNetworkAddressPrefix
     parWorkloadSubnetAddressPrefix: parWorkload.network.subnetAddressPrefix
-  
+
     //Firewall Parameters
     parFirewallPrivateIPAddress: parFirewallPrivateIPAddress
 
@@ -202,14 +212,217 @@ module modTier3 '../../azresources/hub-spoke/tier3/anoa.lz.workload.network.bice
 
     //Storage Parameters
     parStorageAccountAccess: parStorageAccountAccess
-    enableActivityLogging: true     
- 
+    enableActivityLogging: true
+
   }
 }
 
 //=== End Workload Tier 3 Buildout === 
 
 //=== Azure Kubernetes Service Workload Buildout === 
+
+module firewallAKSAppRuleCollectionGroup '../../azresources/Modules/Microsoft.Network/firewallPolicies/ruleCollectionGroups/az.net.rule.groups.bicep' = {
+  name: 'deploy-aks-appruleGroup-${parDeploymentNameSuffix}'
+  scope: resourceGroup(parHubResourceGroupName)
+  params: {
+    name: '${parWorkload.shortName}ApplicationRuleCollectionGroup'
+    firewallPolicyName: parHubFirewallPolicyName
+    priority: 210
+    ruleCollections: [
+      {
+        ruleCollectionType: 'FirewallPolicyFilterRuleCollection'
+        action: {
+          type: 'Allow'
+        }
+        rules: [
+          {
+            name: 'Allow-ifconfig'
+            ruleType: 'ApplicationRule'
+            protocols: [
+              {
+                port: 80
+                protocolType: 'Http'
+              }
+              {
+                port: 443
+                protocolType: 'Https'
+              }
+            ]
+            fqdnTags: []
+            webCategories: []
+            targetFqdns: [
+              'ifconfig.co'
+              'api.snapcraft.io'
+              'jsonip.com'
+              'kubernaut.io'
+              'motd.ubuntu.com'
+            ]
+            targetUrls: []
+            terminateTLS: false
+            sourceAddresses: parSourceAddresses
+            destinationAddresses: []
+            sourceIpGroups: []
+          }
+        ]
+        name: 'Helper-tools'
+        priority: 101
+      }
+      {
+        ruleCollectionType: 'FirewallPolicyFilterRuleCollection'
+        action: {
+          type: 'Allow'
+        }
+        rules: [
+          {
+            name: 'Egress'
+            ruleType: 'ApplicationRule'
+            protocols: [
+              {
+                port: 443
+                protocolType: 'Https'
+              }
+            ]
+            ipProtocols: [
+              'Https'
+            ]
+            targetFqdns: [
+              '*.azmk8s.io'
+              'aksrepos.azurecr.io'
+              '*.blob.core.windows.net'
+              'mcr.microsoft.com'
+              '*.cdn.mscr.io'
+              'management.azure.com'
+              'login.microsoftonline.com'
+              'packages.azure.com'
+              'acs-mirror.azureedge.net'
+              '*.opinsights.azure.com'
+              '*.monitoring.azure.com'
+              'dc.services.visualstudio.com'
+            ]
+            sourceAddresses: parSourceAddresses
+          }
+          {
+            name: 'Registries'
+            ruleType: 'ApplicationRule'
+            protocols: [
+              {
+                port: 443
+                protocolType: 'Https'
+              }
+            ]
+            ipProtocols: [
+              'Https'
+            ]
+            targetFqdns: [
+              '*.data.mcr.microsoft.com'
+              '*.azurecr.io'
+              '*.gcr.io'
+              'gcr.io'
+              'storage.googleapis.com'
+              '*.docker.io'
+              'quay.io'
+              '*.quay.io'
+              '*.cloudfront.net'
+              'production.cloudflare.docker.com'
+            ]
+            sourceAddresses: parSourceAddresses
+          }
+          {
+            name: 'Additional-Usefull-Address'
+            ruleType: 'ApplicationRule'
+            protocols: [
+              {
+                port: 443
+                protocolType: 'Https'
+              }
+            ]
+            ipProtocols: [
+              'Https'
+            ]
+            targetFqdns: [
+              'grafana.net'
+              'grafana.com'
+              'stats.grafana.org'
+              'github.com'
+              'raw.githubusercontent.com'
+              'security.ubuntu.com'
+              'security.ubuntu.com'
+              'packages.microsoft.com'
+              'azure.archive.ubuntu.com'
+              'security.ubuntu.com'
+              'hack32003.vault.azure.net'
+              '*.letsencrypt.org'
+              'usage.projectcalico.org'
+              'gov-prod-policy-data.trafficmanager.net'
+              'vortex.data.microsoft.com'
+            ]
+            sourceAddresses: parSourceAddresses
+          }
+          {
+            name: 'AKS-FQDN-TAG'
+            ruleType: 'ApplicationRule'
+            protocols: [
+              {
+                port: 80
+                protocolType: 'Http'
+              }
+              {
+                port: 443
+                protocolType: 'Https'
+              }
+            ]
+            targetFqdns: []
+            fqdnTags: [
+              'AzureKubernetesService'
+            ]
+            sourceAddresses: parSourceAddresses
+          }
+        ]
+        name: 'AKS-egress-application'
+        priority: 102
+      }
+    ]
+  }
+}
+
+module firewallAKSNetworkRuleCollectionGroup '../../azresources/Modules/Microsoft.Network/firewallPolicies/ruleCollectionGroups/az.net.rule.groups.bicep' = {
+  name: 'deploy-aks-networkruleGroup-${parDeploymentNameSuffix}'
+  scope: resourceGroup(parHubResourceGroupName)
+  params: {
+    name: '${parWorkload.shortName}NetworkRuleCollectionGroup'
+    firewallPolicyName: parHubFirewallPolicyName
+    priority: 250
+    ruleCollections: [     
+      {
+        ruleCollectionType: 'FirewallPolicyFilterRuleCollection'
+        action: {
+          type: 'Allow'
+        }
+        rules: [
+          {
+            ruleType: 'NetworkRule'
+            name: 'NTP'
+            ipProtocols: [
+              'UDP'
+            ]
+            sourceAddresses: parSourceAddresses
+            sourceIpGroups: []
+            destinationAddresses: [
+              '*'
+            ]
+            destinationIpGroups: []
+            destinationFqdns: []
+            destinationPorts: [
+              '123'
+            ]
+          }
+        ]
+        name: 'AKS-egress'
+        priority: 100
+      }
+    ]
+  }
+}
 
 module modAcrDeploy '../../overlays/management-services/containerRegistry/deploy.bicep' = {
   name: 'deploy-aks-acr-${parLocation}-${parDeploymentNameSuffix}'
@@ -219,7 +432,7 @@ module modAcrDeploy '../../overlays/management-services/containerRegistry/deploy
     parContainerRegistry: parContainerRegistry
     parRequired: parRequired
     parTags: modTags.outputs.tags
-    parTargetResourceGroup:  modTier3.outputs.workloadResourceGroupName
+    parTargetResourceGroup: modTier3.outputs.workloadResourceGroupName
     parTargetSubscriptionId: parWorkload.subscriptionId
     parTargetSubnetName: modTier3.outputs.subnetNames[0]
     parTargetVNetName: modTier3.outputs.virtualNetworkName

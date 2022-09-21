@@ -10,6 +10,8 @@
 SUMMARY: Overlay Module Example to deploy the Azure Kubernetes Cluster.
 DESCRIPTION: The following components will be options in this deployment
               * Azure Kubernetes Cluster
+              * Private Endpoints
+              * Private DNS Zones
 AUTHOR/S: jspinella
 VERSION: 1.x.x
 */
@@ -54,26 +56,61 @@ param parKubernetesCluster object
 
 // HUB NETWORK PARAMETERS
 
+// Hub Subnet Resource Id
+// (JSON Parameter)
+// ---------------------------
+// "parHubVirtualNetworkResourceId": {
+//   "value": "/subscriptions/xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx/resourceGroups/anoa-eastus-platforms-hub-rg/providers/Microsoft.Network/virtualNetworks/anoa-eastus-platforms-hub-vnet/subnets/anoa-eastus-platforms-hub-vnet"
+// }
 @description('The virtual network resource Id for the Hub Network.')
-param parHubVirtualNetworkResourceId string
+param parHubVirtualNetworkResourceId string = ''
 
 // LOGGING PARAMETERS
-
+// Log Analytics Workspace Resource Id
+// (JSON Parameter)
+// ---------------------------
+// "parLogAnalyticsWorkspaceResourceId": {
+//   "value": "/subscriptions/xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx/resourceGroups/anoa-eastus-platforms-hub-rg/providers/Microsoft.Network/virtualNetworks/anoa-eastus-platforms-hub-vnet/subnets/anoa-eastus-platforms-hub-vnet"
+// }
 @description('Log Analytics Workspace Resource Id Needed for NSG, VNet and Activity Logging')
 param parLogAnalyticsWorkspaceResourceId string
 
 // TARGET PARAMETERS
 
-@description('The subscription ID for the Hub Network and resources. It defaults to the deployment subscription.')
+// Target Virtual Network Name
+// (JSON Parameter)
+// ---------------------------
+// "parTargetSubscriptionId": {
+//   "value": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxx"
+// }
+@description('The subscription ID for the Target Network and resources. It defaults to the deployment subscription.')
 param parTargetSubscriptionId string = subscription().subscriptionId
 
-@description('The name of the resource group in which the aks will be deployed. If unchanged or not specified, the NoOps Accelerator shared services resource group is used.')
-param parTargetResourceGroup string
+// Target Resource Group Name
+// (JSON Parameter)
+// ---------------------------
+// "parTargetResourceGroup": {
+//   "value": "anoa-eastus-platforms-hub-rg"
+// }
+@description('The name of the resource group in which the service will be deployed. If unchanged or not specified, the NoOps Accelerator will create an resource group to be used.')
+param parTargetResourceGroup string = ''
 
-@description('The name of the VNet in which the aks will be deployed. If unchanged or not specified, the NoOps Accelerator shared services resource group is used.')
+// Target Virtual Network Name
+// (JSON Parameter)
+// ---------------------------
+// "parHubVirtualNetworkName": {
+//   "value": "anoa-eastus-platforms-hub-vnet"
+// }
+@description('The name of the VNet in which the aks will be deployed.')
 param parTargetVNetName string
 
-@description('The name of the Subnet in which the aks will be deployed. If unchanged or not specified, the NoOps Accelerator shared services resource group is used.')
+// Target Subnet Name
+// (JSON Parameter)
+// ---------------------------
+// "parHubVirtualNetworkName": {
+//   "value": "anoa-eastus-platforms-hub-snet"
+// }
+@description('The name of the Subnet in which the aks will be deployed.')
 param parTargetSubnetName string
 
 // RESOURCE NAMING PARAMETERS

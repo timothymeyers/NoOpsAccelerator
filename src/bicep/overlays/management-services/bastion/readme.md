@@ -16,7 +16,7 @@ Some particulars about Bastion:
 * The subnet must be titled AzureBastionSubnet
 * Azure Bastion Hosts require a public IP address
 
-## Deploy Virtual Machine
+## About Virtual Machines
 
 This overlay module also deploys two virtual machines into a new subnet in the existing Hub virtual network to serve as jumpboxes.
 
@@ -62,7 +62,7 @@ For example, deploying using the `az deployment sub create` command in the Azure
 ### Azure CLI
 
 ```bash
-# For Azure global regions
+# For Azure Commerical regions
 az login
 cd src/bicep
 cd platforms/lz-platform-scca-hub-3spoke
@@ -73,11 +73,11 @@ az deployment sub create \
 --location eastus \
 --parameters @platforms/lz-platform-scca-hub-3spoke/parameters/deploy.parameters.json
 cd overlays
-cd app-service-plan
+cd bastion
 az deployment sub create \
-   --name deploy-AppServicePlan
-   --template-file overlays/app-service-plan/deploy.bicep \
-   --parameters @overlays/app-service-plan/deploy.parameters.json \
+   --name deploy-RemoteAccess
+   --template-file overlays/bastion/deploy.bicep \
+   --parameters @overlays/bastion/deploy.parameters.json \
    --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx \
    --location 'eastus'
 ```
@@ -85,38 +85,35 @@ az deployment sub create \
 OR
 
 ```bash
-# For Azure IL regions
+# For Azure Government regions
 az deployment sub create \
-  --template-file overlays/app-service-plan/deploy.bicep \
-  --parameters @overlays/app-service-plan/deploy.parameters.json \
+  --template-file overlays/bastion/deploy.bicep \
+  --parameters @overlays/bastion/deploy.parameters.json \
   --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx \
-  --resource-group anoa-usgovvirginia-platforms-hub-rg \
   --location 'usgovvirginia'
 ```
 
 ### PowerShell
 
 ```powershell
-# For Azure global regions
+# For Azure Commerical regions
 New-AzSubscriptionDeployment `
   -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
-  -TemplateFile overlays/app-service-plan/deploy.bicepp `
-  -TemplateParameterFile overlays/app-service-plan/deploy.parameters.example.json `
+  -TemplateFile overlays/bastion/deploy.bicepp `
+  -TemplateParameterFile overlays/bastion/deploy.parameters.json `
   -Subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx `
-  -ResourceGroup anoa-eastus-platforms-hub-rg `
   -Location 'eastus'
 ```
 
 OR
 
 ```powershell
-# For Azure IL regions
+# For Azure Government regions
 New-AzSubscriptionDeployment `
   -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
-  -TemplateFile overlays/app-service-plan/deploy.bicepp `
-  -TemplateParameterFile overlays/app-service-plan/deploy.parameters.example.json `
+  -TemplateFile overlays/bastion/deploy.bicepp `
+  -TemplateParameterFile overlays/bastion/deploy.parameters.json `
   -Subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx `
-  -ResourceGroup anoa-usgovvirginia-platforms-hub-rg `
   -Location  'usgovvirginia'
 ```
 
@@ -128,17 +125,53 @@ By default, this overlay has the minium parmeters needed to deploy the service. 
 
 For air-gapped clouds it may be convenient to transfer and deploy the compiled ARM template instead of the Bicep template if the Bicep CLI tools are not available or if it is desirable to transfer only one file into the air gap.
 
+## Validate the deployment
+
+Use the Azure portal, Azure CLI, or Azure PowerShell to list the deployed resources in the resource group.
+
+Configure the default group using:
+
+```bash
+az configure --defaults group=anoa-eastus-hub-bastion-rg.
+```
+
+```bash
+az resource list --location eastus --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxx --resource-group anoa-eastus-hub-bastion-rg
+```
+
+OR
+
+```powershell
+Get-AzResource -ResourceGroupName anoa-eastus-hub-bastion-rg
+```
+
 ## Cleanup
 
 The Bicep/ARM deployment of NoOps Accelerator - Remote Access - Bastion deployment can be deleted with these steps:
 
 ### Delete Resource Groups
 
-Remove-AzResourceGroup -Name anoa-eastus-workload-app-service-plan-rg
+```bash
+az group delete --name anoa-eastus-hub-bastion-rg
+```
+
+OR
+
+```powershell
+Remove-AzResourceGroup -Name anoa-eastus-hub-bastion-rg
+```
 
 ### Delete Deployments
 
-Remove-AzSubscriptionDeployment -Name deploy-AppServicePlan
+```bash
+az deployment delete --name deploy-RemoteAccess
+```
+
+OR
+
+```powershell
+Remove-AzSubscriptionDeployment -Name deploy-RemoteAccess
+```
 
 ## Example Output in Azure
 

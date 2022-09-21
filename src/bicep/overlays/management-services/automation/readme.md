@@ -1,37 +1,41 @@
-# Overlays:   NoOps Accelerator - Auotmation Account
+# Overlays:   NoOps Accelerator - Automation Account
 
 ## Overview
 
 This overlay module deploys an Platform Landing Zone compatible Azure Automation account, with diagnostic logs pointed to the Platform Landing Zone Log Analytics Workspace (LAWS) instance.
 
-## About Azure Auotmation Account
+## About Azure Automation Account
 
-The docs on Azure Bastion: <https://docs.microsoft.com/en-us/azure/bastion/bastion-overview>
+The docs on Azure Automation Account: <https://docs.microsoft.com/en-us/azure/automation/>. By default, this overlay will deploy resources into standard default hub/spoke subscriptions and resource groups.  
 
-Some particulars about Bastion:
+The subscription and resource group can be changed by providing the resource group name (Param: parTargetSubscriptionId/parTargetResourceGroup) and ensuring that the Azure context is set the proper subscription.  
 
-* Azure Bastion Host requires a subnet of /27 or larger
-* The subnet must be titled AzureBastionSubnet
-* Azure Bastion Hosts require a public IP address
+Automation is needed in three broad areas of cloud operations:
 
-## Deploy Virtual Machine
+* Deploy and manage - Deliver repeatable and consistent infrastructure as code.
+* Response - Create event-based automation to diagnose and resolve issues.
+* Orchestrate - Orchestrate and integrate your automation with other Azure or third party services and products.
 
-This add-on module also deploys two virtual machines into a new subnet in the existing Hub virtual network to serve as jumpboxes.
-
-The docs on Virtual Machines: <https://docs.microsoft.com/en-us/azure/templates/microsoft.compute/virtualmachines?tabs=json>
+One Automation account can manage resources across all regions and subscriptions for a given tenant.
 
 ## Pre-requisites
 
-* A Mission LZ deployment (a deployment of anoa.mlz.bicep)
+* A hub/spoke LZ deployment (a deployment of [deploy.bicep](../../../../bicep/platforms/lz-platform-scca-hub-3spoke/deploy.bicep))
+* Decide if the optional parameters is appropriate for your deployment. If it needs to change, override one of the optional parameters.
 
 See below for information on how to use the appropriate deployment parameters for use with this overlay:
 
-Deployment Output Name | Description
------------------------| -----------
-parHubResourceGroupName | The resource group that contains the Hub Virtual Network and deploy the virtual machines into
-parHubVirtualNetworkName | The resource to deploy a subnet configured for Bastion Host
-parHubSubnetResourceId | The resource ID of the subnet in the Hub Virtual Network for hosting virtual machines
-parHubNetworkSecurityGroupResourceId | The resource ID of the Network Security Group in the Hub Virtual Network that hosts rules for Hub Subnet traffic
+Required Parameters | Type | Allowed Values | Description
+| :-- | :-- | :-- | :-- |
+parRequired | object | {object} | Required values used with all resources.
+parTags | object | {object} | Required tags values used with all resources.
+parLocation | string | `[deployment().location]` | The region to deploy resources into. It defaults to the deployment location.
+parLockLevel | string | `[deployment().location]` | The region to deploy resources into. It defaults to the deployment location.
+parDiagnosticStorageAccountName | The resource group that contains the Hub Virtual Network and deploy the virtual machines into
+parLogAnalyticsWorkspaceName | The resource to deploy a subnet configured for Bastion Host
+parTargetSubscriptionId | string | `xxxxxx-xxxx-xxxx-xxxxx-xxxxxx` | The target subscription ID for the target Network and resources. It defaults to the deployment subscription.
+parTargetResourceGroup | string | `anoa-eastus-platforms-hub-rg` | The name of the resource group in which the automation account will be deployed. If unchanged or not specified, the NoOps Accelerator will create an resource group.
+
 
 ## Deploy the Service
 

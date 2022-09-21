@@ -50,7 +50,7 @@ In this overlay, the role definitions hierarchy are created at a specific `Manag
 ### Azure CLI
 
 ```bash
-# For Azure global regions
+# For Azure Commerical regions
 az deployment mg create \
    --name deploy-roles \
    --management-group-id 'ANOA' \
@@ -62,7 +62,7 @@ az deployment mg create \
 OR
 
 ```bash
-# For Azure IL regions
+# For Azure Government regions
 az deployment mg create \
   --name deploy-roles \
   --management-group-id 'ANOA' \
@@ -74,7 +74,7 @@ az deployment mg create \
 ### PowerShell
 
 ```powershell
-# For Azure global regions
+# For Azure Commerical regions
 New-AzManagementGroupDeployment `
   -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
   -TemplateFile overlays/management-groups/anoa.enclave.roles.bicepp `
@@ -85,7 +85,7 @@ New-AzManagementGroupDeployment `
 OR
 
 ```powershell
-# For Azure IL regions
+# For Azure Government regions
 New-AzManagementGroupDeployment `
   -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
   -TemplateFile overlays/management-groups/anoa.enclave.roles.bicepp `

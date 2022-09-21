@@ -59,7 +59,7 @@ In this overlay, the management groups are created at the `Tenant Root Group` th
 ### Azure CLI
 
 ```bash
-# For Azure global regions
+# For Azure Commerical regions
 az deployment mg create \
    --template-file overlays/management-groups/anoa.lz.mgmt.groups.bicep \
    --parameters @overlays/management-groups/anoa.lz.mgmt.groups.parameters.example.json \
@@ -69,7 +69,7 @@ az deployment mg create \
 OR
 
 ```bash
-# For Azure IL regions
+# For Azure Government regions
 az deployment mg create \
   --template-file overlays/management-groups/anoa.lz.mgmt.groups.bicep \
   --parameters @overlays/management-groups/anoa.lz.mgmt.groups.parameters.example.json \
@@ -79,7 +79,7 @@ az deployment mg create \
 ### PowerShell
 
 ```powershell
-# For Azure global regions
+# For Azure Commerical regions
 New-AzManagementGroupDeployment `
   -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
   -TemplateFile overlays/management-groups/anoa.lz.mgmt.groups.bicepp `
@@ -90,7 +90,7 @@ New-AzManagementGroupDeployment `
 OR
 
 ```powershell
-# For Azure IL regions
+# For Azure Government regions
 New-AzManagementGroupDeployment `
   -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
   -TemplateFile overlays/management-groups/anoa.lz.mgmt.groups.bicepp `

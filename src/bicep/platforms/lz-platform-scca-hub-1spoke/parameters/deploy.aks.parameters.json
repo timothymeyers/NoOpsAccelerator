@@ -88,7 +88,6 @@
     },
     "parOperationsSpoke": {
       "value": {
-<<<<<<< HEAD
         "subscriptionId": "xxxxxxx-xxxx-xxxx-xxxx-xxxxxxx",
         "virtualNetworkAddressPrefix": "10.0.115.0/26",
         "subnetAddressPrefix": "10.0.115.0/27",
@@ -146,13 +145,6 @@
             "service": "Microsoft.Storage"
           }
         ]
-=======
-        "enableSentinel": true,
-        "logAnalyticsWorkspaceCappingDailyQuotaGb": -1,
-        "logAnalyticsWorkspaceRetentionInDays": 30,
-        "logAnalyticsWorkspaceSkuName": "PerGB2018",
-        "logStorageSkuName": "Standard_GRS"
->>>>>>> fb840110bb44381eaca2be4365f1c11307d468c4
       }
     },
     "parAzureFirewall": {

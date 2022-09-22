@@ -10,38 +10,64 @@ Read on to understand what this landing zone does, and when you're ready, collec
 
 ## Architecture
 
- ![Hub/Spoke landing zone Architecture](../../../bicep/)
+ ![Hub/Spoke landing zone Architecture](./media/hub-1spoke-network-topology-architecture.jpg)
 
 ## About Hub 1 Spoke Landing Zone
 
-The docs on Hub/Spoke Landing Zone: <https://docs.microsoft.com/en-us/azure/app-service/overview-hosting-plans>.
+The docs on Hub/Spoke Landing Zone: <https://learn.microsoft.com/en-us/azure/architecture/reference-architectures/hybrid-networking/hub-spoke?tabs=cli>
+
+### What is a Landing Zone?
+
+A **landing zone** is networking infrastructure configured to provide a secure environment for hosting workloads.
+
+[![Landing Zones Azure Academy Video](https://img.youtube.com/vi/9BKgz9Rl1eo/0.jpg)](https://youtu.be/9BKgz9Rl1eo "Don't let this happen to you 😮 Build A Landing Zone 👍 - Click to Watch!")
+
+### Hub/Spoke Networking
+
+Hub/ 1 Spoke Networking is set up in a hub and spoke design, separated by one tier: T1 (Infrastructure Operations). Access control can be configured to allow separation of duties between all tiers.
+
+### Firewall
+
+All network traffic is directed through the firewall residing in the Network Hub resource group. The firewall is configured as the default route for all the T0 (Identity and Authorization) through T3 (workload/team environments) resource groups as follows:
+
+|Name         |Address prefix| Next hop type| Next hop IP address|
+|-------------|--------------|-----------------|-----------------|
+|default_route| 0.0.0.0/0    |Virtual Appliance|10.0.100.4*       |
+
+*-example IP for firewall
 
 ## Pre-requisites
 
-* One or more Azure subscriptions where you or an identity you manage has Owner RBAC permissions
-* For deployments in the Azure Portal you need access to the portal in the cloud you want to deploy to, such as <https://portal.azure.com> or <https://portal.azure.us>.
-* For deployments in BASH or a Windows shell, then a terminal instance with the AZ CLI installed is required. For example, Azure Cloud Shell,   or a command shell on your local machine with the AZ CLI installed.
-* For PowerShell deployments you need a PowerShell terminal with the Azure Az PowerShell module installed.
+### Subscriptions
 
->NOTE: The AZ CLI will automatically install the Bicep tools when a command is run that needs them, or you can manually install them following the instructions here.
+Most customers will deploy each tier to a separate Azure subscription, but multiple subscriptions are not required. A single subscription deployment is good for a testing and evaluation, or possibly a small IT Admin team.
+
+### Operational Network Artifacts
+
+If needed, The Operational Network Artifacts are used when operations wants to seperate all key, secrets and operations storage from the hub/spoke model.
+
+See below for information on how to use the appropriate deployment parameters for use with this landing zone:
 
 Required Parameters | Type | Allowed Values | Description
 | :-- | :-- | :-- | :-- |
 parRequired | object | {object} | Required values used with all resources.
 parTags | object | {object} | Required tags values used with all resources.
 parLocation | string | `[deployment().location]` | The region to deploy resources into. It defaults to the deployment location.
+parHub | object | {object} | Hub Virtual network configuration. See [azresources/hub-spoke-core/vdss/hub/readme.md](../../azresources/hub-spoke-core/vdss/hub/readme.md)
+parOperationsSpoke | object | {object} | Operations Spoke Virtual network configuration. See [See azresources/hub-spoke-core/vdms/operations/readme.md](../../azresources/hub-spoke-core/vdms/operations/readme.md)
+parAzureFirewall | object | {object} | Azure Firewall configuration. Azure Firewall is deployed in Forced Tunneling mode where a route table must be added as the next hop.
+parLogging | object | {object} | Enables logging parmeters and Microsoft Sentinel within the Log Analytics Workspace created in this deployment.
+parRemoteAccess | object | {object} | When set to "true", provisions Azure Bastion Host. It defaults to "false".
 
 Optional Parameters | Type | Allowed Values | Description
 | :-- | :-- | :-- | :-- |
-None
+parNetworkArtifacts | object | {object} | Optional. Enables Operations Network Artifacts Resource Group with KV and Storage account for the ops subscriptions used in the deployment.
+parSecurityCenter | object | {object} | Microsoft Defender for Cloud.  It includes email and phone.
+parDdosStandard | bool | `false` | DDOS Standard configuration.
 
 ## Deploy the Landing Zone
 
 Connect to the appropriate Azure Environment and set appropriate context, see getting started with Azure PowerShell or Azure CLI for help if needed. The commands below assume you are deploying in Azure Commercial and show the entire process deploying Platform Hub/Spoke Design.
-
-> NOTE: Since you can deploy this overlay post-deployment, you can also build this overlay within other deployment models such as Platforms & Workloads.
-
-Once you have the hub/spoke output values, you can pass those in as parameters to this deployment.
 
 For example, deploying using the `az deployment sub create` command in the Azure CLI:
 
@@ -78,7 +104,7 @@ az deployment sub create \
 # For Azure Commerical regions
 New-AzSubscriptionDeployment `
   -TemplateFile platforms/lz-platform-scca-hub-1spoke/deploy.bicepp `
-  -TemplateParameterFile platforms/lz-platform-scca-hub-1spoke/parameters/deploy.parameters.example.json `
+  -TemplateParameterFile platforms/lz-platform-scca-hub-1spoke/parameters/deploy.parameters.json `
   -Subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx `
   -Location 'eastus'
 ```
@@ -89,14 +115,14 @@ OR
 # For Azure Government regions
 New-AzSubscriptionDeployment `
   -TemplateFile platforms/lz-platform-scca-hub-1spoke/deploy.bicepp `
-  -TemplateParameterFile platforms/lz-platform-scca-hub-1spoke/parameters/deploy.parameters.example.json `
+  -TemplateParameterFile platforms/lz-platform-scca-hub-1spoke/parameters/deploy.parameters.json `
   -Subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx `
   -Location  'usgovvirginia'
 ```
 
 ## Extending the Landing Zone
 
-By default, this overlay has the minium parmeters needed to deploy the service. If you like to add addtional parmeters to the service, please refer to the module description located in AzResources here: [`App Service Plans `[Microsoft.Web/serverfarms]`](D:\source\repos\NoOpsAccelerator\src\bicep\azresources\Modules\Microsoft.Web\serverfarms\readme.md)
+By default, this Landing Zone has the minium parmeters needed to deploy the service. If you like to add addtional parmeters to the Landing Zone, please refer to the Landing Zone description located in AzResources here: [`Hub-Spoke-Core`](../../azresources/hub-spoke-core/readme.md)
 
 ## Air-Gapped Clouds
 
@@ -109,59 +135,43 @@ Use the Azure portal, Azure CLI, or Azure PowerShell to list the deployed resour
 Configure the default group using:
 
 ```bash
-az configure --defaults group=anoa-eastus-dev-appplan-rg.
+az configure --defaults group=anoa-eastus-platforms-hub-rg.
 ```
 
 ```bash
-az resource list --location eastus --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxx --resource-group anoa-eastus-dev-appplan-rg
+az resource list --location eastus --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxx --resource-group anoa-eastus-platforms-hub-rg
 ```
 
 ```powershell
-Get-AzResource -ResourceGroupName anoa-eastus-dev-appplan-rg
+Get-AzResource -ResourceGroupName anoa-eastus-platforms-hub-rg
 ```
 
 ## Cleanup
 
-The Bicep/ARM deployment of NoOps Accelerator - Azure App Service Plan deployment can be deleted with these steps:
+The Bicep/ARM deployment of NoOps Accelerator - Hub/Spoke deployment can be deleted with these steps:
 
 ### Delete Resource Groups
 
 ```bash
-az group delete --name anoa-eastus-dev-appplan-rg
+az group delete -n anoa-eastus-platforms-logging-rg -y
+az group delete -n anoa-eastus-platforms-hub-rg -y
+az group delete -n anoa-eastus-platforms-operations-rg -y
+az group delete -n anoa-eastus-platforms-artifacts-rg -y
 ```
 
 ```powershell
-Remove-AzResourceGroup -Name anoa-eastus-dev-appplan-rg
+Remove-AzResourceGroup -Name anoa-eastus-platforms-logging-rg
+Remove-AzResourceGroup -Name anoa-eastus-platforms-hub-rg
+Remove-AzResourceGroup -Name anoa-eastus-platforms-operations-rg
+Remove-AzResourceGroup -Name anoa-eastus-platforms-artifacts-rg
 ```
 
 ### Delete Deployments
 
 ```bash
-az deployment delete --name deploy-AppServicePlan
+az deployment sub delete -n deploy-hubspoke-network
 ```
 
 ```powershell
-Remove-AzSubscriptionDeployment -Name deploy-AppServicePlan
+Remove-AzSubscriptionDeployment -Name deploy-hubspoke-network
 ```
-
-## Example Output in Azure
-
-![Example Deployment Output](media/aspExampleDeploymentOutput.png "Example Deployment Output in Azure global regions")
-
-## Resource Types
-
-| Resource Type | API Version |
-| :-- | :-- |
-| `Microsoft.Authorization/locks` | [2017-04-01](https://docs.microsoft.com/en-us/azure/templates/Microsoft.Authorization/2017-04-01/locks) |
-| `Microsoft.Authorization/roleAssignments` | [2022-04-01](https://docs.microsoft.com/en-us/azure/templates/Microsoft.Authorization/2022-04-01/roleAssignments) |
-| `Microsoft.Insights/diagnosticSettings` | [2021-05-01-preview](https://docs.microsoft.com/en-us/azure/templates/Microsoft.Insights/2021-05-01-preview/diagnosticSettings) |
-| `Microsoft.Network/privateEndpoints` | [2021-08-01](https://docs.microsoft.com/en-us/azure/templates/Microsoft.Network/2021-08-01/privateEndpoints) |
-| `Microsoft.Network/privateEndpoints/privateDnsZoneGroups` | [2021-08-01](https://docs.microsoft.com/en-us/azure/templates/Microsoft.Network/2021-08-01/privateEndpoints/privateDnsZoneGroups) |
-| `Microsoft.App/containerApps` | [2021-03-01](https://docs.microsoft.com/en-us/azure/templates/microsoft.app/2022-03-01/containerapps) |
-| `Microsoft.App/managedEnvironments` | [2021-03-01](https://docs.microsoft.com/en-us/azure/templates/microsoft.app/2022-03-01/managedenvironments) |
-
-### References
-
-* [Azure App Service plan Documentation](https://docs.microsoft.com/en-us/azure/app-service/overview-hosting-plans/)
-* [Azure App Service Overview](https://docs.microsoft.com/en-us/azure/app-service/overview)
-* [Manage an App Service plan in Azure](https://docs.microsoft.com/en-us/azure/app-service/app-service-plan-manage)

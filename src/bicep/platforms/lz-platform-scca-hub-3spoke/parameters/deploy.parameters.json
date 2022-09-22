@@ -1,5 +1,5 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "$schema": "https:schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
     "parRequired": {
@@ -67,7 +67,31 @@
         ],
         "virtualNetworkDiagnosticsLogs": [],
         "virtualNetworkDiagnosticsMetrics": [],
-        "networkSecurityGroupRules": [],
+        "networkSecurityGroupRules": [
+          {
+            "name": "Allow-Traffic-From-Spokes",
+            "properties": {
+              "access": "Allow",
+              "description": "Allow traffic from spokes",
+              "destinationAddressPrefix": "10.0.110.0/26",
+              "destinationPortRanges": [
+                "22",
+                "80",
+                "443",
+                "3389"
+              ],
+              "direction": "Inbound",
+              "priority": 200,
+              "protocol": "*",
+              "sourceAddressPrefixes": [
+                "10.0.115.0/26",
+                "10.0.120.0/26"
+              ],
+              "sourcePortRange": "*"
+            },
+            "type": "string"
+          }
+        ],
         "publicIPAddressDiagnosticsLogs": [
           "DDoSProtectionNotifications",
           "DDoSMitigationFlowLogs",
@@ -102,7 +126,31 @@
         ],
         "virtualNetworkDiagnosticsLogs": [],
         "virtualNetworkDiagnosticsMetrics": [],
-        "networkSecurityGroupRules": [],
+        "networkSecurityGroupRules": [
+          {
+            "name": "Allow-Traffic-From-Spokes",
+            "properties": {
+              "access": "Allow",
+              "description": "Allow traffic from spokes",
+              "destinationAddressPrefix": "10.0.115.0/26",
+              "destinationPortRanges": [
+                "22",
+                "80",
+                "443",
+                "3389"
+              ],
+              "direction": "Inbound",
+              "priority": 200,
+              "protocol": "*",
+              "sourceAddressPrefixes": [
+                "10.0.110.0/26",
+                "10.0.120.0/26"
+              ],
+              "sourcePortRange": "*"
+            },
+            "type": "string"
+          }
+        ],
         "publicIPAddressDiagnosticsLogs": [
           "DDoSProtectionNotifications",
           "DDoSMitigationFlowLogs",
@@ -137,7 +185,31 @@
         ],
         "virtualNetworkDiagnosticsLogs": [],
         "virtualNetworkDiagnosticsMetrics": [],
-        "networkSecurityGroupRules": [],
+        "networkSecurityGroupRules": [
+          {
+            "name": "Allow-Traffic-From-Spokes",
+            "properties": {
+              "access": "Allow",
+              "description": "Allow traffic from spokes",
+              "destinationAddressPrefix": "10.0.120.0/26",
+              "destinationPortRanges": [
+                "22",
+                "80",
+                "443",
+                "3389"
+              ],
+              "direction": "Inbound",
+              "priority": 200,
+              "protocol": "*",
+              "sourceAddressPrefixes": [
+                "10.0.115.0/26",
+                "10.0.120.0/26"
+              ],
+              "sourcePortRange": "*"
+            },
+            "type": "string"
+          }
+        ],
         "publicIPAddressDiagnosticsLogs": [
           "DDoSProtectionNotifications",
           "DDoSMitigationFlowLogs",
@@ -197,7 +269,7 @@
     "parAzureFirewall": {
       "value": {
         "enable": true,
-        "clientPublicIPAddressAvailabilityZones": [],     
+        "clientPublicIPAddressAvailabilityZones": [],
         "managementPublicIPAddressAvailabilityZones": [],
         "supernetIPAddress": "10.0.96.0/19",
         "skuTier": "Premium",

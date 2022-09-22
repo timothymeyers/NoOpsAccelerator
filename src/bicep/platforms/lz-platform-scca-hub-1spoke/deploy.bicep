@@ -1,10 +1,15 @@
 /*
+Copyright (c) Microsoft Corporation. Licensed under the MIT license.
+*/
+
+/*
 SUMMARY: Module Example to deploy an AKS Platform Hub/Spoke Landing Zone
 DESCRIPTION: The following components will be options in this deployment
             * Hub Virtual Network (VNet)
               * Operations Artifacts (Optional)
               * Bastion Host (Optional)
-              * Microsoft Defender for Cloud (Optional)              
+              * Microsoft Defender for Cloud (Optional)
+              * DDOS Standard (Optional)              
             * Spokes
               * Operations (Tier 1)
             * Logging
@@ -14,17 +19,6 @@ DESCRIPTION: The following components will be options in this deployment
             * Private DNS Zones - Details of all the Azure Private DNS zones can be found here --> [https://docs.microsoft.com/en-us/azure/private-link/private-endpoint-dns#azure-services-dns-zone-configuration](https://docs.microsoft.com/en-us/azure/private-link/private-endpoint-dns#azure-services-dns-zone-configuration)  
 AUTHOR/S: jspinella
 VERSION: 1.x.x
-*/
-
-/*
-Copyright (c) Microsoft Corporation. Licensed under the MIT license.
-*/
-
-/*
-  PARAMETERS
-  Here are all the parameters a user can override.
-  These are the required parameters that Network does not provide a default for:    
-    - parDeployEnvironment
 */
 
 targetScope = 'subscription' //Deploying at Subscription scope to allow resource groups to be created and resources in one deployment
@@ -54,7 +48,7 @@ param parRequired object
 //     "deploymentType": "NoOpsBicep"
 //   }
 // }
-@description('Required. The tags values used with all resources.')
+@description('Required. A set of key/value pairs of tags assigned to the subscription or resource.')
 param parTags object
 
 @description('Required. The region to deploy resources into. It defaults to the deployment location.')
@@ -69,7 +63,7 @@ param parDeploymentNameSuffix string = utcNow()
 param dateUtcNow string = utcNow('yyyy-MM-dd HH:mm:ss')
 
 // OPERATIONS NETWORK ARTIFACTS
-// Example (JSON)
+// (JSON Parameter)
 // -----------------------------
 // "parNetworkArtifacts": {
 //   "value": {
@@ -111,7 +105,7 @@ param parNetworkArtifacts object
 //        "enable": false
 //      }
 //    }
-@description('Optional. Enables DDOS deployment on the Hub Network.')
+@description('DDOS Standard configuration.  See readme.md for configuration settings.')
 param parDdosStandard object
 
 // HUB PARAMETERS
@@ -150,6 +144,7 @@ param parDdosStandard object
 //        }
 //      }
 //    }
+@description('Hub Virtual network configuration.  See azresources/hub-spoke-core/vdss/hub/readme.md')
 param parHub object
 
 // OPERATIONS SPOKE PARAMETERS
@@ -163,28 +158,7 @@ param parHub object
 //        "sourceAddressPrefixes": [],
 //        "virtualNetworkDiagnosticsLogs": [],
 //        "virtualNetworkDiagnosticsMetrics": [],
-//        "networkSecurityGroupRules": [
-//          {
-//            "name": "Allow-Traffic-From-Spokes",
-//            "properties": {
-//              "access": "Allow",
-//              "description": "Allow traffic from spokes",
-//              "destinationAddressPrefix": "10.0.115.0/26",
-//             "destinationPortRanges": [
-//               "22",
-//                "80",
-//                "443",
-//                "3389"
-//             ],
-//              "direction": "Inbound",
-//              "priority": 200,
-//              "protocol": "*",
-//              "sourceAddressPrefixes": [],
-//              "sourcePortRange": "*"
-//            },
-//            "type": "string"
-//          }
-//        ],
+//        "networkSecurityGroupRules": [],
 //        "publicIPAddressDiagnosticsLogs": [
 //          {
 //            "category": "DDoSProtectionNotifications",
@@ -224,7 +198,7 @@ param parHub object
 //         }
 //      }
 //    }
-@description('An array of Network Diagnostic Logs to enable for the Operations Virtual Network. See https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/diagnostic-settings?tabs=CMD#logs for valid settings.')
+@description('Operations Spoke Virtual network configuration.  See azresources/hub-spoke-core/vdms/operations/readme.md')
 param parOperationsSpoke object
 
 // FIREWALL PARAMETERS
@@ -270,12 +244,11 @@ param parOperationsSpoke object
 //        "ruleCollectionGroups": []
 //      }
 //    }
-@description('Required. The CIDR Subnet Address Prefix for the Azure Firewall Subnet. It must be in the Hub Virtual Network space. It must be /26.')
+@description('Required. Azure Firewall configuration. Azure Firewall is deployed in Forced Tunneling mode where a route table must be added as the next hop.')
 param parAzureFirewall object
 
 // LOGGING PARAMETERS
-// Logging
-// Example (JSON)
+// (JSON Parameter)
 // -----------------------------
 // "parLogging": {
 //   "value": {
@@ -296,10 +269,8 @@ param parAzureFirewall object
 @description('Enables logging parmeters and Microsoft Sentinel within the Log Analytics Workspace created in this deployment.')
 param parLogging object
 
-// MICROSOFT DEFENDER PARAMETERS
-
 // Microsoft Defender for Cloud
-// Example (JSON)
+// (JSON Parameter)
 // -----------------------------
 // "parSecurityCenter": {
 //   "value": {
@@ -314,7 +285,7 @@ param parSecurityCenter object
 // REMOTE ACCESS PARAMETERS
 
 // Bastion Host (Remote Access)
-// Example (JSON)
+// (JSON Parameter)
 // -----------------------------
 // "parRemoteAccess": {
 //   "value": {

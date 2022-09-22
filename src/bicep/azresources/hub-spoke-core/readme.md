@@ -40,42 +40,6 @@ NoOps Accelerator Landing Zone Core has the following scope:
 <img src="docs/images/scope-v2.png" alt="A table of the components Mission LZ provisions in Azure beneath a rectangle labeled DISA Secure Cloud Computing Architecture Controls" width="600" />
 <!-- markdownlint-enable MD033 -->
 
-### Hub/Spoke Networking
-
-Networking is set up in a hub and spoke design, separated by tiers: T0 (Identity and Authorization), T1 (Infrastructure Operations), T2 (DevSecOps and Shared Services), and multiple T3s (Workloads). Access control can be configured to allow separation of duties between all tiers.
-
-<!-- markdownlint-disable MD033 -->
-<!-- allow html for images so that they can be sized -->
-<img src="docs/wiki/media/architecture/networking.png" alt="A diagram that depicts a hub with four spokes, each spoke pointing at the hub" width="600" />
-<!-- markdownlint-enable MD033 -->
-
-### Subscriptions
-
-Most customers will deploy each tier to a separate Azure subscription, but multiple subscriptions are not required. A single subscription deployment is good for a testing and evaluation, or possibly a small IT Admin team.
-
-### Firewall
-
-All network traffic is directed through the firewall residing in the Network Hub resource group. The firewall is configured as the default route for all the T0 (Identity and Authorization) through T3 (workload/team environments) resource groups as follows:
-
-|Name         |Address prefix| Next hop type| Next hop IP address|
-|-------------|--------------|-----------------|-----------------|
-|default_route| 0.0.0.0/0    |Virtual Appliance|10.0.100.4*       |
-
-*-example IP for firewall
-
-The default firewall configured for Landing Zone Core is [Azure Firewall Premium](https://docs.microsoft.com/en-us/azure/firewall/premium-features).
-
-Presently, there are two firewall rules configured to ensure access to the Azure Portal and to facilitate interactive logon via PowerShell and Azure CLI, all other traffic is restricted by default. Below are the collection of rules configured for Azure Commercial and Azure Government clouds:
-
-|Rule Collection Priority | Rule Collection Name | Rule name | Source | Port     | Protocol                               |
-|-------------------------|----------------------|-----------|--------|----------|----------------------------------------|
-|100                      | AllowAzureCloud      | AzureCloud|*       |   *      |Any                                     |
-|110                      | AzureAuth            | msftauth  |  *     | Https:443| aadcdn.msftauth.net, aadcdn.msauth.net |
-
-### Operational Network Artifacts
-
-Operational Network Artifacts are used when operations wants to seperate all key, secrets and operations storage from the hub/spoke model.
-
 ## NoOps Accelerator Landing Zone Core - Module Deployment Sequence
 
 There are 2 deployment options available to deploy the NoOps Accelerator Landing Zone networking topology. One that uses an orchestration module for the spoke networking and one that does not.

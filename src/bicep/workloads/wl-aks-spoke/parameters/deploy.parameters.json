@@ -77,7 +77,7 @@
         "enableAadProfileEnableAzureRBAC": true,
         "enableAadProfileManaged": true,
         "aadProfileAdminGroupObjectIDs": [
-          "b24988ac-6180-42a0-ab88-20f7382dd24c"
+          "<<objectId>>"
         ],
         "aksClusterSkuTier": "Free",
         "primaryAgentPoolProfile": {
@@ -110,7 +110,7 @@
       "value": {
         "enableRoleAssignmentForStorageAccount": false,
         "principalIds": [
-          "7bc6bc45-b256-407c-9d79-bde13dfb5639"
+          "<<principalId>>"
         ],
         "roleDefinitionIdOrName": "Contributor"
       }

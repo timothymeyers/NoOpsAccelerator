@@ -50,7 +50,7 @@
         "storageAccountAccess": {
           "enableRoleAssignmentForStorageAccount": false,
           "principalIds": [
-            "7bc6bc45-b256-407c-9d79-bde13dfb5639"
+            "<<principalId>>"
           ],
           "roleDefinitionIdOrName": "Contributor"
         }
@@ -85,7 +85,7 @@
         "storageAccountAccess": {
           "enableRoleAssignmentForStorageAccount": false,
           "principalIds": [
-            "7bc6bc45-b256-407c-9d79-bde13dfb5639"
+            "<<principalId>>"
           ],
           "roleDefinitionIdOrName": "Contributor"
         }
@@ -120,7 +120,7 @@
         "storageAccountAccess": {
           "enableRoleAssignmentForStorageAccount": false,
           "principalIds": [
-            "7bc6bc45-b256-407c-9d79-bde13dfb5639"
+            "<<principalId>>"
           ],
           "roleDefinitionIdOrName": "Contributor"
         }
@@ -155,7 +155,7 @@
         "storageAccountAccess": {
           "enableRoleAssignmentForStorageAccount": false,
           "principalIds": [
-            "7bc6bc45-b256-407c-9d79-bde13dfb5639"
+            "<<principalId>>"
           ],
           "roleDefinitionIdOrName": "Contributor"
         }
@@ -166,7 +166,7 @@
         "enable": false,
         "artifactsKeyVault": {
           "keyVaultPolicies": {
-            "objectId": "7bc6bc45-b256-407c-9d79-bde13dfb5639",
+            "objectId": "<<objectId>>",
             "permissions": {
               "keys": [
                 "get",
@@ -183,7 +183,7 @@
         "storageAccountAccess": {
           "enableRoleAssignmentForStorageAccount": false,
           "principalIds": [
-            "7bc6bc45-b256-407c-9d79-bde13dfb5639"
+            "<<principalId>>"
           ],
           "roleDefinitionIdOrName": "Contributor"
         }
@@ -223,7 +223,7 @@
           "value": {
             "enableRoleAssignmentForStorageAccount": false,
             "principalIds": [
-              "7bc6bc45-b256-407c-9d79-bde13dfb5639"
+              "<<principalId>>"
             ],
             "roleDefinitionIdOrName": "Contributor"
           }
@@ -240,7 +240,7 @@
         "storageAccountAccess": {
           "enableRoleAssignmentForStorageAccount": false,
           "principalIds": [
-            "7bc6bc45-b256-407c-9d79-bde13dfb5639"
+            "<<principalId>>"
           ],
           "roleDefinitionIdOrName": "Contributor"
         }

@@ -13,7 +13,7 @@
           {
             "name": "anoa",
             "displayName": "ANOA",
-            "parentMGName": "0ff59ae6-406c-4aba-a174-fddb35d8dd6f"
+            "parentMGName": "<<tenantId>>"
           },
           {
             "name": "anoa-lzs",

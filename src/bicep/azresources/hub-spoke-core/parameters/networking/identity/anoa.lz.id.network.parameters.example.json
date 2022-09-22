@@ -9,7 +9,7 @@
             "value": "v1.0"
         },
         "parIdentitySubscriptionId": {
-            "value": "xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx"
+            "value": "<<subscriptionId>>"
         },
         "parDeployEnvironment": {
             "value": "workload"
@@ -30,7 +30,7 @@
             "value": true
         },
         "parStorageAccountAccessObjectId": {
-            "value": "xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx"
+            "value": "<<objectId>>"
         },
         "parStorageAccountAccessType": {
             "value": "Group"

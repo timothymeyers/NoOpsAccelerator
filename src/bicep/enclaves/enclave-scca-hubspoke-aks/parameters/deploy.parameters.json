@@ -19,7 +19,7 @@
       }
     },
     "parTenantId": {
-      "value": "ded6b38d-d740-4564-ae25-2e3f041093be"
+      "value": "<<tenantId>>"
     },
     "parRootMg": {
       "value": "ANOA"

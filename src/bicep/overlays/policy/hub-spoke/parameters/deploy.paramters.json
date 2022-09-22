@@ -4,6 +4,9 @@
     "parameters": {
         "parPolicy": {
             "value": {
+                "tenantId": "0ff59ae6-406c-4aba-a174-fddb35d8dd6f",
+                "rootManagementGroupId": "ANOA",
+                "requireAuthorizationForGroupCreation": true,
                 "bulitInPolicy": {
                     "policies": [
                         {
@@ -100,8 +103,16 @@
                             }
                         ]
                     }
+                },
+                "subscriptionMovement": {
+                    "value": [
+                        {
+                            "subscriptionId": "c24647bf-0c86-4408-8d29-6a67262a2701",
+                            "managementGroupName": "anoa-management"
+                        }
+                    ]
                 }
             }
-        }        
+        }
     }
 }

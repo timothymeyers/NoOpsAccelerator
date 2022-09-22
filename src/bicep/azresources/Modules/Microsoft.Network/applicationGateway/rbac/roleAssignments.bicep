@@ -1,4 +1,5 @@
 /* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
+
 @sys.description('Required. The IDs of the principals to assign the role to.')
 param principalIds array
 

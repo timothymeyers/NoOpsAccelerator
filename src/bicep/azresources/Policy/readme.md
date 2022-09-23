@@ -1,5 +1,7 @@
 # Overlays: NoOps Accelerator - Azure Policy for Guardrails
 
+> **IMPORTANT: This is currenly work in progress.**
+
 ## Table of Contents
 
   - [Overview](#overview)
@@ -32,7 +34,7 @@ All built-in policy set assignments are located in [policy/builtin/assignments](
 * For the purpose of remediating policies, deployment templates can be adjusted with new policy elements and role assignments.
 * When assigning a policy set, runtime parameters are defined in configuration files.
 
-All policy set assignments are at the `root` top level management group.  This top level management group is retrieved from configuration parameter `parTopLevelManagementGroupName`.  See the [GitHub Actions](../onboarding/azure-devops-pipelines.md) onboarding guide for instructions to setting up management groups & policy pipeline.
+All policy set assignments are at the `root` top level management group.  This top level management group is retrieved from configuration parameter `parRootMg`.  See the [GitHub Actions](../onboarding/policy-as-code/github-actions.md) onboarding guide for instructions to setting up policy pipeline.
 
 | Policy Set | Description | Deployment Template | Configuration |
 | --- | --- | --- | --- |
@@ -46,7 +48,7 @@ All policy set assignments are at the `root` top level management group.  This t
 
 > **Note**: When a built-in alternative is unavailable, custom policies and policy sets are applied. As new options become available, automation is continually updated to utilize built-in policies and policy sets.
 
-All policies and policy set definitions & assignments are at the `root` top level management group.  This top level management group is retrieved from configuration parameter `var-topLevelManagementGroupName`.  See the [GitHub Actions Pipelines](../onboarding/azure-devops-pipelines.md) onboarding guide for instructions to setting up management groups & policy pipeline.
+All policies and policy set definitions & assignments are at the `root` top level management group.  This top level management group is retrieved from configuration parameter `parRootMg`.  See the [GitHub Actions Pipelines](../onboarding/policy-as-code/github-actions.md) onboarding guide for instructions to setting up policy pipeline.
 
 ### Custom Policy Definitions
 
@@ -60,7 +62,7 @@ Each policy is organized into it's own folder.  The folder name must not have an
 
 See [step-by-step instructions on Azure Policy Authoring Guide](authoring-guide.md) for more information.
 
-GitHub Actions ([.pipelines/policy.yml](../../.pipelines/policy.yml)) is used for policy definition automation.  The automation enumerates the policy definition directory (`policy/custom/definitions/policy`) and creates/updates policies that it identifies.
+GitHub Actions ([.github/workflows/policy.yml](../../.github/workflows/policy.yml)) is used for policy definition automation.  The automation enumerates the policy definition directory (`policy/custom/definitions/policy`) and creates/updates policies that it identifies.
 
 **Action Step**
 
@@ -75,7 +77,7 @@ GitHub Actions ([.pipelines/policy.yml](../../.pipelines/policy.yml)) is used fo
 
 All custom policy set definitions are located in [policy/custom/definitions/policyset](../../policy/custom/definitions/policyset) folder.  Custom policy sets contain built-in and custom policies.
 
-GitHub Actions ([.pipelines/policy.yml](../../.pipelines/policy.yml)) is used for policy set definition automation.  Defined policy sets can be customized through pipeline configuration.
+GitHub Actions ([.github/workflows/policy.yml](../../.github/workflows/policy.yml)) is used for policy set definition automation.  Defined policy sets can be customized through pipeline configuration.
 
 **Action Step**
 
@@ -85,7 +87,7 @@ GitHub Actions ([.pipelines/policy.yml](../../.pipelines/policy.yml)) is used fo
         description: 'Define Policy Set'
         deployTemplates: [AKS, DefenderForCloud, LogAnalytics, Network, DNSPrivateEndpoints, Tags]
         deployOperation: ${{ variables['deployOperation'] }}
-        policyAssignmentManagementGroupScope: $(var-topLevelManagementGroupName)
+        policyAssignmentManagementGroupScope: $(parRootMg)
         workingDir: $(System.DefaultWorkingDirectory)/policy/custom/definitions/policyset
 ```
 
@@ -107,7 +109,7 @@ All custom policy set assignments are located in [policy/custom/assignments](../
 * Deployment templates can be customized for additional policy parameters & role assignments for policy remediation.
 * Configuration files are used to define runtime parameters during policy set assignment.  
 
-GitHub Actions ([.pipelines/policy.yml](../../.pipelines/policy.yml)) is used for policy set assignment automation.  Assigned policy sets can be customized through pipeline configuration.
+GitHub Actions ([.github/workflows/policy.yml](../../.github/workflows/policy.yml)) is used for policy set assignment automation.  Assigned policy sets can be customized through pipeline configuration.
 
 **Action Step**
 ```yml

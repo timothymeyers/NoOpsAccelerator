@@ -1,30 +1,8 @@
 # Overlays: NoOps Accelerator - Management Groups
 
-### Module Tested on
-
-* Azure Commercial ✔️
-* Azure Government ✔️
-* Azure Government Secret ✔️
-* Azure Government Top Secret ❔
-
-> ✔️ = tested,  ❔= currently testing
-
-## Navigation
-
-  - [Overview](#overview)
-  - [Prerequisites](#prerequisites)
-  - [Architecture](#architecture)
-  - [Deployment](#deployment)
-  - [Parameters](#parameters)
-  - [Outputs](#outputs)
-  - [Resource types](#resource-types)
-  - [Air-Gapped Clouds](#air-gapped-clouds)
-  - [Cleanup](#cleanup)
-  - [Example Output in Azure](#example-output-in-azure)
-
 ## Overview
 
-The Enclave Management Groups module deploys a management group hierarchy in a tenant under the `Tenant Root Group`.  This is accomplished through a tenant-scoped Azure Resource Manager (ARM) deployment.  The heirarchy can be modifed by editing `deploy.enclave.mg.parameters.json`.
+The Enclave Management Groups module deploys a management group hierarchy in a tenant under the `Tenant Root Group`.  This is accomplished through a tenant-scoped Azure Resource Manager (ARM) deployment.  The heirarchy can be modifed by editing `deploy.parameters.json`.
 
 >NOTE: This module setups up a enclave management group structure suitable for the Hub/ 3 Spoke Design. You can create other parameter files that can be used for other organizational requirement.
 

@@ -165,6 +165,14 @@ param parSupportedClouds array = [
   'AzureUSGovernment'
 ]
 
+// Telemetry - Azure customer usage attribution
+// Reference:  https://docs.microsoft.com/azure/marketplace/azure-partner-customer-usage-attribution
+var telemetry = json(loadTextContent('../../azresources/Modules/Global/telemetry.json'))
+module telemetryCustomerUsageAttribution '../../azresources/Modules/Global/partnerUsageAttribution/customer-usage-attribution-subscription.bicep' = if (telemetry.customerUsageAttribution.enabled) {
+  name: 'pid-${telemetry.customerUsageAttribution.modules.workloads.aks}'
+  scope: subscription(parWorkload.subscriptionId)
+}
+
 //=== TAGS === 
 
 var referential = {

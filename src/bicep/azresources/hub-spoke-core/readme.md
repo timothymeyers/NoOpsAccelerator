@@ -46,13 +46,13 @@ There are 2 deployment options available to deploy the NoOps Accelerator Landing
 
 > NOTE: We recommend using deployment option 1 were possible as the orchestration module has some added benefits, like remote access, microsoft defender as well as the spoke networking.
 
-### Deployment Option 1 - Using Orchestration Module
+### Deployment Option 1 - Using Orchestration Module - lz-platform-scca-hub-3spoke
 
 This deployment option does utilize the orchestration module (a module that wrap/call other core modules).
 
 | Deployment Order | Module | Description | Prerequisites | Module Documentation |
  | --------------------------------- | ------ | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
- | 1 | NoOps Accelerator Landing Zone Core | Creates NoOps Accelerator Landing Zone Core with Azure Firewall to support Hub & Spoke network topology in the Connectivity subscription. | Management Groups, Subscription for NoOps Accelerator Landing Zone Networking. | [src\bicep\deployments\HubSpoke\](../deployments/HubSpoke/)|
+ | 1 | NoOps Accelerator SCCA Compliant Hub - 3 Spoke Landing Zone | Creates NoOps Accelerator SCCA Compliant Hub - 3 Spoke Landing Zone with Azure Firewall to support Hub & Spoke network topology in the Transport subscription. | Management Groups, Policy, Subscription for NoOps Accelerator Landing Zone Networking. | [src\bicep\plarforms\lz-platform-scca-hub-3spoke\](../../../bicep/platforms/lz-platform-scca-hub-3spoke)|
 
 ### Deploy Option 1 using the Azure CLI
 <!-- markdownlint-disable MD013 -->
@@ -60,16 +60,16 @@ This deployment option does utilize the orchestration module (a module that wrap
 
 ```bash
     git clone https://github.com/Azure/NoOpsAccelerator.git
-    cd noops
+    cd noopsaccelerator
 ```
 
-2. Deploy NoOps Accelerator Landing Zone Core with the az deployment sub create command. For a quickstart, we suggest a test deployment into the current AZ CLI subscription setting these parameters:
+2. Deploy NoOps Accelerator SCCA Compliant Hub - 3 Spoke Landing Zone with the az deployment sub create command. For a quickstart, we suggest a test deployment into the current AZ CLI subscription setting these parameters:
 
     * `--name`: (optional) The deployment name, which is visible in the Azure Portal under Subscription/Deployments.
     * `--location`: (required) The Azure region to store the deployment metadata.
     * `--subscription`: (required) The Azure subscription Id.
-    * `--template-file`: (required) The file path to the `anoa.lz.bicep` template.
-    * `--parameters`: (required) (required) The file path to the `deployments\MLZ\anoa.mlz.parameters.example.json` template that is used to generate values for your resources.
+    * `--template-file`: (required) The file path to the `deploy.bicep` template.
+    * `--parameters`: (required) (required) The file path to the `deployments\MLZ\deploy.parameters.json` template that is used to generate values for your resources.
 
 Here's an example:
 
@@ -77,12 +77,12 @@ Here's an example:
     az deployment sub create \
     --name deploy-lz-network \
     --location eastus \
-    --template-file ./src/bicep/landing-zone/anoa.lz.bicep \
-    --parameters @./src/bicep/deployments/MLZ/anoa.mlz.parameters.example.json \
+    --template-file ./src/bicep/platforms/lz-platform-scca-hub-3spoke/deploy.bicep \
+    --parameters @./src/bicep/platforms/lz-platform-scca-hub-3spoke/deploy.parameters.json \
     --subscription xxxxxxx-xxxx-xxxxxxx-xxxxx-xxxx
 ```
 
-3. After a successful deployment, see our add-ons & examples directory for how to extend the capabilities of NoOps Accelerator Landing Zone.
+3. After a successful deployment, see our overlays directory for how to extend the capabilities of NoOps Accelerator Landing Zone.
 
 > Don't have Azure CLI? Here's how to get started with Azure Cloud Shell in your browser: <https://docs.microsoft.com/en-us/azure/cloud-shell/overview>
 
@@ -92,13 +92,13 @@ This deployment option doesn't utilize any orchestration modules (modules that w
 
  | Deployment Order | Module | Description | Prerequisites | Module Documentation |
  | --------------------------------- | ------ | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
- | 1 | Logging | Creates Logging infrastructure to support (Sentinel, Log Analytics, Automation Account (Optional)) in the Connectivity subscription. | Management Groups, Subscription for Hub Networking. | [src\bicep\common\landingzone\core\vdms\logging\anoa.lz.logging.bicep](../common/landingzone/core/vdms/logging/README.md) |
-  | 2 | Hub Networking | Creates Hub networking infrastructure with Azure Firewall to support Mission Landing Zone network topology in the Connectivity subscription. | Management Groups, Subscription for Hub Networking. | [src\bicep\common\landingzone\core\vdss\hub\anoa.lz.hub.network.bicep](../common/landingzone/core/vdss/hub/readme.md) |
-   | 3 | Operations Spoke Network | Creates Operations Spoke networking infrastructure for workloads to support Mission Landing Zone network topology. Spoke subscriptions are used for deploying construction sets and workloads. | Management Groups, Logging, Hub Networking & Subscription for spoke networking. | [src\bicep\common\landingzone\core\vdms\operations\anoa.lz.ops.network.bicep](../common/landingzone/core/vdms/operations/README.md) |
-   | 3 | Identity Spoke Network | Creates Identiyy Spoke networking infrastructure for workloads to support Mission Landing Zone network topology. Spoke subscriptions are used for deploying construction sets and workloads. | Management Groups, Logging, Hub Networking & Subscription for spoke networking. | [src\bicep\common\landingzone\core\vdss\identity\anoa.lz.id.network.bicep](../common/landingzone/core/vdss/identity/README.md) |
-   | 3 | Shared Services Spoke Network | Creates Shared Services Spoke networking infrastructure for workloads to support Mission Landing Zone network topology. Spoke subscriptions are used for deploying construction sets and workloads. | Management Groups, Logging, Hub Networking & Subscription for spoke networking. | [src\bicep\common\landingzone\core\vdms\sharedservices\anoa.lz.svcs.network.bicep](../common/landingzone/core/vdms/sharedServices/README.md) |
-   | 4 | Hub VNet Peering | Creates VNet peering between 2 VNets (e.g. Hub & Spoke) in the Mission Landing Zone topology. Make sure to run this module twice, once in each direction. e.g. Hub to Spoke and then Spoke to Hub | Management Groups, Logging, Hub Networking & Subscription for spoke networking. | [src\bicep\common\landingzone\core\peering\hub\anoa.lz.hub.network.peerings.bicep](../common/landingzone/core/peering/hub/readme.md) |
-   | 5 | Spoke VNet Peering | Creates Spoke VNet peering between 2 VNets (e.g. Hub & Spoke) in the Mission Landing Zone topology. Make sure to run this module twice, once in each direction. e.g. Hub to Spoke and then Spoke to Hub | Management Groups, Logging, Hub Networking & Subscription for spoke networking. | [src\bicep\common\landingzone\core\peering\spoke\anoa.lz.spoke.network.peerings.bicep](../common/landingzone/core/peering/spoke/readme.md) |
+ | 1 | Logging | Creates Logging infrastructure to support (Sentinel, Log Analytics, Automation Account (Optional)) in the Connectivity subscription. | Management Groups, Subscription for Hub Networking. | [src\bicep\azresources\hub-spoke-core\vdms\logging\anoa.lz.logging.bicep](../azresources/hub-spoke-core/vdms/logging/README.md) |
+  | 2 | Hub Networking | Creates Hub networking infrastructure with Azure Firewall to support Mission Landing Zone network topology in the Connectivity subscription. | Management Groups, Subscription for Hub Networking. | [src\bicep\azresources\hub-spoke-core\vdss\hub\anoa.lz.hub.network.bicep](../azresources/hub-spoke-core/vdss/hub/readme.md) |
+   | 3 | Operations Spoke Network | Creates Operations Spoke networking infrastructure for workloads to support Mission Landing Zone network topology. Spoke subscriptions are used for deploying construction sets and workloads. | Management Groups, Logging, Hub Networking & Subscription for spoke networking. | [src\bicep\azresources\hub-spoke-core\vdms\operations\anoa.lz.ops.network.bicep](../azresources/hub-spoke-core/vdms/operations/README.md) |
+   | 3 | Identity Spoke Network | Creates Identiyy Spoke networking infrastructure for workloads to support Mission Landing Zone network topology. Spoke subscriptions are used for deploying construction sets and workloads. | Management Groups, Logging, Hub Networking & Subscription for spoke networking. | [src\bicep\azresources\hub-spoke-core\vdss\identity\anoa.lz.id.network.bicep](../azresources/hub-spoke-core/vdss/identity/README.md) |
+   | 3 | Shared Services Spoke Network | Creates Shared Services Spoke networking infrastructure for workloads to support Mission Landing Zone network topology. Spoke subscriptions are used for deploying construction sets and workloads. | Management Groups, Logging, Hub Networking & Subscription for spoke networking. | [src\bicep\azresources\hub-spoke-core\vdms\sharedservices\anoa.lz.svcs.network.bicep](../azresources/hub-spoke-core/vdms/sharedServices/README.md) |
+   | 4 | Hub VNet Peering | Creates VNet peering between 2 VNets (e.g. Hub & Spoke) in the Mission Landing Zone topology. Make sure to run this module twice, once in each direction. e.g. Hub to Spoke and then Spoke to Hub | Management Groups, Logging, Hub Networking & Subscription for spoke networking. | [src\bicep\azresources\hub-spoke-core\peering\hub\anoa.lz.hub.network.peerings.bicep](../azresources/hub-spoke-core/peering/hub/readme.md) |
+   | 5 | Spoke VNet Peering | Creates Spoke VNet peering between 2 VNets (e.g. Hub & Spoke) in the Mission Landing Zone topology. Make sure to run this module twice, once in each direction. e.g. Hub to Spoke and then Spoke to Hub | Management Groups, Logging, Hub Networking & Subscription for spoke networking. | [src\bicep\azresources\hub-spoke-core\peering\spoke\anoa.lz.spoke.network.peerings.bicep](../azresources/hub-spoke-core/peering/spoke/readme.md) |
 
 ### Deploy Option 2 using the Azure CLI
 
@@ -271,23 +271,6 @@ az monitor diagnostic-settings subscription list --query value[] --output table
 # Delete a diagnostic setting
 az monitor diagnostic-settings subscription delete --name <diagnostic setting name>
 ```
-
-## Contributing
-
-This project welcomes contributions and suggestions. See our [Contributing Guide](CONTRIBUTING.md) for details.
-
-## Feedback, Support, and How to Contact Us
-
-Please see the [Support and Feedback Guide](SUPPORT.md). To report a security issue please see our [security guidance](./SECURITY.md).
-
-## Trademarks
-
-This project may contain trademarks or logos for projects, products, or services. Authorized use of Microsoft
-trademarks or logos is subject to and must follow
-[Microsoft's Trademark & Brand Guidelines](https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks/usage/general).
-Use of Microsoft trademarks or logos in modified versions of this project must not cause confusion or imply Microsoft sponsorship.
-Any use of third-party trademarks or logos are subject to those third-party's policies.
-
 ## References
 
 [Hub and Spoke network topology](https://docs.microsoft.com/en-us/azure/architecture/reference-architectures/hybrid-networking/hub-spoke)

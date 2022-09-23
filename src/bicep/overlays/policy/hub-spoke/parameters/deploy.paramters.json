@@ -10,7 +10,7 @@
                 "bulitInPolicy": {
                     "policies": [
                         {
-                            "enabled": false,
+                            "enabled": true,
                             "name": "Location",
                             "policyAssignmentManagementGroupId": "anoa",
                             "enforcementMode": "Default",
@@ -79,14 +79,7 @@
                                 "policyDefinitionManagementGroupId": "anoa",
                                 "policySource": "ANOA",
                                 "policyCategory": "Security"
-                            },
-                            {
-                                "enabled": true,
-                                "name": "Custom - SQL Governance Initiative",
-                                "policyDefinitionManagementGroupId": "anoa",
-                                "policySource": "ANOA",
-                                "policyCategory": "SQL"
-                            },
+                            },                           
                             {
                                 "enabled": true,
                                 "name": "Custom - Storage Governance Initiative",
@@ -103,14 +96,6 @@
                             }
                         ]
                     }
-                },
-                "subscriptionMovement": {
-                    "value": [
-                        {
-                            "subscriptionId": "<<subscriptionId>>",
-                            "managementGroupName": "anoa-management"
-                        }
-                    ]
                 }
             }
         }

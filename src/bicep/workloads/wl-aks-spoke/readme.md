@@ -2,7 +2,7 @@
 
 ## Overview
 
-This workload module creates a Workload [Tier 3 Spoke Network](../tier3/README.md) deployment that deploys a Private Azure Kubernetes Service with RBAC enabled, if required. A Azure Kubernetes Service utilizes hardware security modules to protect key material. Roles for use must be assigned post-deployment, review reference list below for detailed information.
+This workload module creates a Workload [Tier 3 Spoke Network](../../azresources/hub-spoke-core/tier3/README.md) deployment that deploys a Private Azure Kubernetes Service with RBAC enabled, if required. A Azure Kubernetes Service utilizes hardware security modules to protect key material. Roles for use must be assigned post-deployment, review reference list below for detailed information.
 
 Read on to understand what this workload does, and when you're ready, collect all of the pre-requisites, then deploy the workload.
 
@@ -10,13 +10,15 @@ Read on to understand what this workload does, and when you're ready, collect al
 
  ![Private Azure Kubernetes Service](./media/AKSPrivateClusterTier3.jpg)
 
+> **NOTE:** You have to deploy this Policy, Service Alerts and Budgets in post-deployment. View [Overlay Management Services folder](../../overlays/management-services/)
+
 ## About Azure Container Registry
 
-The docs on Azure Container Registry: <https://docs.microsoft.com/en-us/azure/container-registry/>. By default, this workload uses the Azure Container Registry workload to deploy resources into [Tier 1 Spoke Network](../../../bicep/platforms/lz-platform-scca-hub-1spoke/readme.md).  
+The docs on Azure Container Registry: <https://docs.microsoft.com/en-us/azure/container-registry/>. By default, this workload uses the Azure Container Registry workload to deploy resources into [Platform Hub 1 Spoke Network](../../../bicep/platforms/lz-platform-scca-hub-1spoke/readme.md).  
 
-## About Azure Kubernetes Service - Cluster
+## About Azure Kubernetes Service - Private Cluster
 
-The docs on Azure Kubernetes Service: <https://docs.microsoft.com/en-us/azure/aks/>.  this workload uses the Azure Kubernetes Service - Cluster workload to deploy resources into [Tier 1 Spoke Network](../../../bicep/platforms/lz-platform-scca-hub-1spoke/readme.md).  
+The docs on Azure Kubernetes Service: <https://docs.microsoft.com/en-us/azure/aks/>.  this workload uses the Azure Kubernetes Service - Cluster workload to deploy resources into [Platform Hub 1 Spoke Network](../../../bicep/platforms/lz-platform-scca-hub-1spoke/readme.md).  
 
 ## Pre-requisites
 

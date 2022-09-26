@@ -6,11 +6,11 @@
 that enables US Department of Defense and other Public Sector customers
 to quickly develop and maintain
 opinionated, policy-driven, and self-service
-encalves in their Azure environments.
+enclaves in their Azure environments.
 
 Delivered as a collection of infrastructure as code (IaC) [module templates](https://github.com/Azure/NoOpsAccelerator/tree/main/src/bicep) written in Bicep, the NoOps Accelerator is intended to empower organizations on their journey towards a continuous deployment and governance model for their cloud infrastructure.
 
-Learn more about the NoOps movement and philosphy here - *[What is NoOps?](TBD)*.
+Learn more about the NoOps movement and philosophy here - *[What is NoOps?](TBD)*.
 
 ## Quickstart
 
@@ -23,7 +23,7 @@ These steps walk through how to use NoOps to deploy a hub and spoke architecture
 
 * Hub: SCCA-compliant networking hub (1 vnet, 1 resource group)
 * Tier 0 (T0): Identity & Authorization (1 vnet, 1 resource group)
-* Tier 1 (T1): Infrastrcture Operations, and Logging (1 vnet, 2 resource groups)
+* Tier 1 (T1): Infrastructure Operations, and Logging (1 vnet, 2 resource groups)
 * Tier 2 (T2): DevSecOps & Shared Services (1 vnet, 1 resource group)
 
 Steps:
@@ -41,7 +41,7 @@ For a quickstart, we suggest a test deployment into the current AZ CLI subscript
     * `--name`: (optional) The deployment name, which is visible in the Azure Portal under Subscription/Deployments.
     * `--location`: (required) The Azure region to store the deployment metadata.
     * `--template-file`: The file path to the `deploy.bicep` template.
-    * `--parameters`: The file path to the `parameters/deploy.parameters.json` file, preceeded by `@`.
+    * `--parameters`: The file path to the `parameters/deploy.parameters.json` file, preceded by `@`.
         Individual parameters can be overwritten using `<parameter>=<value>` format as well.
     * `--subscription`: The GUID for the subscription to deploy into.
         Multiple subscriptions may be configured (*i.e.*, to have separate subscriptions for each 'tier' in the MLZ architecture) in the `parameters/deploy.parameters.json`
@@ -108,7 +108,7 @@ NoOps is amaze. Definitions of NoOps primitives.
 Full deployment of a workload that is Secure Cloud Computing
 Architecture, SCCA compliant Monitoring, policy, governance, a
 workload, and role based access control (RBAC) will be
-im plemented.
+implemented.
 
 -->
 
@@ -120,7 +120,7 @@ im plemented.
 | **Overlays** | Extend *AzResources* with specific configurations or combine them to create more useful objects.<BR/><BR/>For example, one could use the `kubernetesCluster` overlay to deploy a Private AKS Cluster rather than using the `Microsoft.ContainerService/managedClusters` AzResource to deploy a vanilla AKS cluster.<BR/><BR/>Similarly, one could create a `virtualMachine` overlay that combines the deployment of a `Microsoft.Network/networkInterfaces` with a `Microsoft.Compute/virtualmachine` since you will rarely if ever deploy a VM without an associated NIC. |
 | **Platforms** | Combine *Overlays* and *AzResources* to lay the networking required to support mission workloads. NoOps is provided with two SCCA-compliant hub-and-spoke landing zone platforms. The [Quickstart](#quickstart) above walks through the deployment of a SCCA-compliant hub-and-3-spoke platform.
 | **Workloads** | Combine *Overlays* and *AzResources* to create solutions that achieve mission and operational goals. For example, one could mix a `kubernetesCluster` overlay (Private AKS Cluster) with a `Microsoft.ContainerRegistry` AzResource to create a **Dev Environment** Workload.<BR/><BR/>Workloads can be deployed into either a new or an existing hub-peered virtual network.|
-| **Enclaves** | Bring it all together -- combining a single *Platform* with one or more *Workloads*, and mixing in Zero Trust governance and RBAC -- to enable the rapid, repeatable, auditible, and authorizable deployment of outcome-driven infrastructure. |
+| **Enclaves** | Bring it all together -- combining a single *Platform* with one or more *Workloads*, and mixing in Zero Trust governance and RBAC -- to enable the rapid, repeatable, auditable, and authorizable deployment of outcome-driven infrastructure. |
 
 <!-- markdownlint-disable MD033 -->
 <!-- allow html for images so that they can be sized -->
@@ -166,7 +166,7 @@ Any use of third-party trademarks or logos are subject to those third-party's po
 
 ## Special Thanks and Liner Notes
 
-This project is greatly influenced by and owes a debt of graititude to the following:
+This project is greatly influenced by and owes a debt of gratitude to the following:
 
 * [Common Azure Resource Modules Library](aka.ms/carml)
 * [Azure Landing Zones for Canadian Public Sector](https://github.com/azure/canadapubsecalz)

@@ -14,7 +14,7 @@ Read on to understand what this landing zone does, and when you're ready, collec
 
 ## About Hub 3 Spoke Landing Zone
 
-The docs on Hub/Spoke Landing Zone: <https://docs.microsoft.com/en-us/azure/app-service/overview-hosting-plans>.
+Learn more about Hub/Spoke architectures in the [Microsoft Docs](https://learn.microsoft.com/en-us/azure/architecture/reference-architectures/hybrid-networking/hub-spoke).
 
 ### What is a Landing Zone?
 

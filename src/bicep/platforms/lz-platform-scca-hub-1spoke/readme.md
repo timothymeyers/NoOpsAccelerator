@@ -14,7 +14,7 @@ Read on to understand what this landing zone does, and when you're ready, collec
 
 ## About Hub 1 Spoke Landing Zone
 
-The docs on Hub/Spoke Landing Zone: <https://learn.microsoft.com/en-us/azure/architecture/reference-architectures/hybrid-networking/hub-spoke?tabs=cli>
+Learn more about Hub/Spoke architectures in the [Microsoft Docs](https://learn.microsoft.com/en-us/azure/architecture/reference-architectures/hybrid-networking/hub-spoke).
 
 ### What is a Landing Zone?
 

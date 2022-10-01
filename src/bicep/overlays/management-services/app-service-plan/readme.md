@@ -17,6 +17,8 @@ The subscription and resource group can be changed by providing the resource gro
 * A virtual network and subnet is deployed. (a deployment of [deploy.bicep](../../../../bicep/platforms/lz-platform-scca-hub-3spoke/deploy.bicep))
 * Decide if the optional parameters is appropriate for your deployment. If it needs to change, override one of the optional parameters.
 
+## Parameters
+
 See below for information on how to use the appropriate deployment parameters for use with this overlay:
 
 Required Parameters | Type | Allowed Values | Description
@@ -32,6 +34,16 @@ Optional Parameters | Type | Allowed Values | Description
 | :-- | :-- | :-- | :-- |
 None
 
+## Outputs
+
+This overlay will generate the following outputs:
+
+| Output Name | Type | Allowed Values | Description
+| :-- | :-- | :-- | :-- |
+outAppServicePlanName | string | '' | App Service Plan Name
+outResourceGroupName | string | '' | App Service Plan Resource Group Name
+outTags object | {object} | Required tags values used with App Service Plan overlay.
+
 ## Deploy the Overlay
 
 Connect to the appropriate Azure Environment and set appropriate context, see getting started with Azure PowerShell or Azure CLI for help if needed. The commands below assume you are deploying in Azure Commercial and show the entire process from deploying Platform Hub/Spoke Design and then adding an Azure App Service Plan post-deployment.
@@ -42,7 +54,11 @@ Once you have the hub/spoke output values, you can pass those in as parameters t
 
 For example, deploying using the `az deployment sub create` command in the Azure CLI:
 
-### Azure CLI
+<h3>Overlay Example: App Service Plan</h3>
+
+<details>
+
+<summary>via Bash</summary>
 
 ```bash
 # For Azure Commerical regions
@@ -77,6 +93,14 @@ az deployment sub create \
   --location 'usgovvirginia'
 ```
 
+
+</details>
+<p>
+
+<details>
+
+<summary>via Powershell</summary>
+
 ### PowerShell
 
 ```powershell
@@ -102,6 +126,8 @@ New-AzSubscriptionDeployment `
   -ResourceGroup anoa-usgovvirginia-platforms-hub-rg `
   -Location  'usgovvirginia'
 ```
+</details>
+<p>
 
 ## Extending the Overlay
 

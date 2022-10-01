@@ -266,7 +266,7 @@ param parAzureFirewall object
 //            }
 //   }
 // }
-@description('Enables logging parmeters and Microsoft Sentinel within the Log Analytics Workspace created in this deployment.')
+@description('Enables logging parmeters and Microsoft Sentinel within the Log Analytics Workspace created in this deployment. See azresources/hub-spoke-core/vdms/logging/readme.md')
 param parLogging object
 
 // Microsoft Defender for Cloud
@@ -331,7 +331,7 @@ param parSecurityCenter object
 //     }
 //   }
 // }
-@description('When set to "true", provisions Azure Bastion Host. It defaults to "false".')
+@description('When set to "true", provisions Azure Bastion Host with Jumpboxes, when specified. It defaults to "false".')
 param parRemoteAccess object
 
 // Telemetry - Azure customer usage attribution

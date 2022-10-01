@@ -23,6 +23,8 @@ Some particulars about Application Gateway:
 * A virtual network and subnet is deployed. (a deployment of [deploy.bicep](../../../../bicep/platforms/lz-platform-scca-hub-3spoke/deploy.bicep))
 * Decide if the optional parameters is appropriate for your deployment. If it needs to change, override one of the optional parameters.
 
+## Parameters
+
 See below for information on how to use the appropriate deployment parameters for use with this overlay:
 
 Required Parameters | Type | Allowed Values | Description
@@ -45,11 +47,18 @@ Once you have the hub/spoke output values, you can pass those in as parameters t
 
 For example, deploying using the `az deployment sub create` command in the Azure CLI:
 
-### Azure CLI
+<h3>Overlay Example: Application Gateway</h3>
+
+<details>
+
+<summary>via Bash</summary>
 
 ```bash
 # For Azure Commerical regions
+
+#sign  into AZ CLI, this will redirect you to a web browser for authentication, if required
 az login
+
 cd src/bicep
 cd platforms/lz-platform-scca-hub-3spoke
 az deployment sub create \ 
@@ -72,6 +81,14 @@ OR
 
 ```bash
 # For Azure Government regions
+
+# change Azure Clouds
+az cloud set --name AzureUSGovernment
+
+#sign  into AZ CLI, this will redirect you to a web browser for authentication, if required
+az login
+cd src/bicep/overlays
+cd applicationGateway
 az deployment sub create \
   --template-file overlays/applicationGateway/deploy.bicep \
   --parameters @overlays/applicationGateway/parameters/deploy.parameters.json \
@@ -80,10 +97,25 @@ az deployment sub create \
   --location 'usgovvirginia'
 ```
 
-### PowerShell
+</details>
+<p>
+
+<details>
+
+<summary>via Powershell</summary>
 
 ```powershell
 # For Azure Commerical regions
+
+#sign in to Azure  from Powershell, this will redirect you to a web browser for authentication, if required
+Connect-AzAccount
+
+#Fetch the list of available Tenant Ids.
+Get-AzTenant
+
+#Grab the tenant Id Switch to another active directory tenant.
+Set-AzContext -TenantId XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+
 New-AzSubscriptionDeployment `
   -TemplateFile overlays/applicationGateway/deploy.bicepp `
   -TemplateParameterFile overlays/applicationGateway/parameters/deploy.parameters.example.json `
@@ -95,12 +127,25 @@ OR
 
 ```powershell
 # For Azure Government regions
+
+#sign in to Azure  from Powershell, this will redirect you to a web browser for authentication, if required
+Connect-AzAccount
+
+#Fetch the list of available Tenant Ids.
+Get-AzTenant
+
+#Grab the tenant Id Switch to another active directory tenant.
+Set-AzContext -TenantId XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+
 New-AzSubscriptionDeployment `
   -TemplateFile overlays/applicationGateway/deploy.bicepp `
   -TemplateParameterFile overlays/applicationGateway/parameters/deploy.parameters.example.json `
   -Subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx `
   -Location  'usgovvirginia'
 ```
+
+</details>
+<p>
 
 ## Extending the Overlay
 

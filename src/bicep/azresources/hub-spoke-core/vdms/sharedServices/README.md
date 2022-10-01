@@ -1,8 +1,8 @@
-# Module:   NoOps Accelerator - Shared Services Network
+# Hub/Spoke Core Module:   NoOps Accelerator - Shared Services Spoke Network
 
 ## Overview
 
-This module defines Shared Services network deployment based on the recommendations from the Azure Mission Landing Zone Conceptual Architecture.  
+This module defines Shared Services spoke network deployment based on the recommendations from the Azure Mission Landing Zone Conceptual Architecture.  
 
 Module deploys the following resources:
 

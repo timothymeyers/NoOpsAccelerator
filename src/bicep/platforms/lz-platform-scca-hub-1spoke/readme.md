@@ -36,6 +36,15 @@ All network traffic is directed through the firewall residing in the Network Hub
 
 *-example IP for firewall
 
+### Tagging
+
+Organize cloud resources to meet the needs of governance, operational management, and accounting. Resources can be managed and found more quickly with the aid of well-defined metadata tagging protocols. By using charge back and show back accounting procedures, these conventions also assist in tying cloud usage charges to specific business teams.
+
+A tagging strategy include business and operational details:
+
+* The business side of this strategy ensures that tags include the organizational information needed to identify the teams. Use a resource along with the business owners who are responsible for resource costs.
+* The operational side ensures that tags include information that IT teams use to identify the workload, application, environment, criticality, and other information useful for managing resources.
+
 ## Pre-requisites
 
 ### Subscriptions
@@ -45,6 +54,12 @@ Most customers will deploy each tier to a separate Azure subscription, but multi
 ### Operational Network Artifacts
 
 If needed, The Operational Network Artifacts are used when operations wants to seperate all key, secrets and operations storage from the hub/spoke model.
+
+### DDOS
+
+If needed, You can dpeloy an DDOS Standard configuration if a firewall is not needed.
+
+## Parameters
 
 See below for information on how to use the appropriate deployment parameters for use with this landing zone:
 
@@ -56,13 +71,13 @@ parLocation | string | `[deployment().location]` | The region to deploy resource
 parHub | object | {object} | Hub Virtual network configuration. See [azresources/hub-spoke-core/vdss/hub/readme.md](../../azresources/hub-spoke-core/vdss/hub/readme.md)
 parOperationsSpoke | object | {object} | Operations Spoke Virtual network configuration. See [See azresources/hub-spoke-core/vdms/operations/readme.md](../../azresources/hub-spoke-core/vdms/operations/readme.md)
 parAzureFirewall | object | {object} | Azure Firewall configuration. Azure Firewall is deployed in Forced Tunneling mode where a route table must be added as the next hop.
-parLogging | object | {object} | Enables logging parmeters and Microsoft Sentinel within the Log Analytics Workspace created in this deployment.
-parRemoteAccess | object | {object} | When set to "true", provisions Azure Bastion Host. It defaults to "false".
+parLogging | object | {object} | Enables logging parmeters and Microsoft Sentinel within the Log Analytics Workspace created in this deployment. See [azresources/hub-spoke-core/vdms/logging/readme.md](../../azresources/hub-spoke-core/vdms/logging/readme.md)
+parRemoteAccess | object | {object} | When set to "true", provisions Azure Bastion Host. It defaults to "false". See [overlays/management-services/bastion/readme.md](../../overlays/management-services/bastion/readme.md)
 
 Optional Parameters | Type | Allowed Values | Description
 | :-- | :-- | :-- | :-- |
-parNetworkArtifacts | object | {object} | Optional. Enables Operations Network Artifacts Resource Group with KV and Storage account for the ops subscriptions used in the deployment.
-parSecurityCenter | object | {object} | Microsoft Defender for Cloud.  It includes email and phone.
+parNetworkArtifacts | object | {object} | Optional. Enables Operations Network Artifacts Resource Group with KV and Storage account for the ops subscriptions used in the deployment. This overlay allows Bastion keys to be added if Basion Host is enabled. See [azresources/hub-spoke-core/vdss/networkArtifacts/readme.md](../../azresources/hub-spoke-core/vdss/networkArtifacts/readme.md)
+parSecurityCenter | object | {object} | Microsoft Defender for Cloud.  It includes email and phone. See [overlays/management-services/defender/readme.md](../../overlays/management-services/defender/readme.md)
 parDdosStandard | bool | `false` | DDOS Standard configuration.
 
 ## Deploy the Landing Zone

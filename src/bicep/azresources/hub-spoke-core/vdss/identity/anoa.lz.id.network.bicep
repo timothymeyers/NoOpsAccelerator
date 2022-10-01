@@ -99,11 +99,22 @@ param parIdentitySubnetServiceEndpoints array = [
 
 // ROUTE TABLE 
 
+@description(' An Array of Routes to be established within the hub route table.')
+param parRouteTableRoutes array = [
+  {
+    name: 'id-routetable'
+    properties: {
+      addressPrefix: '0.0.0.0/0'
+      nextHopIpAddress: parFirewallPrivateIPAddress
+      nextHopType: 'VirtualAppliance'
+    }
+  }
+]
+
+@description('Firewall private IP address within the hub route table.')
 param parFirewallPrivateIPAddress string
-param parRouteTableRouteAddressPrefix string = '0.0.0.0/0'
-param parRouteTableRouteNextHopIpAddress string = parFirewallPrivateIPAddress
-param parRouteTableRouteNextHopType string = 'VirtualAppliance'
-param parDisableBgpRoutePropagation bool = true
+
+param parDisableBgpRoutePropagation bool
 
 //DDOS PARAMETERS
 
@@ -235,16 +246,7 @@ module modIdentityRouteTable '../../../Modules/Microsoft.Network/routeTable/az.n
     location: parLocation
     tags: modTags.outputs.tags
 
-    routes: [
-      {
-        name: varRouteTableName
-        properties: {
-          addressPrefix: parRouteTableRouteAddressPrefix
-          nextHopIpAddress: parRouteTableRouteNextHopIpAddress
-          nextHopType: parRouteTableRouteNextHopType
-        }
-      }
-    ]
+    routes: parRouteTableRoutes
     disableBgpRoutePropagation: parDisableBgpRoutePropagation
   }
   dependsOn: [

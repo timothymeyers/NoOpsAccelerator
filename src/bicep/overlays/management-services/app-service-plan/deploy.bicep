@@ -140,6 +140,6 @@ module appServicePlan '../../../azresources/Modules/Microsoft.Web/serverfarms/az
   }
 }
 
-output appServicePlanName string = varAppServicePlanName
-output resourceGroupName string = parTargetResourceGroup
-output tags object = modTags.outputs.tags
+output outAppServicePlanName string = varAppServicePlanName
+output outResourceGroupName string = parTargetResourceGroup
+output outTags object = modTags.outputs.tags

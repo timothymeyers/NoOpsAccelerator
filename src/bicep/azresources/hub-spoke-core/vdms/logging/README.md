@@ -1,8 +1,8 @@
-# Module:   NoOps Accelerator - Logging, & Sentinel
+# Hub/Spoke Core Module: NoOps Accelerator - Operations Logging, & Sentinel
 
 ## Overview
 
-This module defines Azure Log Analytics Workspace, Automation Account (linked together) & multiple Solutions deploy to the Log Analytics Workspace to an Logging Resource Group in the Hub Tier.
+This module defines Azure Log Analytics Workspace, Automation Account (linked together) & multiple Solutions deploy to the Log Analytics Workspace to an Logging Resource Group in the Operations Tier.
 
 Automation Account will be linked to Log Analytics Workspace to provide integration for Update Management, Change Tracking and Inventory, and Start/Stop VMs during off-hours for your servers and virtual machines, if deployed. Only one mapping can exist between Log Analytics Workspace and Automation Account.
 
@@ -12,6 +12,7 @@ The module will deploy the following Log Analytics Workspace solutions by defaul
 * AntiMalware
 * AzureActivity
 * ChangeTracking
+* Container Insights
 * Security
 * SecurityInsights (Azure Sentinel)
 * ServiceMap
@@ -40,8 +41,8 @@ The module requires the following inputs:
 | Parameter                         | Type   | Default                                                                                              | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | Required                   | Example                                        |
  | --------------------------------- | ------ | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- | ---------------------------------------------- |
 | parDeployAutomationAccount | bool | `aona`                                                                          | Prefix value which will be prepended to all resource names. Default: anoa   | Yes  | `aona` |
-| parLogAnalyticsWorkspaceCappingDailyQuotaGb | int | `aona`                                                                          | Prefix value which will be prepended to all resource names. Default: anoa   | Yes  | `aona` |
-| parLogAnalyticsWorkspaceRetentionInDays | int | `aona`                                                                          | Prefix value which will be prepended to all resource names. Default: anoa   | Yes  | `aona` |
+| parLogAnalyticsWorkspaceCappingDailyQuotaGb | int | `-1`                                                                          | Prefix value which will be prepended to all resource names. Default: anoa   | Yes  | `aona` |
+| parLogAnalyticsWorkspaceRetentionInDays | int | `30`                                                                          | Prefix value which will be prepended to all resource names. Default: anoa   | Yes  | `aona` |
 | parLogAnalyticsWorkspaceSkuName | string | `PerGB2018`                                                                          | Prefix value which will be prepended to all resource names. Default: anoa   | Yes  | `PerGB2018` |
 | parDeploySentinel | bool | `false`                                                                          | Prefix value which will be prepended to all resource names. Default: anoa   | Yes  | `false` |
 | parLogStorageSkuName | string | `Standard_GRS`                                                                          | Prefix value which will be prepended to all resource names. Default: anoa   | Yes  | `Standard_GRS` |
@@ -55,7 +56,9 @@ Parameters file located in the [Deployments](../../../../deployments/HubSpoke/lo
 
 The module will generate the following outputs:
 
-table
+Parameters | Type | Allowed Values | Description
+| :-- | :-- | :-- | :-- |
+None
 
 ## Deployment
 
@@ -67,8 +70,8 @@ Other differences in Azure IL regions are as follow:
 
  | Azure Cloud    | Bicep template      | Input parameters file                    |
  | -------------- | ------------------- | ---------------------------------------- |
- | Global regions | anoa.lz.logging.bicep | anoa.lz.logging.parameters.json    |
- | IL regions  | anoa.lz.logging.bicep | anoa.lz.logging.parameters.json |
+ | Commerical regions | anoa.lz.logging.bicep | anoa.lz.logging.parameters.json    |
+ | Government regions  | anoa.lz.logging.bicep | anoa.lz.logging.parameters.json |
 
 > For the examples below we assume you have downloaded or cloned the Git repo as-is and are in the root of the repository as your selected directory in your terminal of choice.
 
@@ -87,6 +90,7 @@ az deployment sub create \
    --location eastus \
    --template-file src/bicep/common/landingzone/core/vdms/logging/anoa.lz.logging.bicep \
    --parameters @src/bicep/common/landingzone/core/vdms/logging/anoa.lz.logging.parameters.json
+   --subscription $ConnectivitySubscriptionId
 ```
 
 OR

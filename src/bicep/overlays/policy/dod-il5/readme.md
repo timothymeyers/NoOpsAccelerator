@@ -1,10 +1,10 @@
-# Overlays: NoOps Accelerator - Policy - NIST SP 800-53 R4
+# Overlays: NoOps Accelerator - Policy - NIST SP 800-53 R5 
 
 > **IMPORTANT: This is currenly work in progress.**
 
 ## Overview
 
-Azure Policy Regulatory Compliance built-in initiative definition maps to compliance domains and controls in NIST SP 800-53 Rev. 4. For more information about this compliance standard, see [NIST SP 800-53 Rev. 4](https://csrc.nist.gov/Projects/risk-management/sp800-53-controls/release-search#/).
+Azure Policy Regulatory Compliance built-in initiative definition maps to compliance domains and controls in NIST SP 800-53 Rev. 5. For more information about this compliance standard, see [NIST SP 800-53 Rev. 5](https://csrc.nist.gov/Projects/risk-management/sp800-53-controls/release-search#/).
 
 A collection of built-in Azure Policy Sets based on Regulatory Compliance are configured with Azure NoOps Accelerator. To boost compliance for logging, networking, and tagging requirements, custom policy sets have been developed. Through automation, these can be further expanded or eliminated as needed by the department.
 
@@ -43,7 +43,7 @@ None
 
 Policy |  Description
 | :-- | :-- |
-[NIST SP 800-53 Rev. 4](https://learn.microsoft.com/en-us/azure/governance/policy/samples/nist-sp-800-53-r4) | NIST Risk Management Framework
+[NIST SP 800-53 Rev. 5](https://learn.microsoft.com/en-us/azure/governance/policy/samples/nist-sp-800-53-r4) | NIST Risk Management Framework
 
 ## Deployment
 
@@ -51,7 +51,7 @@ In this overlay, the policy definitions hierarchy are created at a specific `Man
 
 Input parameter file parameters/deploy.parameters.all.json defines the assignable scope for the policies. In this case, it will be the same management group (i.e. 'ANOA') as the one specified for the deployment operation. There is no change in the input parameter file for different Azure clouds because there is no change to the intermediate root management group.
 
-<h3>Overlay Example: NIST SP 800-53 Rev. 4 Policy</h3>
+<h3>Overlay Example: NIST SP 800-53 Rev. 5 Policy</h3>
 
 <details>
 
@@ -63,10 +63,10 @@ az login
 cd src/bicep/overlays
 cd policy/nist-r5
 az deployment mg create \
-   --name deploy-policy-nist-r4 \
+   --name deploy-policy-nist-r5 \
    --management-group-id 'ANOA' \
-   --template-file overlays/policy/nist-r4/deploy.bicep \
-   --parameters @overlays/policy/nist-r4/deploy.parameters.all.json \
+   --template-file overlays/policy/nist-r5/deploy.bicep \
+   --parameters @overlays/policy/nist-r5/deploy.parameters.all.json \
    --location 'eastus'
 ```
 
@@ -79,10 +79,10 @@ az cloud set --name AzureUSGovernment
 #sign  into AZ CLI, this will redirect you to a web browser for authentication, if required
 az login
 az deployment mg create \
-   --name deploy-policy-nist-r4 \
+   --name deploy-policy-nist-r5 \
    --management-group-id 'ANOA' \
-   --template-file overlays/policy/nist-r4/deploy.bicep \
-   --parameters @overlays/policy/nist-r4/deploy.parameters.all.json \
+   --template-file overlays/policy/nist-r5/deploy.bicep \
+   --parameters @overlays/policy/nist-r5/deploy.parameters.all.json \
   --location 'usgovvirginia'
 ```
 
@@ -106,10 +106,10 @@ Get-AzTenant
 Set-AzContext -TenantId XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
 
 New-AzManagementGroupDeployment `
-  -Name deploy-policy-nist-r4 `
+  -Name deploy-policy-nist-r5 `
   -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
-  -TemplateFile overlays/policy/nist-r4/deploy.bicep `
-  -TemplateParameterFile overlays/policy/nist-r4/deploy.parameters.all.json `
+  -TemplateFile overlays/policy/nist-r5/deploy.bicep `
+  -TemplateParameterFile overlays/policy/nist-r5/deploy.parameters.all.json `
   -Location 'eastus'
 ```
 
@@ -128,10 +128,10 @@ Get-AzTenant
 Set-AzContext -TenantId XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
 
 New-AzManagementGroupDeployment `
-  -Name deploy-policy-nist-r4 `
+  -Name deploy-policy-nist-r5 `
   -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
-  -TemplateFile overlays/policy/nist-r4/deploy.bicep `
-  -TemplateParameterFile overlays/policy/nist-r4/deploy.parameters.all.json `
+  -TemplateFile overlays/policy/nist-r5/deploy.bicep `
+  -TemplateParameterFile overlays/policy/nist-r5/deploy.parameters.all.json `
   -Location  'usgovvirginia'
 ```
 </details>

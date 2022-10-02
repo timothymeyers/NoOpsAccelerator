@@ -13,7 +13,6 @@ DESCRIPTION: The following components will be options in this deployment
                 * Bulit-In - NIST SP 800-53 R4                      
               
 AUTHOR/S: jspinella
-VERSION: 1.x.x
 */
 
 targetScope = 'managementGroup'

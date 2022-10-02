@@ -10,21 +10,7 @@
 SUMMARY: Overlay Example to deploy Bulit-In/Custom policy defintions/assignments to a existing enclave
 DESCRIPTION: The following components will be options in this deployment
               * Policies
-                * Bulit-In - Location
-                * Bulit-In - NIST SP 800-53 R5
-                * Bulit-In - FedRAMP Moderate
-                * Bulit-In - FedRAMP Moderate
                 * Bulit-In - DDO IL4
-                * Bulit-In - DDO IL5
-                * Custom - Compute Governance 
-                * Custom - AKS Governance 
-                * Custom - Data Protection Governance 
-                * Custom - Network Governance
-                * Custom - Storage Governance
-                * Custom - Key Vault Governance
-                * Custom - Log Analytics Governance
-                * Custom - Security Center Governance             
-              
 AUTHOR/S: jspinella
 */
 
@@ -49,13 +35,12 @@ module telemetryCustomerUsageAttribution '../../../azresources//Modules/Global/p
 }
 
 // BUILT-IN POLICIES
-//NIST SP 800-53 R5 Policy
-module polNISTR5 '../../../azresources/Policy/builtin/assignments/policy-nist80053r5.bicep' = if (parPolicy.bulitInPolicy.policies.enabled) {
+//DDO IL4 Policy
+module polDDOIL4 '../../../azresources/Policy/builtin/assignments/policy-dodil4.bicep' = if (parPolicy.bulitInPolicy.policies.enabled) {
   name: 'NISTR5DefintionDeployment-${parDeploymentNameSuffix}'
   params: {
     parLocation: parLocation
     parPolicyAssignmentManagementGroupId: parPolicy.bulitInPolicy.policies.policyAssignmentManagementGroupId
     parRequiredRetentionDays: parPolicy.bulitInPolicy.policies.requiredRetentionDays
-    parLogAnalyticsWorkspaceId: parPolicy.bulitInPolicy.policies.logAnalyticsWorkspaceId
   }
 }

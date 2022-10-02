@@ -343,6 +343,19 @@ parOperationsSpoke | object | {object} | Operations Spoke Virtual network config
 parAzureFirewall | object | {object} | Azure Firewall configuration. Azure Firewall is deployed in Forced Tunneling mode where a route table must be added as the next hop.
 parLogging | object | {object} | Enables logging parmeters and Microsoft Sentinel within the Log Analytics Workspace created in this deployment.
 parRemoteAccess | object | {object} | When set to "true", provisions Azure Bastion Host. It defaults to "false".
+parWorkload | object | {object} | Required values used for workloads.
+parHubSubscriptionId | string | `xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxx` | The subscription ID for the Hub Network.
+parHubResourceGroupName | string | `anoa-eastus-platforms-hub-rg` | The resource group name for the Hub Network.
+parHubVirtualNetworkName | string | `anoa-eastus-platforms-hub-vnet` | The virtual network name for the Hub Network.
+parHubVirtualNetworkResourceId | string | `/subscriptions/xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx/resourceGroups/anoa-eastus-platforms-hub-rg/providers/Microsoft.Network/virtualNetworks/anoa-eastus-platforms-hub-vnet/subnets/anoa-eastus-platforms-hub-vnet` | The resource ID of the virtual network for the Hub Network.
+parHubFirewallPolicyName | string | `anoa-eastus-dev-hub-afwp` | The name of the Firewall Policy in the Hub Virtual Network that hosts rules for Hub Subnet traffic
+parFirewallPrivateIPAddress | string | `10.0.100.4` | The private ip address of the Firewall in the Hub Virtual Network.
+parLogAnalyticsWorkspaceResourceId | string | `/subscriptions/xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx/resourcegroups/anoa-eastus-dev-logging-rg/providers/microsoft.operationalinsights/workspaces/anoa-eastus-dev-logging-log` | Log Analytics Workspace Resource Id.
+parLogAnalyticsWorkspaceId | string | `anoa-eastus-dev-logging-log` | Log Analytics Workspace Resource Id
+parSourceAddresses | array | `10.0.100.4` | Log Analytics Workspace Resource Id
+parKubernetesCluster | object | {object} | The object parameters of the Azure Kubernetes Cluster. Found at [Azure Kubernetes Cluster](../../../bicep/overlays/management-services/kubernetesCluster/readme.md)
+parContainerRegistry | object | {object} | Defines the Container Registry. Found at [Azure Container Registry](../../../bicep/overlays/management-services/containerRegistry/readme.md)
+parStorageAccountAccess | object | {object} | Defines the Storage Account Access.
 
 Optional Parameters | Type | Allowed Values | Description
 | :-- | :-- | :-- | :-- |
@@ -362,21 +375,13 @@ For example, deploying using the `az deployment sub create` command in the Azure
 # For Azure Commerical regions
 az login
 cd src/bicep
-cd platforms/lz-platform-scca-hub-3spoke
+cd enclaves/enclave-scca-hubspoke-aks
 az deployment sub create \ 
---name contoso \
+--name deploy-scca-enclave-with-aks \
 --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx \
---template-file platforms/lz-platform-scca-hub-3spoke/deploy.bicep \
+--template-file deploy.bicep \
 --location eastus \
---parameters @platforms/lz-platform-scca-hub-3spoke/parameters/deploy.parameters.json
-cd overlays
-cd app-service-plan
-az deployment sub create \
-   --name deploy-AppServicePlan
-   --template-file overlays/app-service-plan/deploy.bicep \
-   --parameters @overlays/app-service-plan/parameters/deploy.parameters.json \
-   --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx \
-   --location 'eastus'
+--parameters @parameters/deploy.parameters.json
 ```
 
 OR
@@ -384,10 +389,10 @@ OR
 ```bash
 # For Azure Government regions
 az deployment sub create \
-  --template-file overlays/app-service-plan/deploy.bicep \
-  --parameters @overlays/app-service-plan/parameters/deploy.parameters.json \
+  --name deploy-scca-enclave-with-aks \
+  --template-file enclaves/enclave-scca-hubspoke-aks/deploy.bicep \
+  --parameters @enclaves/enclave-scca-hubspoke-aks/parameters/deploy.parameters.json \
   --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx \
-  --resource-group anoa-usgovvirginia-platforms-hub-rg \
   --location 'usgovvirginia'
 ```
 
@@ -396,11 +401,10 @@ az deployment sub create \
 ```powershell
 # For Azure Commerical regions
 New-AzSubscriptionDeployment `
-  -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
-  -TemplateFile overlays/app-service-plan/deploy.bicepp `
-  -TemplateParameterFile overlays/app-service-plan/parameters/deploy.parameters.example.json `
+  -Name deploy-scca-enclave-with-aks `
+  -TemplateFile enclaves/enclave-scca-hubspoke-aks/deploy.bicep `
+  -TemplateParameterFile enclaves/enclave-scca-hubspoke-aks/parameters/deploy.parameters.json `
   -Subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx `
-  -ResourceGroup anoa-eastus-platforms-hub-rg `
   -Location 'eastus'
 ```
 
@@ -409,11 +413,10 @@ OR
 ```powershell
 # For Azure Government regions
 New-AzSubscriptionDeployment `
-  -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
-  -TemplateFile overlays/app-service-plan/deploy.bicepp `
-  -TemplateParameterFile overlays/app-service-plan/parameters/deploy.parameters.example.json `
+  -Name deploy-scca-enclave-with-aks `
+  -TemplateFile enclaves/enclave-scca-hubspoke-aks/deploy.bicep `
+  -TemplateParameterFile enclaves/enclave-scca-hubspoke-aks/parameters/deploy.parameters.json `
   -Subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx `
-  -ResourceGroup anoa-usgovvirginia-platforms-hub-rg `
   -Location  'usgovvirginia'
 ```
 
@@ -432,17 +435,17 @@ Use the Azure portal, Azure CLI, or Azure PowerShell to list the deployed resour
 Configure the default group using:
 
 ```bash
-az configure --defaults group=anoa-eastus-dev-appplan-rg.
+az configure --defaults group=anoa-eastus-dev-aks-rg.
 ```
 
 ```bash
-az resource list --location eastus --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxx --resource-group anoa-eastus-dev-appplan-rg
+az resource list --location eastus --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxx --resource-group anoa-eastus-dev-aks-rg
 ```
 
 OR
 
 ```powershell
-Get-AzResource -ResourceGroupName anoa-eastus-dev-appplan-rg
+Get-AzResource -ResourceGroupName anoa-eastus-dev-aks-rg
 ```
 
 ## Cleanup
@@ -452,29 +455,23 @@ The Bicep/ARM deployment of NoOps Accelerator - Azure App Service Plan deploymen
 ### Delete Resource Groups
 
 ```bash
-az group delete --name anoa-eastus-dev-appplan-rg
+az group delete --name anoa-eastus-dev-aks-rg
 ```
 
 OR
 
 ```powershell
-Remove-AzResourceGroup -Name anoa-eastus-dev-appplan-rg
+Remove-AzResourceGroup -Name anoa-eastus-dev-aks-rg
 ```
 
 ### Delete Deployments
 
 ```bash
-az deployment delete --name deploy-AppServicePlan
+az deployment delete --name deploy-scca-enclave-with-aks
 ```
 
 OR
 
 ```powershell
-Remove-AzSubscriptionDeployment -Name deploy-AppServicePlan
+Remove-AzSubscriptionDeployment -Name deploy-scca-enclave-with-aks
 ```
-
-## Example Output in Azure
-
-![Example Deployment Output](media/aspExampleDeploymentOutput.png "Example Deployment Output in Azure global regions")
-
-### References

@@ -10,7 +10,7 @@ encalves in their Azure environments.
 
 Delivered as a collection of infrastructure as code (IaC) [module templates](https://github.com/Azure/NoOpsAccelerator/tree/main/src/bicep) written in Bicep, the NoOps Accelerator is intended to empower organizations on their journey towards a continuous deployment and governance model for their cloud infrastructure.
 
-Learn more about the NoOps movement and philosphy here - *[What is NoOps?](https://github.com/Azure/NoOpsAccelerator/tree/main/src/docs/wiki/What-is-NoOps.md)*.
+Learn more about the NoOps movement and philosphy here - *[What is NoOps?](https://github.com/Azure/NoOpsAccelerator/tree/main/docs/wiki/What-is-NoOps.md)*.
 
 ## Quickstart
 
@@ -23,7 +23,7 @@ These steps walk through how to use NoOps to deploy a hub and spoke architecture
 
 * Hub: SCCA-compliant networking hub (1 vnet, 1 resource group)
 * Tier 0 (T0): Identity & Authorization (1 vnet, 1 resource group)
-* Tier 1 (T1): Infrastrcture Operations, and Logging (1 vnet, 2 resource groups)
+* Tier 1 (T1): Infrastructure Operations, and Logging (1 vnet, 2 resource groups)
 * Tier 2 (T2): DevSecOps & Shared Services (1 vnet, 1 resource group)
 
 Steps:

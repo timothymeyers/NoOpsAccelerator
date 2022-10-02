@@ -59,7 +59,7 @@ The commands below assume you are deploying in Azure Commercial and show the ent
 
 For example, deploying using the `az deployment mg create` command in the Azure CLI:
 
-<h3>Example 1: Azure</h3>
+<h3>Overlay Example: Management Groups</h3>
 
 <details>
 
@@ -72,7 +72,7 @@ cd src/bicep/overlays
 cd management-groups
 az deployment mg create \
    --template-file overlays/management-groups/deploy.bicep \
-   --parameters @overlays/management-groups/deploy.enclave.mg.parameters.json \
+   --parameters @overlays/management-groups/deploy.parameters.json \
    --location 'eastus'
 ```
 
@@ -86,7 +86,7 @@ az cloud set --name AzureUSGovernment
 az login
 az deployment mg create \
   --template-file overlays/management-groups/deploy.bicep \
-  --parameters @overlays/management-groups/deploy.enclave.mg.parameters.json \
+  --parameters @overlays/management-groups/deploy.parameters.json \
   --location 'usgovvirginia'
 ```
 
@@ -112,7 +112,7 @@ Set-AzContext -TenantId XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
 New-AzManagementGroupDeployment `
   -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
   -TemplateFile overlays/management-groups/deploy.bicepp `
-  -TemplateParameterFile overlays/management-groups/deploy.enclave.mg.parameters.json `
+  -TemplateParameterFile overlays/management-groups/deploy.parameters.json `
   -Location 'eastus'
 ```
 
@@ -133,18 +133,11 @@ Set-AzContext -TenantId XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
 New-AzManagementGroupDeployment `
   -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
   -TemplateFile overlays/management-groups/deploy.bicepp `
-  -TemplateParameterFile overlays/management-groups/deploy.enclave.mg.parameters.json.json `
+  -TemplateParameterFile overlays/management-groups/deploy.parameters.json `
   -Location  'usgovvirginia'
 ```
 </details>
 <p>
-
-## Resource types
-
-| Resource Type | API Version |
-| :-- | :-- |
-| `Microsoft.Management/managementGroups` | [2021-04-01](https://docs.microsoft.com/en-us/azure/templates/Microsoft.Management/2021-04-01/managementGroups) |
-| `Microsoft.Management/managementGroups/subscriptions` | [2021-04-01](https://docs.microsoft.com/en-us/azure/templates/Microsoft.Management/2021-04-01/managementGroups/subscriptions) |
 
 ## Air-Gapped Clouds
 

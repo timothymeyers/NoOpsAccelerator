@@ -60,7 +60,7 @@ cd src/bicep/overlays
 cd management-groups
 az deployment mg create \
    --template-file overlays/management-groups/deploy.bicep \
-   --parameters @overlays/management-groups/deploy.enclave.mg.parameters.json \
+   --parameters @overlays/management-groups/deploy.parameters.json \
    --location 'eastus'
 ```
 
@@ -76,7 +76,7 @@ cd src/bicep/overlays
 cd management-groups
 az deployment mg create \
   --template-file overlays/management-groups/deploy.bicep \
-  --parameters @overlays/management-groups/deploy.enclave.mg.parameters.json \
+  --parameters @overlays/management-groups/deploy.parameters.json \
   --location 'usgovvirginia'
 ```
 
@@ -102,7 +102,7 @@ Set-AzContext -TenantId XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
 New-AzManagementGroupDeployment `
   -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
   -TemplateFile overlays/management-groups/deploy.bicepp `
-  -TemplateParameterFile overlays/management-groups/deploy.enclave.mg.parameters.json `
+  -TemplateParameterFile overlays/management-groups/deploy.parameters.json `
   -Location 'eastus'
 ```
 
@@ -123,7 +123,7 @@ Set-AzContext -TenantId XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
 New-AzManagementGroupDeployment `
   -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
   -TemplateFile overlays/management-groups/deploy.bicepp `
-  -TemplateParameterFile overlays/management-groups/deploy.enclave.mg.parameters.json.json `
+  -TemplateParameterFile overlays/management-groups/deploy.parameters.json `
   -Location  'usgovvirginia'
 ```
 </details>
@@ -154,7 +154,7 @@ cd src/bicep/overlays
 cd policy
 az deployment mg create \
    --template-file overlays/policy/deploy.bicep \
-   --parameters @overlays/policy/deploy.enclave.policy.parameters.json \
+   --parameters @overlays/policy/deploy.parameters.json \
    --location 'eastus'
 ```
 
@@ -162,7 +162,7 @@ az deployment mg create \
 # For Azure Government regions
 az deployment mg create \
   --template-file overlays/policy/deploy.bicep \
-  --parameters @overlays/policy/deploy.enclave.policy.parameters.json \
+  --parameters @overlays/policy/deploy.parameters.json \
   --location 'usgovvirginia'
 ```
 
@@ -188,7 +188,7 @@ Set-AzContext -TenantId XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
 New-AzManagementGroupDeployment `
   -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
   -TemplateFile overlays/policy/deploy.bicep `
-  -TemplateParameterFile overlays/policy/deploy.enclave.policy.parameters.json `
+  -TemplateParameterFile overlays/policy/deploy.parameters.json `
   -Location 'eastus'
 ```
 
@@ -209,7 +209,7 @@ Set-AzContext -TenantId XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
 New-AzManagementGroupDeployment `
   -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
   -TemplateFile overlays/policy/deploy.bicep `
-  -TemplateParameterFile overlays/policy/deploy.enclave.policy.parameters.json.json `
+  -TemplateParameterFile overlays/policy/deploy.parameters.json `
   -Location  'usgovvirginia'
 ```
 </details>
@@ -260,7 +260,7 @@ cd src/bicep/overlays
 cd roles
 az deployment mg create \
    --template-file overlays/roles/deploy.bicep \
-   --parameters @overlays/roles/deploy.enclave.roles.parameters.json \
+   --parameters @overlays/roles/deploy.parameters.json \
    --location 'eastus'
 ```
 
@@ -276,7 +276,7 @@ cd src/bicep/overlays
 cd roles
 az deployment mg create \
   --template-file overlays/roles/deploy.bicep \
-  --parameters @overlays/roles/deploy.enclave.roles.parameters.json \
+  --parameters @overlays/roles/deploy.parameters.json \
   --location 'usgovvirginia'
 ```
 
@@ -302,7 +302,7 @@ Set-AzContext -TenantId XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
 New-AzManagementGroupDeployment `
   -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
   -TemplateFile overlays/roles/deploy.bicepp `
-  -TemplateParameterFile overlays/roles/deploy.enclave.roles.parameters.json `
+  -TemplateParameterFile overlays/roles/deploy.parameters.json `
   -Location 'eastus'
 ```
 
@@ -323,7 +323,7 @@ Set-AzContext -TenantId XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
 New-AzManagementGroupDeployment `
   -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
   -TemplateFile overlays/roles/deploy.bicepp `
-  -TemplateParameterFile overlays/roles/deploy.enclave.roles.parameters.json `
+  -TemplateParameterFile overlays/roles/deploy.parameters.json `
   -Location  'usgovvirginia'
 ```
 </details>
@@ -354,7 +354,7 @@ parLogAnalyticsWorkspaceResourceId | string | `/subscriptions/xxxxxxxx-xxxxxx-xx
 parLogAnalyticsWorkspaceId | string | `anoa-eastus-dev-logging-log` | Log Analytics Workspace Resource Id
 parSourceAddresses | array | `10.0.100.4` | Log Analytics Workspace Resource Id
 parKubernetesCluster | object | {object} | The object parameters of the Azure Kubernetes Cluster. Found at [Azure Kubernetes Cluster](../../../bicep/overlays/management-services/kubernetesCluster/readme.md)
-parContainerRegistry | object | {object} | Defines the Container Registry. Found at [Azure Container Registry](../../../bicep/overlays/management-services/containerRegistry/readme.md)
+parContainerRegistry | object | {object} | The object parameters of the Container Registry. Found at [Azure Container Registry](../../../bicep/overlays/management-services/containerRegistry/readme.md)
 parStorageAccountAccess | object | {object} | Defines the Storage Account Access.
 
 Optional Parameters | Type | Allowed Values | Description

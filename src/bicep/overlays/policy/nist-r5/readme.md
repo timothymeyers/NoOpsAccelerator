@@ -1,4 +1,4 @@
-# Overlays: NoOps Accelerator - Policy - Hub/Spoke
+# Overlays: NoOps Accelerator - Policy - NIST SP 800-53 R5 Policy
 
 > **IMPORTANT: This is currenly work in progress.**
 

@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Enclave Roles overlay module deploys a role definitions in a specific `Management Group`.  This is accomplished through a managmenent-group-scoped Azure Resource Manager (ARM) deployment.  The role definitions heirarchy can be modifed by editing `anoa.enclave.roles.parameters.example.json`.  
+The Enclave Roles overlay module deploys a role definitions in a specific `Management Group`.  This is accomplished through a managmenent-group-scoped Azure Resource Manager (ARM) deployment.  The role definitions heirarchy can be modifed by editing `deploy.parameters.json`.  
 
 Module deploys the following resources:
 
@@ -17,9 +17,9 @@ The definitions created by the deployment is:
 * Custom - Landing Zone Subscription Owner
 * Custom - Storage Operator
 
-## Deploy Enclave Management Groups
+## Deploy Enclave Roles
 
-The docs on Management Groups: <https://docs.microsoft.com/en-us/azure/bastion/bastion-overview>
+The docs on Roles: <https://docs.microsoft.com/en-us/azure/bastion/bastion-overview>
 
 ## Pre-requisites
 
@@ -31,6 +31,7 @@ The module requires the following inputs:
 
 | Parameter                             | Type   | Description                                                                                                                                                     | Requirements                      | Example               |
 | ------------------------------------- | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------- | --------------------- |
+| parAssignableScopeManagementGroupId       | object | The management group scope to which the role can be assigned.  This management group ID will be used for the assignableScopes property in the role definition.
 | parRoleDefinitionInfo      | object | Prefix for the role definition hierarchy.  This role definition will be created as part of the deployment.                                                    | role definition                   | `none`                 |
 | parDefaultManagementGroupIdForRoleDefinitions | string | Name for default Management Group Id For role definitions. | Minimum two characters            | `ANOA` |
 | parUserAssignedIdentities | array   | Set of User Assigned Identities to apply role definitions hierarchy of deployment | `none`  | `none` |

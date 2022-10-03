@@ -12,9 +12,9 @@ NoOps in a nutshell: create smart infrastructure with as little maintenance effo
 
 ## Requirements for Successful NoOps Environment
 
-The creator of the Azure NoOps Accelerator, John Spinella coins NoOps as **"NoOps is the union of people, processes and automation to enable organizations to deploy, monitor, and improve cloud operations."**
+The creator of the Azure NoOps Accelerator, John Spinella coins NoOps as **"NoOps is a policy-based, automated process to enable organizations to deploy, monitor, and improve cloud operations."**
 
-John looks at NoOps as the next evolution of DevOps. DevOps being the fusion of development and operations engineers collaborating together,NoOps main aim is to automate all the platform management parts and reduce friction between developers and infrastructure.
+John looks at NoOps as the next evolution of DevOps. DevOps being the fusion of development and operations engineers collaborating together,NoOps main aim is to automate all the platform management parts and reduce friction between developers and infrastructure. 
 
 ![DevOps-NoOps](./media/devops-noops.png)
 

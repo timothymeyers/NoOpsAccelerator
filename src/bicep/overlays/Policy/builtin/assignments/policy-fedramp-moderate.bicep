@@ -34,37 +34,28 @@ module telemetryCustomerUsageAttribution '../../../../azresources//Modules/Globa
 var varPolicyId = 'e95f5a9f-57ad-4d03-bb0b-b1d16db93693' // FedRAMP Moderate
 var varAssignmentName = 'FedRAMP Moderate'
 
-var varScope = tenantResourceId('Microsoft.Management/managementGroups', parPolicyAssignmentManagementGroupId)
 var varPolicyScopedId = resourceId('Microsoft.Authorization/policySetDefinitions', varPolicyId)
 
-resource policySetAssignment 'Microsoft.Authorization/policyAssignments@2020-03-01' = {
+
+// Policy Assignment
+module modPolicySetAssignment '../../../../azresources/Modules/Microsoft.Authorization/policyAssignments/managementGroup/az.auth.policy.set.assignment.mg.bicep' = {
   name: 'fedramp-m-${uniqueString('fedramp-moderate-',parPolicyAssignmentManagementGroupId)}'
-  properties: {
-    displayName: varAssignmentName
+  scope: managementGroup()
+  params: {
+    name: varAssignmentName
     policyDefinitionId: varPolicyScopedId
-    scope: varScope
-    notScopes: [
-    ]
+    enforcementMode: parEnforcementMode
+    displayName: varAssignmentName
+    managementGroupId: parPolicyAssignmentManagementGroupId
     parameters: {
       requiredRetentionDays: {
         value: parRequiredRetentionDays
       }
     }
-    enforcementMode: parEnforcementMode
-  }
-  identity: {
-    type: 'SystemAssigned'
-  }
-  location: parLocation
-}
-
-// These role assignments are required to allow Policy Assignment to remediate.
-resource policySetRoleAssignmentContributor 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
-  name: guid(parPolicyAssignmentManagementGroupId, 'fedramp-moderate-Contributor')
-  scope: managementGroup()
-  properties: {
-    roleDefinitionId: '/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c'
-    principalId: policySetAssignment.identity.principalId
-    principalType: 'ServicePrincipal'
+    location: parLocation
+    identity: 'SystemAssigned'
+    roleDefinitionIds:  [
+      '/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c'
+    ]
   }
 }

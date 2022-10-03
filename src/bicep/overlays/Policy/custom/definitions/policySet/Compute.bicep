@@ -16,10 +16,10 @@ param parPolicyCategory string = 'Compute'
 param parPolicyDefinitionManagementGroupId string
 
 // VARAIBLES
-var builtinPolicies_compute = json(loadTextContent('../../../builtin/definitions/compute.json'))
+var builtinPolicies_compute = json(loadTextContent('../../../../../azresources/Policy/builtin/definitions/compute.json'))
 var customPolicyDefinitionMgScope = tenantResourceId('Microsoft.Management/managementGroups', parPolicyDefinitionManagementGroupId)
 
-module computePolicySetDefinitions '../../../../Modules/Microsoft.Authorization/policySetDefinitions/az.auth.policy.set.def.bicep' = {
+module computePolicySetDefinitions '../../../../../azresources/Modules/Microsoft.Authorization/policySetDefinitions/az.auth.policy.set.def.bicep' = {
   name: 'compute-${uniqueString(deployment().name)}-policySetDefs'
   params: {
     // Required parameters

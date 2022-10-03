@@ -10,16 +10,16 @@ targetScope = 'managementGroup'
 
 // PARAMETERS
 param policySource string = 'ANOA'
-param policyCategory string = 'SQL'
+param policyCategory string = 'Storage'
 
 // VARAIBLES
-var builtinPolicies_sql = json(loadTextContent('../../../builtin/definitions/sql.json'))
+var builtinPolicies_storage = json(loadTextContent('../../../../../azresources/Policy/builtin/definitions/storage.json'))
 
 resource computePolicySet 'Microsoft.Authorization/policySetDefinitions@2020-03-01' = {
   name: 'custom-keyVault'
   properties: {
-    displayName: 'Custom - SQL Governance Initiative'
-    description: 'SQL Governance Initiative - MG Scope via ${policySource}'
+    displayName: 'Custom - Storage Governance Initiative'
+    description: 'Storage Governance Initiative - MG Scope via ${policySource}'
     metadata: {
       category: policyCategory
       source: policySource
@@ -31,8 +31,8 @@ resource computePolicySet 'Microsoft.Authorization/policySetDefinitions@2020-03-
     }
     policyDefinitionGroups: [
       {
-        name: 'SQL'
-        displayName: 'SQL Governance Controls'
+        name: 'Storage'
+        displayName: 'Storage Governance Controls'
       }
       {
         name: 'CUSTOM'
@@ -42,10 +42,10 @@ resource computePolicySet 'Microsoft.Authorization/policySetDefinitions@2020-03-
     policyDefinitions: [
       {
         groupNames: [
-          'SQL'
+          'Storage'
         ]
-        policyDefinitionId: builtinPolicies_sql.SQL_DeployAdvancedDataSecurityOnSQLServers
-        policyDefinitionReferenceId: toLower(replace('Deploy Advanced Data Security on SQL servers', ' ', '-'))
+        policyDefinitionId: builtinPolicies_storage.Storageaccountpublicaccessshouldbedisallowed
+        policyDefinitionReferenceId: toLower(replace('Storage Account Public Access should be disallowed', ' ', '-'))
         parameters: {}
       }      
     ]

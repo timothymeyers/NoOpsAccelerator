@@ -34,7 +34,6 @@ param parListOfMembersToIncludeInWindowsVMAdministratorsGroup string
 var varPolicyId = 'f9a961fa-3241-4b20-adc4-bbf8ad9d7197' // DoD Impact Level 5 (Azure Government) /providers/Microsoft.Authorization/policySetDefinitions/f9a961fa-3241-4b20-adc4-bbf8ad9d7197
 var varAssignmentName = 'DoD Impact Level 5 (Azure Government)'
 
-var varScope = tenantResourceId('Microsoft.Management/managementGroups', parPolicyAssignmentManagementGroupId)
 var varPolicyScopedId = resourceId('Microsoft.Authorization/policySetDefinitions', varPolicyId)
 
 // Telemetry - Azure customer usage attribution
@@ -44,41 +43,33 @@ module telemetryCustomerUsageAttribution '../../../../azresources//Modules/Globa
   name: 'pid-${telemetry.customerUsageAttribution.modules.policy}-dod-il5'
 }
 
-
-resource resPolicySetAssignment 'Microsoft.Authorization/policyAssignments@2020-03-01' = {
+// Policy Assignment
+module modPolicySetAssignment '../../../../azresources/Modules/Microsoft.Authorization/policyAssignments/managementGroup/az.auth.policy.set.assignment.mg.bicep' = {
   name: 'dodil5-${uniqueString('dod-il5-',parPolicyAssignmentManagementGroupId)}'
-  properties: {
-    displayName: varAssignmentName
-    policyDefinitionId: varPolicyScopedId
-    scope: varScope
-    notScopes: [
-    ]
-    parameters: {
-      logAnalyticsWorkspaceIdforVMReporting: {
-        value: parLogAnalyticsWorkspaceId
-       }
-       listOfMembersToExcludeFromWindowsVMAdministratorsGroup: {
-        value: parListOfMembersToExcludeFromWindowsVMAdministratorsGroup
-       }
-       listOfMembersToIncludeInWindowsVMAdministratorsGroup: {
-        value: parListOfMembersToIncludeInWindowsVMAdministratorsGroup
-       }
-    }
-    enforcementMode: parEnforcementMode
-  }
-  identity: {
-    type: 'SystemAssigned'
-  }
-  location: parLocation
-}
-
-// These role assignments are required to allow Policy Assignment to remediate.
-resource policySetRoleAssignmentContributor 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
-  name: guid(parPolicyAssignmentManagementGroupId, 'dod-il5-contributor')
   scope: managementGroup()
-  properties: {
-    roleDefinitionId: '/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c'
-    principalId: resPolicySetAssignment.identity.principalId
-    principalType: 'ServicePrincipal'
+  params: {
+    name: varAssignmentName
+    policyDefinitionId: varPolicyScopedId
+    enforcementMode: parEnforcementMode
+    displayName: varAssignmentName
+    managementGroupId: parPolicyAssignmentManagementGroupId
+    parameters: {
+      requiredRetentionDays: {
+        logAnalyticsWorkspaceIdforVMReporting: {
+          value: parLogAnalyticsWorkspaceId
+         }
+         listOfMembersToExcludeFromWindowsVMAdministratorsGroup: {
+          value: parListOfMembersToExcludeFromWindowsVMAdministratorsGroup
+         }
+         listOfMembersToIncludeInWindowsVMAdministratorsGroup: {
+          value: parListOfMembersToIncludeInWindowsVMAdministratorsGroup
+         }
+      }
+    }
+    location: parLocation
+    identity: 'SystemAssigned'
+    roleDefinitionIds:  [
+      '/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c'
+    ]
   }
 }

@@ -64,32 +64,11 @@ See [step-by-step instructions on Azure Policy Authoring Guide](authoring-guide.
 
 GitHub Actions ([.github/workflows/policy.yml](../../.github/workflows/policy.yml)) is used for policy definition automation.  The automation enumerates the policy definition directory (`policy/custom/definitions/policy`) and creates/updates policies that it identifies.
 
-**Action Step**
-
-```yml
-    - template: actions/steps/define-policy.yml
-      parameters:
-        description: 'Define Policies'
-        workingDir: $(System.DefaultWorkingDirectory)/policy/custom/definitions/policy
-```
-
 ### Custom Policy Set Definitions
 
 All custom policy set definitions are located in [policy/custom/definitions/policyset](../../policy/custom/definitions/policyset) folder.  Custom policy sets contain built-in and custom policies.
 
 GitHub Actions ([.github/workflows/policy.yml](../../.github/workflows/policy.yml)) is used for policy set definition automation.  Defined policy sets can be customized through pipeline configuration.
-
-**Action Step**
-
-```yml
-    - template: actions/steps/define-policyset.yml
-      parameters:
-        description: 'Define Policy Set'
-        deployTemplates: [AKS, DefenderForCloud, LogAnalytics, Network, DNSPrivateEndpoints, Tags]
-        deployOperation: ${{ variables['deployOperation'] }}
-        policyAssignmentManagementGroupScope: $(parRootMg)
-        workingDir: $(System.DefaultWorkingDirectory)/policy/custom/definitions/policyset
-```
 
 | Policy Set | Description | Deployment Template | Configuration |
 | --- | --- | --- | --- |

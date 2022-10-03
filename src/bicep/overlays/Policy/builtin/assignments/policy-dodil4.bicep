@@ -28,7 +28,6 @@ param parRequiredRetentionDays string
 var varPolicyId = '8d792a84-723c-4d92-a3c3-e4ed16a2d133' // DoD Impact Level 4 (Azure Government) /providers/Microsoft.Authorization/policySetDefinitions/8d792a84-723c-4d92-a3c3-e4ed16a2d133
 var varAssignmentName = 'DoD Impact Level 4 (Azure Government)'
 
-var varScope = tenantResourceId('Microsoft.Management/managementGroups', parPolicyAssignmentManagementGroupId)
 var varPolicyScopedId = resourceId('Microsoft.Authorization/policySetDefinitions', varPolicyId)
 
 // Telemetry - Azure customer usage attribution
@@ -38,35 +37,25 @@ module telemetryCustomerUsageAttribution '../../../../azresources//Modules/Globa
   name: 'pid-${telemetry.customerUsageAttribution.modules.policy}-dod-il4'
 }
 
-
-resource resPolicySetAssignment 'Microsoft.Authorization/policyAssignments@2020-03-01' = {
-  name: 'dodil4-${uniqueString('dod-il4-',parPolicyAssignmentManagementGroupId)}'
-  properties: {
-    displayName: varAssignmentName
+// Policy Assignment
+module modPolicySetAssignment '../../../../azresources/Modules/Microsoft.Authorization/policyAssignments/managementGroup/az.auth.policy.set.assignment.mg.bicep' = {
+  name: 'nistr5-${uniqueString('dod-il4-',parPolicyAssignmentManagementGroupId)}'
+  scope: managementGroup()
+  params: {
+    name: varAssignmentName
     policyDefinitionId: varPolicyScopedId
-    scope: varScope
-    notScopes: [
-    ]
+    enforcementMode: parEnforcementMode
+    displayName: varAssignmentName
+    managementGroupId: parPolicyAssignmentManagementGroupId
     parameters: {
-      parRequiredRetentionDays: {
+      requiredRetentionDays: {
         value: parRequiredRetentionDays
       }
     }
-    enforcementMode: parEnforcementMode
-  }
-  identity: {
-    type: 'SystemAssigned'
-  }
-  location: parLocation
-}
-
-// These role assignments are required to allow Policy Assignment to remediate.
-resource policySetRoleAssignmentContributor 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
-  name: guid(parPolicyAssignmentManagementGroupId, 'dod-il4-contributor')
-  scope: managementGroup()
-  properties: {
-    roleDefinitionId: '/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c'
-    principalId: resPolicySetAssignment.identity.principalId
-    principalType: 'ServicePrincipal'
+    location: parLocation
+    identity: 'SystemAssigned'
+    roleDefinitionIds:  [
+      '/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c'
+    ]
   }
 }

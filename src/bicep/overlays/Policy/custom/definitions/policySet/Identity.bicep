@@ -16,7 +16,7 @@ param policyCategory string = 'IAM'
 param policyDefinitionManagementGroupId string
 
 // VARAIBLES
-var builtinPolicies_general = json(loadTextContent('../../../builtin/definitions/general.json'))
+var builtinPolicies_general = json(loadTextContent('../../../../../azresources/Policy/builtin/definitions/general.json'))
 var customPolicyDefinitionMgScope = tenantResourceId('Microsoft.Management/managementGroups', policyDefinitionManagementGroupId)
 
 resource computePolicySet 'Microsoft.Authorization/policySetDefinitions@2020-03-01' = {

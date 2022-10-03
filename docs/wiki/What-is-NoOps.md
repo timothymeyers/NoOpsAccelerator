@@ -1,7 +1,5 @@
 # What is NoOps? - Shift IT’s focus from Operations to Mission Outcomes
 
-First and foremost, The goal of NoOps is to drive mission success with an outcome-based approach to deliver continuous value to enable the warfighter.
-
 The term "NoOps" in our context came from a special mission unit customer that was looking for the ease of deployment with Mission Landing Zone (MLZ) plus valuable workloads with greater flexibility and needed to have lower O&M due to a small staff size. They requested the ability to “hyper-automate” their Azure footprint and Governance to allow for what they called “NoOps.”
 
 NoOps stands for “no operations” but it is not that. In our mindset, It is the belief that software environments can be automated to a point where manual handoffs and low-value, rote administration can be eliminated. NoOps helps increase the abstraction of infrastructure, tightly integrated with DevOps workflows, that requires no operations team to oversee the process.

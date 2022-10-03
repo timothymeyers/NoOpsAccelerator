@@ -1,8 +1,8 @@
-# Module:   NoOps Accelerator - Identity-Network
+# Hub/Spoke Core Module:   NoOps Accelerator - Identity Spoke Network
 
 ## Overview
 
-This module defines Identity network deployment based on the recommendations from the Azure Mission Landing Zone Conceptual Architecture.  
+This module defines Identity spoke network deployment based on the recommendations from the Azure Mission Landing Zone Conceptual Architecture.  
 
 Module deploys the following resources:
 

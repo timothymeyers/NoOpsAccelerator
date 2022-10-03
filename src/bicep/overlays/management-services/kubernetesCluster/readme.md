@@ -14,8 +14,10 @@ The subscription and resource group can be changed by providing the resource gro
 
 ## Pre-requisites
 
-1. A virtual network and subnet is deployed.
-1. Decide if the optional parameters is appropriate for your deployment. If it needs to change, override one of the optional parameters.
+* A virtual network and subnet is deployed. (a deployment of [deploy.bicep](../../../../bicep/platforms/lz-platform-scca-hub-3spoke/deploy.bicep))
+* Decide if the optional parameters is appropriate for your deployment. If it needs to change, override one of the optional parameters.
+  
+## Parameters
 
 See below for information on how to use the appropriate deployment parameters for use with this overlay:
 

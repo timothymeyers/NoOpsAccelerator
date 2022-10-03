@@ -1,6 +1,6 @@
 # Azure NoOps Accelerator
 
-> "NoOps is not about the elimination of ops; it is about the **elimination of manual handoffs and low-value, rote administration**." - *Forrester*
+> **"NoOps is a policy-based, automated process to enable organizations to deploy, monitor, and improve cloud operations.**." - *John Spinella, Creator of the Azure NoOps Accelerator*
 
 **Azure NoOps Accelerator** is a flexible foundation
 that enables US Department of Defense and other Public Sector customers
@@ -10,7 +10,7 @@ enclaves in their Azure environments.
 
 Delivered as a collection of infrastructure as code (IaC) [module templates](https://github.com/Azure/NoOpsAccelerator/tree/main/src/bicep) written in Bicep, the NoOps Accelerator is intended to empower organizations on their journey towards a continuous deployment and governance model for their cloud infrastructure.
 
-Learn more about the NoOps movement and philosophy here - *[What is NoOps?](TBD)*.
+Learn more about the NoOps movement and philosphy here - *[What is NoOps?](https://github.com/Azure/NoOpsAccelerator/tree/main/docs/wiki/What-is-NoOps.md)*.
 
 ## Quickstart
 

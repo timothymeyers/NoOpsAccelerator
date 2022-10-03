@@ -136,6 +136,7 @@ param parDdosStandard object
 //        ]
 //      }
 //    }
+@description('Hub Virtual network configuration.  See azresources/hub-spoke-core/vdss/hub/readme.md')
 param parHub object
 
 // OPERATIONS SPOKE PARAMETERS
@@ -202,7 +203,7 @@ param parHub object
 //        ]
 //      }
 //    }
-@description('An array of Network Diagnostic Logs to enable for the Operations Virtual Network. See https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/diagnostic-settings?tabs=CMD#logs for valid settings.')
+@description('Operations Spoke Virtual network configuration.  See azresources/hub-spoke-core/vdms/operations/readme.md')
 param parOperationsSpoke object
 
 // IDENTITY SPOKE PARAMETERS
@@ -269,7 +270,7 @@ param parOperationsSpoke object
 //        ]
 //      }
 //    }
-@description('An array of Network Diagnostic Logs to enable for the Operations Virtual Network. See https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/diagnostic-settings?tabs=CMD#logs for valid settings.')
+@description('Identity Spoke Virtual network configuration.  See azresources/hub-spoke-core/vdss/identity/readme.md')
 param parIdentitySpoke object
 
 // SHARED SERVICES SPOKE PARAMETERS
@@ -336,7 +337,7 @@ param parIdentitySpoke object
 //        ]
 //      }
 //    }
-@description('An array of Network Diagnostic Logs to enable for the Operations Virtual Network. See https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/diagnostic-settings?tabs=CMD#logs for valid settings.')
+@description('Shared Services Spoke Virtual network configuration.  See azresources/hub-spoke-core/vdms/sharedservices/readme.md')
 param parSharedServicesSpoke object
 
 // FIREWALL PARAMETERS
@@ -406,23 +407,6 @@ param parAzureFirewall object
 // }
 @description('Enables logging parmeters and Microsoft Sentinel within the Log Analytics Workspace created in this deployment.')
 param parLogging object
-
-// STORAGE ACCOUNTS RBAC
-
-// Storage Account RBAC
-// Example (JSON)
-// -----------------------------
-// "parStorageAccountAccess": {
-//   "value": {
-//     "enableRoleAssignmentForStorageAccount": true,
-//     "principalIds": [
-//       "xxxxxx-xxxxx-xxxxx-xxxx-xxxxxxx"
-//     ],
-//     "roleDefinitionIdOrName": "Group"
-//   }
-// },  
-@description('Account for access to Storage')
-param parStorageAccountAccess object
 
 // MICROSOFT DEFENDER PARAMETERS
 
@@ -567,9 +551,11 @@ module modLogAnalyticsWorkspace '../../azresources/hub-spoke-core/vdms/logging/a
     parLogAnalyticsWorkspaceSkuName: parLogging.logAnalyticsWorkspaceSkuName
     parLogAnalyticsWorkspaceRetentionInDays: parLogging.logAnalyticsWorkspaceRetentionInDays
     parLogAnalyticsWorkspaceCappingDailyQuotaGb: parLogging.logAnalyticsWorkspaceCappingDailyQuotaGb
+    parLogStorageSkuName: parLogging.logStorageSkuName
 
     // RBAC for Storage Parameters
     parLoggingStorageAccountAccess: parLogging.storageAccountAccess
+    
   }
 }
 
@@ -595,6 +581,9 @@ module modArtifacts '../../azresources/hub-spoke-core/vdss/networkArtifacts/anoa
     parEnableBastionSecrets: parRemoteAccess.enable
     parLinuxVmAdminPasswordOrKey: parRemoteAccess.bastion.linux.vmAdminPasswordOrKey
     parWindowsVmAdminPassword: parRemoteAccess.bastion.windows.vmAdminPassword
+
+    // Logging Parameters
+    parLogStorageSkuName: parLogging.logStorageSkuName
   }
 }
 
@@ -611,7 +600,7 @@ module modHubNetwork '../../azresources/hub-spoke-core/vdss/hub/anoa.lz.hub.netw
     parLocation: parLocation
     parDeployEnvironment: parRequired.deployEnvironment
     parTags: modTags.outputs.tags
-
+ 
     // Enable DDOS Protection Plan
     parDeployddosProtectionPlan: parDdosStandard.enabled
 
@@ -648,6 +637,7 @@ module modHubNetwork '../../azresources/hub-spoke-core/vdss/hub/anoa.lz.hub.netw
     // Log Analytics Parameters
     parLogAnalyticsWorkspaceResourceId: modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceResourceId
     parLogAnalyticsWorkspaceName: modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceName
+    parLogStorageSkuName: parLogging.logStorageSkuName
 
   }
 }
@@ -680,7 +670,7 @@ module modIdentityNetwork '../../azresources/hub-spoke-core/vdss/identity/anoa.l
     parLogStorageSkuName: parLogging.logStorageSkuName
 
     // RBAC for Storage Parameters
-    parStorageAccountAccess: parStorageAccountAccess
+    parStorageAccountAccess: parIdentitySpoke.storageAccountAccess
 
     // Log Analytics Parameters
     parLogAnalyticsWorkspaceResourceId: modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceResourceId

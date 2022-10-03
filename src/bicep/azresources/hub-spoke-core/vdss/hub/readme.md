@@ -1,4 +1,4 @@
-# Module:   NoOps Accelerator - Hub-Network
+# Hub/Spoke Core Module: NoOps Accelerator - Hub Network
 
 ## Overview
 

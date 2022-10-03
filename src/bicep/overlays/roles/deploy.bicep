@@ -27,7 +27,7 @@ targetScope = 'managementGroup'
 
 // REQUIRED PARAMETERS
 param parRoleDefinitionInfo object
-param parDefaultManagementGroupIdForRoleDefinitions string
+param parAssignableScopeManagementGroupId string
 
 param parLocation string = deployment().location
 
@@ -50,7 +50,7 @@ module role_definitions '../../azresources/Modules/Microsoft.Authorization/roleD
     location: parLocation
     roleName:  definitionInfo.roleName
     actions: definitionInfo.actions
-    managementGroupId: parDefaultManagementGroupIdForRoleDefinitions   
+    managementGroupId: parAssignableScopeManagementGroupId   
   }
 }]
 

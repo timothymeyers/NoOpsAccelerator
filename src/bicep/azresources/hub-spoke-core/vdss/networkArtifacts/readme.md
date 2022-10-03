@@ -1,4 +1,4 @@
-# Module:   NoOps Accelerator - Operational Network Artifacts
+# Hub/Spoke Core Module:   NoOps Accelerator - Operational Network Artifacts
 
 ## Overview
 

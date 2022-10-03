@@ -51,7 +51,7 @@ param parDeploymentNameSuffix string = utcNow()
 
 // WORKLOAD PARAMETERS
 
-@description('The subscription ID for the Hub Network and resources. It defaults to the deployment subscription.')
+@description('Required values used with the workload, Please review the Read Me for required parameters')
 param parWorkload object
 
 // HUB NETWORK PARAMETERS

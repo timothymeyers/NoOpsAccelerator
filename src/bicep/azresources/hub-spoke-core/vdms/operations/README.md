@@ -1,8 +1,8 @@
-# Module:   NoOps Accelerator - Operations Network
+# Hub/Spoke Core Module: NoOps Accelerator - Operations Spoke Network
 
 ## Overview
 
-This module defines Operations network deployment based on the recommendations from the Azure Mission Landing Zone Conceptual Architecture.  
+This module defines Operations spoke network deployment based on the recommendations from the Azure Mission Landing Zone Conceptual Architecture.  
 
 Module deploys the following resources:
 

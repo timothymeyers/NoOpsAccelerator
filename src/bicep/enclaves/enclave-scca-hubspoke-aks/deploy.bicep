@@ -68,16 +68,97 @@ param parLocation string = deployment().location
 
 // SUBSCRIPTIONS
 
-// HUB NETWORK
-// Example (JSON)
-// -----------------------------
-@description('The object for the Hub Network and resources. It defaults to the deployment subscription.')
+// HUB PARAMETERS
+// (JSON Parameter)
+// ---------------------------
+//"parHub": {
+//      "value": {
+//        "subscriptionId": "xxxxxxx-xxxx-xxxx-xxxx-xxxxxxx",
+//        "virtualNetworkAddressPrefix": "10.0.100.0/24",
+//        "subnetAddressPrefix": "10.0.100.128/27",
+//        "virtualNetworkDiagnosticsLogs": [],
+//        "virtualNetworkDiagnosticsMetrics": [],
+//        "networkSecurityGroupRules": [],
+//        "networkSecurityGroupDiagnosticsLogs":[
+//          {
+//            "category": "NetworkSecurityGroupEvent",
+//            "enabled": true
+//          },
+//          {
+//            "category": "NetworkSecurityGroupRuleCounter",
+//            "enabled": true
+//          }
+//        ],
+//        "subnetServiceEndpoints": [
+//          {
+//           "service": "Microsoft.Storage"
+//         }
+//        ],
+//       "storageAccountAccess": {
+//          "enableRoleAssignmentForStorageAccount": false,
+//              "principalIds": [
+//                "7bc6bc45-b256-407c-9d79-bde13dfb5639"
+//             ],
+//              "roleDefinitionIdOrName": "Contributor"
+//            }
+//        }
+//      }
+//    }
+@description('Hub Virtual network configuration.  See azresources/hub-spoke-core/vdss/hub/readme.md')
 param parHub object
 
-// OPERATIONS SPOKE NETWORK 
-// Example (JSON)
-// -----------------------------
-@description('The object for the Operations Spoke Network and resources. It defaults to the deployment subscription.')
+// OPERATIONS SPOKE PARAMETERS
+// (JSON Parameter)
+// ---------------------------
+//"parOperationsSpoke": {
+//      "value": {
+//        "subscriptionId": "xxxxxxx-xxxx-xxxx-xxxx-xxxxxxx",
+//        "virtualNetworkAddressPrefix": "10.0.115.0/26",
+//        "subnetAddressPrefix": "10.0.115.0/27",
+//        "sourceAddressPrefixes": [],
+//        "virtualNetworkDiagnosticsLogs": [],
+//        "virtualNetworkDiagnosticsMetrics": [],
+//        "networkSecurityGroupRules": [],
+//        "publicIPAddressDiagnosticsLogs": [
+//          {
+//            "category": "DDoSProtectionNotifications",
+//            "enabled": true
+//          },
+//          {
+//            "category": "DDoSMitigationFlowLogs",
+//            "enabled": true
+//          },
+//          {
+//            "category": "DDoSMitigationReports",
+//            "enabled": true
+//          }
+//        ],
+//        "networkSecurityGroupDiagnosticsLogs":[
+//          {
+//            "category": "NetworkSecurityGroupEvent",
+//            "enabled": true
+//          },
+//          {
+//            "category": "NetworkSecurityGroupRuleCounter",
+//            "enabled": true
+//          }
+//        ],
+//        "subnetServiceEndpoints": [
+//          {
+//            "service": "Microsoft.Storage"
+//          }
+//        ],
+//       "storageAccountAccess": {
+//          "enableRoleAssignmentForStorageAccount": false,
+//              "principalIds": [
+//                "7bc6bc45-b256-407c-9d79-bde13dfb5639"
+//             ],
+//              "roleDefinitionIdOrName": "Contributor"
+//            }
+//         }
+//      }
+//    }
+@description('Operations Spoke Virtual network configuration.  See azresources/hub-spoke-core/vdms/operations/readme.md')
 param parOperationsSpoke object
 
 // OPERATIONS NETWORK ARTIFACTS
@@ -122,7 +203,50 @@ param dateUtcNow string = utcNow('yyyy-MM-dd HH:mm:ss')
 
 // FIREWALL PARAMETERS
 
-@description('Switch which allows Azure Firewall deployment to be disabled. Default: true')
+// FIREWALL PARAMETERS
+// (JSON Parameter)
+// ---------------------------
+//"parAzureFirewall": {
+//      "value": {
+//       "enable": true,
+//        "clientPublicIPAddressAvailabilityZones": [],
+//        "managementPublicIPAddressAvailabilityZones": [],
+//        "supernetIPAddress": "10.0.96.0/19",
+//        "skuTier": "Premium",
+//        "threatIntelMode": "Alert",
+//        "intrusionDetectionMode": "Alert",
+//        "publicIPAddressDiagnosticsLogs": [
+//          {
+//            "category": "DDoSProtectionNotifications",
+//            "enabled": true
+//          },
+//          {
+//            "category": "DDoSMitigationFlowLogs",
+//            "enabled": true
+//          },
+//          {
+//            "category": "DDoSMitigationReports",
+//            "enabled": true
+//          }
+//        ],
+//        "publicIPAddressDiagnosticsMetrics": [
+//          {
+//            "category": "AllMetrics",
+//            "enabled": true
+//          }
+//        ],
+//        "diagnosticsLogs": [
+//          "AzureFirewallApplicationRule",
+//          "AzureFirewallNetworkRule",
+//          "AzureFirewallDnsProxy"
+//        ],
+//        "diagnosticsMetrics": [
+//          "AllMetrics"
+//        ],
+//        "ruleCollectionGroups": []
+//      }
+//    }
+@description('Required. Azure Firewall configuration. Azure Firewall is deployed in Forced Tunneling mode where a route table must be added as the next hop.')
 param parAzureFirewall object
 
 // LOGGING PARAMETERS
@@ -138,7 +262,7 @@ param parAzureFirewall object
 //     "logStorageSkuName": "Standard_GRS"      The Storage Account SKU to use for log storage. The default is "Standard_GRS".
 //   }
 // }
-@description('Enables logging parmeters and Microsoft Sentinel within the Log Analytics Workspace created in this deployment.')
+@description('Enables logging parmeters and Microsoft Sentinel within the Log Analytics Workspace created in this deployment. See azresources/hub-spoke-core/vdms/logging/readme.md')
 param parLogging object
 
 // STORAGE ACCOUNTS RBAC
@@ -170,7 +294,7 @@ param parStorageAccountAccess object
 //       "phoneSecurityContact": "5555555555"
 //   }
 // }
-@description('Microsoft Defender for Cloud.  It includes email and phone.')
+@description('Microsoft Defender for Cloud.  It includes contact email and phone.')
 param parSecurityCenter object
 
 // REMOTE ACCESS PARAMETERS
@@ -215,7 +339,7 @@ param parSecurityCenter object
 //     }
 //   }
 // }
-@description('When set to "true", provisions Azure Bastion Host. It defaults to "false".')
+@description('When set to "true", provisions Azure Bastion Host with Jumpboxes, when specified. It defaults to "false".')
 param parRemoteAccess object
 
 // Azure Container Registry
@@ -239,7 +363,7 @@ param parRemoteAccess object
 //     ]
 //   }
 // }
-@description('Defines the Container Registry.')
+@description('Parmaters Object of the Container Registry, Please review the Read Me for required parameters.')
 param parContainerRegistry object
 
 // Azure Kubernetes Service - Cluster
@@ -271,13 +395,13 @@ param parContainerRegistry object
 //     "aksClusterDnsPrefix": "anoaaks"
 //   }
 // }
-@description('Parmaters Object of Azure Kubernetes specified when creating the managed cluster.')
+@description('Parmaters Object of Azure Kubernetes specified when creating the managed cluster Azure Kubernetes, Please review the Read Me for required parameters.')
 param parKubernetesCluster object
 
 // WORKLOAD PARAMETERS
 
-@description('The subscription ID for the Hub Network and resources. It defaults to the deployment subscription.')
-param parWorkload object
+@description('Parmaters Object of the workload, Please review the Read Me for required parameters.')
+param parAksWorkload object
 
 // Telemetry - Azure customer usage attribution
 // Reference:  https://docs.microsoft.com/azure/marketplace/azure-partner-customer-usage-attribution
@@ -367,6 +491,6 @@ module modAKSWorkload '../../workloads/wl-aks-spoke/deploy.bicep' = {
     parLogAnalyticsWorkspaceResourceId: modHubSpoke.outputs.logAnalyticsWorkspaceResourceId
     parStorageAccountAccess: parStorageAccountAccess
     parTags: parTags
-    parWorkload: parWorkload
+    parWorkload: parAksWorkload
   }    
 }

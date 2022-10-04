@@ -3,7 +3,7 @@ SUMMARY: Module to deploy the Spoke Network Peering to Hub based on the Azure Mi
 DESCRIPTION: The following components will be options in this deployment
               SpokeToHubPeering
 AUTHOR/S: jspinella
-VERSION: 1.x.x
+
 */
 
 /*

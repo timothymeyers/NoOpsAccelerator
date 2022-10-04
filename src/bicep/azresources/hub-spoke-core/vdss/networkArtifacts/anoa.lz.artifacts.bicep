@@ -5,7 +5,7 @@ DESCRIPTION: The following components will be options in this deployment
               Windows VM
               Lunix VM
 AUTHOR/S: jspinella
-VERSION: 1.x.x
+
 */
 
 /*

@@ -5,7 +5,7 @@ DESCRIPTION: The following components will be options in this deployment
               Log Storage
               Diagnostic Logging
 AUTHOR/S: jrspinella
-VERSION: 1.x.x
+
 */
 
 /*

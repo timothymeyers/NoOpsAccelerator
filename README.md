@@ -19,7 +19,7 @@ You can use the NoOps Accelerator to deploy [SCCA-compliant landing zones](./src
 
 ### Deploy a SCCA-compliant Landing Zone (SCCA Hub with 3 Spokes) using the Azure CLI
 
-These steps walk through how to use NoOps to deploy a hub and spoke architecture. At the conclusion, you will have five resources groups mapped to the following:
+These steps walk through how to use NoOps to deploy a hub and spoke architecture. At the conclusion, you will have five resource groups mapped to the following:
 
 * Hub: SCCA-compliant networking hub (1 vnet, 1 resource group)
 * Tier 0 (T0): Identity & Authorization (1 vnet, 1 resource group)
@@ -101,7 +101,7 @@ For a quickstart, we suggest a test deployment into the current AZ CLI subscript
 
 ## Getting Started
 
-NoOps is amaze. Definitions of NoOps primitives.
+Definitions of NoOps primitives.
 
 <!--
 
@@ -134,10 +134,6 @@ Microsoft can identify the deployments of the Azure Resource Manager and Bicep t
 If you don't wish to send usage data to Microsoft, you can set the `customerUsageAttribution.enabled` setting to `false` in `global/telemetry.json`.
 
 Project Bicep [collects telemetry in some scenarios](https://github.com/Azure/bicep/blob/main/README.md#telemetry) as part of improving the product.
-
-## Product Roadmap
-
-We have one.
 
 ## Contributing
 

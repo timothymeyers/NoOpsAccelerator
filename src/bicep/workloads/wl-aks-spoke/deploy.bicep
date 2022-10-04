@@ -3,7 +3,7 @@ SUMMARY: Workload Module to deploy a Azure Kubernetes Service to an target sub.
 DESCRIPTION: The following components will be options in this deployment
               Azure Kubernetes Service
 AUTHOR/S: jspinella
-VERSION: 1.x.x
+
 */
 
 /*
@@ -146,7 +146,7 @@ param parKubernetesCluster object
 // Storage Account RBAC
 // Example (JSON)
 // -----------------------------
-// "parStorageAccountAccess": {
+// "parWorkloadLogStorageAccountAccess": {
 //   "value": {
 //     "enableRoleAssignmentForStorageAccount": true,
 //     "principalIds": [
@@ -156,7 +156,7 @@ param parKubernetesCluster object
 //   }
 // },  
 @description('Account for access to Storage')
-param parStorageAccountAccess object
+param parWorkloadLogStorageAccountAccess object
 
 // SUPPORTED CLOUDS PARAMETERS
 
@@ -219,7 +219,7 @@ module modTier3 '../../azresources/hub-spoke-core/tier3/anoa.lz.workload.network
     parLogAnalyticsWorkspaceResourceId: parLogAnalyticsWorkspaceResourceId
 
     //Storage Parameters
-    parStorageAccountAccess: parStorageAccountAccess
+    parWorkloadLogStorageAccountAccess: parWorkloadLogStorageAccountAccess
     enableActivityLogging: true
 
   }

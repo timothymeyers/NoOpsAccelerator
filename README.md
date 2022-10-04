@@ -1,6 +1,6 @@
 # Azure NoOps Accelerator
 
-> **"NoOps is a policy-based, automated process to enable organizations to deploy, monitor, and improve cloud operations.**." - *John Spinella, Creator of the Azure NoOps Accelerator*
+> **"NoOps is a policy-based, automated process enabling organizations to deploy, monitor, and improve cloud operations.**." - *John Spinella, Creator of the Azure NoOps Accelerator*
 
 **Azure NoOps Accelerator** is a flexible foundation
 that enables US Department of Defense and other Public Sector customers

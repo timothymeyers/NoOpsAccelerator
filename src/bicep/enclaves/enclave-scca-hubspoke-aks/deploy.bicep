@@ -52,6 +52,9 @@ param parKubernetesCluster object
 @description('Parmaters Object of the workload, Please review the Read Me for required parameters.')
 param parAksWorkload object
 
+@description('The firewall source addresses for the Rule Collection Groups, Must be Hub/Spoke addresses.')
+param parSourceAddresses array = []
+
 var telemetry = json(loadTextContent('../../azresources/Modules/Global/telemetry.json'))
 module telemetryCustomerUsageAttribution '../../azresources/Modules/Global/partnerUsageAttribution/customer-usage-attribution-subscription.bicep' = if (telemetry.customerUsageAttribution.enabled) {
   name: 'pid-${telemetry.customerUsageAttribution.modules.enclaves.sccahubspokeaks}'
@@ -94,6 +97,7 @@ module modAKSWorkload '../../workloads/wl-aks-spoke/deploy.bicep' = {
     parKubernetesCluster: parKubernetesCluster
     parLogAnalyticsWorkspaceName: modHubSpoke.outputs.logAnalyticsWorkspaceName
     parLogAnalyticsWorkspaceResourceId: modHubSpoke.outputs.logAnalyticsWorkspaceResourceId
-    parWorkloadLogStorageAccountAccess: parWorkloadLogStorageAccountAccess    
+    parWorkloadLogStorageAccountAccess: parWorkloadLogStorageAccountAccess 
+    parSourceAddresses:  parSourceAddresses
   }    
 }

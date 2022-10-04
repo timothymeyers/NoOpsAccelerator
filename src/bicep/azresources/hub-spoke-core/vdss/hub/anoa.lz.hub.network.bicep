@@ -13,7 +13,7 @@ DESCRIPTION: The following components will be options in this deployment
               DDos Standard Plan (optional)      
 PREREQS: Logging        
 AUTHOR/S: jspinella
-VERSION: 1.x.x
+
 */
 
 /*

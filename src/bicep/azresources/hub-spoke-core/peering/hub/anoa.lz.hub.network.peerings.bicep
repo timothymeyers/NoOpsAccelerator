@@ -3,7 +3,7 @@ SUMMARY: Module to deploy the Hub Network Peering to Spokes based on the Azure M
 DESCRIPTION: The following components will be options in this deployment
               hubToSpokePeering
 AUTHOR/S: jspinella
-VERSION: 1.x.x
+
 */
 
 /*

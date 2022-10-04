@@ -23,7 +23,7 @@ param appInsightId string = ''
 param setAzureWebJobsDashboard bool = contains(kind, 'functionapp') ? true : false
 
 @description('Optional. The app settings key-value pairs except for AzureWebJobsStorage, AzureWebJobsDashboard, APPINSIGHTS_INSTRUMENTATIONKEY and APPLICATIONINSIGHTS_CONNECTION_STRING.')
-param appSettingsKeyValuePairs object = {}
+param networkSettingsKeyValuePairs object = {}
 
 // =========== //
 // Variables   //
@@ -39,7 +39,7 @@ var appInsightsValues = !empty(appInsightId) ? {
   APPLICATIONINSIGHTS_CONNECTION_STRING: appInsight.properties.ConnectionString
 } : {}
 
-var expandedAppSettings = union(appSettingsKeyValuePairs, azureWebJobsValues, appInsightsValues)
+var expandedAppSettings = union(networkSettingsKeyValuePairs, azureWebJobsValues, appInsightsValues)
 
 // =========== //
 // Existing resources //
@@ -62,10 +62,9 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2021-02-01' existing 
 // Deployments //
 // =========== //
 
-resource appSettings 'Microsoft.Web/sites/config@2021-01-15' = {
-  name: 'appsettings'
-  kind: kind
+resource networkSettings 'Microsoft.Web/sites/networkConfig@2021-01-15' = {
   parent: app
+  name: 'virtualNetwork' 
   properties: expandedAppSettings
 }
 
@@ -73,10 +72,10 @@ resource appSettings 'Microsoft.Web/sites/config@2021-01-15' = {
 // Outputs     //
 // =========== //
 @description('The name of the site config.')
-output name string = appSettings.name
+output name string = networkSettings.name
 
 @description('The resource ID of the site config.')
-output resourceId string = appSettings.id
+output resourceId string = networkSettings.id
 
 @description('The resource group the site config was deployed into.')
 output resourceGroupName string = resourceGroup().name

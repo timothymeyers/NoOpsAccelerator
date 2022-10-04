@@ -8,7 +8,7 @@ DESCRIPTION: The following components will be options in this deployment
               Log Storage
               Activity Logging              
 AUTHOR/S: jspinella
-VERSION: 1.x.x
+
 */
 
 /*

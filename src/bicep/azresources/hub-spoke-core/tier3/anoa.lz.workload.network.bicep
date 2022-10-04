@@ -9,7 +9,7 @@ DESCRIPTION: The following components will be options in this deployment
               Activity Logging
               Netowrk Peering (Hub/Spoke)
 AUTHOR/S: jspinella
-VERSION: 1.x.x
+
 */
 
 /*
@@ -144,7 +144,7 @@ param parDeployddosProtectionPlan bool = false
 
 // STORAGE ACCOUNTS RBAC
 @description('Account for access to Storage')
-param parStorageAccountAccess object
+param parWorkloadLogStorageAccountAccess object
 
 /*
   NAMING CONVENTION
@@ -214,12 +214,11 @@ module modWorkloadLogStorage '../../Modules/Microsoft.Storage/storageAccounts/az
     location: parLocation
     storageAccountSku: parLogStorageSkuName
     tags: modTags.outputs.tags
-    roleAssignments: (parStorageAccountAccess.enableRoleAssignmentForStorageAccount) ? [
+    roleAssignments: (parWorkloadLogStorageAccountAccess.enableRoleAssignmentForStorageAccount) ? [
       {
-        principalIds: [
-          parStorageAccountAccess.principalIds
-        ]
-        roleDefinitionIdOrName: parStorageAccountAccess.roleDefinitionIdOrName
+        principalIds: parWorkloadLogStorageAccountAccess.principalIds
+        
+        roleDefinitionIdOrName: parWorkloadLogStorageAccountAccess.roleDefinitionIdOrName
       }
     ] : []
     lock: 'CanNotDelete'

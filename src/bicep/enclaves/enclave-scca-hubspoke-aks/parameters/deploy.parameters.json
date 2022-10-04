@@ -87,6 +87,12 @@
         }
       }
     },
+    "parSourceAddresses": {
+      "value": [
+        "10.0.100.0/24",
+        "10.0.115.0/26"
+      ]
+    },
     "parAksWorkload": {
       "value": {
         "name": "aks",

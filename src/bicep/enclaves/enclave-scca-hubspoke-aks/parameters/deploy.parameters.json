@@ -20,7 +20,7 @@
     },
     "parHub": {
       "value": {
-        "subscriptionId": "896f5276-df9a-4317-a791-469396bef7fa",
+        "subscriptionId": "<<subscriptionId>>",
         "virtualNetworkAddressPrefix": "10.0.100.0/24",
         "subnetAddressPrefix": "10.0.100.128/27",
         "subnets": [
@@ -58,7 +58,7 @@
     },
     "parOperationsSpoke": {
       "value": {
-        "subscriptionId": "896f5276-df9a-4317-a791-469396bef7fa",
+        "subscriptionId": "<<subscriptionId>>",
         "virtualNetworkAddressPrefix": "10.0.115.0/26",
         "subnetAddressPrefix": "10.0.115.0/27",
         "virtualNetworkDiagnosticsLogs": [],
@@ -97,7 +97,7 @@
       "value": {
         "name": "aks",
         "shortName": "aks",
-        "subscriptionId": "896f5276-df9a-4317-a791-469396bef7fa",
+        "subscriptionId": "<<subscriptionId>>",
         "network": {
           "virtualNetworkAddressPrefix": "10.0.125.0/26",
           "subnetAddressPrefix": "10.0.125.0/26"
@@ -155,7 +155,7 @@
         "enable": false,
         "artifactsKeyVault": {
           "keyVaultPolicies": {
-            "objectId": "7bc6bc45-b256-407c-9d79-bde13dfb5639",
+            "objectId": "<<objectId>>",
             "permissions": {
               "keys": [
                 "get",
@@ -172,7 +172,7 @@
         "storageAccountAccess": {
           "enableRoleAssignmentForStorageAccount": false,
           "principalIds": [
-            "7bc6bc45-b256-407c-9d79-bde13dfb5639"
+            "<<principalIds>>"
           ],
           "roleDefinitionIdOrName": "Contributor"
         }

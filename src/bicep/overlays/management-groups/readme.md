@@ -89,8 +89,8 @@ az deployment mg create \
   --parameters @overlays/management-groups/deploy.parameters.json \
   --location 'usgovvirginia'
 ```
-
 </details>
+
 <p>
 
 <details>
@@ -139,6 +139,44 @@ New-AzManagementGroupDeployment `
 </details>
 <p>
 
+<p>
+  <details>
+    <summary>via Azure CLI</summary>
+
+```bash
+# For Azure Commerical regions
+
+# Sign into AZ CLI, this will redirect you to a web browser for authentication, if required
+az login
+
+az deployment mg create
+ --template-file deploy.bicep
+ --parameters @parameters/deploy.parameters.json
+ --location eastus
+ --name deploy-enclave-mg
+ --management-group-id '<< your tenant id >>'
+```
+
+```bash
+# For Azure Government regions
+
+# change Azure Clouds
+az cloud set --name AzureUSGovernment
+
+#sign  into AZ CLI, this will redirect you to a web browser for authentication, if required
+az login
+
+az deployment mg create
+ --template-file deploy.bicep
+ --parameters @parameters/deploy.parameters.json
+ --location eastus
+ --name deploy-enclave-mg
+ --management-group-id '<< your tenant id >>'
+```
+
+  </details>
+</p>
+
 ## Air-Gapped Clouds
 
 For air-gapped clouds it may be convenient to transfer and deploy the compiled ARM template instead of the Bicep template if the Bicep CLI tools are not available or if it is desirable to transfer only one file into the air gap.
@@ -155,4 +193,4 @@ az account management-group hierarchy-settings delete --name GroupName
 
 ## Example Output in Azure
 
-![Example Deployment Output](media/mgExampleDeploymentOutput.png "Example Deployment Output in Azure global regions")
+![Example Deployment Output](media/mgExampleManagementStructure.png "Example Deployment Output in Azure global regions")

@@ -59,7 +59,7 @@ The commands below assume you are deploying in Azure Commercial and show the ent
 
 For example, deploying using the `az deployment mg create` command in the Azure CLI:
 
-<h3>Example 1: Azure</h3>
+<h3>Overlay Example: Management Groups</h3>
 
 <details>
 
@@ -72,7 +72,7 @@ cd src/bicep/overlays
 cd management-groups
 az deployment mg create \
    --template-file overlays/management-groups/deploy.bicep \
-   --parameters @overlays/management-groups/deploy.enclave.mg.parameters.json \
+   --parameters @overlays/management-groups/deploy.parameters.json \
    --location 'eastus'
 ```
 
@@ -86,11 +86,11 @@ az cloud set --name AzureUSGovernment
 az login
 az deployment mg create \
   --template-file overlays/management-groups/deploy.bicep \
-  --parameters @overlays/management-groups/deploy.enclave.mg.parameters.json \
+  --parameters @overlays/management-groups/deploy.parameters.json \
   --location 'usgovvirginia'
 ```
-
 </details>
+
 <p>
 
 <details>
@@ -112,7 +112,7 @@ Set-AzContext -TenantId XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
 New-AzManagementGroupDeployment `
   -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
   -TemplateFile overlays/management-groups/deploy.bicepp `
-  -TemplateParameterFile overlays/management-groups/deploy.enclave.mg.parameters.json `
+  -TemplateParameterFile overlays/management-groups/deploy.parameters.json `
   -Location 'eastus'
 ```
 
@@ -133,18 +133,49 @@ Set-AzContext -TenantId XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
 New-AzManagementGroupDeployment `
   -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
   -TemplateFile overlays/management-groups/deploy.bicepp `
-  -TemplateParameterFile overlays/management-groups/deploy.enclave.mg.parameters.json.json `
+  -TemplateParameterFile overlays/management-groups/deploy.parameters.json `
   -Location  'usgovvirginia'
 ```
 </details>
 <p>
 
-## Resource types
+<p>
+  <details>
+    <summary>via Azure CLI</summary>
 
-| Resource Type | API Version |
-| :-- | :-- |
-| `Microsoft.Management/managementGroups` | [2021-04-01](https://docs.microsoft.com/en-us/azure/templates/Microsoft.Management/2021-04-01/managementGroups) |
-| `Microsoft.Management/managementGroups/subscriptions` | [2021-04-01](https://docs.microsoft.com/en-us/azure/templates/Microsoft.Management/2021-04-01/managementGroups/subscriptions) |
+```bash
+# For Azure Commerical regions
+
+# Sign into AZ CLI, this will redirect you to a web browser for authentication, if required
+az login
+
+az deployment mg create
+ --template-file deploy.bicep
+ --parameters @parameters/deploy.parameters.json
+ --location eastus
+ --name deploy-enclave-mg
+ --management-group-id '<< your tenant id >>'
+```
+
+```bash
+# For Azure Government regions
+
+# change Azure Clouds
+az cloud set --name AzureUSGovernment
+
+#sign  into AZ CLI, this will redirect you to a web browser for authentication, if required
+az login
+
+az deployment mg create
+ --template-file deploy.bicep
+ --parameters @parameters/deploy.parameters.json
+ --location eastus
+ --name deploy-enclave-mg
+ --management-group-id '<< your tenant id >>'
+```
+
+  </details>
+</p>
 
 ## Air-Gapped Clouds
 
@@ -162,4 +193,4 @@ az account management-group hierarchy-settings delete --name GroupName
 
 ## Example Output in Azure
 
-![Example Deployment Output](media/mgExampleDeploymentOutput.png "Example Deployment Output in Azure global regions")
+![Example Deployment Output](media/mgExampleManagementStructure.png "Example Deployment Output in Azure global regions")

@@ -87,12 +87,75 @@
         }
       }
     },
+    "parSourceAddresses": {
+      "value": [
+        "10.0.100.0/24",
+        "10.0.115.0/26"
+      ]
+    },
+    "parAksWorkload": {
+      "value": {
+        "name": "aks",
+        "shortName": "aks",
+        "subscriptionId": "<<subscriptionId>>",
+        "network": {
+          "virtualNetworkAddressPrefix": "10.0.125.0/26",
+          "subnetAddressPrefix": "10.0.125.0/26"
+        }
+      }
+    },
+    "parContainerRegistry": {
+      "value": {
+        "name": "anoaeastusdevacr",
+        "acrSku": "Premium",
+        "enableResourceLock": true
+      }
+    },
+    "parKubernetesCluster": {
+      "value": {
+        "name": "Contoso",
+        "enableSystemAssignedIdentity": true,
+        "aksClusterKubernetesVersion": "1.24.3",
+        "enableResourceLock": true,
+        "enableRBAC": true,
+        "enablePrivateCluster": true,
+        "enableAzurePolicy": true,
+        "enableAadProfileEnableAzureRBAC": true,
+        "enableAadProfileManaged": true,
+        "aadProfileAdminGroupObjectIDs": [],
+        "aksClusterSkuTier": "Free",
+        "primaryAgentPoolProfile": {
+          "name": "default",
+          "vmSize": "Standard_D4s_v3",
+          "osDiskSizeGB": 128,
+          "osDiskType": "Managed",
+          "enableAutoScaling": true,
+          "count": 1,
+          "maxCount": 5,
+          "minCount": 1,
+          "maxPods": 50,
+          "osType": "Linux",
+          "osSKU": "Ubuntu",
+          "type": "VirtualMachineScaleSets",
+          "mode": "System"
+        },
+        "networkProfile": {
+          "aksClusterLoadBalancerSku": "standard",
+          "aksClusterNetworkPlugin": "azure",
+          "aksClusterNetworkPolicy": "azure",
+          "aksClusterServiceCidr": "10.1.0.0/16",
+          "aksClusterDnsServiceIP": "10.1.0.10",
+          "aksClusterDockerBridgeCidr": "170.10.0.1/16",
+          "aksClusterOutboundType": "userDefinedRouting"
+        }
+      }
+    },
     "parNetworkArtifacts": {
       "value": {
         "enable": false,
         "artifactsKeyVault": {
           "keyVaultPolicies": {
-            "objectId": "7bc6bc45-b256-407c-9d79-bde13dfb5639",
+            "objectId": "<<objectId>>",
             "permissions": {
               "keys": [
                 "get",
@@ -109,7 +172,7 @@
         "storageAccountAccess": {
           "enableRoleAssignmentForStorageAccount": false,
           "principalIds": [
-            "7bc6bc45-b256-407c-9d79-bde13dfb5639"
+            "<<principalIds>>"
           ],
           "roleDefinitionIdOrName": "Contributor"
         }
@@ -223,6 +286,15 @@
         "alertsToAdminsNotifications": "Off",
         "emailSecurityContact": "anoa@microsoft.com",
         "phoneSecurityContact": "5555555555"
+      }
+    },
+    "parWorkloadLogStorageAccountAccess": {
+      "value": {
+        "enableRoleAssignmentForStorageAccount": false,
+        "principalIds": [
+          "xxxxxx-xxxxx-xxxxx-xxxx-xxxxxxx"
+        ],
+        "roleDefinitionIdOrName": "Group"
       }
     }
   }

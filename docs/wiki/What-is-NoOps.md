@@ -1,7 +1,5 @@
 # What is NoOps? - Shift IT’s focus from Operations to Mission Outcomes
 
-First and foremost, The goal of NoOps is to drive mission success with an outcome-based approach to deliver continuous value to enable the warfighter.
-
 The term "NoOps" in our context came from a special mission unit customer that was looking for the ease of deployment with Mission Landing Zone (MLZ) plus valuable workloads with greater flexibility and needed to have lower O&M due to a small staff size. They requested the ability to “hyper-automate” their Azure footprint and Governance to allow for what they called “NoOps.”
 
 NoOps stands for “no operations” but it is not that. In our mindset, It is the belief that software environments can be automated to a point where manual handoffs and low-value, rote administration can be eliminated. NoOps helps increase the abstraction of infrastructure, tightly integrated with DevOps workflows, that requires no operations team to oversee the process.
@@ -12,9 +10,9 @@ NoOps in a nutshell: create smart infrastructure with as little maintenance effo
 
 ## Requirements for Successful NoOps Environment
 
-The creator of the Azure NoOps Accelerator, John Spinella coins NoOps as **"NoOps is the union of people, processes and automation to enable organizations to deploy, monitor, and improve cloud operations."**
+The creator of the Azure NoOps Accelerator, John Spinella coins NoOps as **"NoOps is a policy-based, automated process to enable organizations to deploy, monitor, and improve cloud operations."**
 
-John looks at NoOps as the next evolution of DevOps. DevOps being the fusion of development and operations engineers collaborating together,NoOps main aim is to automate all the platform management parts and reduce friction between developers and infrastructure.
+John looks at NoOps as the next evolution of DevOps. DevOps being the fusion of development and operations engineers collaborating together,NoOps main aim is to automate all the platform management parts and reduce friction between developers and infrastructure. 
 
 ![DevOps-NoOps](./media/devops-noops.png)
 

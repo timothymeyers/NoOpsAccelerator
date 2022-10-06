@@ -2,8 +2,8 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": { 
-    "parAssignableScopeManagementGroupId ": {
-      "value": "<<ManagementGroupId>>"
+    "parAssignableScopeManagementGroupId": {
+      "value": "anoa"
     },
     "parRoleDefinitionInfo": {
       "value": {
@@ -26,7 +26,7 @@
             "dataActions": [],
             "notDataActions": [],
             "scopeType": "ManagementGroup",
-            "scopeName": "anoalz"
+            "scopeName": "anoa"
           },
           {
             "roleID": "72dd118f-5398-5835-8432-ced9ab12a3de",
@@ -46,7 +46,7 @@
             "dataActions": [],
             "notDataActions": [],
             "scopeType": "ManagementGroup",
-            "scopeName": "anoalz"
+            "scopeName": "anoa"
           },
           {
             "roleID": "72dd118f-5398-5835-8432-ced9ab12a3de",
@@ -70,7 +70,7 @@
             "dataActions": [],
             "notDataActions": [],
             "scopeType": "ManagementGroup",
-            "scopeName": "anoalz"
+            "scopeName": "anoa"
           },
           {
             "roleID": "72dd118f-5398-5835-8432-ced9ab12a3de",
@@ -88,7 +88,7 @@
             "dataActions": [],
             "notDataActions": [],
             "scopeType": "ManagementGroup",
-            "scopeName": "anoalz"
+            "scopeName": "anoa"
           },
           {
             "roleID": "72dd118f-5398-5835-8432-ced9ab12a3de",
@@ -107,7 +107,7 @@
             "dataActions": [],
             "notDataActions": [],
             "scopeType": "ManagementGroup",
-            "scopeName": "anoalz"
+            "scopeName": "anoa"
           },
           {
             "roleID": "bb465e79-5df0-597b-a848-85006554c065",
@@ -127,7 +127,7 @@
             ],
             "notActions": [],
             "scopeType": "ManagementGroup",
-            "scopeName": "anoalz"
+            "scopeName": "anoa"
           }
         ]
       }

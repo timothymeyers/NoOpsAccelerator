@@ -1,6 +1,5 @@
 // ----------------------------------------------------------------------------------
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT license.
+// Copyright (c) Microsoft Corporation. Licensed under the MIT license.
 //
 // THIS CODE AND INFORMATION ARE PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, 
 // EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
@@ -43,7 +42,6 @@ var telemetry = json(loadTextContent('../../../../azresources/Modules/Global/tel
 module telemetryCustomerUsageAttribution '../../../../azresources//Modules/Global/partnerUsageAttribution/customer-usage-attribution-management-group.bicep' = if (telemetry.customerUsageAttribution.enabled) {
   name: 'pid-${telemetry.customerUsageAttribution.modules.policy}-nist-80053-r4'
 }
-
 
 resource resPolicySetAssignment 'Microsoft.Authorization/policyAssignments@2020-03-01' = {
   name: 'nistr4-${uniqueString('nist-sp-800-53-r4-',parPolicyAssignmentManagementGroupId)}'

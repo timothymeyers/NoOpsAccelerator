@@ -16,7 +16,7 @@ param policyCategory string = 'KeyVault'
 param policyDefinitionManagementGroupId string
 
 // VARAIBLES
-var builtinPolicies_keyvault = json(loadTextContent('../../../builtin/definitions/keyvault.json'))
+var builtinPolicies_keyvault = json(loadTextContent('../../../../../azresources/Policy/builtin/definitions/keyvault.json'))
 var customPolicyDefinitionMgScope = tenantResourceId('Microsoft.Management/managementGroups', policyDefinitionManagementGroupId)
 
 resource computePolicySet 'Microsoft.Authorization/policySetDefinitions@2020-03-01' = {

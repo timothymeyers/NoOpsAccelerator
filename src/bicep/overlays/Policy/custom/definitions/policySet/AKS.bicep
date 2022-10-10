@@ -12,7 +12,7 @@ targetScope = 'managementGroup'
 param parPolicySource string = 'ANOA'
 param parPolicyCategory string = 'Azure Kubernetes Service'
 
-module computePolicySetDefinitions '../../../../Modules/Microsoft.Authorization/policySetDefinitions/az.auth.policy.set.def.bicep' = {
+module computePolicySetDefinitions '../../../../../azresources/Modules/Microsoft.Authorization/policySetDefinitions/az.auth.policy.set.def.bicep' = {
   name: 'compute-${uniqueString(deployment().name)}-policySetDefs'
   params: {
     // Required parameters

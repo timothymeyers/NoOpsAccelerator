@@ -13,7 +13,7 @@ param policySource string = 'ANOA'
 param policyCategory string = 'Security'
 
 // VARAIBLES
-var builtinPolicies_security = json(loadTextContent('../../../policy_id_library/securitycenter.json'))
+var builtinPolicies_security = json(loadTextContent('../../../../../azresources/Policy/builtin/definitions/security.json'))
 
 resource computePolicySet 'Microsoft.Authorization/policySetDefinitions@2020-03-01' = {
   name: 'custom-keyVault'

@@ -13,8 +13,8 @@ param policySource string = 'ANOA'
 param policyCategory string = 'Data Protection'
 
 // VARAIBLES
-var builtinPolicies_compute = json(loadTextContent('../../../builtin/definitions/compute.json'))
-var builtinPolicies_backup = json(loadTextContent('../../../builtin/definitions/backup.json'))
+var builtinPolicies_compute = json(loadTextContent('../../../../../azresources/Policy/builtin/definitions/compute.json'))
+var builtinPolicies_backup = json(loadTextContent('../../../../../azresources/Policy/builtin/definitions/backup.json'))
 
 resource computePolicySet 'Microsoft.Authorization/policySetDefinitions@2020-03-01' = {
   name: 'custom-dataProtection'

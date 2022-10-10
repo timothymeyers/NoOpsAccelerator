@@ -16,7 +16,7 @@ param policyCategory string = 'Network'
 param policyDefinitionManagementGroupId string
 
 // VARAIBLES
-var builtinPolicies_network = json(loadTextContent('../../../builtin/definitions/network.json'))
+var builtinPolicies_network = json(loadTextContent('../../../../../azresources/Policy/builtin/definitions/network.json'))
 
 var customPolicyDefinitionMgScope = tenantResourceId('Microsoft.Management/managementGroups', policyDefinitionManagementGroupId)
 

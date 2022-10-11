@@ -2,19 +2,19 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "policyAssignmentManagementGroupId": {
-            "value": "{{var-policyAssignmentManagementGroupId}}"
+        "parPolicyAssignmentManagementGroupId": {
+            "value": "anoa"
         },
-        "enforcementMode": {
+        "parEnforcementMode": {
             "value": "Default"
         },
-        "logAnalyticsWorkspaceId": {
-            "value": "{{var-logging-logAnalyticsWorkspaceId}}"
+        "parLogAnalyticsWorkspaceId": {
+            "value": "<<Log Analytics Workspace ID>>"
         },
-        "listOfMembersToExcludeFromWindowsVMAdministratorsGroup": {
+        "parListOfMembersToExcludeFromWindowsVMAdministratorsGroup": {
             "value": "__tbd__implementation_specific__"
         },
-        "listOfMembersToIncludeInWindowsVMAdministratorsGroup": {
+        "parListOfMembersToIncludeInWindowsVMAdministratorsGroup": {
             "value": "__tbd__implementation_specific__"
         }
     }

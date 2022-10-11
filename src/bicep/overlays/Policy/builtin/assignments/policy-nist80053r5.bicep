@@ -21,15 +21,8 @@ param parPolicyAssignmentManagementGroupId string
 @description('Policy set assignment enforcement mode.  Possible values are { Default, DoNotEnforce }.  Default value:  Default')
 param parEnforcementMode string = 'Default'
 
-@description('Log Analytics Resource Id to integrate Microsoft Defender for Cloud.')
-param parLogAnalyticsWorkspaceId string
-
-@description('Log Analytics Workspace Data Retention in days.')
-param parRequiredRetentionDays string
-
 var varPolicyId = '179d1daa-458f-4e47-8086-2a68d0d6c38f' // NIST SP 800-53 R5 
 var varAssignmentName = 'NIST SP 800-53 R5'
-
 var varScope = tenantResourceId('Microsoft.Management/managementGroups', parPolicyAssignmentManagementGroupId)
 var varPolicyScopedId = resourceId('Microsoft.Authorization/policySetDefinitions', varPolicyId)
 
@@ -42,12 +35,6 @@ resource resPolicySetAssignment 'Microsoft.Authorization/policyAssignments@2020-
     notScopes: [
     ]
     parameters: {
-      logAnalyticsWorkspaceIdforVMReporting: {
-        value: parLogAnalyticsWorkspaceId
-       }
-      parRequiredRetentionDays: {
-        value: parRequiredRetentionDays
-      }
     }
     enforcementMode: parEnforcementMode
   }

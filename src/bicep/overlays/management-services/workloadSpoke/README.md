@@ -2,7 +2,7 @@
 
 ## Overview
 
-This module defines Tier 3 Workload network deployment based on the recommendations from the Azure Mission Landing Zone Conceptual Architecture.  
+This overlay module deploys Tier 3 Workload network deployment based on the recommendations from the Azure Mission Landing Zone Conceptual Architecture.  
 
 Module deploys the following resources:
 
@@ -12,12 +12,20 @@ Module deploys the following resources:
 * Route Table
 * Storage Account
 
-## Required Parameters
+## About Tier 3 Workload Network
 
-The module requires the following inputs:
 
-| Parameter                         | Type   | Default                                                                                              | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | Required                   | Example                                        |
- | --------------------------------- | ------ | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- | ---------------------------------------------- |
+## Pre-requisites
+
+* A virtual network and subnet is deployed. (a deployment of [deploy.bicep](../../../../bicep/platforms/lz-platform-scca-hub-3spoke/deploy.bicep))
+* Decide if the optional parameters is appropriate for your deployment. If it needs to change, override one of the optional parameters.
+
+## Parameters
+
+See below for information on how to use the appropriate deployment parameters for use with this overlay:
+
+Required Parameters | Type | Allowed Values | Description
+| :-- | :-- | :-- | :-- |
 | parOrgPrefix                       | string | `aona`                                                                           | Prefix value which will be prepended to all resource names. Default: anoa                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | Yes                          | `aona`
 | parLocation                       | string | `resourceGroup().location`                                                                           | The Azure Region to deploy the resources into                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | Yes                          | `eastus`
 | parTemplateVersion                       | string | `1.0`                                                                           | The ANOA template version                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | Yes                          | `1.o`

@@ -1,0 +1,86 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "parRequired": {
+            "value": {
+                "orgPrefix": "anoa",
+                "templateVersion": "v1.0",
+                "deployEnvironment": "aks"
+            }
+        },
+        "parTags": {
+            "value": {
+                "organization": "anoa",
+                "templateVersion": "v1.0",
+                "deployEnvironment": "aks",
+                "deploymentType": "NoOpsBicep"
+            }
+        },
+        "parWorkloadSpoke": {
+            "value": {
+                "name": "app",
+                "shortName": "app",
+                "subscriptionId": "<<subscriptionId>>",
+                "enableDdosProtectionPlan": false,
+                "network": {
+                    "virtualNetworkAddressPrefix": "10.0.125.0/26",
+                    "subnetAddressPrefix": "10.0.125.0/26",
+                    "virtualNetworkDiagnosticsLogs": [],
+                    "virtualNetworkDiagnosticsMetrics": [],
+                    "networkSecurityGroupRules": [],
+                    "NetworkSecurityGroupDiagnosticsLogs": [
+                        "NetworkSecurityGroupEvent",
+                        "NetworkSecurityGroupRuleCounter"
+                    ],
+                    "subnetServiceEndpoints": [
+                        {
+                            "service": "Microsoft.Storage"
+                        }
+                    ],
+                    "subnets": [
+                        {
+                            "name": "app",
+                            "addressPrefix": ""
+                        }
+                    ],
+                    "routes": [
+
+                    ]
+                }
+            }
+        },
+        "parHubSubscriptionId": {
+            "value": "xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx"
+        },
+        "parHubResourceGroupName": {
+            "value": "anoa-eastus-workload-hub-rg"
+        },
+        "parHubVirtualNetworkName": {
+            "value": "anoa-eastus-workload-hub-vnet"
+        },
+        "parHubVirtualNetworkResourceId": {
+            "value": "/subscriptions/xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx/resourceGroups/anoa-eastus-workload-hub-rg/providers/Microsoft.Network/virtualNetworks/anoa-eastus-workload-hub-vnet"
+        },
+        "parLogAnalyticsWorkspaceResourceId": {
+            "value": "/subscriptions/xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx/resourcegroups/anoa-eastus-workload-logging-rg/providers/microsoft.operationalinsights/workspaces/anoa-eastus-workload-logging-log"
+        },
+        "parLogAnalyticsWorkspaceName": {
+            "value": "anoa-eastus-workload-logging-log"
+        },    
+        "parDeployddosProtectionPlan": {
+            "value": {
+                "enable": false
+            }
+        },
+        "parWorkloadStorageAccountAccess": {
+            "value": {
+                "enableRoleAssignmentForStorageAccount": false,
+                "principalIds": [
+                    "<<principalId>>"
+                ],
+                "roleDefinitionIdOrName": "Contributor"
+            }
+        }
+    }
+}

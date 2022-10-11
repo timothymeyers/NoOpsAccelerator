@@ -9,7 +9,7 @@ DESCRIPTION: The following components will be options in this deployment
               Activity Logging
               Netowrk Peering (Hub/Spoke)
 AUTHOR/S: jspinella
-
+VERSION: 1.x.x
 */
 
 /*
@@ -19,20 +19,17 @@ Copyright (c) Microsoft Corporation. Licensed under the MIT license.
 targetScope = 'subscription'
 
 // REQUIRED PARAMETERS
-
-@description('Prefix value which will be prepended to all resource names. Default: anoa')
-param parOrgPrefix string = 'anoa'
-
-@description('The subscription ID for the Workload Network and resources. It defaults to the deployment subscription.')
-param parWorkloadSubscriptionId string = subscription().subscriptionId
-
-@description('The region to deploy resources into. It defaults to the deployment location.')
-param parLocation string = deployment().location
-
-@minLength(3)
-@maxLength(15)
-@description('A suffix, 3 to 15 characters in length, to append to resource names (e.g. "dev", "test", "prod"). ')
-param parDeployEnvironment string
+// Example (JSON)
+// -----------------------------
+// "parRequired": {
+//   "value": {
+//     "orgPrefix": "anoa",
+//     "templateVersion": "v1.0",
+//     "deployEnvironment": "mlz"
+//   }
+// }
+@description('Required values used with all resources.')
+param parRequired object
 
 // REQUIRED TAGS
 // Example (JSON)
@@ -49,6 +46,12 @@ param parDeployEnvironment string
 @description('Required tags values used with all resources.')
 param parTags object
 
+@description('The subscription ID for the Workload Network and resources. It defaults to the deployment subscription.')
+param parWorkloadSubscriptionId string = subscription().subscriptionId
+
+@description('The region to deploy resources into. It defaults to the deployment location.')
+param parLocation string = deployment().location
+
 @minLength(3)
 @maxLength(12)
 @description('Prefix value which will be the workload name. Default: workload')
@@ -64,12 +67,7 @@ param parWorkloadShortName string = 'wk1'
 @description('A suffix to use for naming deployments uniquely. It defaults to the Bicep resolution of the "utcNow()" function.')
 param parDeploymentNameSuffix string = utcNow()
 
-// NETWORK ADDRESS SPACE PARAMETERS
-@description('The CIDR Virtual Network Address Prefix for the Workload Virtual Network.')
-param parWorkloadVirtualNetworkAddressPrefix string = '10.8.125.0/26'
-
-@description('The CIDR Subnet Address Prefix for the default Workload subnet. It must be in the Workload Virtual Network space.')
-param parWorkloadSubnetAddressPrefix string = '10.8.125.0/27'
+// HUB PARAMETERS
 
 @description('The subscription ID for the Hub Network.')
 param parHubSubscriptionId string
@@ -83,34 +81,15 @@ param parHubVirtualNetworkName string
 @description('The virtual network resource Id for the Hub Network.')
 param parHubVirtualNetworkResourceId string
 
-@description('The Storage Account SKU to use for log storage. It defaults to "Standard_GRS". See https://docs.microsoft.com/en-us/rest/api/storagerp/srp_sku_types for valid settings.')
-param parLogStorageSkuName string = 'Standard_GRS'
-
 // WORKLOAD NETWORK PARAMETERS
 
-@description('An array of Network Diagnostic Logs to enable for the Workload Virtual Network. See https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/diagnostic-settings?tabs=CMD#logs for valid settings.')
-param parWorkloadVirtualNetworkDiagnosticsLogs array = []
-
-@description('An array of Network Diagnostic Metrics to enable for the Workload Virtual Network. See https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/diagnostic-settings?tabs=CMD#metrics for valid settings.')
-param parWorkloadVirtualNetworkDiagnosticsMetrics array = []
-
-@description('An array of Network Security Group rules to apply to the Workload Virtual Network. See https://docs.microsoft.com/en-us/azure/templates/microsoft.network/networksecuritygroups/securityrules?tabs=bicep#securityrulepropertiesformat for valid settings.')
-param parWorkloadNetworkSecurityGroupRules array = []
-
-@description('An array of Network Security Group diagnostic logs to apply to the Workload Virtual Network. See https://docs.microsoft.com/en-us/azure/virtual-network/virtual-network-nsg-manage-log#log-categories for valid settings.')
-param parWorkloadNetworkSecurityGroupDiagnosticsLogs array = [
-  'NetworkSecurityGroupEvent'
-  'NetworkSecurityGroupRuleCounter'
-]
-
-@description('An array of Service Endpoints to enable for the Workload subnet. See https://docs.microsoft.com/en-us/azure/virtual-network/virtual-network-service-endpoints-overview for valid settings.')
-param parWorkloadSubnetServiceEndpoints array = [
-  {
-    service: 'Microsoft.Storage'
-  }
-]
+@description('Required values used with the workload, Please review the Read Me for required parameters')
+param parWorkloadSpoke object
 
 // LOGGING PARAMETERS
+
+@description('The Storage Account SKU to use for log storage. It defaults to "Standard_GRS". See https://docs.microsoft.com/en-us/rest/api/storagerp/srp_sku_types for valid settings.')
+param parLogStorageSkuName string = 'Standard_GRS'
 
 @description('Log Analytics Workspace Resource Id Needed for NSG, VNet and Activity Logging')
 param parLogAnalyticsWorkspaceResourceId string
@@ -119,32 +98,19 @@ param parLogAnalyticsWorkspaceResourceId string
 param parLogAnalyticsWorkspaceName string
 
 @description('Enable this setting if this network is on a different subscriptiom as the Hub. Will give conflict errors if on same sub as the Hub')
-param enableActivityLogging bool = false
+param parEnableActivityLogging bool = false
 
 // ROUTE TABLE 
 
-param parFirewallPrivateIPAddress string
-@description(' An Array of Routes to be established within the hub route table.')
-param parRouteTableRoutes array = [
-  {
-    name: 'wl-routetable'
-    properties: {
-      addressPrefix: '0.0.0.0/0'
-      nextHopIpAddress: parFirewallPrivateIPAddress
-      nextHopType: 'VirtualAppliance'
-    }
-  }
-]
+@description('An array of Route Table routes to apply to the Workload Virtual Network. If custom routes are enabled, over write the default. it  See https://docs.microsoft.com/en-us/azure/templates/microsoft.network/routetables/routes?tabs=bicep#routepropertiesformat for valid settings.')
+param parRouteTableRoutes array = [] 
+
+@description('Switch which allows Bgp Route Propagation. Default: false') 
 param parDisableBgpRoutePropagation bool = false
-
-//DDOS PARAMETERS
-
-@description('Switch which allows DDOS deployment to be disabled. Default: false')
-param parDeployddosProtectionPlan bool = false
 
 // STORAGE ACCOUNTS RBAC
 @description('Account for access to Storage')
-param parWorkloadLogStorageAccountAccess object
+param parWorkloadStorageAccountAccess object
 
 /*
   NAMING CONVENTION
@@ -155,13 +121,13 @@ param parWorkloadLogStorageAccountAccess object
 
 var varResourceToken = 'resource_token'
 var varNameToken = 'name_token'
-var varNamingConvention = '${toLower(parOrgPrefix)}-${toLower(parLocation)}-${toLower(parDeployEnvironment)}-${varNameToken}-${toLower(varResourceToken)}'
+var varNamingConvention = '${toLower(parRequired.orgPrefix)}-${toLower(parLocation)}-${toLower(parRequired.deployEnvironment)}-${varNameToken}-${toLower(varResourceToken)}'
 
 // RESOURCE NAME CONVENTIONS WITH ABBREVIATIONS
 
 var varNetworkSecurityGroupNamingConvention = replace(varNamingConvention, varResourceToken, 'nsg')
 var varResourceGroupNamingConvention = replace(varNamingConvention, varResourceToken, 'rg')
-var varStorageAccountNamingConvention = toLower('${parOrgPrefix}st${varNameToken}unique_storage_token')
+var varStorageAccountNamingConvention = toLower('${parRequired.orgPrefix}st${varNameToken}unique_storage_token')
 var varSubnetNamingConvention = replace(varNamingConvention, varResourceToken, 'snet')
 var varVirtualNetworkNamingConvention = replace(varNamingConvention, varResourceToken, 'vnet')
 var varDdosNamingConvention = replace(varNamingConvention, varResourceToken, 'ddos')
@@ -172,7 +138,7 @@ var varWorkloadName = parWorkloadName
 var varWorkloadShortName = parWorkloadShortName
 var varWorkloadResourceGroupName = replace(varResourceGroupNamingConvention, varNameToken, varWorkloadName)
 var varWorkloadLogStorageAccountShortName = replace(varStorageAccountNamingConvention, varNameToken, replace(varWorkloadShortName, '-', ''))
-var varWorkloadLogStorageAccountUniqueName = replace(varWorkloadLogStorageAccountShortName, 'unique_storage_token', uniqueString(parWorkloadSubscriptionId, parLocation, parDeployEnvironment, parOrgPrefix))
+var varWorkloadLogStorageAccountUniqueName = replace(varWorkloadLogStorageAccountShortName, 'unique_storage_token', uniqueString(parWorkloadSubscriptionId, parLocation, parRequired.deployEnvironment, parRequired.orgPrefix))
 var varWorkloadLogStorageAccountName = take(varWorkloadLogStorageAccountUniqueName, 23)
 var varWorkloadVirtualNetworkName = replace(varVirtualNetworkNamingConvention, varNameToken, varWorkloadName)
 var varWorkloadNetworkSecurityGroupName = replace(varNetworkSecurityGroupNamingConvention, varNameToken, varWorkloadName)
@@ -185,7 +151,7 @@ var varRouteTableName = '${varWorkloadSubnetName}-routetable'
 // TAGS
 
 @description('Workload Resource group tags')
-module modTags '../../Modules/Microsoft.Resources/tags/az.resources.tags.bicep' = {
+module modTags '../../../azresources/Modules/Microsoft.Resources/tags/az.resources.tags.bicep' = {
   name: 'deploy-${varWorkloadShortName}-tags-${parLocation}-${parDeploymentNameSuffix}'
   params: {
     tags: parTags
@@ -194,7 +160,7 @@ module modTags '../../Modules/Microsoft.Resources/tags/az.resources.tags.bicep' 
 
 // RESOURCE GROUPS
 
-module modWorkloadResourceGroup '../../Modules/Microsoft.Resources/resourceGroups/az.resource.groups.bicep' = {
+module modWorkloadResourceGroup '../../../azresources/Modules/Microsoft.Resources/resourceGroups/az.resource.groups.bicep' = {
   name: 'deploy-${varWorkloadShortName}-rg-${parDeploymentNameSuffix}'
   scope: subscription(parWorkloadSubscriptionId)
   params: {
@@ -206,7 +172,7 @@ module modWorkloadResourceGroup '../../Modules/Microsoft.Resources/resourceGroup
 
 //STORAGE ACCOUNT
 
-module modWorkloadLogStorage '../../Modules/Microsoft.Storage/storageAccounts/az.data.storage.bicep' = {
+module modWorkloadLogStorage '../../../azresources/Modules/Microsoft.Storage/storageAccounts/az.data.storage.bicep' = {
   name: 'deploy-${varWorkloadShortName}-logStorage-${parLocation}-${parDeploymentNameSuffix}'
   scope: resourceGroup(varWorkloadResourceGroupName)
   params: {
@@ -214,11 +180,12 @@ module modWorkloadLogStorage '../../Modules/Microsoft.Storage/storageAccounts/az
     location: parLocation
     storageAccountSku: parLogStorageSkuName
     tags: modTags.outputs.tags
-    roleAssignments: (parWorkloadLogStorageAccountAccess.enableRoleAssignmentForStorageAccount) ? [
+    roleAssignments: (parWorkloadStorageAccountAccess.enableRoleAssignmentForStorageAccount) ? [
       {
-        principalIds: parWorkloadLogStorageAccountAccess.principalIds
-        
-        roleDefinitionIdOrName: parWorkloadLogStorageAccountAccess.roleDefinitionIdOrName
+        principalIds: [
+          parWorkloadStorageAccountAccess.principalIds
+        ]
+        roleDefinitionIdOrName: parWorkloadStorageAccountAccess.roleDefinitionIdOrName
       }
     ] : []
     lock: 'CanNotDelete'
@@ -230,7 +197,7 @@ module modWorkloadLogStorage '../../Modules/Microsoft.Storage/storageAccounts/az
 
 // NETWORK SECURITY GROUP
 
-module modWorkloadNetworkSecurityGroup '../../Modules/Microsoft.Network/networkSecurityGroups/az.net.network.security.group.with.diagnostics.bicep' = {
+module modWorkloadNetworkSecurityGroup '../../../azresources/Modules/Microsoft.Network/networkSecurityGroups/az.net.network.security.group.with.diagnostics.bicep' = {
   name: 'deploy-${varWorkloadShortName}-nsg-${parLocation}-${parDeploymentNameSuffix}'
   scope: resourceGroup(varWorkloadResourceGroupName)
   params: {
@@ -238,16 +205,16 @@ module modWorkloadNetworkSecurityGroup '../../Modules/Microsoft.Network/networkS
     location: parLocation
     tags: modTags.outputs.tags
 
-    securityRules: parWorkloadNetworkSecurityGroupRules
+    securityRules: parWorkloadSpoke.network.networkSecurityGroupRules
 
     diagnosticWorkspaceId: parLogAnalyticsWorkspaceResourceId
     diagnosticStorageAccountId: modWorkloadLogStorage.outputs.resourceId
 
-    diagnosticLogCategoriesToEnable: parWorkloadNetworkSecurityGroupDiagnosticsLogs
+    diagnosticLogCategoriesToEnable: parWorkloadSpoke.network.networkSecurityGroupDiagnosticsLogs
   }
 }
 
-module modWorkloadRouteTable '../../Modules/Microsoft.Network/routeTable/az.net.route.table.bicep' = {
+module modWorkloadRouteTable '../../../azresources/Modules/Microsoft.Network/routeTable/az.net.route.table.bicep' = {
   name: 'deploy-${varWorkloadShortName}-rt-${parLocation}-${parDeploymentNameSuffix}'
   scope: resourceGroup(varWorkloadResourceGroupName)
   params: {
@@ -263,7 +230,7 @@ module modWorkloadRouteTable '../../Modules/Microsoft.Network/routeTable/az.net.
   ]
 }
 
-module modWorkloadVirtualNetwork '../../Modules/Microsoft.Network/virtualNetworks/az.net.virtual.network.with.diagnostics.bicep' = {
+module modWorkloadVirtualNetwork '../../../azresources/Modules/Microsoft.Network/virtualNetworks/az.net.virtual.network.with.diagnostics.bicep' = {
   name: 'deploy-${varWorkloadShortName}-vnet-${parLocation}-${parDeploymentNameSuffix}'
   scope: resourceGroup(varWorkloadResourceGroupName)
   params: {
@@ -272,30 +239,30 @@ module modWorkloadVirtualNetwork '../../Modules/Microsoft.Network/virtualNetwork
     tags: modTags.outputs.tags
 
     addressPrefixes: [
-      parWorkloadVirtualNetworkAddressPrefix
+      parWorkloadSpoke.network.virtualNetworkAddressPrefix
     ]
 
-    subnets: [
+    subnets: union([
       {
-        addressPrefix: parWorkloadSubnetAddressPrefix
+        addressPrefix: parWorkloadSpoke.network.subnetAddressPrefix
         name: varWorkloadSubnetName
         networkSecurityGroupId: modWorkloadNetworkSecurityGroup.outputs.resourceId
         routeTableId: modWorkloadRouteTable.outputs.resourceId
-        serviceEndpoints: parWorkloadSubnetServiceEndpoints
+        serviceEndpoints: parWorkloadSpoke.network.subnetServiceEndpoints
       }
-    ]
+    ], parWorkloadSpoke.network.subnets) 
     
     diagnosticWorkspaceId: parLogAnalyticsWorkspaceResourceId
     diagnosticStorageAccountId: modWorkloadLogStorage.outputs.resourceId
 
-    diagnosticLogCategoriesToEnable: parWorkloadVirtualNetworkDiagnosticsLogs
-    diagnosticMetricsToEnable: parWorkloadVirtualNetworkDiagnosticsMetrics
-    ddosProtectionPlanEnabled: parDeployddosProtectionPlan
+    diagnosticLogCategoriesToEnable: parWorkloadSpoke.network.virtualNetworkDiagnosticsLogs
+    diagnosticMetricsToEnable: parWorkloadSpoke.network.virtualNetworkDiagnosticsMetrics
+    ddosProtectionPlanEnabled: parWorkloadSpoke.enableDdosProtectionPlan
     ddosProtectionPlanId: workloadddosName
   }
 }
 
-module modWorkloadVirtualNetworkPeerings '../../hub-spoke-core/peering/spoke/anoa.lz.spoke.network.peering.bicep' = {
+module modWorkloadVirtualNetworkPeerings '../../../azresources/hub-spoke-core/peering/spoke/anoa.lz.spoke.network.peering.bicep' = {
   name: 'deploy-hub-peerings-${varWorkloadShortName}-${parLocation}-${parDeploymentNameSuffix}'
   scope: resourceGroup(parWorkloadSubscriptionId, varWorkloadResourceGroupName)
   params: {
@@ -307,7 +274,7 @@ module modWorkloadVirtualNetworkPeerings '../../hub-spoke-core/peering/spoke/ano
   }
 }
 
-module modHubToWorkloadVirtualNetworkPeering '../../hub-spoke-core/peering/hub/anoa.lz.hub.network.peerings.bicep' = {
+module modHubToWorkloadVirtualNetworkPeering '../../../azresources/hub-spoke-core/peering/hub/anoa.lz.hub.network.peerings.bicep' = {
   name: 'deploy-spoke-peerings-${varWorkloadShortName}-${parLocation}-${parDeploymentNameSuffix}'
   scope: resourceGroup(parHubSubscriptionId, parHubResourceGroupName)
   params: {
@@ -322,7 +289,7 @@ module modHubToWorkloadVirtualNetworkPeering '../../hub-spoke-core/peering/hub/a
   }
 }
 
-module spokeWorkloadSubscriptionActivityLogging '../../Modules/Microsoft.Insights/diagnosticSettings/az.insights.diagnostic.setting.bicep' = if (enableActivityLogging) {
+module spokeWorkloadSubscriptionActivityLogging '../../../azresources/Modules/Microsoft.Insights/diagnosticSettings/az.insights.diagnostic.setting.bicep' = if (parEnableActivityLogging) {
   name: 'deploy-logs-${varWorkloadShortName}-${parLocation}-${parDeploymentNameSuffix}'
   params: {
     name: 'log-workload-sub-activity-to-${parLogAnalyticsWorkspaceName}'

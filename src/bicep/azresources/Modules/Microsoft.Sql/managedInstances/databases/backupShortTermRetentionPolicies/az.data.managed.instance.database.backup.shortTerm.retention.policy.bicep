@@ -1,3 +1,4 @@
+/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 @description('Required. The name of the Short Term Retention backup policy. For example "default".')
 param name string
 

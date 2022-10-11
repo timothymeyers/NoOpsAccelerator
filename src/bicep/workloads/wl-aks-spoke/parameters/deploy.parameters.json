@@ -17,14 +17,34 @@
         "deploymentType": "NoOpsBicep"
       }
     },
-    "parWorkload": {
+    "parWorkloadSpoke": {
       "value": {
         "name": "app",
         "shortName": "app",
         "subscriptionId": "<<subscriptionId>>",
+        "enableDdosProtectionPlan": false,
         "network": {
           "virtualNetworkAddressPrefix": "10.0.125.0/26",
-          "subnetAddressPrefix": "10.0.125.0/26"
+          "subnetAddressPrefix": "10.0.125.0/26",
+          "virtualNetworkDiagnosticsLogs": [],
+          "virtualNetworkDiagnosticsMetrics": [],
+          "networkSecurityGroupRules": [],
+          "NetworkSecurityGroupDiagnosticsLogs": [
+            "NetworkSecurityGroupEvent",
+            "NetworkSecurityGroupRuleCounter"
+          ],
+          "subnetServiceEndpoints": [
+            {
+              "service": "Microsoft.Storage"
+            }
+          ],
+          "subnets": [
+            {
+              "name": "app",
+              "addressPrefix": ""
+            }
+          ],
+          "routes": []
         }
       }
     },
@@ -62,7 +82,7 @@
       "value": {
         "name": "anoaeastusdevacr",
         "acrSku": "Premium",
-        "enableResourceLock": true        
+        "enableResourceLock": true
       }
     },
     "parKubernetesCluster": {

@@ -52,7 +52,7 @@ param parDeploymentNameSuffix string = utcNow()
 // WORKLOAD PARAMETERS
 
 @description('Required values used with the workload, Please review the Read Me for required parameters')
-param parWorkload object
+param parWorkloadSpoke object
 
 // HUB NETWORK PARAMETERS
 
@@ -72,9 +72,6 @@ param parHubVirtualNetworkResourceId string
 
 @description('The virtual network name for the Hub Network.')
 param parHubFirewallPolicyName string
-
-@description('The firewall private IP address for the Hub Network.')
-param parFirewallPrivateIPAddress string
 
 @description('The firewall source addresses for the Rule Collection Groups, Must be Hub/Spoke addresses.')
 param parSourceAddresses array = []
@@ -146,7 +143,7 @@ param parKubernetesCluster object
 // Storage Account RBAC
 // Example (JSON)
 // -----------------------------
-// "parWorkloadLogStorageAccountAccess": {
+// "parStorageAccountAccess": {
 //   "value": {
 //     "enableRoleAssignmentForStorageAccount": true,
 //     "principalIds": [
@@ -156,27 +153,21 @@ param parKubernetesCluster object
 //   }
 // },  
 @description('Account for access to Storage')
-param parWorkloadLogStorageAccountAccess object
+param parWorkloadStorageAccountAccess object
 
-// SUPPORTED CLOUDS PARAMETERS
-
-param parSupportedClouds array = [
-  'AzureCloud'
-  'AzureUSGovernment'
-]
 
 // Telemetry - Azure customer usage attribution
 // Reference:  https://docs.microsoft.com/azure/marketplace/azure-partner-customer-usage-attribution
 var telemetry = json(loadTextContent('../../azresources/Modules/Global/telemetry.json'))
 module telemetryCustomerUsageAttribution '../../azresources/Modules/Global/partnerUsageAttribution/customer-usage-attribution-subscription.bicep' = if (telemetry.customerUsageAttribution.enabled) {
   name: 'pid-${telemetry.customerUsageAttribution.modules.workloads.aks}'
-  scope: subscription(parWorkload.subscriptionId)
+  scope: subscription(parWorkloadSpoke.subscriptionId)
 }
 
 //=== TAGS === 
 
 var referential = {
-  workload: parWorkload.name
+  workload: parWorkloadSpoke.name
 }
 
 @description('Resource group tags')
@@ -189,14 +180,12 @@ module modTags '../../azresources/Modules/Microsoft.Resources/tags/az.resources.
 }
 
 //=== Workload Tier 3 Buildout === 
-module modTier3 '../../azresources/hub-spoke-core/tier3/anoa.lz.workload.network.bicep' = {
+module modTier3 '../../overlays/management-services/workloadSpoke/deploy.bicep' = {
   name: 'deploy-wl-vnet-${parLocation}-${parDeploymentNameSuffix}'
-  scope: subscription(parWorkload.subscriptionId)
+  scope: subscription(parWorkloadSpoke.subscriptionId)
   params: {
     //Required Parameters
-    parWorkloadName: parWorkload.name
-    parWorkloadShortName: parWorkload.shortName
-    parDeployEnvironment: parRequired.deployEnvironment
+    parRequired:parRequired
     parLocation: parLocation
     parTags: modTags.outputs.tags
 
@@ -207,21 +196,15 @@ module modTier3 '../../azresources/hub-spoke-core/tier3/anoa.lz.workload.network
     parHubResourceGroupName: parHubResourceGroupName
 
     //WorkLoad Parameters
-    parWorkloadSubscriptionId: parWorkload.subscriptionId
-    parWorkloadVirtualNetworkAddressPrefix: parWorkload.network.virtualNetworkAddressPrefix
-    parWorkloadSubnetAddressPrefix: parWorkload.network.subnetAddressPrefix
-
-    //Firewall Parameters
-    parFirewallPrivateIPAddress: parFirewallPrivateIPAddress
-
+    parWorkloadSpoke: parWorkloadSpoke    
+ 
     //Logging Parameters
     parLogAnalyticsWorkspaceName: parLogAnalyticsWorkspaceName
     parLogAnalyticsWorkspaceResourceId: parLogAnalyticsWorkspaceResourceId
+    parEnableActivityLogging: true
 
     //Storage Parameters
-    parWorkloadLogStorageAccountAccess: parWorkloadLogStorageAccountAccess
-    enableActivityLogging: true
-
+    parWorkloadStorageAccountAccess: parWorkloadStorageAccountAccess
   }
 }
 
@@ -233,7 +216,7 @@ module firewallAKSAppRuleCollectionGroup '../../azresources/Modules/Microsoft.Ne
   name: 'deploy-aks-appruleGroup-${parDeploymentNameSuffix}'
   scope: resourceGroup(parHubResourceGroupName)
   params: {
-    name: '${parWorkload.shortName}ApplicationRuleCollectionGroup'
+    name: '${parWorkloadSpoke.shortName}ApplicationRuleCollectionGroup'
     firewallPolicyName: parHubFirewallPolicyName
     priority: 210
     ruleCollections: [
@@ -397,7 +380,7 @@ module firewallAKSNetworkRuleCollectionGroup '../../azresources/Modules/Microsof
   name: 'deploy-aks-networkruleGroup-${parDeploymentNameSuffix}'
   scope: resourceGroup(parHubResourceGroupName)
   params: {
-    name: '${parWorkload.shortName}NetworkRuleCollectionGroup'
+    name: '${parWorkloadSpoke.shortName}NetworkRuleCollectionGroup'
     firewallPolicyName: parHubFirewallPolicyName
     priority: 250
     ruleCollections: [     
@@ -434,14 +417,14 @@ module firewallAKSNetworkRuleCollectionGroup '../../azresources/Modules/Microsof
 
 module modAcrDeploy '../../overlays/management-services/containerRegistry/deploy.bicep' = {
   name: 'deploy-aks-acr-${parLocation}-${parDeploymentNameSuffix}'
-  scope: subscription(parWorkload.subscriptionId)
+  scope: subscription(parWorkloadSpoke.subscriptionId)
   params: {
     parLocation: parLocation
     parContainerRegistry: parContainerRegistry
     parRequired: parRequired
     parTags: modTags.outputs.tags
     parTargetResourceGroup: modTier3.outputs.workloadResourceGroupName
-    parTargetSubscriptionId: parWorkload.subscriptionId
+    parTargetSubscriptionId: parWorkloadSpoke.subscriptionId
     parTargetSubnetName: modTier3.outputs.subnetNames[0]
     parTargetVNetName: modTier3.outputs.virtualNetworkName
   }
@@ -452,7 +435,7 @@ module modAcrDeploy '../../overlays/management-services/containerRegistry/deploy
 
 // Create a AKS Cluster
 module modDeployAzureKS '../../overlays/management-services/kubernetesCluster/deploy.bicep' = {
-  scope: subscription(parWorkload.subscriptionId)
+  scope: subscription(parWorkloadSpoke.subscriptionId)
   name: 'deploy-aks-${parLocation}-${parDeploymentNameSuffix}'
   params: {
     parLocation: parLocation
@@ -462,7 +445,7 @@ module modDeployAzureKS '../../overlays/management-services/kubernetesCluster/de
     parTargetResourceGroup: modTier3.outputs.workloadResourceGroupName
     parTargetSubnetName: modTier3.outputs.subnetNames[0]
     parTargetVNetName: modTier3.outputs.virtualNetworkName
-    parTargetSubscriptionId: parWorkload.subscriptionId
+    parTargetSubscriptionId: parWorkloadSpoke.subscriptionId
     parHubVirtualNetworkResourceId: parHubVirtualNetworkResourceId
     parLogAnalyticsWorkspaceResourceId: parLogAnalyticsWorkspaceResourceId
   }

@@ -38,41 +38,41 @@
                             "service": "Microsoft.Storage"
                         }
                     ],
-                    "subnets": [
-                        {
-                            "name": "app",
-                            "addressPrefix": ""
-                        }
-                    ],
-                    "routes": [
-
-                    ]
+                    "subnets": [],
+                    "routeTable": {
+                        "disableBgpRoutePropagation": false,
+                        "routes": [
+                            {
+                                "name": "wl-routetable",                                
+                                "properties": {
+                                    "addressPrefix": "0.0.0.0/0",
+                                    "nextHopIpAddress": "10.0.100.4",
+                                    "nextHopType": "VirtualAppliance"
+                                }
+                            }
+                        ]
+                    }
                 }
             }
         },
         "parHubSubscriptionId": {
-            "value": "xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx"
+            "value": "<<subscriptionId>>"
         },
         "parHubResourceGroupName": {
-            "value": "anoa-eastus-workload-hub-rg"
+            "value": "anoa-eastus-dev-hub-rg"
         },
         "parHubVirtualNetworkName": {
-            "value": "anoa-eastus-workload-hub-vnet"
+            "value": "anoa-eastus-dev-hub-vnet"
         },
         "parHubVirtualNetworkResourceId": {
-            "value": "/subscriptions/xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx/resourceGroups/anoa-eastus-workload-hub-rg/providers/Microsoft.Network/virtualNetworks/anoa-eastus-workload-hub-vnet"
+            "value": "/subscriptions/<<subscriptionId>>/resourceGroups/anoa-eastus-dev-hub-rg/providers/Microsoft.Network/virtualNetworks/anoa-eastus-dev-hub-vnet"
         },
         "parLogAnalyticsWorkspaceResourceId": {
-            "value": "/subscriptions/xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx/resourcegroups/anoa-eastus-workload-logging-rg/providers/microsoft.operationalinsights/workspaces/anoa-eastus-workload-logging-log"
+            "value": "/subscriptions/<<subscriptionId>>/resourcegroups/anoa-eastus-dev-logging-rg/providers/microsoft.operationalinsights/workspaces/anoa-eastus-dev-logging-log"
         },
         "parLogAnalyticsWorkspaceName": {
-            "value": "anoa-eastus-workload-logging-log"
-        },    
-        "parDeployddosProtectionPlan": {
-            "value": {
-                "enable": false
-            }
-        },
+            "value": "anoa-eastus-dev-logging-log"
+        },        
         "parWorkloadStorageAccountAccess": {
             "value": {
                 "enableRoleAssignmentForStorageAccount": false,

@@ -59,12 +59,30 @@ param parWorkloadSpoke object
 @description('The subscription ID for the Hub Network.')
 param parHubSubscriptionId string
 
+// Hub Resource Group Name
+// (JSON Parameter)
+// ---------------------------
+// "parHubResourceGroupName": {
+//   "value": "anoa-eastus-platforms-hub-rg"
+// }
 @description('The resource group name for the Hub Network.')
 param parHubResourceGroupName string
 
+// Hub Virtual Network Name
+// (JSON Parameter)
+// ---------------------------
+// "parHubResourceGroupName": {
+//   "value": "anoa-eastus-platforms-hub-rg"
+// }
 @description('The virtual network name for the Hub Network.')
 param parHubVirtualNetworkName string
 
+// Hub Virtual Network Resource Id
+// (JSON Parameter)
+// ---------------------------
+// "parHubVirtualNetworkResourceId": {
+//   "value": "/subscriptions/xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx/resourceGroups/anoa-eastus-platforms-hub-rg/providers/Microsoft.Network/virtualNetworks/anoa-eastus-platforms-hub-vnet/subnets/anoa-eastus-platforms-hub-vnet"
+// }
 @description('The virtual network resource Id for the Hub Network.')
 param parHubVirtualNetworkResourceId string
 

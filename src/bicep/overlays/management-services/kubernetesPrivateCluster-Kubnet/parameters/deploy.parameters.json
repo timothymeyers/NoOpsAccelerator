@@ -17,68 +17,26 @@
         "deploymentType": "NoOpsBicep"
       }
     },
-    "parWorkloadSpoke": {
-      "value": {
-        "name": "app",
-        "shortName": "app",
-        "subscriptionId": "<<subscriptionId>>",
-        "enableDdosProtectionPlan": false,
-        "network": {
-          "virtualNetworkAddressPrefix": "10.0.125.0/26",
-          "subnetAddressPrefix": "10.0.125.0/26",
-          "virtualNetworkDiagnosticsLogs": [],
-          "virtualNetworkDiagnosticsMetrics": [],
-          "networkSecurityGroupRules": [],
-          "NetworkSecurityGroupDiagnosticsLogs": [
-            "NetworkSecurityGroupEvent",
-            "NetworkSecurityGroupRuleCounter"
-          ],
-          "subnetServiceEndpoints": [
-            {
-              "service": "Microsoft.Storage"
-            }
-          ],
-          "subnets": [],
-          "routeTable": {
-            "disableBgpRoutePropagation": false,
-            "routes": [
-              {
-                "name": "wl-routetable",
-                "properties": {
-                  "addressPrefix": "0.0.0.0/0",
-                  "nextHopIpAddress": "10.0.100.4",
-                  "nextHopType": "VirtualAppliance"
-                }
-              }
-            ]
-          }
-        }
-      }
-    },
     "parHubSubscriptionId": {
       "value": "<<subscriptionId>>"
     },
     "parHubResourceGroupName": {
       "value": "anoa-eastus-dev-hub-rg"
     },
-    "parHubVirtualNetworkName": {
-      "value": "anoa-eastus-dev-hub-vnet"
-    },
     "parHubVirtualNetworkResourceId": {
       "value": "/subscriptions/<<subscriptionId>>/resourceGroups/anoa-eastus-dev-hub-rg/providers/Microsoft.Network/virtualNetworks/anoa-eastus-dev-hub-vnet"
     },
-    "parLogAnalyticsWorkspaceResourceId": {
-      "value": "/subscriptions/<<subscriptionId>>/resourcegroups/anoa-eastus-dev-logging-rg/providers/microsoft.operationalinsights/workspaces/anoa-eastus-dev-logging-log"
+    "parTargetSubscriptionId": {
+      "value": "<<subscriptionId>>"
     },
-    "parLogAnalyticsWorkspaceName": {
-      "value": "anoa-eastus-dev-logging-log"
+    "parTargetResourceGroup": {
+      "value": "anoa-eastus-aks-app-rg"
     },
-    "parContainerRegistry": {
-      "value": {
-        "name": "anoaeastusdevacr",
-        "acrSku": "Premium",
-        "enableResourceLock": true
-      }
+    "parTargetVNetName": {
+      "value": "anoa-eastus-aks-app-vnet"
+    },
+    "parTargetSubnetName": {
+      "value": "anoa-eastus-aks-app-snet"
     },
     "parKubernetesCluster": {
       "value": {
@@ -138,15 +96,6 @@
           "clientId": "<<clientId>>",
           "secret": "<<secret>>"
         }
-      }
-    },
-    "parWorkloadStorageAccountAccess": {
-      "value": {
-        "enableRoleAssignmentForStorageAccount": false,
-        "principalIds": [
-          "<<principalId>>"
-        ],
-        "roleDefinitionIdOrName": "Contributor"
       }
     }
   }

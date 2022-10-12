@@ -4,39 +4,39 @@
   "parameters": {
     "parRequired": {
       "value": {
-        "orgPrefix": "anoa9876",
+        "orgPrefix": "anoa",
         "templateVersion": "v1.0",
         "deployEnvironment": "dev"
       }
     },
     "parTags": {
       "value": {
-        "organization": "anoa9876",
+        "organization": "anoa",
         "templateVersion": "v1.0",
         "deployEnvironment": "dev",
         "deploymentType": "NoOpsBicep"
       }
     },
     "parHubSubscriptionId": {
-      "value": "896f5276-df9a-4317-a791-469396bef7fa"
+      "value": "<<subscriptionId>>"
     },
     "parHubResourceGroupName": {
-      "value": "anoa9876-eastus-dev-hub-rg"
+      "value": "anoa-eastus-dev-hub-rg"
     },
     "parHubVirtualNetworkResourceId": {
-      "value": "/subscriptions/896f5276-df9a-4317-a791-469396bef7fa/resourceGroups/anoa9876-eastus-dev-hub-rg/providers/Microsoft.Network/virtualNetworks/anoa9876-eastus-dev-hub-vnet"
+      "value": "/subscriptions/<<subscriptionId>>/resourceGroups/anoa-eastus-dev-hub-rg/providers/Microsoft.Network/virtualNetworks/anoa-eastus-dev-hub-vnet"
     },
     "parTargetSubscriptionId": {
-      "value": "896f5276-df9a-4317-a791-469396bef7fa"
+      "value": "<<subscriptionId>>"
     },
     "parTargetResourceGroup": {
-      "value": "anoa9876-eastus-aks-app-rg"
+      "value": "anoa-eastus-aks-app-rg"
     },
     "parTargetVNetName": {
-      "value": "anoa9876-eastus-aks-app-vnet"
+      "value": "anoa-eastus-aks-app-vnet"
     },
     "parTargetSubnetName": {
-      "value": "anoa9876-eastus-aks-app-snet"
+      "value": "anoa-eastus-aks-app-snet"
     },
     "parKubernetesCluster": {
       "value": {
@@ -74,9 +74,9 @@
           "enablePrivateClusterPublicFQDN": false
         },
         "aadProfile": {
-          "aadProfileTenantId": "ded6b38d-d740-4564-ae25-2e3f041093be",
+          "aadProfileTenantId": "<<TenantId>>",
           "aadProfileAdminGroupObjectIDs": [
-            "157ea1d7-342f-4a7c-8077-06469e358978"
+            "<<GroupObjectID>>"
           ],
           "enableAadProfileEnableAzureRBAC": true,
           "enableAadProfileManaged": true
@@ -85,7 +85,7 @@
           "omsagent": {
             "enable": true,
             "config": {
-              "logAnalyticsWorkspaceResourceID": "/subscriptions/896f5276-df9a-4317-a791-469396bef7fa/resourcegroups/anoa9876-eastus-dev-logging-rg/providers/microsoft.operationalinsights/workspaces/anoa9876-eastus-dev-logging-log"
+              "logAnalyticsWorkspaceResourceID": "/subscriptions/<<subscriptionId>>/resourcegroups/anoa-eastus-dev-logging-rg/providers/microsoft.operationalinsights/workspaces/anoa-eastus-dev-logging-log"
             }
           },
           "enableResourceLock": true,
@@ -93,8 +93,8 @@
           "azureKeyvaultSecretsProvider": true
         },
         "servicePrincipalProfile": {
-          "clientId": "178979fa-74c1-46f2-b451-e8290b78fba3",
-          "secret": "UEt8Q~TT3mujGNgHjXzGdB48g0trHYBpu~j1wa5l"
+          "clientId": "<<clientId>>",
+          "secret": "<<secret>>"
         }
       }
     }

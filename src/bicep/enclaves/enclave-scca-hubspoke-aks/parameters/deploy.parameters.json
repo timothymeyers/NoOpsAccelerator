@@ -50,7 +50,7 @@
         "storageAccountAccess": {
           "enableRoleAssignmentForStorageAccount": false,
           "principalIds": [
-            "7bc6bc45-b256-407c-9d79-bde13dfb5639"
+            "<<principalId>>"
           ],
           "roleDefinitionIdOrName": "Contributor"
         }
@@ -81,7 +81,7 @@
         "storageAccountAccess": {
           "enableRoleAssignmentForStorageAccount": false,
           "principalIds": [
-            "7bc6bc45-b256-407c-9d79-bde13dfb5639"
+            "<<principalId>>"
           ],
           "roleDefinitionIdOrName": "Contributor"
         }
@@ -93,7 +93,7 @@
         "10.0.115.0/26"
       ]
     },
-    "parAksWorkload": {
+    "parAksSpoke": {
       "value": {
         "name": "app",
         "shortName": "app",
@@ -114,12 +114,7 @@
               "service": "Microsoft.Storage"
             }
           ],
-          "subnets": [
-            {
-              "name": "app",
-              "addressPrefix": ""
-            }
-          ],
+          "subnets": [],
           "routeTable": {
             "disableBgpRoutePropagation": false,
             "routes": [
@@ -127,7 +122,7 @@
                 "name": "wl-routetable",
                 "properties": {
                   "addressPrefix": "0.0.0.0/0",
-                  "nextHopIpAddress": "<<FirewallPrivateIPAddress>>",
+                  "nextHopIpAddress": "10.0.100.4",
                   "nextHopType": "VirtualAppliance"
                 }
               }
@@ -146,39 +141,60 @@
     "parKubernetesCluster": {
       "value": {
         "name": "Contoso",
-        "enableSystemAssignedIdentity": true,
+        "enableSystemAssignedIdentity": false,
         "aksClusterKubernetesVersion": "1.24.3",
-        "enableResourceLock": true,
         "enableRBAC": true,
-        "enablePrivateCluster": true,
-        "enableAzurePolicy": true,
-        "enableAadProfileEnableAzureRBAC": true,
-        "enableAadProfileManaged": true,
-        "aadProfileAdminGroupObjectIDs": [],
+        "enableResourceLock": false,
+        "enablePodIdentity": false,
         "aksClusterSkuTier": "Free",
+        "enableIngressApplicationGateway": false,
         "primaryAgentPoolProfile": {
-          "name": "default",
-          "vmSize": "Standard_D4s_v3",
-          "osDiskSizeGB": 128,
+          "name": "systempool",
+          "vmSize": "Standard_DS2_v2",
+          "osDiskSizeGB": 30,
           "osDiskType": "Managed",
           "enableAutoScaling": true,
-          "count": 1,
-          "maxCount": 5,
-          "minCount": 1,
-          "maxPods": 50,
+          "count": 10,
           "osType": "Linux",
           "osSKU": "Ubuntu",
           "type": "VirtualMachineScaleSets",
-          "mode": "System"
+          "mode": "System",
+          "availabilityZones": []
         },
-        "networkProfile": {
+        "networkProfile": {          
           "aksClusterLoadBalancerSku": "standard",
-          "aksClusterNetworkPlugin": "azure",
-          "aksClusterNetworkPolicy": "azure",
-          "aksClusterServiceCidr": "10.1.0.0/16",
-          "aksClusterDnsServiceIP": "10.1.0.10",
-          "aksClusterDockerBridgeCidr": "170.10.0.1/16",
+          "aksClusterPodCidr": "10.244.0.0/16",
+          "aksClusterServiceCidr": "172.16.1.0/24",
+          "aksClusterDnsServiceIP": "172.16.1.10",
+          "aksClusterDockerBridgeCidr": "170.10.0.1/30",
           "aksClusterOutboundType": "userDefinedRouting"
+        },
+        "apiServerAccessProfile": {
+          "enablePrivateCluster": true,
+          "enablePrivateClusterPublicFQDN": false
+        },
+        "aadProfile": {
+          "aadProfileTenantId": "<<TenantId>>",
+          "aadProfileAdminGroupObjectIDs": [
+            "<<GroupObjectID>>"
+          ],
+          "enableAadProfileEnableAzureRBAC": true,
+          "enableAadProfileManaged": true
+        },
+        "addonProfiles": {
+          "omsagent": {
+            "enable": true,
+            "config": {
+              "logAnalyticsWorkspaceResourceID": "/subscriptions/<<subscriptionId>>/resourcegroups/anoa-eastus-dev-logging-rg/providers/microsoft.operationalinsights/workspaces/anoa-eastus-dev-logging-log"
+            }
+          },
+          "enableResourceLock": true,
+          "enableAzurePolicy": true,
+          "azureKeyvaultSecretsProvider": true
+        },
+        "servicePrincipalProfile": {
+          "clientId": "<<clientId>>",
+          "secret": "<<secret>>"
         }
       }
     },
@@ -244,7 +260,7 @@
           "value": {
             "enableRoleAssignmentForStorageAccount": false,
             "principalIds": [
-              "7bc6bc45-b256-407c-9d79-bde13dfb5639"
+              "<<principalId>>"
             ],
             "roleDefinitionIdOrName": "Contributor"
           }
@@ -261,7 +277,7 @@
         "storageAccountAccess": {
           "enableRoleAssignmentForStorageAccount": false,
           "principalIds": [
-            "7bc6bc45-b256-407c-9d79-bde13dfb5639"
+            "<<principalId>>"
           ],
           "roleDefinitionIdOrName": "Contributor"
         }

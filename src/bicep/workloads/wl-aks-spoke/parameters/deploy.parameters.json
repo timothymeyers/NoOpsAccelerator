@@ -135,9 +135,7 @@
           "azureKeyvaultSecretsProvider": true
         },
         "servicePrincipalProfile": {
-          "clientId": "<<clientId>>",
-          "secret": "<<secret>>"
-        }
+          "clientId": "<<clientId>>"        }
       }
     },
     "parWorkloadStorageAccountAccess": {

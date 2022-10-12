@@ -93,7 +93,8 @@
           "azureKeyvaultSecretsProvider": true
         },
         "servicePrincipalProfile": {
-          "clientId": "<<clientId>>"
+          "clientId": "<<clientId>>",
+          "secret": "<<secret>>"
         }
       }
     }

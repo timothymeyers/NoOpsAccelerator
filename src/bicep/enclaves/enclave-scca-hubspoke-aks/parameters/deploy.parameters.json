@@ -95,12 +95,44 @@
     },
     "parAksWorkload": {
       "value": {
-        "name": "aks",
-        "shortName": "aks",
+        "name": "app",
+        "shortName": "app",
         "subscriptionId": "<<subscriptionId>>",
+        "enableDdosProtectionPlan": false,
         "network": {
           "virtualNetworkAddressPrefix": "10.0.125.0/26",
-          "subnetAddressPrefix": "10.0.125.0/26"
+          "subnetAddressPrefix": "10.0.125.0/26",
+          "virtualNetworkDiagnosticsLogs": [],
+          "virtualNetworkDiagnosticsMetrics": [],
+          "networkSecurityGroupRules": [],
+          "NetworkSecurityGroupDiagnosticsLogs": [
+            "NetworkSecurityGroupEvent",
+            "NetworkSecurityGroupRuleCounter"
+          ],
+          "subnetServiceEndpoints": [
+            {
+              "service": "Microsoft.Storage"
+            }
+          ],
+          "subnets": [
+            {
+              "name": "app",
+              "addressPrefix": ""
+            }
+          ],
+          "routeTable": {
+            "disableBgpRoutePropagation": false,
+            "routes": [
+              {
+                "name": "wl-routetable",
+                "properties": {
+                  "addressPrefix": "0.0.0.0/0",
+                  "nextHopIpAddress": "<<FirewallPrivateIPAddress>>",
+                  "nextHopType": "VirtualAppliance"
+                }
+              }
+            ]
+          }
         }
       }
     },

@@ -46,21 +46,8 @@ param parRequired object
 @description('Required tags values used with all resources.')
 param parTags object
 
-@description('The subscription ID for the Workload Network and resources. It defaults to the deployment subscription.')
-param parWorkloadSubscriptionId string = subscription().subscriptionId
-
 @description('The region to deploy resources into. It defaults to the deployment location.')
 param parLocation string = deployment().location
-
-@minLength(3)
-@maxLength(12)
-@description('Prefix value which will be the workload name. Default: workload')
-param parWorkloadName string = 'workload'
-
-@minLength(3)
-@maxLength(12)
-@description('Prefix value which will be the workload name. Default: wk1')
-param parWorkloadShortName string = 'wk1'
 
 // RESOURCE NAMING PARAMETERS
 
@@ -72,17 +59,79 @@ param parDeploymentNameSuffix string = utcNow()
 @description('The subscription ID for the Hub Network.')
 param parHubSubscriptionId string
 
+// Hub Resource Group Name
+// (JSON Parameter)
+// ---------------------------
+// "parHubResourceGroupName": {
+//   "value": "anoa-eastus-platforms-hub-rg"
+// }
 @description('The resource group name for the Hub Network.')
 param parHubResourceGroupName string
 
+// Hub Virtual Network Name
+// (JSON Parameter)
+// ---------------------------
+// "parHubVirtualNetworkName": {
+//   "value": "anoa-eastus-platforms-hub-vnet"
+// }
 @description('The virtual network name for the Hub Network.')
 param parHubVirtualNetworkName string
 
+// Hub Virtual Network Resource Id
+// (JSON Parameter)
+// ---------------------------
+// "parHubVirtualNetworkResourceId": {
+//   "value": "/subscriptions/xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx/resourceGroups/anoa-eastus-platforms-hub-rg/providers/Microsoft.Network/virtualNetworks/anoa-eastus-platforms-hub-vnet/subnets/anoa-eastus-platforms-hub-vnet"
+// }
 @description('The virtual network resource Id for the Hub Network.')
 param parHubVirtualNetworkResourceId string
 
-// WORKLOAD NETWORK PARAMETERS
-
+// WORKLOAD PARAMETERS
+// Example (JSON)
+// -----------------------------
+// "parWorkloadSpoke": {
+//   "value": {
+//       "name": "app",
+//       "shortName": "app",
+//       "subscriptionId": "<<subscriptionId>>",
+//       "enableDdosProtectionPlan": false,
+//       "network": {
+//           "virtualNetworkAddressPrefix": "10.0.125.0/26",
+//           "subnetAddressPrefix": "10.0.125.0/26",
+//           "virtualNetworkDiagnosticsLogs": [],
+//           "virtualNetworkDiagnosticsMetrics": [],
+//           "networkSecurityGroupRules": [],
+//           "NetworkSecurityGroupDiagnosticsLogs": [
+//               "NetworkSecurityGroupEvent",
+//               "NetworkSecurityGroupRuleCounter"
+//           ],
+//           "subnetServiceEndpoints": [
+//               {
+//                   "service": "Microsoft.Storage"
+//               }
+//           ],
+//           "subnets": [
+//               {
+//                   "name": "app",
+//                   "addressPrefix": ""
+//               }
+//           ],
+//           "routeTable": {
+//               "disableBgpRoutePropagation": false,
+//               "routes": [
+//                   {
+//                       "name": "wl-routetable",                                
+//                       "properties": {
+//                           "addressPrefix": "0.0.0.0/0",
+//                           "nextHopIpAddress": "<<FirewallPrivateIPAddress>>",
+//                           "nextHopType": "VirtualAppliance"
+//                       }
+//                   }
+//               ]
+//           }
+//       }
+//   }
+// }
 @description('Required values used with the workload, Please review the Read Me for required parameters')
 param parWorkloadSpoke object
 
@@ -91,6 +140,13 @@ param parWorkloadSpoke object
 @description('The Storage Account SKU to use for log storage. It defaults to "Standard_GRS". See https://docs.microsoft.com/en-us/rest/api/storagerp/srp_sku_types for valid settings.')
 param parLogStorageSkuName string = 'Standard_GRS'
 
+// LOGGING PARAMETERS
+// Log Analytics Workspace Resource Id
+// (JSON Parameter)
+// ---------------------------
+// "parLogAnalyticsWorkspaceResourceId": {
+//   "value": "/subscriptions/xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx/resourceGroups/anoa-eastus-platforms-hub-rg/providers/Microsoft.Network/virtualNetworks/anoa-eastus-platforms-hub-vnet/subnets/anoa-eastus-platforms-hub-vnet"
+// }
 @description('Log Analytics Workspace Resource Id Needed for NSG, VNet and Activity Logging')
 param parLogAnalyticsWorkspaceResourceId string
 
@@ -99,14 +155,6 @@ param parLogAnalyticsWorkspaceName string
 
 @description('Enable this setting if this network is on a different subscriptiom as the Hub. Will give conflict errors if on same sub as the Hub')
 param parEnableActivityLogging bool = false
-
-// ROUTE TABLE 
-
-@description('An array of Route Table routes to apply to the Workload Virtual Network. If custom routes are enabled, over write the default. it  See https://docs.microsoft.com/en-us/azure/templates/microsoft.network/routetables/routes?tabs=bicep#routepropertiesformat for valid settings.')
-param parRouteTableRoutes array = [] 
-
-@description('Switch which allows Bgp Route Propagation. Default: false') 
-param parDisableBgpRoutePropagation bool = false
 
 // STORAGE ACCOUNTS RBAC
 @description('Account for access to Storage')
@@ -134,11 +182,11 @@ var varDdosNamingConvention = replace(varNamingConvention, varResourceToken, 'dd
 
 // WORKLOAD NAMES
 
-var varWorkloadName = parWorkloadName
-var varWorkloadShortName = parWorkloadShortName
+var varWorkloadName = parWorkloadSpoke.name
+var varWorkloadShortName = parWorkloadSpoke.shortName
 var varWorkloadResourceGroupName = replace(varResourceGroupNamingConvention, varNameToken, varWorkloadName)
 var varWorkloadLogStorageAccountShortName = replace(varStorageAccountNamingConvention, varNameToken, replace(varWorkloadShortName, '-', ''))
-var varWorkloadLogStorageAccountUniqueName = replace(varWorkloadLogStorageAccountShortName, 'unique_storage_token', uniqueString(parWorkloadSubscriptionId, parLocation, parRequired.deployEnvironment, parRequired.orgPrefix))
+var varWorkloadLogStorageAccountUniqueName = replace(varWorkloadLogStorageAccountShortName, 'unique_storage_token', uniqueString(parWorkloadSpoke.subscriptionId, parLocation, parRequired.deployEnvironment, parRequired.orgPrefix))
 var varWorkloadLogStorageAccountName = take(varWorkloadLogStorageAccountUniqueName, 23)
 var varWorkloadVirtualNetworkName = replace(varVirtualNetworkNamingConvention, varNameToken, varWorkloadName)
 var varWorkloadNetworkSecurityGroupName = replace(varNetworkSecurityGroupNamingConvention, varNameToken, varWorkloadName)
@@ -162,7 +210,7 @@ module modTags '../../../azresources/Modules/Microsoft.Resources/tags/az.resourc
 
 module modWorkloadResourceGroup '../../../azresources/Modules/Microsoft.Resources/resourceGroups/az.resource.groups.bicep' = {
   name: 'deploy-${varWorkloadShortName}-rg-${parDeploymentNameSuffix}'
-  scope: subscription(parWorkloadSubscriptionId)
+  scope: subscription(parWorkloadSpoke.subscriptionId)
   params: {
     name: varWorkloadResourceGroupName
     location: parLocation
@@ -222,8 +270,8 @@ module modWorkloadRouteTable '../../../azresources/Modules/Microsoft.Network/rou
     location: parLocation
     tags: modTags.outputs.tags
 
-    routes: parRouteTableRoutes
-    disableBgpRoutePropagation: parDisableBgpRoutePropagation
+    routes: parWorkloadSpoke.network.routeTable.routes
+    disableBgpRoutePropagation: parWorkloadSpoke.network.routeTable.disableBgpRoutePropagation
   }
   dependsOn: [
     modWorkloadResourceGroup
@@ -264,11 +312,11 @@ module modWorkloadVirtualNetwork '../../../azresources/Modules/Microsoft.Network
 
 module modWorkloadVirtualNetworkPeerings '../../../azresources/hub-spoke-core/peering/spoke/anoa.lz.spoke.network.peering.bicep' = {
   name: 'deploy-hub-peerings-${varWorkloadShortName}-${parLocation}-${parDeploymentNameSuffix}'
-  scope: resourceGroup(parWorkloadSubscriptionId, varWorkloadResourceGroupName)
+  scope: resourceGroup(parWorkloadSpoke.subscriptionId, varWorkloadResourceGroupName)
   params: {
     parHubVirtualNetworkName: parHubVirtualNetworkName
     parHubVirtualNetworkResourceId: parHubVirtualNetworkResourceId
-    parSpokeName: parWorkloadName
+    parSpokeName: parWorkloadSpoke.name
     parSpokeResourceGroupName: modWorkloadResourceGroup.outputs.name
     parSpokeVirtualNetworkName: modWorkloadVirtualNetwork.outputs.name
   }
@@ -281,7 +329,7 @@ module modHubToWorkloadVirtualNetworkPeering '../../../azresources/hub-spoke-cor
     parHubVirtualNetworkName: parHubVirtualNetworkName
     parSpokes: [
       {
-        name: parWorkloadName
+        name: parWorkloadSpoke.name
         virtualNetworkResourceId: modWorkloadVirtualNetwork.outputs.resourceId
         virtualNetworkName: modWorkloadVirtualNetwork.outputs.name
       }

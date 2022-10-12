@@ -52,9 +52,18 @@ param parLocation string = deployment().location
 // AZURE KUBERNETES SERVICE - CLUSTER PARAMETERS
 
 @description('Defines the Azure Kubernetes Service - Cluster.')
-param parKubernetesCluster object 
+param parKubernetesCluster object
 
 // HUB NETWORK PARAMETERS
+
+// Hub Virtual Network Name
+// (JSON Parameter)
+// ---------------------------
+// "parHubSubscriptionId": {
+//   "value": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxx"
+// }
+@description('The subscription ID for the Hub Network and resources. It defaults to the deployment subscription.')
+param parHubSubscriptionId string = subscription().subscriptionId
 
 // Hub Subnet Resource Id
 // (JSON Parameter)
@@ -65,15 +74,14 @@ param parKubernetesCluster object
 @description('The virtual network resource Id for the Hub Network.')
 param parHubVirtualNetworkResourceId string = ''
 
-// LOGGING PARAMETERS
-// Log Analytics Workspace Resource Id
+// Hub Resource Group Name
 // (JSON Parameter)
 // ---------------------------
-// "parLogAnalyticsWorkspaceResourceId": {
-//   "value": "/subscriptions/xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx/resourceGroups/anoa-eastus-platforms-hub-rg/providers/Microsoft.Network/virtualNetworks/anoa-eastus-platforms-hub-vnet/subnets/anoa-eastus-platforms-hub-vnet"
+// "parHubResourceGroupName": {
+//   "value": "anoa-eastus-platforms-hub-rg"
 // }
-@description('Log Analytics Workspace Resource Id Needed for NSG, VNet and Activity Logging')
-param parLogAnalyticsWorkspaceResourceId string
+@description('The name of the Hub resource group which contains the network for vnet peering.')
+param parHubResourceGroupName string = ''
 
 // TARGET PARAMETERS
 
@@ -118,7 +126,6 @@ param parTargetSubnetName string
 @description('A suffix to use for naming deployments uniquely. It defaults to the Bicep resolution of the "utcNow()" function.')
 param parDeploymentNameSuffix string = utcNow()
 
-
 @description('The current date - do not override the default value')
 param dateUtcNow string = utcNow('yyyy-MM-dd HH:mm:ss')
 
@@ -147,7 +154,6 @@ var referential = {
   deploymentDate: dateUtcNow
 }
 
-
 @description('Resource group tags')
 module modTags '../../../azresources/Modules/Microsoft.Resources/tags/az.resources.tags.bicep' = {
   name: 'deploy-aks-tags-${parLocation}-${parDeploymentNameSuffix}'
@@ -166,34 +172,48 @@ resource rgKubernetesCluster 'Microsoft.Resources/resourceGroups@2021-04-01' = {
 }
 
 // Get Existing VNet
-resource vnet 'Microsoft.Network/virtualNetworks@2019-11-01' existing = {
+resource resVNet 'Microsoft.Network/virtualNetworks@2019-11-01' existing = {
   name: parTargetVNetName
-  scope: az.resourceGroup(parTargetResourceGroup)
+  scope: resourceGroup(parTargetResourceGroup)
 }
 
 // Get Existing subnet
-resource subnetakspvt 'Microsoft.Network/virtualNetworks/subnets@2021-05-01' existing = {
-  parent: vnet
+resource resSubnetakspvt 'Microsoft.Network/virtualNetworks/subnets@2021-05-01' existing = {
+  parent: resVNet
   name: parTargetSubnetName
 }
 
-module privatednsAKSZone '../../../azresources/Modules/Microsoft.Network/privateDnsZones/az.net.private.dns.bicep' = {
-  name: 'deploy-akspvtdnszone-${parLocation}-${parDeploymentNameSuffix}'
-  scope: resourceGroup(parTargetResourceGroup)
+module modAksIdentity '../../../azresources/Modules/Microsoft.ManagedIdentity/userAssignedIdentities/az.managed.identity.user.assigned.bicep' = {
+  name: 'deploy-aksIdentity-${parLocation}-${parDeploymentNameSuffix}'
+  scope: resourceGroup(rgKubernetesCluster.name)
   params: {
-    name: (environment().name =~ 'AzureCloud' ? 'privatelink.azmk8s.${environment().suffixes.storage}' : 'privatelink.azmk8s.usgovcloudapi.net')
-    location: 'global'    
-  }  
+    location: parLocation
+  }
 }
 
-module aksHubLink '../../../azresources/Modules/Microsoft.Network/privateDnsZones/virtualNetworkLinks/az.net.private.dns.vnet.link.bicep' = {
-  name: 'deploy-aksHubLink-${parLocation}-${parDeploymentNameSuffix}'
-  scope: resourceGroup(parTargetResourceGroup)
+module modAksContribRoleAssignement '../../../azresources/Modules/Microsoft.Authorization/roleAssignments/resourceGroup/az.auth.role.assignment.rg.bicep' = {
+  scope: resourceGroup(rgKubernetesCluster.name)
+  name: 'deploy-aksContribRole-${parLocation}-${parDeploymentNameSuffix}'
   params: {
-    location: 'global'
-    virtualNetworkResourceId: parHubVirtualNetworkResourceId 
-    privateDnsZoneName: privatednsAKSZone.outputs.name
+    principalId: modAksIdentity.outputs.principalId
+    roleDefinitionIdOrName: '/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c' //Contributor
   }
+  dependsOn: [
+    modAksIdentity
+  ]
+}
+
+module modDefAKSAssignment '../../../azresources/Modules/Microsoft.Authorization/policyAssignments/resourceGroup/az.auth.policy.set.assignment.rg.bicep' = {
+  name: 'deploy-aksDefPolicy-${parLocation}-${parDeploymentNameSuffix}'
+  scope: resourceGroup(rgKubernetesCluster.name)
+  params: {
+    location: parLocation
+    name: 'EnableDefenderForAKS'
+    policyDefinitionId: '/providers/Microsoft.Authorization/policyDefinitions/64def556-fbad-4622-930e-72d1d5589bf5'
+  }
+  dependsOn: [
+    modKubernetesCluster
+  ]
 }
 
 // Create Azure Kubernetes Cluster
@@ -203,45 +223,126 @@ module modKubernetesCluster '../../../azresources/Modules/Microsoft.ContainerSer
   params: {
     name: '${parKubernetesCluster.name}aks'
     location: parLocation
-    nodeResourceGroup: '${parKubernetesCluster.name}-aksInfraRG'
+    nodeResourceGroup: 'MC${parKubernetesCluster.name}-aksInfraRG'
     aksClusterSkuTier: parKubernetesCluster.aksClusterSkuTier
     systemAssignedIdentity: parKubernetesCluster.enableSystemAssignedIdentity
+    userAssignedIdentities: {
+      '${modAksIdentity.outputs.resourceId}': {}
+    }
+    aksClusterKubernetesVersion: parKubernetesCluster.aksClusterKubernetesVersion
     enableRBAC: parKubernetesCluster.enableRBAC
-    lock: parKubernetesCluster.enableResourceLock ? 'CanNotDelete' : '' 
+    lock: parKubernetesCluster.enableResourceLock ? 'CanNotDelete' : ''
     tags: modTags.outputs.tags
-    primaryAgentPoolProfile:  [
+    podIdentityProfileEnable: parKubernetesCluster.enablePodIdentity
+    podIdentityProfileAllowNetworkPluginKubenet: false
+    ingressApplicationGatewayEnabled: parKubernetesCluster.enableIngressApplicationGateway
+    primaryAgentPoolProfile: [
       {
         name: parKubernetesCluster.primaryAgentPoolProfile.name
+        availabilityZones: !empty(parKubernetesCluster.primaryAgentPoolProfile.availabilityZones) ? parKubernetesCluster.primaryAgentPoolProfile.availabilityZones : null
         count: parKubernetesCluster.primaryAgentPoolProfile.count
-        maxCount: parKubernetesCluster.primaryAgentPoolProfile.maxCount
-        minCount: parKubernetesCluster.primaryAgentPoolProfile.minCount
-        maxPods: parKubernetesCluster.primaryAgentPoolProfile.maxPods
+        minCount: parKubernetesCluster.primaryAgentPoolProfile.enableAutoScaling ? 1 : null
+        maxCount: parKubernetesCluster.primaryAgentPoolProfile.enableAutoScaling ? parKubernetesCluster.primaryAgentPoolProfile.count : null
         vmSize: parKubernetesCluster.primaryAgentPoolProfile.vmSize
         enableAutoScaling: parKubernetesCluster.primaryAgentPoolProfile.enableAutoScaling
-        vnetSubnetID: subnetakspvt.id
+        vnetSubnetID: resSubnetakspvt.id
         osDiskSizeGB: parKubernetesCluster.primaryAgentPoolProfile.osDiskSizeGB
         osDiskType: parKubernetesCluster.primaryAgentPoolProfile.osDiskType
         osType: parKubernetesCluster.primaryAgentPoolProfile.osType
         osSKU: parKubernetesCluster.primaryAgentPoolProfile.osSKU
-        mode: parKubernetesCluster.primaryAgentPoolProfile.mode        
+        mode: parKubernetesCluster.primaryAgentPoolProfile.mode
       }
     ]
     //Network Profile
     aksClusterLoadBalancerSku: parKubernetesCluster.networkProfile.aksClusterLoadBalancerSku
-    aksClusterNetworkPlugin: parKubernetesCluster.networkProfile.aksClusterNetworkPlugin
-    aksClusterNetworkPolicy: parKubernetesCluster.networkProfile.aksClusterNetworkPolicy
-    aksClusterKubernetesVersion: parKubernetesCluster.aksClusterKubernetesVersion       
+    aksClusterNetworkPlugin: 'kubenet'
+    aksClusterNetworkPolicy: 'calico'
+    aksClusterPodCidr: (!empty(parKubernetesCluster.networkProfile.aksClusterPodCidr)) ? parKubernetesCluster.networkProfile.aksClusterPodCidr : ''
     aksClusterServiceCidr: (!empty(parKubernetesCluster.networkProfile.aksClusterServiceCidr)) ? parKubernetesCluster.networkProfile.aksClusterServiceCidr : ''
     aksClusterDnsServiceIP: (!empty(parKubernetesCluster.networkProfile.aksClusterDnsServiceIP)) ? parKubernetesCluster.networkProfile.aksClusterDnsServiceIP : ''
     aksClusterDockerBridgeCidr: (!empty(parKubernetesCluster.networkProfile.aksClusterDockerBridgeCidr)) ? parKubernetesCluster.networkProfile.aksClusterDockerBridgeCidr : ''
     aksClusterOutboundType: parKubernetesCluster.networkProfile.aksClusterOutboundType
-    monitoringWorkspaceId: parLogAnalyticsWorkspaceResourceId
-    enablePrivateCluster: parKubernetesCluster.enablePrivateCluster
-    azurePolicyEnabled: parKubernetesCluster.enableAzurePolicy
-    aadProfileEnableAzureRBAC: parKubernetesCluster.enableAadProfileEnableAzureRBAC
-    aadProfileAdminGroupObjectIDs: parKubernetesCluster.aadProfileAdminGroupObjectIDs
-    aadProfileManaged: parKubernetesCluster.enableAadProfileManaged
+
+    //Addons
+    omsAgentEnabled: parKubernetesCluster.addonProfiles.omsagent.enable
+    monitoringWorkspaceId: parKubernetesCluster.addonProfiles.omsagent.config.logAnalyticsWorkspaceResourceID
+    azurePolicyEnabled: parKubernetesCluster.addonProfiles.enableAzurePolicy
+
+    //ApiServerAccessProfile
+    enablePrivateCluster: parKubernetesCluster.apiServerAccessProfile.enablePrivateCluster
+    enablePrivateClusterPublicFQDN: parKubernetesCluster.apiServerAccessProfile.enablePrivateClusterPublicFQDN
+
+    //AADProfile
+    aadProfileEnableAzureRBAC: parKubernetesCluster.aadProfile.enableAadProfileEnableAzureRBAC
+    aadProfileAdminGroupObjectIDs: parKubernetesCluster.aadProfile.aadProfileAdminGroupObjectIDs
+    aadProfileManaged: parKubernetesCluster.aadProfile.enableAadProfileManaged
+    aadProfileTenantId: parKubernetesCluster.aadProfile.aadProfileTenantId
+ 
+    //ServicePrincipalProfile
+    aksServicePrincipalProfile: parKubernetesCluster.servicePrincipalProfile
+  }
+  dependsOn: [
+    modAksIdentity
+    modAksContribRoleAssignement
+  ]
+}
+
+module akspvtEndpoint '../../../azresources/Modules/Microsoft.Network/privateEndPoints/az.net.private.endpoint.bicep' = {
+  name: 'deploy-akspvtendpnt-${parLocation}-${parDeploymentNameSuffix}'
+  scope: resourceGroup(parTargetResourceGroup)
+  params: {
+    name: 'akspvtEndpoint'
+    location: parLocation
+    groupIds:  [
+      'management'
+    ]
+    subnetResourceId: resSubnetakspvt.id
+    serviceResourceId: modKubernetesCluster.outputs.resourceId
+  }  
+}
+
+module privatednsAKSZone '../../../azresources/Modules/Microsoft.Network/privateDnsZones/az.net.private.dns.bicep' = {
+  name: 'deploy-akspvtdnszone-${parLocation}-${parDeploymentNameSuffix}'
+  scope: resourceGroup(parTargetResourceGroup)
+  params: {
+    name: (environment().name =~ 'AzureCloud' ? 'privatelink.azmk8s.io' : 'privatelink.azmk8s.us')
+    location: 'global'     
+  }  
+}
+
+module privateDNSAKS '../../../azresources/Modules/Microsoft.Network/privateDnsZones/virtualNetworkLinks/az.net.private.dns.vnet.link.bicep' = {
+  name: 'deploy-akspvtdns-${parLocation}-${parDeploymentNameSuffix}'
+  scope: resourceGroup(parTargetResourceGroup)
+  params: {
+    location: 'global'
+    virtualNetworkResourceId: resVNet.id
+    privateDnsZoneName: privatednsAKSZone.outputs.name
   }
 }
 
-output aksResourceId string = modKubernetesCluster.outputs.resourceId 
+module privateAKSDNSZoneGroup  '../../../azresources/Modules/Microsoft.Network/privateEndPoints/privateDnsZoneGroups/az.net.private.dns.groups.bicep' = {
+  name: 'deploy-akspvtdnsgrp-${parLocation}-${parDeploymentNameSuffix}'
+  scope: resourceGroup(parTargetResourceGroup)
+  params:  {
+    privateDNSResourceIds: [
+      privatednsAKSZone.outputs.resourceId
+    ]
+    privateEndpointName: akspvtEndpoint.outputs.name
+  }
+}
+
+module modAKSHubLink '../../../azresources/Modules/Microsoft.Network/privateDnsZones/virtualNetworkLinks/az.net.private.dns.vnet.link.bicep' = {
+  name: 'deploy-aksHubLink-${parLocation}-${parDeploymentNameSuffix}'
+  scope: resourceGroup(parHubSubscriptionId, parHubResourceGroupName)
+  params: {
+    virtualNetworkResourceId: parHubVirtualNetworkResourceId
+    privateDnsZoneName: privateAKSDNSZoneGroup.name
+  }
+  dependsOn: [
+    modKubernetesCluster
+  ]
+}
+
+output aksResourceId string = modKubernetesCluster.outputs.resourceId
+output aksIdentityPrincipalId string = modAksIdentity.outputs.principalId
+output aksControlPlaneFQDN string = modKubernetesCluster.outputs.controlPlaneFQDN

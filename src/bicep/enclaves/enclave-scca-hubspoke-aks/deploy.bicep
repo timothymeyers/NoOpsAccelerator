@@ -86,7 +86,6 @@ module modAKSWorkload '../../workloads/wl-aks-spoke/deploy.bicep' = {
     parRequired: parRequired
     parLocation: parLocation
     parTags: parTags        
-    parHubFirewallPolicyName: modHubSpoke.outputs.firewallPolicyName
     parHubResourceGroupName: modHubSpoke.outputs.hub.resourceGroupName
     parHubSubscriptionId: modHubSpoke.outputs.hub.subscriptionId
     parHubVirtualNetworkName: modHubSpoke.outputs.hub.virtualNetworkName
@@ -97,6 +96,5 @@ module modAKSWorkload '../../workloads/wl-aks-spoke/deploy.bicep' = {
     parLogAnalyticsWorkspaceName: modHubSpoke.outputs.logAnalyticsWorkspaceName
     parLogAnalyticsWorkspaceResourceId: modHubSpoke.outputs.logAnalyticsWorkspaceResourceId
     parWorkloadStorageAccountAccess: parWorkloadLogStorageAccountAccess 
-    parSourceAddresses:  parSourceAddresses
   }        
 }

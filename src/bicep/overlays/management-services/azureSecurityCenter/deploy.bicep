@@ -8,7 +8,7 @@
 // ----------------------------------------------------------------------------------
 
 /*
-SUMMARY: Module to deploy the Microsoft Defender for Cloud to the Hub Network 
+SUMMARY: Module to deploy the Microsoft Azure SecurityCenter to the Hub Network 
 DESCRIPTION: The following components will be options in this deployment
               Microsoft Defender
 AUTHOR/S: jspinella
@@ -54,7 +54,7 @@ param parLogAnalyticsWorkspaceResourceId string
 @description('A suffix to use for naming deployments uniquely. It defaults to the Bicep resolution of the "utcNow()" function.')
 param parDeploymentNameSuffix string = utcNow()
 
-module modDefender '../../../azresources/Modules/Microsoft.Security/defenderForCloud/az.sec.defender.bicep' = {
+module modDefender '../../../azresources/Modules/Microsoft.Security/azureSecurityCenter/az.sec.center.bicep' = {
   name: 'set-sub-defender-${parLocation}-${parDeploymentNameSuffix}'
   params: {
     // Required parameters

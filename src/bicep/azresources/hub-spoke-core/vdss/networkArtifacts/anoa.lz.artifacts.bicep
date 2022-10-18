@@ -70,31 +70,30 @@ param parWindowsVmAdminPassword string
   Then, using string interpolation "${}", we insert those values into a naming convention.
 */
 
-// Location Var
-var location_nospaces = toLower(replace(parLocation, ' ', ''))
-var location_short_usnat = replace(location_nospaces, 'usnat', '')
-var location_short_ussec = replace(location_short_usnat, 'ussec', '')
-var location_short = replace(location_short_ussec, 'usgov', '')
-
 var varResourceToken = 'resource_token'
 var varNameToken = 'name_token'
 var varNamingConvention = '${toLower(parOrgPrefix)}-${toLower(parLocation)}-${toLower(parDeployEnvironment)}-${varNameToken}-${toLower(varResourceToken)}'
-var varKvNamingConvention = (environment().name =~ 'AzureCloud' ? '${toLower(parOrgPrefix)}-${toLower(parLocation)}-${varNameToken}-${toLower(varResourceToken)}' : '${toLower(parOrgPrefix)}-${toLower(location_short)}-${varNameToken}-${toLower(varResourceToken)}')
 
 // RESOURCE NAME CONVENTIONS WITH ABBREVIATIONS
 
 var varResourceGroupNamingConvention = replace(varNamingConvention, varResourceToken, 'rg')
 var varStorageAccountNamingConvention = toLower('${parOrgPrefix}st${varNameToken}unique_storage_token')
-var varKeyVaultNamingConvention = replace(varKvNamingConvention, varResourceToken, 'kv')
+var varKeyVaultNamingConvention = toLower('${parOrgPrefix}kv${varNameToken}unique_kv_token')
 
 // PREREQ NAMES
 var varPreReqName = 'artifacts'
 var varPreReqShortName = 'afts'
 var varPreReqResourceGroupName = replace(varResourceGroupNamingConvention, varNameToken, varPreReqName)
+
+// PREREQ NAMES - STORAGE ACCOUNT
 var varPreReqLogStorageAccountShortName = replace(varStorageAccountNamingConvention, varNameToken, varPreReqShortName)
 var varPreReqLogStorageAccountUniqueName = replace(varPreReqLogStorageAccountShortName, 'unique_storage_token', uniqueString(parOrgPrefix, parLocation, parDeployEnvironment, parHubSubscriptionId))
 var varPreReqLogStorageAccountName = take(varPreReqLogStorageAccountUniqueName, 23)
-var varPreReqKeyVaultName = replace(varKeyVaultNamingConvention, varNameToken, varPreReqShortName)
+
+// PREREQ NAMES - KEY VAULT
+var varPreReqKeyVaultShortName = replace(varKeyVaultNamingConvention, varNameToken, varPreReqShortName)
+var varPreReqKeyVaultUniqueName = replace(varPreReqKeyVaultShortName, 'unique_kv_token', uniqueString(parOrgPrefix, parLocation, parDeployEnvironment, parHubSubscriptionId))
+var varPreReqKeyVaultName = take(varPreReqKeyVaultUniqueName, 23)
 
 // TAGS
 
@@ -110,7 +109,7 @@ module modTags '../../../Modules/Microsoft.Resources/tags/az.resources.tags.bice
 
 // RESOURCE GROUPS
 
-module modPreReqResourceGroup '../../../Modules/Microsoft.Resources/resourceGroups/az.resource.groups.bicep' = {
+module modAftsResourceGroup '../../../Modules/Microsoft.Resources/resourceGroups/az.resource.groups.bicep' = {
   name: 'deploy-rg-${varPreReqShortName}-${parLocation}-${parDeploymentNameSuffix}'
   scope: subscription(parHubSubscriptionId)
   params: {
@@ -123,7 +122,7 @@ module modPreReqResourceGroup '../../../Modules/Microsoft.Resources/resourceGrou
 // PREQREQS - VDMS
 
 @description('Logging Storage Account')
-module modPreStorageAccount '../../../Modules/Microsoft.Storage/storageAccounts/az.data.storage.bicep' = {
+module modAftsStorageAccount '../../../Modules/Microsoft.Storage/storageAccounts/az.data.storage.bicep' = {
   name: 'deploy-${varPreReqShortName}-Storage-${parLocation}-${parDeploymentNameSuffix}'
   scope: resourceGroup(parHubSubscriptionId, varPreReqResourceGroupName)
   params: {
@@ -131,23 +130,20 @@ module modPreStorageAccount '../../../Modules/Microsoft.Storage/storageAccounts/
     location: parLocation
     storageAccountSku: parLogStorageSkuName
     tags: modTags.outputs.tags
-    roleAssignments: (parArtifactsStorageAccountAccess.storageAccountAccess.enableRoleAssignmentForStorageAccount) ? [
+    roleAssignments: (parArtifactsStorageAccountAccess.enableRoleAssignmentForStorageAccount) ? [
       {
-        principalIds: [
-          parArtifactsStorageAccountAccess.storageAccountAccess.principalIds
-        ]
-        principalType: parArtifactsStorageAccountAccess.storageAccountAccess.principalType
-        roleDefinitionIdOrName: parArtifactsStorageAccountAccess.storageAccountAccess.roleDefinitionIdOrName
+        principalIds: parArtifactsStorageAccountAccess.principalIds  
+        roleDefinitionIdOrName: parArtifactsStorageAccountAccess.roleDefinitionIdOrName
       }
     ] : []
     lock: 'CanNotDelete'
   }
   dependsOn: [
-    modPreReqResourceGroup
+    modAftsResourceGroup
   ]
 }
 
-module modPreKeyVault '../../../Modules/Microsoft.KeyVault/vaults/az.sec.key.vault.bicep' = {
+module modAftsKeyVault '../../../Modules/Microsoft.KeyVault/vaults/az.sec.key.vault.bicep' = {
   name: 'deploy-${varPreReqShortName}-KV-${parLocation}-${parDeploymentNameSuffix}'
   scope: resourceGroup(parHubSubscriptionId, varPreReqResourceGroupName)
   params: {
@@ -188,9 +184,9 @@ module modPreKeyVault '../../../Modules/Microsoft.KeyVault/vaults/az.sec.key.vau
     enableVaultForTemplateDeployment: true
   }
   dependsOn: [
-    modPreReqResourceGroup
+    modAftsResourceGroup
   ]
 }
 
-output prereqStorageResourceId string = modPreStorageAccount.outputs.resourceId
-output prereqKeyVaultResourceId string = modPreKeyVault.outputs.resourceId
+output prereqStorageResourceId string = modAftsStorageAccount.outputs.resourceId
+output prereqKeyVaultResourceId string = modAftsKeyVault.outputs.resourceId

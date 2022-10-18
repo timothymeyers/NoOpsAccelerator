@@ -1,4 +1,3 @@
-/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 @sys.description('Required. The IDs of the principals to assign the role to.')
 param principalIds array
 
@@ -22,6 +21,18 @@ param principalType string = ''
 @sys.description('Optional. The description of the role assignment.')
 param description string = ''
 
+@sys.description('Optional. The conditions on the role assignment. This limits the resources it can be assigned to. e.g.: @Resource[Microsoft.Storage/storageAccounts/blobServices/containers:ContainerName] StringEqualsIgnoreCase "foo_storage_container"')
+param condition string = ''
+
+@sys.description('Optional. Version of the condition.')
+@allowed([
+  '2.0'
+])
+param conditionVersion string = '2.0'
+
+@sys.description('Optional. Id of the delegated managed identity resource.')
+param delegatedManagedIdentityResourceId string = ''
+
 resource managedCluster 'Microsoft.ContainerService/managedClusters@2022-04-02-preview' existing = {
   name: last(split(resourceId, '/'))
 }
@@ -33,6 +44,9 @@ resource roleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = [
     roleDefinitionId: roleDefinitionIdOrName
     principalId: principalId
     principalType: !empty(principalType) ? any(principalType) : null
+    condition: !empty(condition) ? condition : null
+    conditionVersion: !empty(conditionVersion) && !empty(condition) ? conditionVersion : null
+    delegatedManagedIdentityResourceId: !empty(delegatedManagedIdentityResourceId) ? delegatedManagedIdentityResourceId : null
   }
   scope: managedCluster
 }]

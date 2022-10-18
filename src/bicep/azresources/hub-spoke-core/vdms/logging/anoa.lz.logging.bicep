@@ -233,14 +233,12 @@ module modLoggingStorage '../../../Modules/Microsoft.Storage/storageAccounts/az.
     tags: modTags.outputs.tags
     roleAssignments: (parLoggingStorageAccountAccess.enableRoleAssignmentForStorageAccount) ? [
       {
-        principalIds: [
-          parLoggingStorageAccountAccess.principalIds
-        ]
-        principalType: parLoggingStorageAccountAccess.principalType
+        principalIds: parLoggingStorageAccountAccess.principalIds             
         roleDefinitionIdOrName: parLoggingStorageAccountAccess.roleDefinitionIdOrName
       }
     ] : []
     lock: 'CanNotDelete'
+ 
   }
   dependsOn: [
     modLoggingResourceGroup
@@ -294,6 +292,7 @@ module logAnalyticsDiagnosticLogging '../../../Modules/Microsoft.Insights/diagno
   ]
 }
 
+// OUTPUTS
 output outLogAnalyticsWorkspaceName string = modLogAnalyticsWorkspace.outputs.name
 output outLogAnalyticsWorkspaceResourceId string = modLogAnalyticsWorkspace.outputs.resourceId
 output outLogAnalyticsWorkspaceId string = modLogAnalyticsWorkspace.outputs.logAnalyticsWorkspaceId

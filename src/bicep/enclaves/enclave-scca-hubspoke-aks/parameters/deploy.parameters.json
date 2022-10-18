@@ -20,7 +20,7 @@
     },
     "parHub": {
       "value": {
-        "subscriptionId": "<<subscriptionId>>",
+        "subscriptionId": "896f5276-df9a-4317-a791-469396bef7fa",
         "virtualNetworkAddressPrefix": "10.0.100.0/24",
         "subnetAddressPrefix": "10.0.100.128/27",
         "subnets": [
@@ -48,9 +48,9 @@
           }
         ],
         "storageAccountAccess": {
-          "enableRoleAssignmentForStorageAccount": false,
+          "enableRoleAssignmentForStorageAccount": true,
           "principalIds": [
-            "<<principalId>>"
+            "47c98c84-d2d0-41ed-b05a-fc5baa5cda78"
           ],
           "roleDefinitionIdOrName": "Contributor"
         }
@@ -58,7 +58,7 @@
     },
     "parOperationsSpoke": {
       "value": {
-        "subscriptionId": "<<subscriptionId>>",
+        "subscriptionId": "896f5276-df9a-4317-a791-469396bef7fa",
         "virtualNetworkAddressPrefix": "10.0.115.0/26",
         "subnetAddressPrefix": "10.0.115.0/27",
         "virtualNetworkDiagnosticsLogs": [],
@@ -79,25 +79,19 @@
           }
         ],
         "storageAccountAccess": {
-          "enableRoleAssignmentForStorageAccount": false,
+          "enableRoleAssignmentForStorageAccount": true,
           "principalIds": [
-            "<<principalId>>"
+            "47c98c84-d2d0-41ed-b05a-fc5baa5cda78"
           ],
           "roleDefinitionIdOrName": "Contributor"
         }
       }
-    },
-    "parSourceAddresses": {
-      "value": [
-        "10.0.100.0/24",
-        "10.0.115.0/26"
-      ]
-    },
-    "parAksSpoke": {
+    },  
+    "parAksWorkload": {
       "value": {
-        "name": "app",
-        "shortName": "app",
-        "subscriptionId": "<<subscriptionId>>",
+        "name": "aks",
+        "shortName": "aks",
+        "subscriptionId": "896f5276-df9a-4317-a791-469396bef7fa",
         "enableDdosProtectionPlan": false,
         "network": {
           "virtualNetworkAddressPrefix": "10.0.125.0/26",
@@ -127,6 +121,13 @@
                 }
               }
             ]
+          },
+          "storageAccountAccess": {
+            "enableRoleAssignmentForStorageAccount": true,
+            "principalIds": [
+              "47c98c84-d2d0-41ed-b05a-fc5baa5cda78"
+            ],
+            "roleDefinitionIdOrName": "Contributor"
           }
         }
       }
@@ -140,7 +141,7 @@
     },
     "parKubernetesCluster": {
       "value": {
-        "name": "Contoso",
+        "name": "anoa",
         "enableSystemAssignedIdentity": false,
         "aksClusterKubernetesVersion": "1.24.3",
         "enableRBAC": true,
@@ -174,9 +175,9 @@
           "enablePrivateClusterPublicFQDN": false
         },
         "aadProfile": {
-          "aadProfileTenantId": "<<TenantId>>",
+          "aadProfileTenantId": "ded6b38d-d740-4564-ae25-2e3f041093be",
           "aadProfileAdminGroupObjectIDs": [
-            "<<GroupObjectID>>"
+            "47c98c84-d2d0-41ed-b05a-fc5baa5cda78"
           ],
           "enableAadProfileEnableAzureRBAC": true,
           "enableAadProfileManaged": true
@@ -185,7 +186,7 @@
           "omsagent": {
             "enable": true,
             "config": {
-              "logAnalyticsWorkspaceResourceID": "/subscriptions/<<subscriptionId>>/resourcegroups/anoa-eastus-dev-logging-rg/providers/microsoft.operationalinsights/workspaces/anoa-eastus-dev-logging-log"
+              "logAnalyticsWorkspaceResourceID": "/subscriptions/896f5276-df9a-4317-a791-469396bef7fa/resourcegroups/anoa-eastus-dev-logging-rg/providers/microsoft.operationalinsights/workspaces/anoa-eastus-dev-logging-log"
             }
           },
           "enableResourceLock": true,
@@ -193,17 +194,17 @@
           "azureKeyvaultSecretsProvider": true
         },
         "servicePrincipalProfile": {
-          "clientId": "<<clientId>>",
-          "secret": "<<secret>>"
+          "clientId": "178979fa-74c1-46f2-b451-e8290b78fba3",
+          "secret": "eEv8Q~PMmJpp-_rVruJqCGJHxcElAG0znC3eobxP"
         }
       }
     },
     "parNetworkArtifacts": {
       "value": {
-        "enable": false,
+        "enable": true,
         "artifactsKeyVault": {
           "keyVaultPolicies": {
-            "objectId": "<<objectId>>",
+            "objectId": "47c98c84-d2d0-41ed-b05a-fc5baa5cda78",
             "permissions": {
               "keys": [
                 "get",
@@ -211,16 +212,18 @@
                 "update"
               ],
               "secrets": [
-                "all"
+                "get",
+                "list",
+                "set"
               ]
             },
-            "tenantId": "<<tenantId>>"
+            "tenantId": "ded6b38d-d740-4564-ae25-2e3f041093be"
           }
         },
         "storageAccountAccess": {
-          "enableRoleAssignmentForStorageAccount": false,
+          "enableRoleAssignmentForStorageAccount": true,
           "principalIds": [
-            "<<principalIds>>"
+            "47c98c84-d2d0-41ed-b05a-fc5baa5cda78"
           ],
           "roleDefinitionIdOrName": "Contributor"
         }
@@ -258,9 +261,9 @@
         ],
         "storageAccountAccess": {
           "value": {
-            "enableRoleAssignmentForStorageAccount": false,
+            "enableRoleAssignmentForStorageAccount": true,
             "principalIds": [
-              "<<principalId>>"
+              "47c98c84-d2d0-41ed-b05a-fc5baa5cda78"
             ],
             "roleDefinitionIdOrName": "Contributor"
           }
@@ -275,9 +278,9 @@
         "logAnalyticsWorkspaceSkuName": "PerGB2018",
         "logStorageSkuName": "Standard_GRS",
         "storageAccountAccess": {
-          "enableRoleAssignmentForStorageAccount": false,
+          "enableRoleAssignmentForStorageAccount": true,
           "principalIds": [
-            "<<principalId>>"
+            "47c98c84-d2d0-41ed-b05a-fc5baa5cda78"
           ],
           "roleDefinitionIdOrName": "Contributor"
         }
@@ -334,15 +337,6 @@
         "alertsToAdminsNotifications": "Off",
         "emailSecurityContact": "anoa@microsoft.com",
         "phoneSecurityContact": "5555555555"
-      }
-    },
-    "parWorkloadLogStorageAccountAccess": {
-      "value": {
-        "enableRoleAssignmentForStorageAccount": false,
-        "principalIds": [
-          "xxxxxx-xxxxx-xxxxx-xxxx-xxxxxxx"
-        ],
-        "roleDefinitionIdOrName": "Group"
       }
     }
   }

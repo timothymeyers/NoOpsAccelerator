@@ -34,9 +34,6 @@ param parAzureFirewall object
 @description('Enables logging parmeters and Microsoft Sentinel within the Log Analytics Workspace created in this deployment. See azresources/hub-spoke-core/vdms/logging/readme.md')
 param parLogging object
  
-@description('Account for access to Storage')
-param parWorkloadLogStorageAccountAccess object
-
 @description('Microsoft Defender for Cloud.  It includes contact email and phone.')
 param parSecurityCenter object
 
@@ -51,9 +48,6 @@ param parKubernetesCluster object
 
 @description('Parmaters Object of the workload, Please review the Read Me for required parameters.')
 param parAksWorkload object
-
-@description('The firewall source addresses for the Rule Collection Groups, Must be Hub/Spoke addresses.')
-param parSourceAddresses array = []
 
 var telemetry = json(loadTextContent('../../azresources/Modules/Global/telemetry.json'))
 module telemetryCustomerUsageAttribution '../../azresources/Modules/Global/partnerUsageAttribution/customer-usage-attribution-subscription.bicep' = if (telemetry.customerUsageAttribution.enabled) {
@@ -95,6 +89,5 @@ module modAKSWorkload '../../workloads/wl-aks-spoke/deploy.bicep' = {
     parKubernetesCluster: parKubernetesCluster
     parLogAnalyticsWorkspaceName: modHubSpoke.outputs.logAnalyticsWorkspaceName
     parLogAnalyticsWorkspaceResourceId: modHubSpoke.outputs.logAnalyticsWorkspaceResourceId
-    parWorkloadStorageAccountAccess: parWorkloadLogStorageAccountAccess 
   }        
 }

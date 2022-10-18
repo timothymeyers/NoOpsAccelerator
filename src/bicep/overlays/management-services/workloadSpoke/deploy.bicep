@@ -156,10 +156,6 @@ param parLogAnalyticsWorkspaceName string
 @description('Enable this setting if this network is on a different subscriptiom as the Hub. Will give conflict errors if on same sub as the Hub')
 param parEnableActivityLogging bool = false
 
-// STORAGE ACCOUNTS RBAC
-@description('Account for access to Storage')
-param parWorkloadStorageAccountAccess object
-
 /*
   NAMING CONVENTION
   Here we define a naming conventions for resources.
@@ -228,12 +224,12 @@ module modWorkloadLogStorage '../../../azresources/Modules/Microsoft.Storage/sto
     location: parLocation
     storageAccountSku: parLogStorageSkuName
     tags: modTags.outputs.tags
-    roleAssignments: (parWorkloadStorageAccountAccess.enableRoleAssignmentForStorageAccount) ? [
+    roleAssignments: (parWorkloadSpoke.storageAccountAccess.enableRoleAssignmentForStorageAccount) ? [
       {
         principalIds: [
-          parWorkloadStorageAccountAccess.principalIds
+          parWorkloadSpoke.storageAccountAccess.principalIds
         ]
-        roleDefinitionIdOrName: parWorkloadStorageAccountAccess.roleDefinitionIdOrName
+        roleDefinitionIdOrName: parWorkloadSpoke.storageAccountAccess.roleDefinitionIdOrName
       }
     ] : []
     lock: 'CanNotDelete'

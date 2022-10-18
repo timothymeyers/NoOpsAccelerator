@@ -150,22 +150,6 @@ param parContainerRegistry object
 @description('Parmaters Object of Azure Kubernetes specified when creating the managed cluster.')
 param parKubernetesCluster object
 
-// Storage Account RBAC
-// Example (JSON)
-// -----------------------------
-// "parStorageAccountAccess": {
-//   "value": {
-//     "enableRoleAssignmentForStorageAccount": true,
-//     "principalIds": [
-//       "xxxxxx-xxxxx-xxxxx-xxxx-xxxxxxx"
-//     ],
-//     "roleDefinitionIdOrName": "Group"
-//   }
-// },  
-@description('Account for access to Storage')
-param parWorkloadStorageAccountAccess object
-
-
 // Telemetry - Azure customer usage attribution
 // Reference:  https://docs.microsoft.com/azure/marketplace/azure-partner-customer-usage-attribution
 var telemetry = json(loadTextContent('../../azresources/Modules/Global/telemetry.json'))
@@ -212,9 +196,6 @@ module modTier3 '../../overlays/management-services/workloadSpoke/deploy.bicep' 
     parLogAnalyticsWorkspaceName: parLogAnalyticsWorkspaceName
     parLogAnalyticsWorkspaceResourceId: parLogAnalyticsWorkspaceResourceId
     parEnableActivityLogging: true
-
-    //Storage Parameters
-    parWorkloadStorageAccountAccess: parWorkloadStorageAccountAccess
   }
 }
 

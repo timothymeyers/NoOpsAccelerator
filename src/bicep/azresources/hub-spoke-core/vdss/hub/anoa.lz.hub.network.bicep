@@ -363,9 +363,7 @@ module modHubLogStorage '../../../Modules/Microsoft.Storage/storageAccounts/az.d
     tags: modTags.outputs.tags
     roleAssignments: (parHubStorageAccountAccess.enableRoleAssignmentForStorageAccount) ? [
       {
-        principalIds: [
-          parHubStorageAccountAccess.principalIds
-        ]
+        principalIds: parHubStorageAccountAccess.principalIds
         roleDefinitionIdOrName: parHubStorageAccountAccess.roleDefinitionIdOrName
       }
     ] : []

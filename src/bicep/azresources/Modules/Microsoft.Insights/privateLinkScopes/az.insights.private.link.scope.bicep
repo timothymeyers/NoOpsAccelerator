@@ -26,11 +26,6 @@ param privateEndpoints array = []
 @description('Optional. Resource tags.')
 param tags object = {}
 
-
-
-
-
-
 resource privateLinkScope 'Microsoft.Insights/privateLinkScopes@2019-10-17-preview' = {
   name: name
   location: location
@@ -57,7 +52,7 @@ resource privateLinkScope_lock 'Microsoft.Authorization/locks@2017-04-01' = if (
   scope: privateLinkScope
 }
 
-module privateLinkScope_privateEndpoints '../../Microsoft.Network/privateEndpoint/az.net.private.endpoint.bicep' = [for (privateEndpoint, index) in privateEndpoints: {
+module privateLinkScope_privateEndpoints '../../Microsoft.Network/privateEndpoints/az.net.private.endpoint.bicep' = [for (privateEndpoint, index) in privateEndpoints: {
   name: '${uniqueString(deployment().name, location)}-PvtLinkScope-PrivateEndpoint-${index}'
   params: {
     groupIds: [

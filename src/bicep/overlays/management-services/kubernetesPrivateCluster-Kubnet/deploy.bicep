@@ -280,6 +280,14 @@ module modKubernetesCluster '../../../azresources/Modules/Microsoft.ContainerSer
  
     //ServicePrincipalProfile
     aksServicePrincipalProfile: parKubernetesCluster.servicePrincipalProfile
+    roleAssignments: [
+      {
+        principalIds: [
+          modAksIdentity.outputs.principalId
+        ]
+        roleDefinitionIdOrName: 'Reader'
+      }
+    ]
   }
   dependsOn: [
     modAksIdentity
@@ -287,7 +295,7 @@ module modKubernetesCluster '../../../azresources/Modules/Microsoft.ContainerSer
   ]
 }
 
-module akspvtEndpoint '../../../azresources/Modules/Microsoft.Network/privateEndPoints/az.net.private.endpoint.bicep' = {
+/* module akspvtEndpoint '../../../azresources/Modules/Microsoft.Network/privateEndPoints/az.net.private.endpoint.bicep' = {
   name: 'deploy-akspvtendpnt-${parLocation}-${parDeploymentNameSuffix}'
   scope: resourceGroup(parTargetResourceGroup)
   params: {
@@ -341,7 +349,7 @@ module modAKSHubLink '../../../azresources/Modules/Microsoft.Network/privateDnsZ
   dependsOn: [
     modKubernetesCluster
   ]
-}
+} */
 
 output aksResourceId string = modKubernetesCluster.outputs.resourceId
 output aksIdentityPrincipalId string = modAksIdentity.outputs.principalId

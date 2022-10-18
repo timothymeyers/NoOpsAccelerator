@@ -91,8 +91,8 @@ param aadProfileClientAppID string = ''
 @description('Optional. The server AAD application ID.')
 param aadProfileServerAppID string = ''
 
-@secure()
 @description('Optional. The server AAD application secret.')
+#disable-next-line secure-secrets-in-params // Not a secret
 param aadProfileServerAppSecret string = ''
 
 @description('Optional. Specifies the tenant ID of the Azure Active Directory used by the AKS cluster for authentication.')
@@ -159,7 +159,7 @@ param azurePolicyVersion string = 'v2'
 param kubeDashboardEnabled bool = false
 
 @description('Optional. Specifies whether the KeyvaultSecretsProvider add-on is enabled or not.')
-#disable-next-line secure-secrets-in-params
+#disable-next-line secure-secrets-in-params // Not a secret
 param enableKeyvaultSecretsProvider bool = false
 
 @allowed([
@@ -167,7 +167,7 @@ param enableKeyvaultSecretsProvider bool = false
   'true'
 ])
 @description('Optional. Specifies whether the KeyvaultSecretsProvider add-on uses secret rotation.')
-#disable-next-line secure-secrets-in-params
+#disable-next-line secure-secrets-in-params // Not a secret
 param enableSecretRotation string = 'false'
 
 @description('Optional. Specifies the scan interval of the auto-scaler of the AKS cluster.')
@@ -283,7 +283,6 @@ param diagnosticEventHubName string = ''
 @maxValue(365)
 param diagnosticLogsRetentionInDays int = 365
 
-
 @description('Optional. Array of role assignment objects that contain the \'roleDefinitionIdOrName\' and \'principalId\' to define RBAC role assignments on this resource. In the roleDefinitionIdOrName attribute, you can provide either the display name of the role definition, or its fully qualified ID in the following format: \'/providers/Microsoft.Authorization/roleDefinitions/c2f4ef07-c644-48eb-af81-4b1b4947fb11\'.')
 param roleAssignments array = []
 
@@ -298,7 +297,7 @@ param lock string = ''
 @description('Optional. Tags of the resource.')
 param tags object = {}
 
-@description('Optional. The resource ID of the disc encryption set to apply to the clsuter. For security reasons, this value should be provided.')
+@description('Optional. The resource ID of the disc encryption set to apply to the cluster. For security reasons, this value should be provided.')
 param diskEncryptionSetID string = ''
 
 @description('Optional. The name of logs that will be streamed.')
@@ -308,6 +307,8 @@ param diskEncryptionSetID string = ''
   'kube-controller-manager'
   'kube-scheduler'
   'cluster-autoscaler'
+  'kube-audit-admin'
+  'guard'
 ])
 param diagnosticLogCategoriesToEnable array = [
   'kube-apiserver'
@@ -315,6 +316,8 @@ param diagnosticLogCategoriesToEnable array = [
   'kube-controller-manager'
   'kube-scheduler'
   'cluster-autoscaler'
+  'kube-audit-admin'
+  'guard'
 ]
 
 @description('Optional. The name of metrics that will be streamed.')
@@ -372,9 +375,7 @@ var lbProfile = {
   effectiveOutboundIPs: []
 }
 
-
-
-resource managedCluster 'Microsoft.ContainerService/managedClusters@2022-04-02-preview' = {
+resource managedCluster 'Microsoft.ContainerService/managedClusters@2022-07-01' = {
   name: name
   location: location
   tags: tags
@@ -455,7 +456,7 @@ resource managedCluster 'Microsoft.ContainerService/managedClusters@2022-04-02-p
     }
     autoScalerProfile: {
       'balance-similar-node-groups': autoScalerProfileBalanceSimilarNodeGroups
-      expander: autoScalerProfileExpander
+      'expander': autoScalerProfileExpander
       'max-empty-bulk-delete': autoScalerProfileMaxEmptyBulkDelete
       'max-graceful-termination-sec': autoScalerProfileMaxGracefulTerminationSec
       'max-node-provision-time': autoScalerProfileMaxNodeProvisionTime
@@ -494,7 +495,7 @@ resource managedCluster 'Microsoft.ContainerService/managedClusters@2022-04-02-p
   }
 }
 
-module managedCluster_agentPools './agentPools/az.container.aks.cluster.agentPool.bicep' = [for (agentPool, index) in agentPools: {
+module managedCluster_agentPools 'agentPools/az.container.aks.cluster.agentPool.bicep' = [for (agentPool, index) in agentPools: {
   name: '${uniqueString(deployment().name, location)}-ManagedCluster-AgentPool-${index}'
   params: {
     managedClusterName: managedCluster.name
@@ -558,13 +559,15 @@ resource managedCluster_diagnosticSettings 'Microsoft.Insights/diagnosticsetting
   scope: managedCluster
 }
 
-module managedCluster_roleAssignments './rbac/roleAssignments.bicep' = [for (roleAssignment, index) in roleAssignments: {
+module managedCluster_roleAssignments 'rbac/roleAssignments.bicep' = [for (roleAssignment, index) in roleAssignments: {
   name: '${uniqueString(deployment().name, location)}-ManagedCluster-Rbac-${index}'
   params: {
     description: contains(roleAssignment, 'description') ? roleAssignment.description : ''
     principalIds: roleAssignment.principalIds
     principalType: contains(roleAssignment, 'principalType') ? roleAssignment.principalType : ''
     roleDefinitionIdOrName: roleAssignment.roleDefinitionIdOrName
+    condition: contains(roleAssignment, 'condition') ? roleAssignment.condition : ''
+    delegatedManagedIdentityResourceId: contains(roleAssignment, 'delegatedManagedIdentityResourceId') ? roleAssignment.delegatedManagedIdentityResourceId : ''
     resourceId: managedCluster.id
   }
 }]

@@ -464,7 +464,7 @@ module modHubNetwork '../../azresources/hub-spoke-core/vdss/hub/anoa.lz.hub.netw
 
     // Enable Azure FireWall
     parAzureFirewallEnabled: parAzureFirewall.enable
-    parDisableBgpRoutePropagation: false
+    parDisableBgpRoutePropagation: parAzureFirewall.disableBgpRoutePropagation
  
     // Hub Firewall Parameters
     parFirewallSupernetIPAddress: parAzureFirewall.supernetIPAddress

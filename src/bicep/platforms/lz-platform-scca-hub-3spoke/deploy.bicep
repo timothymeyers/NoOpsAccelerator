@@ -616,7 +616,7 @@ module modHubNetwork '../../azresources/hub-spoke-core/vdss/hub/anoa.lz.hub.netw
 
     // Enable Azure FireWall
     parAzureFirewallEnabled: parAzureFirewall.enable
-    parDisableBgpRoutePropagation: false
+    parDisableBgpRoutePropagation: parAzureFirewall.disableBgpRoutePropagation
 
     // Hub Firewall Parameters
     parFirewallSupernetIPAddress: parAzureFirewall.supernetIPAddress
@@ -628,8 +628,7 @@ module modHubNetwork '../../azresources/hub-spoke-core/vdss/hub/anoa.lz.hub.netw
     parFirewallDiagnosticsMetrics: parAzureFirewall.diagnosticsMetrics
     parFirewallManagementPublicIPAddressAvailabilityZones: parAzureFirewall.managementPublicIPAddressAvailabilityZones
     parPublicIPAddressDiagnosticsLogs: parAzureFirewall.publicIPAddressDiagnosticsLogs
-    parPublicIPAddressDiagnosticsMetrics: parAzureFirewall.parPublicIPAddressDiagnosticsMetrics    
-    parFirewallPolicyRuleCollectionGroups: parAzureFirewall.ruleCollectionGroups
+    parPublicIPAddressDiagnosticsMetrics: parAzureFirewall.publicIPAddressDiagnosticsMetrics    
 
     // RBAC for Storage Parameters
     parHubStorageAccountAccess: parHub.storageAccountAccess

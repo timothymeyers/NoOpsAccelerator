@@ -12,7 +12,7 @@
     "parTags": {
       "value": {
         "organization": "anoa",
-        "region": "eastus",
+        "region": "usgovvirginia",
         "templateVersion": "v1.0",
         "deployEnvironment": "dev",
         "deploymentType": "NoOpsBicep"
@@ -20,7 +20,7 @@
     },
     "parHub": {
       "value": {
-        "subscriptionId": "<<subscriptionId>>",
+        "subscriptionId": "a3ad3fff-f3c5-46cf-ac18-d384307648f8",
         "virtualNetworkAddressPrefix": "10.0.100.0/24",
         "subnetAddressPrefix": "10.0.100.128/27",
         "subnets": [
@@ -58,7 +58,7 @@
     },
     "parIdentitySpoke": {
       "value": {
-        "subscriptionId": "<<subscriptionId>>",
+        "subscriptionId": "a3ad3fff-f3c5-46cf-ac18-d384307648f8",
         "virtualNetworkAddressPrefix": "10.0.110.0/26",
         "subnetAddressPrefix": "10.0.110.0/27",
         "sourceAddressPrefixes": [
@@ -117,7 +117,7 @@
     },
     "parOperationsSpoke": {
       "value": {
-        "subscriptionId": "<<subscriptionId>>",
+        "subscriptionId": "a3ad3fff-f3c5-46cf-ac18-d384307648f8",
         "virtualNetworkAddressPrefix": "10.0.115.0/26",
         "subnetAddressPrefix": "10.0.115.0/27",
         "sourceAddressPrefixes": [
@@ -176,7 +176,7 @@
     },
     "parSharedServicesSpoke": {
       "value": {
-        "subscriptionId": "<<subscriptionId>>",
+        "subscriptionId": "a3ad3fff-f3c5-46cf-ac18-d384307648f8",
         "virtualNetworkAddressPrefix": "10.0.120.0/26",
         "subnetAddressPrefix": "10.0.120.0/27",
         "sourceAddressPrefixes": [
@@ -269,6 +269,7 @@
     "parAzureFirewall": {
       "value": {
         "enable": true,
+        "disableBgpRoutePropagation": false,
         "clientPublicIPAddressAvailabilityZones": [],
         "managementPublicIPAddressAvailabilityZones": [],
         "supernetIPAddress": "10.0.96.0/19",

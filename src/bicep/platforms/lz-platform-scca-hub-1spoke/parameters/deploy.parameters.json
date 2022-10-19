@@ -123,6 +123,7 @@
     "parAzureFirewall": {
       "value": {
         "enable": true,
+        "disableBgpRoutePropagation": false,
         "clientPublicIPAddressAvailabilityZones": [],     
         "managementPublicIPAddressAvailabilityZones": [],
         "supernetIPAddress": "10.0.96.0/19",

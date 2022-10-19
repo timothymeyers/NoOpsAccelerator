@@ -20,7 +20,7 @@
     },
     "parHub": {
       "value": {
-        "subscriptionId": "a3ad3fff-f3c5-46cf-ac18-d384307648f8",
+        "subscriptionId": "<<subscriptionId>>",
         "virtualNetworkAddressPrefix": "10.0.100.0/24",
         "subnetAddressPrefix": "10.0.100.128/27",
         "subnets": [
@@ -50,7 +50,7 @@
         "storageAccountAccess": {
           "enableRoleAssignmentForStorageAccount": true,
           "principalIds": [
-            "7bc6bc45-b256-407c-9d79-bde13dfb5639"
+            "<<principalId>>"
           ],
           "roleDefinitionIdOrName": "Contributor"
         }
@@ -58,7 +58,7 @@
     },
     "parOperationsSpoke": {
       "value": {
-        "subscriptionId": "a3ad3fff-f3c5-46cf-ac18-d384307648f8",
+        "subscriptionId": "<<subscriptionId>>",
         "virtualNetworkAddressPrefix": "10.0.115.0/26",
         "subnetAddressPrefix": "10.0.115.0/27",
         "virtualNetworkDiagnosticsLogs": [],
@@ -81,7 +81,7 @@
         "storageAccountAccess": {
           "enableRoleAssignmentForStorageAccount": true,
           "principalIds": [
-            "7bc6bc45-b256-407c-9d79-bde13dfb5639"
+            "<<principalId>>"
           ],
           "roleDefinitionIdOrName": "Contributor"
         }
@@ -91,7 +91,7 @@
       "value": {
         "name": "aks",
         "shortName": "aks",
-        "subscriptionId": "a3ad3fff-f3c5-46cf-ac18-d384307648f8",
+        "subscriptionId": "<<subscriptionId>>",
         "enableDdosProtectionPlan": false,
         "network": {
           "virtualNetworkAddressPrefix": "10.0.125.0/26",
@@ -126,7 +126,7 @@
         "storageAccountAccess": {
           "enableRoleAssignmentForStorageAccount": true,
           "principalIds": [
-            "7bc6bc45-b256-407c-9d79-bde13dfb5639"
+            "<<principalId>>"
           ],
           "roleDefinitionIdOrName": "Contributor"
         }
@@ -177,9 +177,9 @@
           "enablePrivateClusterPublicFQDN": false
         },
         "aadProfile": {
-          "aadProfileTenantId": "80c5c29b-f6c2-457b-af54-603a8d840878",
+          "aadProfileTenantId": "<<aadProfileTenantId>>",
           "aadProfileAdminGroupObjectIDs": [
-            "6acf1c8c-71a1-406d-b959-6506f47fb36e"
+            "<<aadProfileAdminGroupObjectID>>"
           ],
           "enableAadProfileEnableAzureRBAC": true,
           "enableAadProfileManaged": true
@@ -188,7 +188,7 @@
           "omsagent": {
             "enable": true,
             "config": {
-              "logAnalyticsWorkspaceResourceID": "/subscriptions/a3ad3fff-f3c5-46cf-ac18-d384307648f8/resourcegroups/anoa-usgovvirginia-dev-logging-rg/providers/microsoft.operationalinsights/workspaces/anoa-usgovvirginia-dev-logging-log"
+              "logAnalyticsWorkspaceResourceID": "/subscriptions/<<subscriptionId>>/resourcegroups/anoa-usgovvirginia-dev-logging-rg/providers/microsoft.operationalinsights/workspaces/anoa-usgovvirginia-dev-logging-log"
             }
           },
           "enableResourceLock": true,
@@ -196,8 +196,8 @@
           "azureKeyvaultSecretsProvider": true
         },
         "servicePrincipalProfile": {
-          "clientId": "7b51c750-32b7-46ca-8be6-0cf60d952bfe",
-          "secret": "l5X_~6s77K0744fMBtayCL.~-MqJkWQEM7"
+          "clientId": "<<clientId>>",
+          "secret": ""
         }
       }
     },
@@ -206,7 +206,7 @@
         "enable": true,
         "artifactsKeyVault": {
           "keyVaultPolicies": {
-            "objectId": "7bc6bc45-b256-407c-9d79-bde13dfb5639",
+            "objectId": "<<objectId>>",
             "permissions": {
               "keys": [
                 "get",
@@ -219,13 +219,13 @@
                 "set"
               ]
             },
-            "tenantId": "80c5c29b-f6c2-457b-af54-603a8d840878"
+            "tenantId": "<<tenantId>>"
           }
         },
         "storageAccountAccess": {
           "enableRoleAssignmentForStorageAccount": true,
           "principalIds": [
-            "7bc6bc45-b256-407c-9d79-bde13dfb5639"
+            "<<principalId>>"
           ],
           "roleDefinitionIdOrName": "Contributor"
         }
@@ -265,7 +265,7 @@
           "value": {
             "enableRoleAssignmentForStorageAccount": true,
             "principalIds": [
-              "7bc6bc45-b256-407c-9d79-bde13dfb5639"
+              "<<principalId>>"
             ],
             "roleDefinitionIdOrName": "Contributor"
           }
@@ -282,7 +282,7 @@
         "storageAccountAccess": {
           "enableRoleAssignmentForStorageAccount": true,
           "principalIds": [
-            "7bc6bc45-b256-407c-9d79-bde13dfb5639"
+            "<<principalId>>"
           ],
           "roleDefinitionIdOrName": "Contributor"
         }

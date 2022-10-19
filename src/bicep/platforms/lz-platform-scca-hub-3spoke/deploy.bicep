@@ -602,7 +602,7 @@ module modHubNetwork '../../azresources/hub-spoke-core/vdss/hub/anoa.lz.hub.netw
     parTags: modTags.outputs.tags
  
     // Enable DDOS Protection Plan
-    parDeployddosProtectionPlan: parDdosStandard.enabled
+    parDeployddosProtectionPlan: parDdosStandard.enable
 
     // Hub Network Parameters
     parHubVirtualNetworkAddressPrefix: parHub.virtualNetworkAddressPrefix

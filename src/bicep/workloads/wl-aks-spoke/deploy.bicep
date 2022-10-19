@@ -237,10 +237,7 @@ module modDeployAzureKS '../../overlays/management-services/kubernetesPrivateClu
     parTargetSubnetName: modTier3.outputs.subnetNames[0]
     parTargetVNetName: modTier3.outputs.virtualNetworkName
     parTargetSubscriptionId: parWorkloadSpoke.subscriptionId
-    parHubVirtualNetworkResourceId: parHubVirtualNetworkResourceId
-    parHubResourceGroupName: parHubResourceGroupName
-    parHubSubscriptionId: parHubSubscriptionId
-  }
+   }
   dependsOn: [
     modTier3
   ]

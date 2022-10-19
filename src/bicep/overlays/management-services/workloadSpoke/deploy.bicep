@@ -226,9 +226,7 @@ module modWorkloadLogStorage '../../../azresources/Modules/Microsoft.Storage/sto
     tags: modTags.outputs.tags
     roleAssignments: (parWorkloadSpoke.storageAccountAccess.enableRoleAssignmentForStorageAccount) ? [
       {
-        principalIds: [
-          parWorkloadSpoke.storageAccountAccess.principalIds
-        ]
+        principalIds: parWorkloadSpoke.storageAccountAccess.principalIds
         roleDefinitionIdOrName: parWorkloadSpoke.storageAccountAccess.roleDefinitionIdOrName
       }
     ] : []

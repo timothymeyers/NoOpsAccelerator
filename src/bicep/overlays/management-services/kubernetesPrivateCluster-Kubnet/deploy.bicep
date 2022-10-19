@@ -9,9 +9,7 @@
 /*
 SUMMARY: Overlay Module Example to deploy the Azure Kubernetes Cluster.
 DESCRIPTION: The following components will be options in this deployment
-              * Azure Kubernetes Cluster
-              * Private Endpoints
-              * Private DNS Zones
+              * Azure Kubernetes Cluster (AKS) with 1 node pool              
 AUTHOR/S: jspinella
 VERSION: 1.x.x
 */
@@ -53,35 +51,6 @@ param parLocation string = deployment().location
 
 @description('Defines the Azure Kubernetes Service - Cluster.')
 param parKubernetesCluster object
-
-// HUB NETWORK PARAMETERS
-
-// Hub Virtual Network Name
-// (JSON Parameter)
-// ---------------------------
-// "parHubSubscriptionId": {
-//   "value": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxx"
-// }
-@description('The subscription ID for the Hub Network and resources. It defaults to the deployment subscription.')
-param parHubSubscriptionId string = subscription().subscriptionId
-
-// Hub Subnet Resource Id
-// (JSON Parameter)
-// ---------------------------
-// "parHubVirtualNetworkResourceId": {
-//   "value": "/subscriptions/xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx/resourceGroups/anoa-eastus-platforms-hub-rg/providers/Microsoft.Network/virtualNetworks/anoa-eastus-platforms-hub-vnet/subnets/anoa-eastus-platforms-hub-vnet"
-// }
-@description('The virtual network resource Id for the Hub Network.')
-param parHubVirtualNetworkResourceId string = ''
-
-// Hub Resource Group Name
-// (JSON Parameter)
-// ---------------------------
-// "parHubResourceGroupName": {
-//   "value": "anoa-eastus-platforms-hub-rg"
-// }
-@description('The name of the Hub resource group which contains the network for vnet peering.')
-param parHubResourceGroupName string = ''
 
 // TARGET PARAMETERS
 
@@ -188,6 +157,7 @@ module modAksIdentity '../../../azresources/Modules/Microsoft.ManagedIdentity/us
   scope: resourceGroup(rgKubernetesCluster.name)
   params: {
     location: parLocation
+    name: 'aksIdentity-001'    
   }
 }
 
@@ -197,6 +167,7 @@ module modAksContribRoleAssignement '../../../azresources/Modules/Microsoft.Auth
   params: {
     principalId: modAksIdentity.outputs.principalId
     roleDefinitionIdOrName: '/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c' //Contributor
+    description: 'Role assignment for AKS Contributor'
   }
   dependsOn: [
     modAksIdentity
@@ -208,7 +179,7 @@ module modDefAKSAssignment '../../../azresources/Modules/Microsoft.Authorization
   scope: resourceGroup(rgKubernetesCluster.name)
   params: {
     location: parLocation
-    name: 'EnableDefenderForAKS'
+    name: 'Enable Defender For AKS'
     policyDefinitionId: '/providers/Microsoft.Authorization/policyDefinitions/64def556-fbad-4622-930e-72d1d5589bf5'
   }
   dependsOn: [
@@ -236,6 +207,9 @@ module modKubernetesCluster '../../../azresources/Modules/Microsoft.ContainerSer
     podIdentityProfileEnable: parKubernetesCluster.enablePodIdentity
     podIdentityProfileAllowNetworkPluginKubenet: false
     ingressApplicationGatewayEnabled: parKubernetesCluster.enableIngressApplicationGateway
+    appGatewayResourceId: parKubernetesCluster.enableIngressApplicationGateway ? parKubernetesCluster.appGatewayResourceId : ''
+    usePrivateDNSZone: parKubernetesCluster.usePrivateDNSZone
+  
     primaryAgentPoolProfile: [
       {
         name: parKubernetesCluster.primaryAgentPoolProfile.name
@@ -279,77 +253,13 @@ module modKubernetesCluster '../../../azresources/Modules/Microsoft.ContainerSer
     aadProfileTenantId: parKubernetesCluster.aadProfile.aadProfileTenantId
  
     //ServicePrincipalProfile
-    aksServicePrincipalProfile: parKubernetesCluster.servicePrincipalProfile
-    roleAssignments: [
-      {
-        principalIds: [
-          modAksIdentity.outputs.principalId
-        ]
-        roleDefinitionIdOrName: 'Reader'
-      }
-    ]
+    aksServicePrincipalProfile: parKubernetesCluster.servicePrincipalProfile    
   }
   dependsOn: [
     modAksIdentity
     modAksContribRoleAssignement
   ]
 }
-
-/* module akspvtEndpoint '../../../azresources/Modules/Microsoft.Network/privateEndPoints/az.net.private.endpoint.bicep' = {
-  name: 'deploy-akspvtendpnt-${parLocation}-${parDeploymentNameSuffix}'
-  scope: resourceGroup(parTargetResourceGroup)
-  params: {
-    name: 'akspvtEndpoint'
-    location: parLocation
-    groupIds:  [
-      'management'
-    ]
-    subnetResourceId: resSubnetakspvt.id
-    serviceResourceId: modKubernetesCluster.outputs.resourceId
-  }  
-}
-
-module privatednsAKSZone '../../../azresources/Modules/Microsoft.Network/privateDnsZones/az.net.private.dns.bicep' = {
-  name: 'deploy-akspvtdnszone-${parLocation}-${parDeploymentNameSuffix}'
-  scope: resourceGroup(parTargetResourceGroup)
-  params: {
-    name: (environment().name =~ 'AzureCloud' ? 'privatelink.azmk8s.io' : 'privatelink.azmk8s.us')
-    location: 'global'     
-  }  
-}
-
-module privateDNSAKS '../../../azresources/Modules/Microsoft.Network/privateDnsZones/virtualNetworkLinks/az.net.private.dns.vnet.link.bicep' = {
-  name: 'deploy-akspvtdns-${parLocation}-${parDeploymentNameSuffix}'
-  scope: resourceGroup(parTargetResourceGroup)
-  params: {
-    location: 'global'
-    virtualNetworkResourceId: resVNet.id
-    privateDnsZoneName: privatednsAKSZone.outputs.name
-  }
-}
-
-module privateAKSDNSZoneGroup  '../../../azresources/Modules/Microsoft.Network/privateEndPoints/privateDnsZoneGroups/az.net.private.dns.groups.bicep' = {
-  name: 'deploy-akspvtdnsgrp-${parLocation}-${parDeploymentNameSuffix}'
-  scope: resourceGroup(parTargetResourceGroup)
-  params:  {
-    privateDNSResourceIds: [
-      privatednsAKSZone.outputs.resourceId
-    ]
-    privateEndpointName: akspvtEndpoint.outputs.name
-  }
-}
-
-module modAKSHubLink '../../../azresources/Modules/Microsoft.Network/privateDnsZones/virtualNetworkLinks/az.net.private.dns.vnet.link.bicep' = {
-  name: 'deploy-aksHubLink-${parLocation}-${parDeploymentNameSuffix}'
-  scope: resourceGroup(parHubSubscriptionId, parHubResourceGroupName)
-  params: {
-    virtualNetworkResourceId: parHubVirtualNetworkResourceId
-    privateDnsZoneName: privateAKSDNSZoneGroup.name
-  }
-  dependsOn: [
-    modKubernetesCluster
-  ]
-} */
 
 output aksResourceId string = modKubernetesCluster.outputs.resourceId
 output aksIdentityPrincipalId string = modAksIdentity.outputs.principalId

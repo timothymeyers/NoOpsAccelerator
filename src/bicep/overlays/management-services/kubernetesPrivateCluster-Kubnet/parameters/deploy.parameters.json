@@ -47,6 +47,7 @@
         "enableResourceLock": false,
         "enablePodIdentity": false,
         "aksClusterSkuTier": "Free",
+        "usePrivateDNSZone": true,
         "enableIngressApplicationGateway": false,
         "primaryAgentPoolProfile": {
           "name": "systempool",

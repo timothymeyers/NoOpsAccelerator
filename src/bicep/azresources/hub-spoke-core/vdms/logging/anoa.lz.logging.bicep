@@ -118,36 +118,29 @@ var varLogAnalyticsWorkspaceName = replace(varLogAnalyticsWorkspaceNamingConvent
 var varSolutions = [
   {
     deploy: true
-    name: 'AgentHealthAssessment'
-    product: 'AgentHealthAssessment'
-    publisher: 'Microsoft'
-    promotionCode: ''
-  }
-  {
-    deploy: true
     name: 'AzureActivity'
-    product: 'AzureActivity'
+    product: 'OMSGallery/AzureActivity'
     publisher: 'Microsoft'
     promotionCode: ''
   }
   {
     deploy: parDeploySentinel
     name: 'SecurityInsights'
-    product: 'SecurityInsights'
+    product: 'OMSGallery/SecurityInsights'
     publisher: 'Microsoft'
     promotionCode: ''
   }
   {
     deploy: true
     name: 'VMInsights'
-    product: 'VMInsights'
+    product: 'OMSGallery/VMInsights'
     publisher: 'Microsoft'
-    promotionCode: ''
+    promotionCode: '' 
   }
   {
     deploy: true
     name: 'Security'
-    product: 'Security'
+    product: 'OMSGallery/Security'
     publisher: 'Microsoft'
     promotionCode: ''
   }
@@ -155,35 +148,35 @@ var varSolutions = [
     deploy: true
     name: 'ServiceMap'
     publisher: 'Microsoft'
-    product: 'ServiceMap'
+    product: 'OMSGallery/ServiceMap'
     promotionCode: ''
   }
   {
     deploy: true
     name: 'ContainerInsights'
     publisher: 'Microsoft'
-    product: 'ContainerInsights'
+    product: 'OMSGallery/ContainerInsights'
     promotionCode: ''
   }
   {
     deploy: true
     name: 'KeyVaultAnalytics'
     publisher: 'Microsoft'
-    product: 'KeyVaultAnalytics'
+    product: 'OMSGallery/KeyVaultAnalytics'
     promotionCode: ''
   }
   {
     deploy: true
     name: 'ChangeTracking'
     publisher: 'Microsoft'
-    product: 'ChangeTracking'
+    product: 'OMSGallery/ChangeTracking'
     promotionCode: ''
   }
   {
     deploy: true
     name: 'SQLAssessment'
     publisher: 'Microsoft'
-    product: 'SQLAssessment'
+    product: 'OMSGallery/SQLAssessment'
     promotionCode: ''
   }
   {

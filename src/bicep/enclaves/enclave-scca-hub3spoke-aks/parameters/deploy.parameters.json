@@ -12,7 +12,7 @@
     "parTags": {
       "value": {
         "organization": "anoa",
-        "region": "eastus",
+        "region": "virginiagovus",
         "templateVersion": "v1.0",
         "deployEnvironment": "dev",
         "deploymentType": "NoOpsBicep"
@@ -56,14 +56,42 @@
         }
       }
     },
-    "parOperationsSpoke": {
+    "parIdentitySpoke": {
       "value": {
-        "subscriptionId": "896f5276-df9a-4317-a791-469396bef7fa",
-        "virtualNetworkAddressPrefix": "10.0.115.0/26",
-        "subnetAddressPrefix": "10.0.115.0/27",
+        "subscriptionId": "<<subscriptionId>>",
+        "virtualNetworkAddressPrefix": "10.0.110.0/26",
+        "subnetAddressPrefix": "10.0.110.0/27",
+        "sourceAddressPrefixes": [
+          "10.0.115.0/26",
+          "10.0.120.0/26"
+        ],
         "virtualNetworkDiagnosticsLogs": [],
         "virtualNetworkDiagnosticsMetrics": [],
-        "networkSecurityGroupRules": [],
+        "networkSecurityGroupRules": [
+          {
+            "name": "Allow-Traffic-From-Spokes",
+            "properties": {
+              "access": "Allow",
+              "description": "Allow traffic from spokes",
+              "destinationAddressPrefix": "10.0.110.0/26",
+              "destinationPortRanges": [
+                "22",
+                "80",
+                "443",
+                "3389"
+              ],
+              "direction": "Inbound",
+              "priority": 200,
+              "protocol": "*",
+              "sourceAddressPrefixes": [
+                "10.0.115.0/26",
+                "10.0.120.0/26"
+              ],
+              "sourcePortRange": "*"
+            },
+            "type": "string"
+          }
+        ],
         "publicIPAddressDiagnosticsLogs": [
           "DDoSProtectionNotifications",
           "DDoSMitigationFlowLogs",
@@ -79,14 +107,132 @@
           }
         ],
         "storageAccountAccess": {
-          "enableRoleAssignmentForStorageAccount": true,
+          "enableRoleAssignmentForStorageAccount": false,
           "principalIds": [
-            "47c98c84-d2d0-41ed-b05a-fc5baa5cda78"
+            "<<principalId>>"
           ],
           "roleDefinitionIdOrName": "Contributor"
         }
       }
-    },  
+    },
+    "parOperationsSpoke": {
+      "value": {
+        "subscriptionId": "<<subscriptionId>>",
+        "virtualNetworkAddressPrefix": "10.0.115.0/26",
+        "subnetAddressPrefix": "10.0.115.0/27",
+        "sourceAddressPrefixes": [
+          "10.0.110.0/26",
+          "10.0.120.0/26"
+        ],
+        "virtualNetworkDiagnosticsLogs": [],
+        "virtualNetworkDiagnosticsMetrics": [],
+        "networkSecurityGroupRules": [
+          {
+            "name": "Allow-Traffic-From-Spokes",
+            "properties": {
+              "access": "Allow",
+              "description": "Allow traffic from spokes",
+              "destinationAddressPrefix": "10.0.115.0/26",
+              "destinationPortRanges": [
+                "22",
+                "80",
+                "443",
+                "3389"
+              ],
+              "direction": "Inbound",
+              "priority": 200,
+              "protocol": "*",
+              "sourceAddressPrefixes": [
+                "10.0.110.0/26",
+                "10.0.120.0/26"
+              ],
+              "sourcePortRange": "*"
+            },
+            "type": "string"
+          }
+        ],
+        "publicIPAddressDiagnosticsLogs": [
+          "DDoSProtectionNotifications",
+          "DDoSMitigationFlowLogs",
+          "DDoSMitigationReports"
+        ],
+        "networkSecurityGroupDiagnosticsLogs": [
+          "NetworkSecurityGroupEvent",
+          "NetworkSecurityGroupRuleCounter"
+        ],
+        "subnetServiceEndpoints": [
+          {
+            "service": "Microsoft.Storage"
+          }
+        ],
+        "storageAccountAccess": {
+          "enableRoleAssignmentForStorageAccount": false,
+          "principalIds": [
+            "<<principalId>>"
+          ],
+          "roleDefinitionIdOrName": "Contributor"
+        }
+      }
+    },
+    "parSharedServicesSpoke": {
+      "value": {
+        "subscriptionId": "<<subscriptionId>>",
+        "virtualNetworkAddressPrefix": "10.0.120.0/26",
+        "subnetAddressPrefix": "10.0.120.0/27",
+        "sourceAddressPrefixes": [
+          "10.0.115.0/26",
+          "10.0.110.0/26"
+        ],
+        "virtualNetworkDiagnosticsLogs": [],
+        "virtualNetworkDiagnosticsMetrics": [],
+        "networkSecurityGroupRules": [
+          {
+            "name": "Allow-Traffic-From-Spokes",
+            "properties": {
+              "access": "Allow",
+              "description": "Allow traffic from spokes",
+              "destinationAddressPrefix": "10.0.120.0/26",
+              "destinationPortRanges": [
+                "22",
+                "80",
+                "443",
+                "3389"
+              ],
+              "direction": "Inbound",
+              "priority": 200,
+              "protocol": "*",
+              "sourceAddressPrefixes": [
+                "10.0.115.0/26",
+                "10.0.120.0/26"
+              ],
+              "sourcePortRange": "*"
+            },
+            "type": "string"
+          }
+        ],
+        "publicIPAddressDiagnosticsLogs": [
+          "DDoSProtectionNotifications",
+          "DDoSMitigationFlowLogs",
+          "DDoSMitigationReports"
+        ],
+        "networkSecurityGroupDiagnosticsLogs": [
+          "NetworkSecurityGroupEvent",
+          "NetworkSecurityGroupRuleCounter"
+        ],
+        "subnetServiceEndpoints": [
+          {
+            "service": "Microsoft.Storage"
+          }
+        ],
+        "storageAccountAccess": {
+          "enableRoleAssignmentForStorageAccount": false,
+          "principalIds": [
+            "<<principalId>>"
+          ],
+          "roleDefinitionIdOrName": "Contributor"
+        }
+      }
+    }, 
     "parAksWorkload": {
       "value": {
         "name": "aks",
@@ -121,14 +267,14 @@
                 }
               }
             ]
-          },
-          "storageAccountAccess": {
-            "enableRoleAssignmentForStorageAccount": true,
-            "principalIds": [
-              "47c98c84-d2d0-41ed-b05a-fc5baa5cda78"
-            ],
-            "roleDefinitionIdOrName": "Contributor"
           }
+        },
+        "storageAccountAccess": {
+          "enableRoleAssignmentForStorageAccount": true,
+          "principalIds": [
+            "47c98c84-d2d0-41ed-b05a-fc5baa5cda78"
+          ],
+          "roleDefinitionIdOrName": "Contributor"
         }
       }
     },

@@ -33,6 +33,12 @@ param conditionVersion string = '2.0'
 @sys.description('Optional. Id of the delegated managed identity resource.')
 param delegatedManagedIdentityResourceId string = ''
 
+var builtInRoleNames = {
+  'Owner': subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '8e3af657-a8ff-443c-a75c-2fe8c4bcb635')
+  'Contributor': subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')
+  'Reader': subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'acdd72a7-3385-48ef-bd42-f606fba81ae7')
+}
+
 resource managedCluster 'Microsoft.ContainerService/managedClusters@2022-04-02-preview' existing = {
   name: last(split(resourceId, '/'))
 }
@@ -41,7 +47,7 @@ resource roleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = [
   name: guid(managedCluster.id, principalId, roleDefinitionIdOrName)
   properties: {
     description: description
-    roleDefinitionId: roleDefinitionIdOrName
+    roleDefinitionId: contains(builtInRoleNames, roleDefinitionIdOrName) ? builtInRoleNames[roleDefinitionIdOrName] : roleDefinitionIdOrName
     principalId: principalId
     principalType: !empty(principalType) ? any(principalType) : null
     condition: !empty(condition) ? condition : null

@@ -600,7 +600,7 @@ module modVMExt '../../azresources/Modules/Microsoft.Compute/virtualmachines/ext
 
 // MICROSOFT DEFENDER FOR CLOUD FOR HUB
 
-module modDefender '../../overlays/management-services/defender/deploy.bicep' = if (parSecurityCenter.enableDefender) {
+module modDefender '../../overlays/management-services/azureSecurityCenter/deploy.bicep' = if (parSecurityCenter.enableDefender) {
   name: 'deploy-defender-hub-${parLocation}-${parDeploymentNameSuffix}'
   scope: subscription(parHub.subscriptionId)
   params: {
@@ -612,7 +612,7 @@ module modDefender '../../overlays/management-services/defender/deploy.bicep' = 
 
 // MICROSOFT DEFENDER FOR CLOUD FOR SPOKES
 
-module spokeOpsDefender '../../overlays/management-services/defender/deploy.bicep' = if (parSecurityCenter.enableDefender && parOperationsSpoke.subscriptionId != parHub.subscriptionId) {
+module spokeOpsDefender '../../overlays/management-services/azureSecurityCenter/deploy.bicep' = if (parSecurityCenter.enableDefender && parOperationsSpoke.subscriptionId != parHub.subscriptionId) {
   name: 'deploy-defender-ops-${parLocation}-${parDeploymentNameSuffix}'
   scope: subscription(parOperationsSpoke.subscriptionId)
   params: {
@@ -644,6 +644,6 @@ output hub object = {
 
 output logAnalyticsWorkspaceName string = modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceName
 
-output logAnalyticsWorkspaceResourceId string = modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceId
+output logAnalyticsWorkspaceResourceId string = modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceResourceId
 
 output diagnosticStorageAccountName string = modOperationsNetwork.outputs.operationsLogStorageAccountName

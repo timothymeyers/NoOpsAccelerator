@@ -207,10 +207,7 @@ module modIdentityLogStorage '../../../Modules/Microsoft.Storage/storageAccounts
     tags: modTags.outputs.tags
     roleAssignments: (parStorageAccountAccess.enableRoleAssignmentForStorageAccount) ? [
       {
-        principalIds: [
-          parStorageAccountAccess.principalIds
-        ]
-        principalType: parStorageAccountAccess.principalType
+        principalIds: parStorageAccountAccess.principalIds
         roleDefinitionIdOrName: parStorageAccountAccess.roleDefinitionIdOrName
       }
     ] : []

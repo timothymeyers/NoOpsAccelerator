@@ -183,9 +183,7 @@ module modOpsLogStorage '../../../Modules/Microsoft.Storage/storageAccounts/az.d
       tags: modTags.outputs.tags
       roleAssignments: (parOperationsStorageAccountAccess.enableRoleAssignmentForStorageAccount) ? [
         {
-          principalIds: [
-            parOperationsStorageAccountAccess.principalIds
-          ]
+          principalIds: parOperationsStorageAccountAccess.principalIds
           roleDefinitionIdOrName: parOperationsStorageAccountAccess.roleDefinitionIdOrName
         }
       ] : []
@@ -288,6 +286,8 @@ module spokeOpsSubscriptionActivityLogging '../../../Modules/Microsoft.Insights/
     modOpsLogStorage
   ]
 }
+
+
 
 output virtualNetworkName string = modOperationsVirtualNetwork.outputs.name
 output virtualNetworkResourceId string = modOperationsVirtualNetwork.outputs.resourceId

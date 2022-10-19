@@ -1,0 +1,345 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "parRequired": {
+      "value": {
+        "orgPrefix": "anoa",
+        "templateVersion": "v1.0",
+        "deployEnvironment": "dev"
+      }
+    },
+    "parTags": {
+      "value": {
+        "organization": "anoa",
+        "region": "usgovvirginia",
+        "templateVersion": "v1.0",
+        "deployEnvironment": "dev",
+        "deploymentType": "NoOpsBicep"
+      }
+    },
+    "parHub": {
+      "value": {
+        "subscriptionId": "<<subscriptionId>>",
+        "virtualNetworkAddressPrefix": "10.0.100.0/24",
+        "subnetAddressPrefix": "10.0.100.128/27",
+        "subnets": [
+          {
+            "name": "AzureFirewallSubnet",
+            "addressPrefix": "10.0.100.0/26",
+            "serviceEndpoints": []
+          },
+          {
+            "name": "AzureFirewallManagementSubnet",
+            "addressPrefix": "10.0.100.64/26",
+            "serviceEndpoints": []
+          }
+        ],
+        "virtualNetworkDiagnosticsLogs": [],
+        "virtualNetworkDiagnosticsMetrics": [],
+        "networkSecurityGroupRules": [],
+        "networkSecurityGroupDiagnosticsLogs": [
+          "NetworkSecurityGroupEvent",
+          "NetworkSecurityGroupRuleCounter"
+        ],
+        "subnetServiceEndpoints": [
+          {
+            "service": "Microsoft.Storage"
+          }
+        ],
+        "storageAccountAccess": {
+          "enableRoleAssignmentForStorageAccount": true,
+          "principalIds": [
+            "<<principalId>>"
+          ],
+          "roleDefinitionIdOrName": "Contributor"
+        }
+      }
+    },
+    "parOperationsSpoke": {
+      "value": {
+        "subscriptionId": "<<subscriptionId>>",
+        "virtualNetworkAddressPrefix": "10.0.115.0/26",
+        "subnetAddressPrefix": "10.0.115.0/27",
+        "virtualNetworkDiagnosticsLogs": [],
+        "virtualNetworkDiagnosticsMetrics": [],
+        "networkSecurityGroupRules": [],
+        "publicIPAddressDiagnosticsLogs": [
+          "DDoSProtectionNotifications",
+          "DDoSMitigationFlowLogs",
+          "DDoSMitigationReports"
+        ],
+        "networkSecurityGroupDiagnosticsLogs": [
+          "NetworkSecurityGroupEvent",
+          "NetworkSecurityGroupRuleCounter"
+        ],
+        "subnetServiceEndpoints": [
+          {
+            "service": "Microsoft.Storage"
+          }
+        ],
+        "storageAccountAccess": {
+          "enableRoleAssignmentForStorageAccount": true,
+          "principalIds": [
+            "<<principalId>>"
+          ],
+          "roleDefinitionIdOrName": "Contributor"
+        }
+      }
+    },  
+    "parAksWorkload": {
+      "value": {
+        "name": "aks",
+        "shortName": "aks",
+        "subscriptionId": "<<subscriptionId>>",
+        "enableDdosProtectionPlan": false,
+        "network": {
+          "virtualNetworkAddressPrefix": "10.0.125.0/26",
+          "subnetAddressPrefix": "10.0.125.0/26",
+          "virtualNetworkDiagnosticsLogs": [],
+          "virtualNetworkDiagnosticsMetrics": [],
+          "networkSecurityGroupRules": [],
+          "NetworkSecurityGroupDiagnosticsLogs": [
+            "NetworkSecurityGroupEvent",
+            "NetworkSecurityGroupRuleCounter"
+          ],
+          "subnetServiceEndpoints": [
+            {
+              "service": "Microsoft.Storage"
+            }
+          ],
+          "subnets": [],
+          "routeTable": {
+            "disableBgpRoutePropagation": false,
+            "routes": [
+              {
+                "name": "wl-routetable",
+                "properties": {
+                  "addressPrefix": "0.0.0.0/0",
+                  "nextHopIpAddress": "10.0.100.4",
+                  "nextHopType": "VirtualAppliance"
+                }
+              }
+            ]
+          }
+        },
+        "storageAccountAccess": {
+          "enableRoleAssignmentForStorageAccount": true,
+          "principalIds": [
+            "<<principalId>>"
+          ],
+          "roleDefinitionIdOrName": "Contributor"
+        }
+      }
+    },
+    "parContainerRegistry": {
+      "value": {
+        "name": "anoadevacr",
+        "acrSku": "Premium",
+        "enableResourceLock": true
+      }
+    },
+    "parKubernetesCluster": {
+      "value": {
+        "name": "anoa",
+        "enableSystemAssignedIdentity": false,
+        "aksClusterKubernetesVersion": "1.24.3",
+        "enableRBAC": true,
+        "enableResourceLock": false,
+        "enablePodIdentity": false,
+        "aksClusterSkuTier": "Free",
+        "usePrivateDNSZone": true,
+        "enableIngressApplicationGateway": false,
+        "appGatewayResourceId": "<<appGatewayResourceId, use only if using enableIngressApplicationGateway>>",
+        "primaryAgentPoolProfile": {
+          "name": "systempool",
+          "vmSize": "Standard_DS2_v2",
+          "osDiskSizeGB": 30,
+          "osDiskType": "Managed",
+          "enableAutoScaling": true,
+          "count": 10,
+          "osType": "Linux",
+          "osSKU": "Ubuntu",
+          "type": "VirtualMachineScaleSets",
+          "mode": "System",
+          "availabilityZones": []
+        },
+        "networkProfile": {          
+          "aksClusterLoadBalancerSku": "standard",
+          "aksClusterPodCidr": "10.244.0.0/16",
+          "aksClusterServiceCidr": "172.16.1.0/24",
+          "aksClusterDnsServiceIP": "172.16.1.10",
+          "aksClusterDockerBridgeCidr": "170.10.0.1/30",
+          "aksClusterOutboundType": "userDefinedRouting"
+        },
+        "apiServerAccessProfile": {
+          "enablePrivateCluster": true,
+          "enablePrivateClusterPublicFQDN": false
+        },
+        "aadProfile": {
+          "aadProfileTenantId": "<<aadProfileTenantId>>",
+          "aadProfileAdminGroupObjectIDs": [
+            "<<aadProfileAdminGroupObjectID>>"
+          ],
+          "enableAadProfileEnableAzureRBAC": true,
+          "enableAadProfileManaged": true
+        },
+        "addonProfiles": {
+          "omsagent": {
+            "enable": true,
+            "config": {
+              "logAnalyticsWorkspaceResourceID": "/subscriptions/<<subscriptionId>>/resourcegroups/anoa-usgovvirginia-dev-logging-rg/providers/microsoft.operationalinsights/workspaces/anoa-usgovvirginia-dev-logging-log"
+            }
+          },
+          "enableResourceLock": true,
+          "enableAzurePolicy": true,
+          "azureKeyvaultSecretsProvider": true
+        },
+        "servicePrincipalProfile": {
+          "clientId": "<<clientId>>",
+          "secret": ""
+        }
+      }
+    },
+    "parNetworkArtifacts": {
+      "value": {
+        "enable": true,
+        "artifactsKeyVault": {
+          "keyVaultPolicies": {
+            "objectId": "<<objectId>>",
+            "permissions": {
+              "keys": [
+                "get",
+                "list",
+                "update"
+              ],
+              "secrets": [
+                "get",
+                "list",
+                "set"
+              ]
+            },
+            "tenantId": "<<tenantId>>"
+          }
+        },
+        "storageAccountAccess": {
+          "enableRoleAssignmentForStorageAccount": true,
+          "principalIds": [
+            "<<principalId>>"
+          ],
+          "roleDefinitionIdOrName": "Contributor"
+        }
+      }
+    },
+    "parDdosStandard": {
+      "value": {
+        "enable": false
+      }
+    },
+    "parAzureFirewall": {
+      "value": {
+        "enable": true,
+        "clientPublicIPAddressAvailabilityZones": [],
+        "managementPublicIPAddressAvailabilityZones": [],
+        "supernetIPAddress": "10.0.96.0/19",
+        "skuTier": "Premium",
+        "threatIntelMode": "Alert",
+        "intrusionDetectionMode": "Alert",
+        "publicIPAddressDiagnosticsLogs": [
+          "DDoSProtectionNotifications",
+          "DDoSMitigationFlowLogs",
+          "DDoSMitigationReports"
+        ],
+        "publicIPAddressDiagnosticsMetrics": [
+          "AllMetrics"
+        ],
+        "diagnosticsLogs": [
+          "AzureFirewallApplicationRule",
+          "AzureFirewallNetworkRule",
+          "AzureFirewallDnsProxy"
+        ],
+        "diagnosticsMetrics": [
+          "AllMetrics"
+        ],
+        "storageAccountAccess": {
+          "value": {
+            "enableRoleAssignmentForStorageAccount": true,
+            "principalIds": [
+              "<<principalId>>"
+            ],
+            "roleDefinitionIdOrName": "Contributor"
+          }
+        }
+      }
+    },
+    "parLogging": {
+      "value": {
+        "enableSentinel": true,
+        "logAnalyticsWorkspaceCappingDailyQuotaGb": -1,
+        "logAnalyticsWorkspaceRetentionInDays": 30,
+        "logAnalyticsWorkspaceSkuName": "PerGB2018",
+        "logStorageSkuName": "Standard_GRS",
+        "storageAccountAccess": {
+          "enableRoleAssignmentForStorageAccount": true,
+          "principalIds": [
+            "<<principalId>>"
+          ],
+          "roleDefinitionIdOrName": "Contributor"
+        }
+      }
+    },
+    "parRemoteAccess": {
+      "value": {
+        "enable": true,
+        "bastion": {
+          "sku": "Standard",
+          "subnetAddressPrefix": "10.0.100.160/27",
+          "publicIPAddressAvailabilityZones": [],
+          "encryptionAtHost": false,
+          "linux": {
+            "enable": true,
+            "vmName": "bastion-linux",
+            "vmAdminUsername": "azureuser",
+            "disablePasswordAuthentication": false,
+            "vmAdminPasswordOrKey": "Rem0te@2020246",
+            "vmSize": "Standard_DS1_v2",
+            "vmOsDiskCreateOption": "FromImage",
+            "vmOsDiskType": "Standard_LRS",
+            "vmImagePublisher": "Canonical",
+            "vmImageOffer": "UbuntuServer",
+            "vmImageSku": "18.04-LTS",
+            "vmImageVersion": "latest",
+            "networkInterfacePrivateIPAddressAllocationMethod": "Dynamic"
+          },
+          "windows": {
+            "enable": true,
+            "vmName": "bastion-windows",
+            "vmAdminUsername": "azureuser",
+            "vmAdminPassword": "Rem0te@2020246",
+            "vmSize": "Standard_DS1_v2",
+            "vmOsDiskCreateOption": "FromImage",
+            "vmStorageAccountType": "StandardSSD_LRS",
+            "vmImagePublisher": "MicrosoftWindowsServer",
+            "vmImageOffer": "WindowsServer",
+            "vmImageSku": "2019-datacenter",
+            "vmImageVersion": "latest",
+            "networkInterfacePrivateIPAddressAllocationMethod": "Dynamic"
+          },
+          "customScriptExtension": {
+            "install": false,
+            "script64": ""
+          }
+        }
+      }
+    },
+    "parSecurityCenter": {
+      "value": {
+        "enableDefender": true,
+        "alertNotifications": "Off",
+        "alertsToAdminsNotifications": "Off",
+        "emailSecurityContact": "anoa@microsoft.com",
+        "phoneSecurityContact": "5555555555"
+      }
+    }
+  }
+}

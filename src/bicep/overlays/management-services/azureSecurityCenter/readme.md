@@ -1,4 +1,4 @@
-# Overlay:   NoOps Accelerator - Microsoft Defender for Cloud
+# Overlay:   NoOps Accelerator - Microsoft Azure Security Center
 
 ## Overview
 
@@ -8,10 +8,10 @@ Read on to understand what this overlay does, and when you're ready, collect all
 
 ## About Microsoft Defender
 
-The docs on Microsoft Defender for Cloud: <https://docs.microsoft.com/en-us/azure/defender-for-cloud/defender-for-cloud-introduction>
+The docs on Microsoft Azure Security Center: <https://docs.microsoft.com/en-us/azure/defender-for-cloud/defender-for-cloud-introduction>
 
 NOTE:
-> The Defender plan by resource type for Microsoft Defender for Cloud is enabled by default in the following [Azure Environments](https://docs.microsoft.com/en-us/powershell/module/servicemanagement/azure.service/get-azureenvironment?view=azuresmps-4.0.0): `AzureCloud` and `AzureUSGovernment`. To enable this for other Azure Cloud environments, this will need to executed manually.
+> The Security Center plan by resource type for Microsoft Azure Security Center is enabled by default in the following [Azure Environments](https://docs.microsoft.com/en-us/powershell/module/servicemanagement/azure.service/get-azureenvironment?view=azuresmps-4.0.0): `AzureCloud` and `AzureUSGovernment`. To enable this for other Azure Cloud environments, this will need to executed manually.
 Documentation on how to do this can be found
 [here](https://docs.microsoft.com/en-us/azure/defender-for-cloud/enable-enhanced-security)
 
@@ -108,7 +108,7 @@ New-AzSubscriptionDeployment `
 
 ## Extending the Overlay
 
-By default, this overlay has the minium parmeters needed to deploy the service. If you like to add addtional parmeters to the service, please refer to the module description located in AzResources here: [Microsoft Defender for Cloud `[Microsoft.Security/azureSecurityCenter]`](../../../azresources/Modules/Microsoft.Security/defenderForCloud/readme.md)
+By default, this overlay has the minium parmeters needed to deploy the service. If you like to add addtional parmeters to the service, please refer to the module description located in AzResources here: [Microsoft Azure Security Center `[Microsoft.Security/azureSecurityCenter]`](../../../azresources/Modules/Microsoft.Security/azureSecurityCenter/readme.md)
 
 ## Air-Gapped Clouds
 
@@ -136,7 +136,7 @@ Get-AzResource -ResourceGroupName anoa-eastus-hub-defender-rg
 
 ## Cleanup
 
-The Bicep/ARM deployment of NoOps Accelerator - Microsoft Defender for Cloud deployment can be deleted with these steps:
+The Bicep/ARM deployment of NoOps Accelerator - Microsoft Azure Security Center deployment can be deleted with these steps:
 
 ### Delete Resource Groups
 

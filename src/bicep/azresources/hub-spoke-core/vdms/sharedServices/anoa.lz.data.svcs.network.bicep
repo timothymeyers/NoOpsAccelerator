@@ -209,9 +209,7 @@ module modSvcsLogStorage '../../../Modules/Microsoft.Storage/storageAccounts/az.
     tags: modTags.outputs.tags
     roleAssignments: (parAddRoleAssignmentForStorageAccount) ? [
       {
-        principalIds: [
-          parStorageAccountAccessObjectId
-        ]
+        principalIds: parStorageAccountAccessObjectId
         roleDefinitionIdOrName: 'Contributor'
       }
     ] : []
@@ -222,7 +220,7 @@ module modSvcsLogStorage '../../../Modules/Microsoft.Storage/storageAccounts/az.
   ]
 }
 
-module modDataServicesNetworkSecurityGroup '../../../Modules/Microsoft.Network/networkSecurityGroup/az.net.network.security.group.with.diagnostics.bicep' = {
+module modDataServicesNetworkSecurityGroup '../../../Modules/Microsoft.Network/networkSecurityGroups/az.net.network.security.group.with.diagnostics.bicep' = {
   name: 'deploy-${varDataServicesShortName}-nsg-${parLocation}-${parDeploymentNameSuffix}'
   scope: resourceGroup(varDataServicesResourceGroupName)
   params: {

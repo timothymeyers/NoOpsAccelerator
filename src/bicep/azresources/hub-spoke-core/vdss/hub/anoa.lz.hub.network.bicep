@@ -363,9 +363,7 @@ module modHubLogStorage '../../../Modules/Microsoft.Storage/storageAccounts/az.d
     tags: modTags.outputs.tags
     roleAssignments: (parHubStorageAccountAccess.enableRoleAssignmentForStorageAccount) ? [
       {
-        principalIds: [
-          parHubStorageAccountAccess.principalIds
-        ]
+        principalIds: parHubStorageAccountAccess.principalIds
         roleDefinitionIdOrName: parHubStorageAccountAccess.roleDefinitionIdOrName
       }
     ] : []
@@ -458,6 +456,8 @@ module modHubSubnet '../../../Modules/Microsoft.Network/virtualNetworks/subnets/
     routeTableId: modHubRouteTable.outputs.resourceId
     serviceEndpoints: parHubSubnetServiceEndpoints
     virtualNetworkName: modHubVirtualNetwork.outputs.name
+    privateEndpointNetworkPolicies: 'Disabled'
+    privateLinkServiceNetworkPolicies: 'Enabled'
   }
   dependsOn: [
     modHubVirtualNetwork
@@ -544,7 +544,7 @@ module modAzureFirewall '../../../Modules/Microsoft.Network/firewalls/az.net.fir
 
 // HUB FW - Policy
 
-module modAzureFirewallPolicy '../../../Modules/Microsoft.Network/firewallPolicies/az.net.firewall.policy.bicep' = {
+module modAzureFirewallPolicy '../../../Modules/Microsoft.Network/firewallPolicies/az.net.firewall.policy.bicep' = if (parAzureFirewallEnabled) {
   name: 'deploy-hub-FW-Policy-${parLocation}-${parDeploymentNameSuffix}'
   scope: resourceGroup(parHubSubscriptionId, varHubResourceGroupName)
   params: {

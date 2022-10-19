@@ -19,6 +19,12 @@ param parHub object
 @description('Operations Spoke Virtual network configuration.  See azresources/hub-spoke-core/vdms/operations/readme.md')
 param parOperationsSpoke object
 
+@description('Identity Spoke Virtual network configuration.  See azresources/hub-spoke-core/vdss/identity/readme.md')
+param parIdentitySpoke object
+
+@description('Shared Services Spoke Virtual network configuration.  See azresources/hub-spoke-core/vdms/sharedservices/readme.md')
+param parSharedServicesSpoke object
+
 @description('Enables Operations Network Artifacts Resource Group with KV and Storage account for the ops subscriptions used in the deployment.')
 param parNetworkArtifacts object
 
@@ -34,9 +40,6 @@ param parAzureFirewall object
 @description('Enables logging parmeters and Microsoft Sentinel within the Log Analytics Workspace created in this deployment. See azresources/hub-spoke-core/vdms/logging/readme.md')
 param parLogging object
  
-@description('Account for access to Storage')
-param parWorkloadLogStorageAccountAccess object
-
 @description('Microsoft Defender for Cloud.  It includes contact email and phone.')
 param parSecurityCenter object
 
@@ -52,16 +55,13 @@ param parKubernetesCluster object
 @description('Parmaters Object of the workload, Please review the Read Me for required parameters.')
 param parAksWorkload object
 
-@description('The firewall source addresses for the Rule Collection Groups, Must be Hub/Spoke addresses.')
-param parSourceAddresses array = []
-
 var telemetry = json(loadTextContent('../../azresources/Modules/Global/telemetry.json'))
 module telemetryCustomerUsageAttribution '../../azresources/Modules/Global/partnerUsageAttribution/customer-usage-attribution-subscription.bicep' = if (telemetry.customerUsageAttribution.enabled) {
   name: 'pid-${telemetry.customerUsageAttribution.modules.enclaves.sccahubspokeaks}'
   scope: subscription(parHub.subscriptionId)
 }
 
-module modHubSpoke '../../platforms/lz-platform-scca-hub-1spoke/deploy.bicep' = {
+module modHubSpoke '../../platforms/lz-platform-scca-hub-3spoke/deploy.bicep' = {
   name: 'deploy-HubSpoke-${parLocation}-${parDeploymentNameSuffix}'
   scope: subscription(parHub.subscriptionId)
   params: {
@@ -72,10 +72,12 @@ module modHubSpoke '../../platforms/lz-platform-scca-hub-1spoke/deploy.bicep' = 
     parDdosStandard: parDdosStandard
     parHub: parHub 
     parOperationsSpoke: parOperationsSpoke
+    parIdentitySpoke: parIdentitySpoke
+    parSharedServicesSpoke: parSharedServicesSpoke
     parLogging: parLogging  
     parAzureFirewall: parAzureFirewall
     parSecurityCenter: parSecurityCenter
-    parRemoteAccess: parRemoteAccess    
+    parRemoteAccess: parRemoteAccess   
   }
 }
 
@@ -95,6 +97,5 @@ module modAKSWorkload '../../workloads/wl-aks-spoke/deploy.bicep' = {
     parKubernetesCluster: parKubernetesCluster
     parLogAnalyticsWorkspaceName: modHubSpoke.outputs.logAnalyticsWorkspaceName
     parLogAnalyticsWorkspaceResourceId: modHubSpoke.outputs.logAnalyticsWorkspaceResourceId
-    parWorkloadStorageAccountAccess: parWorkloadLogStorageAccountAccess 
   }        
 }

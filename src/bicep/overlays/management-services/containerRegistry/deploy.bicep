@@ -238,19 +238,6 @@ module privateACRDNSZoneGroup  '../../../azresources/Modules/Microsoft.Network/p
   ]
 }
 
-module modACRHubLink '../../../azresources/Modules/Microsoft.Network/privateDnsZones/virtualNetworkLinks/az.net.private.dns.vnet.link.bicep' = {
-  name: 'deploy-aksHubLink-${parLocation}-${parDeploymentNameSuffix}'
-  scope: resourceGroup(parHubSubscriptionId, parHubResourceGroupName)
-  params: {
-    virtualNetworkResourceId: parHubVirtualNetworkResourceId
-    privateDnsZoneName: privateACRDNSZoneGroup.name
-  }
-  dependsOn: [
-    privateACRDNSZoneGroup
-    modContainerRegistry
-  ]
-}
-
 // Create Container Registry
 module modContainerRegistry '../../../azresources/Modules/Microsoft.ContainerRegistry/registries/az.container.registry.bicep' = {
   scope: resourceGroup(parTargetSubscriptionId, rgContainerRegistry.name)
@@ -262,7 +249,7 @@ module modContainerRegistry '../../../azresources/Modules/Microsoft.ContainerReg
     // Non-required parameters
     acrSku: parContainerRegistry.acrSku    
     lock: parContainerRegistry.enableResourceLock ? 'CanNotDelete' : ''
-    publicNetworkAccess: 'Disabled'
+    publicNetworkAccess: 'Disabled'   
   }
 }
 

@@ -116,11 +116,14 @@ OR
 
 ```bash
 # For Azure Government regions
+az cloudset --name AzureGovernment
+az login
+cd src/bicep
+cd platforms/lz-platform-scca-hub-3spoke
 az deployment sub create \
   --template-file platforms/lz-platform-scca-hub-3spoke/deploy.bicep \
   --parameters @platforms/lz-platform-scca-hub-3spoke/parameters/deploy.parameters.json \
   --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx \
-  --resource-group anoa-usgovvirginia-platforms-hub-rg \
   --location 'usgovvirginia'
 ```
 

@@ -174,8 +174,6 @@ var formattedAccessPolicies = [for accessPolicy in accessPolicies: {
 
 var secretList = !empty(secrets) ? secrets.secureList : []
 
-var enableReferencedModulesTelemetry = false
-
 // =========== //
 // Deployments //
 // =========== //

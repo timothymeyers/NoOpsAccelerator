@@ -210,9 +210,7 @@ module modSvcsLogStorage '../../../Modules/Microsoft.Storage/storageAccounts/az.
     tags: modTags.outputs.tags
     roleAssignments: (parStorageAccountAccess.enableRoleAssignmentForStorageAccount) ? [
       {
-        principalIds: [
-          parStorageAccountAccess.principalIds
-        ]
+        principalIds: parStorageAccountAccess.principalIds
         roleDefinitionIdOrName: parStorageAccountAccess.roleDefinitionIdOrName
       }
     ] : []

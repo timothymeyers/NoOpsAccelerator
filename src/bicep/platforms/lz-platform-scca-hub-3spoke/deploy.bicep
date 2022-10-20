@@ -788,7 +788,7 @@ module modSpokeOpsToHubVirtualNetworkPeerings '../../azresources/hub-spoke-core/
     parHubVirtualNetworkName: modHubNetwork.outputs.virtualNetworkName
     parHubVirtualNetworkResourceId: modHubNetwork.outputs.virtualNetworkResourceId
     parAllowVirtualNetworkAccess: parOperationsSpoke.allowVirtualNetworkAccess
-    parUseRemoteGateways: parOperationsSpoke.useRemoteGateways
+    parUseRemoteGateways: parOperationsSpoke.useRemoteGateway
   }
 }
 
@@ -804,7 +804,7 @@ module modSpokeIdToHubVirtualNetworkPeerings '../../azresources/hub-spoke-core/p
     parHubVirtualNetworkName: modHubNetwork.outputs.virtualNetworkName
     parHubVirtualNetworkResourceId: modHubNetwork.outputs.virtualNetworkResourceId
     parAllowVirtualNetworkAccess: parIdentitySpoke.allowVirtualNetworkAccess
-    parUseRemoteGateways: parIdentitySpoke.useRemoteGateways
+    parUseRemoteGateways: parIdentitySpoke.useRemoteGateway
   }
 }
 
@@ -820,7 +820,7 @@ module modSpokeSharedServicesToHubVirtualNetworkPeerings '../../azresources/hub-
     parHubVirtualNetworkName: modHubNetwork.outputs.virtualNetworkName
     parHubVirtualNetworkResourceId: modHubNetwork.outputs.virtualNetworkResourceId
     parAllowVirtualNetworkAccess: parSharedServicesSpoke.allowVirtualNetworkAccess
-    parUseRemoteGateways: parSharedServicesSpoke.useRemoteGateways
+    parUseRemoteGateways: parSharedServicesSpoke.useRemoteGateway
   }
 }
 

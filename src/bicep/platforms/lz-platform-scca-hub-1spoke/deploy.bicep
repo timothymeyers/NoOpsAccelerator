@@ -461,10 +461,11 @@ module modHubNetwork '../../azresources/hub-spoke-core/vdss/hub/anoa.lz.hub.netw
     parHubVirtualNetworkDiagnosticsLogs: parHub.virtualNetworkDiagnosticsLogs
     parHubVirtualNetworkDiagnosticsMetrics: parHub.virtualNetworkDiagnosticsMetrics
     parHubSubnets: parHub.subnets
+    parEnablePrivateDnsZones: parHub.enablePrivateDnsZones
 
     // Enable Azure FireWall
     parAzureFirewallEnabled: parAzureFirewall.enable
-    parDisableBgpRoutePropagation: false
+    parDisableBgpRoutePropagation: parAzureFirewall.disableBgpRoutePropagation
  
     // Hub Firewall Parameters
     parFirewallSupernetIPAddress: parAzureFirewall.supernetIPAddress
@@ -525,7 +526,7 @@ module modOperationsNetwork '../../azresources/hub-spoke-core/vdms/operations/an
 
 // VIRTUAL NETWORK PEERINGS
 
-module modHubVirtualNetworkPeerings '../../azresources/hub-spoke-core/peering/hub/anoa.lz.hub.network.peerings.bicep' = {
+module modHubVirtualNetworkPeerings '../../azresources/hub-spoke-core/peering/hub/anoa.lz.hub.network.peerings.bicep' = if (parHub.peerToSpokeVirtualNetwork) {
   name: 'deploy-vnet-peerings-hub-${parLocation}-${parDeploymentNameSuffix}'
   scope: resourceGroup(parHub.subscriptionId, varHubResourceGroupName)
   params: {
@@ -540,7 +541,7 @@ module modHubVirtualNetworkPeerings '../../azresources/hub-spoke-core/peering/hu
   }
 }
 
-module modSpokeOpsToHubVirtualNetworkPeerings '../../azresources/hub-spoke-core/peering/spoke/anoa.lz.spoke.network.peering.bicep' = {
+module modSpokeOpsToHubVirtualNetworkPeerings '../../azresources/hub-spoke-core/peering/spoke/anoa.lz.spoke.network.peering.bicep' = if (parOperationsSpoke.peerToHubVirtualNetwork) {
   name: 'deploy-vnet-spoke-peerings-ops-${parLocation}-${parDeploymentNameSuffix}'
   scope: resourceGroup(parOperationsSpoke.subscriptionId, varOperationsResourceGroupName)
   params: {
@@ -551,6 +552,8 @@ module modSpokeOpsToHubVirtualNetworkPeerings '../../azresources/hub-spoke-core/
     // Hub Paramters
     parHubVirtualNetworkName: modHubNetwork.outputs.virtualNetworkName
     parHubVirtualNetworkResourceId: modHubNetwork.outputs.virtualNetworkResourceId
+    parAllowVirtualNetworkAccess: parOperationsSpoke.allowVirtualNetworkAccess
+    parUseRemoteGateways: parOperationsSpoke.useRemoteGateways
   }
 }
 

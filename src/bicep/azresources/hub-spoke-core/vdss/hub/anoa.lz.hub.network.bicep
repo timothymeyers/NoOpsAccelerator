@@ -239,6 +239,10 @@ param parHubSubnetServiceEndpoints array = [
 // ROUTETABLE PARAMETERS
 param parDisableBgpRoutePropagation bool = false
 
+// PRIVATE DNS ZONE PARAMETERS
+
+param parEnablePrivateDnsZones bool = false
+
 // LOGGING PARAMETERS
 
 @description('The Storage Account SKU to use for log storage. It defaults to "Standard_GRS". See https://docs.microsoft.com/en-us/rest/api/storagerp/srp_sku_types for valid settings.')
@@ -300,6 +304,7 @@ var varSubnetNamingConvention = replace(varNamingConvention, varResourceToken, '
 var varPublicIpAddressNamingConvention = replace(varNamingConvention, varResourceToken, 'pip')
 var varVirtualNetworkNamingConvention = replace(varNamingConvention, varResourceToken, 'vnet')
 var varDdosNamingConvention = replace(varNamingConvention, varResourceToken, 'ddos')
+var varPrivateDNSZoneNamingConvention = replace(varNamingConvention, varResourceToken, 'pdz-rg')
 
 // HUB NAMES
 
@@ -312,6 +317,7 @@ var varHubLogStorageAccountName = take(varHubLogStorageAccountUniqueName, 23)
 var varHubVirtualNetworkName = replace(varVirtualNetworkNamingConvention, varNameToken, varHubName)
 var varHubNetworkSecurityGroupName = replace(varNetworkSecurityGroupNamingConvention, varNameToken, varHubName)
 var varHubSubnetName = replace(varSubnetNamingConvention, varNameToken, varHubName)
+var varHubPDZResourceGroupName = replace(varPrivateDNSZoneNamingConvention, varNameToken, varHubName)
 var hubddosName = replace(varDdosNamingConvention, varNameToken, varHubName)
 
 // FIREWALL NAMES
@@ -346,6 +352,17 @@ module modHubResourceGroup '../../../Modules/Microsoft.Resources/resourceGroups/
   scope: subscription(parHubSubscriptionId)
   params: {
     name: varHubResourceGroupName
+    location: parLocation
+    tags: modTags.outputs.tags
+  }
+}
+
+// Create Private DNS Zone Resource Group - optional
+module modPrivateDnsZonesResourceGroup '../../../Modules/Microsoft.Resources/resourceGroups/az.resource.groups.bicep' = if (parEnablePrivateDnsZones) {
+  name: 'deploy-hub-rg-${parLocation}-${parDeploymentNameSuffix}'
+  scope: subscription(parHubSubscriptionId)
+  params: {
+    name: varHubPDZResourceGroupName
     location: parLocation
     tags: modTags.outputs.tags
   }
@@ -562,9 +579,9 @@ module modAzureFirewallPolicy '../../../Modules/Microsoft.Network/firewallPolici
 
 // HUB PRIVATE LINK - VDMS
 
-module modAzureMonitorPrivateLink '../../../Modules/Microsoft.Network/privateEndPoints/privateLinks/az.net.private.link.bicep' = if (contains(parSupportedClouds, environment().name)) {
+module modAzureMonitorPrivateLink '../../../Modules/Microsoft.Network/privateEndPoints/privateLinks/az.net.private.link.bicep' = if (contains(parSupportedClouds, environment().name) && parEnablePrivateDnsZones) {
   name: 'deploy-hub-az-monitor-prvt-link-${parLocation}-${parDeploymentNameSuffix}'
-  scope: resourceGroup(parHubSubscriptionId, varHubResourceGroupName)
+  scope: resourceGroup(parHubSubscriptionId, varHubPDZResourceGroupName)
   params: {
     logAnalyticsWorkspaceName: parLogAnalyticsWorkspaceName
     logAnalyticsWorkspaceResourceId: parLogAnalyticsWorkspaceResourceId

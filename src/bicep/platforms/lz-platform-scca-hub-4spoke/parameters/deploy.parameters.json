@@ -12,7 +12,7 @@
     "parTags": {
       "value": {
         "organization": "anoa",
-        "region": "eastus",
+        "region": "usgovvirginia",
         "templateVersion": "v1.0",
         "deployEnvironment": "dev",
         "deploymentType": "NoOpsBicep"
@@ -58,17 +58,239 @@
         }
       }
     },
-    "parOperationsSpoke": {
+    "parIdentitySpoke": {
       "value": {
         "subscriptionId": "<<subscriptionId>>",
-        "virtualNetworkAddressPrefix": "10.0.115.0/26",
-        "subnetAddressPrefix": "10.0.115.0/27",
+        "virtualNetworkAddressPrefix": "10.0.110.0/26",
+        "subnetAddressPrefix": "10.0.110.0/27",
+        "sourceAddressPrefixes": [
+          "10.0.115.0/26",
+          "10.0.120.0/26",
+          "10.0.130.0/26"
+        ],
         "peerToHubVirtualNetwork": true,
         "useRemoteGateway": false,
         "allowVirtualNetworkAccess": true,
         "virtualNetworkDiagnosticsLogs": [],
         "virtualNetworkDiagnosticsMetrics": [],
-        "networkSecurityGroupRules": [],
+        "networkSecurityGroupRules": [
+          {
+            "name": "Allow-Traffic-From-Spokes",
+            "properties": {
+              "access": "Allow",
+              "description": "Allow traffic from spokes",
+              "destinationAddressPrefix": "10.0.110.0/26",
+              "destinationPortRanges": [
+                "22",
+                "80",
+                "443",
+                "3389"
+              ],
+              "direction": "Inbound",
+              "priority": 200,
+              "protocol": "*",
+              "sourceAddressPrefixes": [
+                "10.0.115.0/26",
+                "10.0.120.0/26",
+                "10.0.130.0/26"
+              ],
+              "sourcePortRange": "*"
+            },
+            "type": "string"
+          }
+        ],
+        "publicIPAddressDiagnosticsLogs": [
+          "DDoSProtectionNotifications",
+          "DDoSMitigationFlowLogs",
+          "DDoSMitigationReports"
+        ],
+        "networkSecurityGroupDiagnosticsLogs": [
+          "NetworkSecurityGroupEvent",
+          "NetworkSecurityGroupRuleCounter"
+        ],
+        "subnetServiceEndpoints": [
+          {
+            "service": "Microsoft.Storage"
+          }
+        ],
+        "storageAccountAccess": {
+          "enableRoleAssignmentForStorageAccount": false,
+          "principalIds": [
+            "<<principalId>>"
+          ],
+          "roleDefinitionIdOrName": "Contributor"
+        }
+      }
+    },
+    "parOperationsSpoke": {
+      "value": {
+        "subscriptionId": "<<subscriptionId>>",
+        "virtualNetworkAddressPrefix": "10.0.115.0/26",
+        "subnetAddressPrefix": "10.0.115.0/27",
+        "sourceAddressPrefixes": [
+          "10.0.110.0/26",
+          "10.0.120.0/26",
+          "10.0.130.0/26"
+        ],
+        "peerToHubVirtualNetwork": true,
+        "useRemoteGateway": false,
+        "allowVirtualNetworkAccess": true,
+        "virtualNetworkDiagnosticsLogs": [],
+        "virtualNetworkDiagnosticsMetrics": [],
+        "networkSecurityGroupRules": [
+          {
+            "name": "Allow-Traffic-From-Spokes",
+            "properties": {
+              "access": "Allow",
+              "description": "Allow traffic from spokes",
+              "destinationAddressPrefix": "10.0.115.0/26",
+              "destinationPortRanges": [
+                "22",
+                "80",
+                "443",
+                "3389"
+              ],
+              "direction": "Inbound",
+              "priority": 200,
+              "protocol": "*",
+              "sourceAddressPrefixes": [
+                "10.0.110.0/26",
+                "10.0.120.0/26",
+                "10.0.130.0/26"
+              ],
+              "sourcePortRange": "*"
+            },
+            "type": "string"
+          }
+        ],
+        "publicIPAddressDiagnosticsLogs": [
+          "DDoSProtectionNotifications",
+          "DDoSMitigationFlowLogs",
+          "DDoSMitigationReports"
+        ],
+        "networkSecurityGroupDiagnosticsLogs": [
+          "NetworkSecurityGroupEvent",
+          "NetworkSecurityGroupRuleCounter"
+        ],
+        "subnetServiceEndpoints": [
+          {
+            "service": "Microsoft.Storage"
+          }
+        ],
+        "storageAccountAccess": {
+          "enableRoleAssignmentForStorageAccount": false,
+          "principalIds": [
+            "<<principalId>>"
+          ],
+          "roleDefinitionIdOrName": "Contributor"
+        }
+      }
+    },
+    "parSharedServicesSpoke": {
+      "value": {
+        "subscriptionId": "<<subscriptionId>>",
+        "virtualNetworkAddressPrefix": "10.0.120.0/26",
+        "subnetAddressPrefix": "10.0.120.0/27",
+        "sourceAddressPrefixes": [
+          "10.0.115.0/26",
+          "10.0.110.0/26",
+          "10.0.130.0/26"
+        ],
+        "peerToHubVirtualNetwork": true,
+        "useRemoteGateway": false,
+        "allowVirtualNetworkAccess": true,
+        "virtualNetworkDiagnosticsLogs": [],
+        "virtualNetworkDiagnosticsMetrics": [],
+        "networkSecurityGroupRules": [
+          {
+            "name": "Allow-Traffic-From-Spokes",
+            "properties": {
+              "access": "Allow",
+              "description": "Allow traffic from spokes",
+              "destinationAddressPrefix": "10.0.120.0/26",
+              "destinationPortRanges": [
+                "22",
+                "80",
+                "443",
+                "3389"
+              ],
+              "direction": "Inbound",
+              "priority": 200,
+              "protocol": "*",
+              "sourceAddressPrefixes": [
+                "10.0.115.0/26",
+                "10.0.110.0/26",
+                "10.0.130.0/26"
+              ],
+              "sourcePortRange": "*"
+            },
+            "type": "string"
+          }
+        ],
+        "publicIPAddressDiagnosticsLogs": [
+          "DDoSProtectionNotifications",
+          "DDoSMitigationFlowLogs",
+          "DDoSMitigationReports"
+        ],
+        "networkSecurityGroupDiagnosticsLogs": [
+          "NetworkSecurityGroupEvent",
+          "NetworkSecurityGroupRuleCounter"
+        ],
+        "subnetServiceEndpoints": [
+          {
+            "service": "Microsoft.Storage"
+          }
+        ],
+        "storageAccountAccess": {
+          "enableRoleAssignmentForStorageAccount": false,
+          "principalIds": [
+            "<<principalId>>"
+          ],
+          "roleDefinitionIdOrName": "Contributor"
+        }
+      }
+    },
+    "parDataSharedServicesSpoke": {
+      "value": {
+        "subscriptionId": "<<subscriptionId>>",
+        "virtualNetworkAddressPrefix": "10.0.130.0/26",
+        "subnetAddressPrefix": "10.0.130.0/27",
+        "sourceAddressPrefixes": [
+          "10.0.115.0/26",
+          "10.0.110.0/26",
+          "10.0.120.0/26"
+        ],
+        "peerToHubVirtualNetwork": true,
+        "useRemoteGateway": false,
+        "allowVirtualNetworkAccess": true,
+        "virtualNetworkDiagnosticsLogs": [],
+        "virtualNetworkDiagnosticsMetrics": [],
+        "networkSecurityGroupRules": [
+          {
+            "name": "Allow-Traffic-From-Spokes",
+            "properties": {
+              "access": "Allow",
+              "description": "Allow traffic from spokes",
+              "destinationAddressPrefix": "10.0.130.0/26",
+              "destinationPortRanges": [
+                "22",
+                "80",
+                "443",
+                "3389"
+              ],
+              "direction": "Inbound",
+              "priority": 200,
+              "protocol": "*",
+              "sourceAddressPrefixes": [
+                "10.0.115.0/26",
+                "10.0.120.0/26",
+                "10.0.110.0/26"
+              ],
+              "sourcePortRange": "*"
+            },
+            "type": "string"
+          }
+        ],
         "publicIPAddressDiagnosticsLogs": [
           "DDoSProtectionNotifications",
           "DDoSMitigationFlowLogs",
@@ -129,7 +351,7 @@
       "value": {
         "enable": true,
         "disableBgpRoutePropagation": false,
-        "clientPublicIPAddressAvailabilityZones": [],     
+        "clientPublicIPAddressAvailabilityZones": [],
         "managementPublicIPAddressAvailabilityZones": [],
         "supernetIPAddress": "10.0.96.0/19",
         "skuTier": "Premium",

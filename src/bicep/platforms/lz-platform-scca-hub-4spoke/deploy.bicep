@@ -13,6 +13,7 @@ DESCRIPTION: The following components will be options in this deployment
               * Identity (Tier 0)
               * Operations (Tier 1)
               * Shared Services (Tier 2)
+              * Data Services (Tier 4)
             * Logging
               * Azure Sentinel
               * Azure Log Analytics
@@ -340,6 +341,73 @@ param parIdentitySpoke object
 @description('Shared Services Spoke Virtual network configuration.  See azresources/hub-spoke-core/vdms/sharedservices/readme.md')
 param parSharedServicesSpoke object
 
+// SHARED SERVICES SPOKE PARAMETERS
+// (JSON Parameter)
+// ---------------------------
+//"parSharedServicesSpoke": {
+//      "value": {
+//        "subscriptionId": "xxxxxxx-xxxx-xxxx-xxxx-xxxxxxx",
+//        "virtualNetworkAddressPrefix": "10.0.115.0/26",
+//        "subnetAddressPrefix": "10.0.115.0/27",
+//        "sourceAddressPrefixes": [],
+//        "virtualNetworkDiagnosticsLogs": [],
+//        "virtualNetworkDiagnosticsMetrics": [],
+//        "networkSecurityGroupRules": [
+//          {
+//            "name": "Allow-Traffic-From-Spokes",
+//            "properties": {
+//              "access": "Allow",
+//              "description": "Allow traffic from spokes",
+//              "destinationAddressPrefix": "10.0.115.0/26",
+//             "destinationPortRanges": [
+//               "22",
+//                "80",
+//                "443",
+//                "3389"
+//             ],
+//              "direction": "Inbound",
+//              "priority": 200,
+//              "protocol": "*",
+//              "sourceAddressPrefixes": [],
+//              "sourcePortRange": "*"
+//            },
+//            "type": "string"
+//          }
+//        ],
+//        "publicIPAddressDiagnosticsLogs": [
+//          {
+//            "category": "DDoSProtectionNotifications",
+//            "enabled": true
+//          },
+//          {
+//            "category": "DDoSMitigationFlowLogs",
+//            "enabled": true
+//          },
+//          {
+//            "category": "DDoSMitigationReports",
+//            "enabled": true
+//          }
+//        ],
+//        "networkSecurityGroupDiagnosticsLogs":[
+//          {
+//            "category": "NetworkSecurityGroupEvent",
+//            "enabled": true
+//          },
+//          {
+//            "category": "NetworkSecurityGroupRuleCounter",
+//            "enabled": true
+//          }
+//        ],
+//        "subnetServiceEndpoints": [
+//          {
+//            "service": "Microsoft.Storage"
+//          }
+//        ]
+//      }
+//    }
+@description('Shared Services Spoke Virtual network configuration.  See azresources/hub-spoke-core/vdms/sharedservices/readme.md')
+param parDataSharedServicesSpoke object
+
 // FIREWALL PARAMETERS
 // (JSON Parameter)
 // ---------------------------
@@ -516,6 +584,9 @@ var varIdentityResourceGroupName = replace(varResourceGroupNamingConvention, var
 
 var sharedServicesName = 'sharedservices'
 var varSharedServicesResourceGroupName = replace(varResourceGroupNamingConvention, varNameToken, sharedServicesName)
+
+var dataSharedServicesName = 'datasharedservices'
+var varDataSharedServicesResourceGroupName = replace(varResourceGroupNamingConvention, varNameToken, dataSharedServicesName)
 
 // TAGS
 
@@ -749,6 +820,42 @@ module modSharedServicesNetwork '../../azresources/hub-spoke-core/vdms/sharedser
   }
 }
 
+// TIER 4 - DATA SHARED SERVICES
+
+module modDataSharedServicesNetwork '../../azresources/hub-spoke-core/vdms/dataSharedServices/anoa.lz.data.svcs.network.bicep' = {
+  name: 'deploy-spoke-svcs-${parLocation}-${parDeploymentNameSuffix}'
+  scope: subscription(parDataSharedServicesSpoke.subscriptionId)
+  params: {
+     // Required Parameters
+    parOrgPrefix: parRequired.orgPrefix
+    parLocation: parLocation
+    parDeployEnvironment: parRequired.deployEnvironment
+    parTags: modTags.outputs.tags
+
+    // SharedServices Network Parameters
+    parDataSharedServicesNetworkSecurityGroupDiagnosticsLogs: parDataSharedServicesSpoke.networkSecurityGroupDiagnosticsLogs
+    parDataSharedServicesSubnetAddressPrefix: parDataSharedServicesSpoke.subnetAddressPrefix
+    parDataSharedServicesSourceAddressPrefixes: parDataSharedServicesSpoke.sourceAddressPrefixes
+    parDataSharedServicesNetworkSecurityGroupRules: parDataSharedServicesSpoke.networkSecurityGroupRules
+    parDataSharedServicesSubnetServiceEndpoints: parDataSharedServicesSpoke.subnetServiceEndpoints
+    parDataSharedServicesVirtualNetworkAddressPrefix: parDataSharedServicesSpoke.virtualNetworkAddressPrefix
+    parDataSharedServicesVirtualNetworkDiagnosticsLogs: parDataSharedServicesSpoke.virtualNetworkDiagnosticsLogs
+    parDataSharedServicesVirtualNetworkDiagnosticsMetrics: parDataSharedServicesSpoke.virtualNetworkDiagnosticsMetrics
+    parFirewallPrivateIPAddress: modHubNetwork.outputs.firewallPrivateIPAddress
+    parDisableBgpRoutePropagation: true // Enable BGP Route Propagation for SharedServices Spoke
+
+    // Log Storage Sku Parameters
+    parLogStorageSkuName: parLogging.logStorageSkuName
+
+    // RBAC for Storage Parameters
+    parStorageAccountAccess: parDataSharedServicesSpoke.storageAccountAccess
+
+    // Log Analytics Parameters
+    parLogAnalyticsWorkspaceResourceId: modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceResourceId
+    parLogAnalyticsWorkspaceName: modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceName
+  }
+}
+
 // VIRTUAL NETWORK PEERINGS
 
 module modHubVirtualNetworkPeerings '../../azresources/hub-spoke-core/peering/hub/anoa.lz.hub.network.peerings.bicep' = if (parHub.peerToSpokeVirtualNetwork) {
@@ -776,7 +883,7 @@ module modHubVirtualNetworkPeerings '../../azresources/hub-spoke-core/peering/hu
   }
 }
 
-module modSpokeOpsToHubVirtualNetworkPeerings '../../azresources/hub-spoke-core/peering/spoke/anoa.lz.spoke.network.peering.bicep' = if (parOperationsSpoke.peerToHubVirtualNetwork){
+module modSpokeOpsToHubVirtualNetworkPeerings '../../azresources/hub-spoke-core/peering/spoke/anoa.lz.spoke.network.peering.bicep' = if (parOperationsSpoke.peerToHubVirtualNetwork) {
   name: 'deploy-vnet-spoke-peerings-ops-${parLocation}-${parDeploymentNameSuffix}'
   scope: resourceGroup(parOperationsSpoke.subscriptionId, varOperationsResourceGroupName)
   params: {
@@ -808,7 +915,7 @@ module modSpokeIdToHubVirtualNetworkPeerings '../../azresources/hub-spoke-core/p
   }
 }
 
-module modSpokeSharedServicesToHubVirtualNetworkPeerings '../../azresources/hub-spoke-core/peering/spoke/anoa.lz.spoke.network.peering.bicep' = if (parIdentitySpoke.peerToHubVirtualNetwork) {
+module modSpokeSharedServicesToHubVirtualNetworkPeerings '../../azresources/hub-spoke-core/peering/spoke/anoa.lz.spoke.network.peering.bicep' = if (parSharedServicesSpoke.peerToHubVirtualNetwork) {
   name: 'deploy-vnet-spoke-peerings-svcs-${parLocation}-${parDeploymentNameSuffix}'
   scope: resourceGroup(parSharedServicesSpoke.subscriptionId, varSharedServicesResourceGroupName)
   params: {
@@ -821,6 +928,22 @@ module modSpokeSharedServicesToHubVirtualNetworkPeerings '../../azresources/hub-
     parHubVirtualNetworkResourceId: modHubNetwork.outputs.virtualNetworkResourceId
     parAllowVirtualNetworkAccess: parSharedServicesSpoke.allowVirtualNetworkAccess
     parUseRemoteGateways: parSharedServicesSpoke.useRemoteGateways
+  }
+}
+
+module modSpokeDataSharedServicesToHubVirtualNetworkPeerings '../../azresources/hub-spoke-core/peering/spoke/anoa.lz.spoke.network.peering.bicep' = if (parDataSharedServicesSpoke.peerToHubVirtualNetwork) {
+  name: 'deploy-vnet-spoke-peerings-svcs-${parLocation}-${parDeploymentNameSuffix}'
+  scope: resourceGroup(parDataSharedServicesSpoke.subscriptionId, varDataSharedServicesResourceGroupName)
+  params: {
+    parSpokeName: 'sharedservices'
+    parSpokeResourceGroupName: varSharedServicesResourceGroupName
+    parSpokeVirtualNetworkName: modSharedServicesNetwork.outputs.virtualNetworkName
+
+    // Hub Parameters
+    parHubVirtualNetworkName: modHubNetwork.outputs.virtualNetworkName
+    parHubVirtualNetworkResourceId: modHubNetwork.outputs.virtualNetworkResourceId
+    parAllowVirtualNetworkAccess: parDataSharedServicesSpoke.allowVirtualNetworkAccess
+    parUseRemoteGateways: parDataSharedServicesSpoke.useRemoteGateways
   }
 }
 

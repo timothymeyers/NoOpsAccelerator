@@ -82,7 +82,7 @@ param parDeploySentinel bool = false
 param parLogStorageSkuName string = 'Standard_GRS'
 
 // STORAGE ACCOUNTS RBAC
-@description('Account for access to Storage')
+@description('Account settings for role assignement to Storage Account')
 param parLoggingStorageAccountAccess object
 
 /*

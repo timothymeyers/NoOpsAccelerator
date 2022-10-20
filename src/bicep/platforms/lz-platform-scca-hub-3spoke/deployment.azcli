@@ -4,8 +4,8 @@
 # Hub/Spoke - Change variables to match your deployment
 az login
 cd src/bicep
-cd platforms/lz-platform-scca-hub-1spoke
-az deployment sub create --name deploy-hub1spoke-network --location EastUS --template-file deploy.bicep  --parameters @parameters/deploy.parameters.json --subscription <<subscriptionId>>
+cd platforms/lz-platform-scca-hub-3spoke
+az deployment sub create --name deploy-hub3spoke-network --location EastUS --template-file deploy.bicep  --parameters @parameters/deploy.parameters.json --subscription <<subscriptionId>>
 
 # Clean Up
 # Delete Resource Locks - Change variables to match your deployment
@@ -26,14 +26,14 @@ az group delete -n anoa-eastus-dev-sharedservices-rg -y
 az group delete -n anoa-eastus-dev-artifacts-rg -y
 
 # Delete Deployments - Change variables to match your deployment
-az deployment sub delete -n deploy-hub1spoke-network
+az deployment sub delete -n deploy-hub3spoke-network
 
 # AZ PowerShell
 # Hub/Spoke - Change variables to match your deployment
 Connect-AzAccount -EnvironmentName AzureCloud
 cd src/bicep
-cd platforms/lz-platform-scca-hub-1spoke
-New-AzSubscriptionDeployment -TemplateFile .\anoa.hubspoke.bicep -TemplateParameterFile .\parameters\anoa.hubspoke.parameters.example.json -Location "EastUS" -Name deploy-hubspoke-network
+cd platforms/lz-platform-scca-hub-3spoke
+New-AzSubscriptionDeployment -TemplateFile .\anoa.hubspoke.bicep -TemplateParameterFile .\parameters\anoa.hubspoke.parameters.example.json -Location "EastUS" -Name deploy-hub3spoke-network
 
 # Clean Up
 # Delete Resource Groups - Change variables to match your deployment
@@ -45,4 +45,4 @@ Remove-AzResourceGroup -Name anoa-eastus-dev-sharedservices-rg
 Remove-AzResourceGroup -Name anoa-eastus-dev-artifacts-rg
 
 # Delete Deployments - Change variables to match your deployment
-Remove-AzSubscriptionDeployment -Name deploy-hub1spoke-network
+Remove-AzSubscriptionDeployment -Name deploy-hub3spoke-network

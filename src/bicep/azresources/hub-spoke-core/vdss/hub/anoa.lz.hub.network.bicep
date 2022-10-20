@@ -359,7 +359,7 @@ module modHubResourceGroup '../../../Modules/Microsoft.Resources/resourceGroups/
 
 // Create Private DNS Zone Resource Group - optional
 module modPrivateDnsZonesResourceGroup '../../../Modules/Microsoft.Resources/resourceGroups/az.resource.groups.bicep' = if (parEnablePrivateDnsZones) {
-  name: 'deploy-hub-rg-${parLocation}-${parDeploymentNameSuffix}'
+  name: 'deploy-pdz-rg-${parLocation}-${parDeploymentNameSuffix}'
   scope: subscription(parHubSubscriptionId)
   params: {
     name: varHubPDZResourceGroupName

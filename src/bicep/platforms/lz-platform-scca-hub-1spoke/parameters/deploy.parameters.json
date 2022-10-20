@@ -23,6 +23,8 @@
         "subscriptionId": "<<subscriptionId>>",
         "virtualNetworkAddressPrefix": "10.0.100.0/24",
         "subnetAddressPrefix": "10.0.100.128/27",
+        "peerToSpokeVirtualNetwork": true,
+        "enablePrivateDnsZones": true,
         "subnets": [
           {
             "name": "AzureFirewallSubnet",
@@ -61,6 +63,9 @@
         "subscriptionId": "<<subscriptionId>>",
         "virtualNetworkAddressPrefix": "10.0.115.0/26",
         "subnetAddressPrefix": "10.0.115.0/27",
+        "peerToHubVirtualNetwork": true,
+        "useRemoteGateway": false,
+        "allowVirtualNetworkAccess": true,
         "virtualNetworkDiagnosticsLogs": [],
         "virtualNetworkDiagnosticsMetrics": [],
         "networkSecurityGroupRules": [],

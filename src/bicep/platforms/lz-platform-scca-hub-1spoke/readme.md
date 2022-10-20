@@ -1,8 +1,8 @@
-# NoOps Accelerator - Platforms - SCCA Compliant Hub - 1 Spoke
+# NoOps Accelerator - Platforms - SCCA Compliant Hub - 1 Spoke Landing Zone
 
 ## Overview
 
-This platform module deploys Hub 1 Spoke landing zone.
+This platform module deploys Hub 1 Spoke landing zone. This landing zone can be used in AKS workload deployments for example. This also can be used for other smaller networks that do not require a Identity or Shared Service Spoke.
 
 > NOTE: This is only the landing zone deployment. The workloads will be deployed with the enclave or can be deployed after the landing zone is created.
 
@@ -109,10 +109,12 @@ Parameter name | Default Value | Description
 -------------- | ------------- | -----------
 `parHub.virtualNetworkAddressPrefix` | '10.0.100.0/24' | The CIDR Virtual Network Address Prefix for the Hub Virtual Network.
 `parHub.subnetAddressPrefix` | '10.0.100.128/27' | The CIDR Subnet Address Prefix for the default Hub subnet. It must be in the Hub Virtual Network space.
+`parHub.peerToSpokeVirtualNetwork` | true | This is a switch for peering to an Spoke Network. This is used with the spoke network peering as well. Both parameters either need to be true or false.
 `parHub.subnets.addressPrefix` (Firewall Client Subnet Address Prefix)| '10.0.100.0/26' | The CIDR Subnet Address Prefix for the Azure Firewall Subnet. It must be in the Hub Virtual Network space. It must be /26.
 `parHub.subnets.addressPrefix` (Firewall Management Subnet Address Prefix) | '10.0.100.64/26' | The CIDR Subnet Address Prefix for the Azure Firewall Management Subnet. It must be in the Hub Virtual Network space. It must be /26.
 `parOperationsSpoke.virtualNetworkAddressPrefix` | '10.0.115.0/26' | The CIDR Virtual Network Address Prefix for the Operations Virtual Network.
 `parOperationsSpoke.subnetAddressPrefix` | '10.0.115.0/27' | The CIDR Subnet Address Prefix for the default Operations subnet. It must be in the Operations Virtual Network space.
+`parOperationsSpoke.peerToHubVirtualNetwork` | true | This is a switch for peering to an Hub Network from a Spoke. This is used with the hub network peering as well. Both parameters either need to be true or false.
 
 ## Optional Features
 

@@ -585,6 +585,9 @@ var varIdentityResourceGroupName = replace(varResourceGroupNamingConvention, var
 var sharedServicesName = 'sharedservices'
 var varSharedServicesResourceGroupName = replace(varResourceGroupNamingConvention, varNameToken, sharedServicesName)
 
+var dataSharedServicesName = 'datasharedservices'
+var varDataSharedServicesResourceGroupName = replace(varResourceGroupNamingConvention, varNameToken, dataSharedServicesName)
+
 // TAGS
 
 var referential = {
@@ -681,6 +684,7 @@ module modHubNetwork '../../azresources/hub-spoke-core/vdss/hub/anoa.lz.hub.netw
     parHubVirtualNetworkDiagnosticsLogs: parHub.virtualNetworkDiagnosticsLogs
     parHubVirtualNetworkDiagnosticsMetrics: parHub.virtualNetworkDiagnosticsMetrics
     parHubSubnets: parHub.subnets
+    parEnablePrivateDnsZones: parHub.enablePrivateDnsZones
 
     // Enable Azure FireWall
     parAzureFirewallEnabled: parAzureFirewall.enable
@@ -820,7 +824,7 @@ module modSharedServicesNetwork '../../azresources/hub-spoke-core/vdms/sharedser
 
 module modDataSharedServicesNetwork '../../azresources/hub-spoke-core/vdms/dataSharedServices/anoa.lz.data.svcs.network.bicep' = {
   name: 'deploy-spoke-svcs-${parLocation}-${parDeploymentNameSuffix}'
-  scope: subscription(parSharedServicesSpoke.subscriptionId)
+  scope: subscription(parDataSharedServicesSpoke.subscriptionId)
   params: {
      // Required Parameters
     parOrgPrefix: parRequired.orgPrefix
@@ -854,7 +858,7 @@ module modDataSharedServicesNetwork '../../azresources/hub-spoke-core/vdms/dataS
 
 // VIRTUAL NETWORK PEERINGS
 
-module modHubVirtualNetworkPeerings '../../azresources/hub-spoke-core/peering/hub/anoa.lz.hub.network.peerings.bicep' = {
+module modHubVirtualNetworkPeerings '../../azresources/hub-spoke-core/peering/hub/anoa.lz.hub.network.peerings.bicep' = if (parHub.peerToSpokeVirtualNetwork) {
   name: 'deploy-vnet-peerings-hub-${parLocation}-${parDeploymentNameSuffix}'
   scope: resourceGroup(parHub.subscriptionId, varHubResourceGroupName)
   params: {
@@ -879,7 +883,7 @@ module modHubVirtualNetworkPeerings '../../azresources/hub-spoke-core/peering/hu
   }
 }
 
-module modSpokeOpsToHubVirtualNetworkPeerings '../../azresources/hub-spoke-core/peering/spoke/anoa.lz.spoke.network.peering.bicep' = {
+module modSpokeOpsToHubVirtualNetworkPeerings '../../azresources/hub-spoke-core/peering/spoke/anoa.lz.spoke.network.peering.bicep' = if (parOperationsSpoke.peerToHubVirtualNetwork) {
   name: 'deploy-vnet-spoke-peerings-ops-${parLocation}-${parDeploymentNameSuffix}'
   scope: resourceGroup(parOperationsSpoke.subscriptionId, varOperationsResourceGroupName)
   params: {
@@ -890,10 +894,12 @@ module modSpokeOpsToHubVirtualNetworkPeerings '../../azresources/hub-spoke-core/
     // Hub Paramters
     parHubVirtualNetworkName: modHubNetwork.outputs.virtualNetworkName
     parHubVirtualNetworkResourceId: modHubNetwork.outputs.virtualNetworkResourceId
+    parAllowVirtualNetworkAccess: parOperationsSpoke.allowVirtualNetworkAccess
+    parUseRemoteGateways: parOperationsSpoke.useRemoteGateways
   }
 }
 
-module modSpokeIdToHubVirtualNetworkPeerings '../../azresources/hub-spoke-core/peering/spoke/anoa.lz.spoke.network.peering.bicep' = {
+module modSpokeIdToHubVirtualNetworkPeerings '../../azresources/hub-spoke-core/peering/spoke/anoa.lz.spoke.network.peering.bicep' = if (parIdentitySpoke.peerToHubVirtualNetwork) {
   name: 'deploy-vnet-spoke-peerings-id-${parLocation}-${parDeploymentNameSuffix}'
   scope: resourceGroup(parIdentitySpoke.subscriptionId, varIdentityResourceGroupName)
   params: {
@@ -904,10 +910,12 @@ module modSpokeIdToHubVirtualNetworkPeerings '../../azresources/hub-spoke-core/p
     // Hub Paramters
     parHubVirtualNetworkName: modHubNetwork.outputs.virtualNetworkName
     parHubVirtualNetworkResourceId: modHubNetwork.outputs.virtualNetworkResourceId
+    parAllowVirtualNetworkAccess: parIdentitySpoke.allowVirtualNetworkAccess
+    parUseRemoteGateways: parIdentitySpoke.useRemoteGateways
   }
 }
 
-module modSpokeSharedServicesToHubVirtualNetworkPeerings '../../azresources/hub-spoke-core/peering/spoke/anoa.lz.spoke.network.peering.bicep' = {
+module modSpokeSharedServicesToHubVirtualNetworkPeerings '../../azresources/hub-spoke-core/peering/spoke/anoa.lz.spoke.network.peering.bicep' = if (parSharedServicesSpoke.peerToHubVirtualNetwork) {
   name: 'deploy-vnet-spoke-peerings-svcs-${parLocation}-${parDeploymentNameSuffix}'
   scope: resourceGroup(parSharedServicesSpoke.subscriptionId, varSharedServicesResourceGroupName)
   params: {
@@ -918,6 +926,24 @@ module modSpokeSharedServicesToHubVirtualNetworkPeerings '../../azresources/hub-
     // Hub Parameters
     parHubVirtualNetworkName: modHubNetwork.outputs.virtualNetworkName
     parHubVirtualNetworkResourceId: modHubNetwork.outputs.virtualNetworkResourceId
+    parAllowVirtualNetworkAccess: parSharedServicesSpoke.allowVirtualNetworkAccess
+    parUseRemoteGateways: parSharedServicesSpoke.useRemoteGateways
+  }
+}
+
+module modSpokeDataSharedServicesToHubVirtualNetworkPeerings '../../azresources/hub-spoke-core/peering/spoke/anoa.lz.spoke.network.peering.bicep' = if (parDataSharedServicesSpoke.peerToHubVirtualNetwork) {
+  name: 'deploy-vnet-spoke-peerings-svcs-${parLocation}-${parDeploymentNameSuffix}'
+  scope: resourceGroup(parDataSharedServicesSpoke.subscriptionId, varDataSharedServicesResourceGroupName)
+  params: {
+    parSpokeName: 'sharedservices'
+    parSpokeResourceGroupName: varSharedServicesResourceGroupName
+    parSpokeVirtualNetworkName: modSharedServicesNetwork.outputs.virtualNetworkName
+
+    // Hub Parameters
+    parHubVirtualNetworkName: modHubNetwork.outputs.virtualNetworkName
+    parHubVirtualNetworkResourceId: modHubNetwork.outputs.virtualNetworkResourceId
+    parAllowVirtualNetworkAccess: parDataSharedServicesSpoke.allowVirtualNetworkAccess
+    parUseRemoteGateways: parDataSharedServicesSpoke.useRemoteGateways
   }
 }
 

@@ -1,4 +1,4 @@
-# NoOps Accelerator - Platforms - SCCA Compliant Hub - 4 Spoke
+# NoOps Accelerator - Platforms - SCCA Compliant Hub - 4 Spoke Landing Zone
 
 ## Overview
 
@@ -10,7 +10,7 @@ Read on to understand what this landing zone does, and when you're ready, collec
 
 ## Architecture
 
- ![Hub/Spoke landing zone Architecture](./media/hub-3spoke-network-topology-architecture.jpg)
+ ![Hub/Spoke landing zone Architecture](./media/hub-4spoke-network-topology-architecture.jpg)
 
 ## About Hub 4 Spoke Landing Zone
 
@@ -24,7 +24,7 @@ A **landing zone** is networking infrastructure configured to provide a secure e
 
 ### Hub/Spoke Networking
 
-Hub/ 4 Spoke Networking (like TMN) is set up in a hub and spoke design, separated by tiers: T0 (Identity and Authorization), T1 (Infrastructure Operations), T2 (DevSecOps and Data Services, Shared Services), and multiple T3s (Workloads). Access control can be configured to allow separation of duties between all tiers.
+Hub/ 4 Spoke Networking (like TMN) is set up in a hub and spoke design, separated by tiers: T0 (Identity and Authorization), T1 (Infrastructure Operations), T2 (DevSecOps and Shared Services), multiple T3s (Workloads), and T4 (Data Shared Services). Access control can be configured to allow separation of duties between all tiers.
 
 ### Firewall
 
@@ -47,7 +47,7 @@ Presently, there are two firewall rules configured to ensure access to the Azure
 
 ### Naming Conventions
 
-By default, Hub - 3 Spoke Platform resources are named according to a naming convention that uses the mandatory `orgPrefix` (that is defaulted to `anoa`), `templateVersion` & `deployEnvironment`.
+By default, Hub - 4 Spoke Platform resources are named according to a naming convention that uses the mandatory `orgPrefix` (that is defaulted to `anoa`), `templateVersion` & `deployEnvironment`.
 
 #### Default Naming Convention Example
 
@@ -101,7 +101,7 @@ A tagging strategy include business and operational details:
 
 Most customers will deploy each tier to a separate Azure subscription, but multiple subscriptions are not required. A single subscription deployment is good for a testing and evaluation, or possibly a small IT Admin team.
 
-Hub - 3 Spoke Platform can deploy to a single subscription or multiple subscriptions. A test and evaluation deployment may deploy everything to a single subscription, and a production deployment may place each tier into its own subscription.
+Hub - 4 Spoke Platform can deploy to a single subscription or multiple subscriptions. A test and evaluation deployment may deploy everything to a single subscription, and a production deployment may place each tier into its own subscription.
 
 The optional parameters related to subscriptions are below. They releated to each tier object used for deployment.
 
@@ -120,24 +120,31 @@ Parameter name | Default Value | Description
 -------------- | ------------- | -----------
 `parHub.virtualNetworkAddressPrefix` | '10.0.100.0/24' | The CIDR Virtual Network Address Prefix for the Hub Virtual Network.
 `parHub.subnetAddressPrefix` | '10.0.100.128/27' | The CIDR Subnet Address Prefix for the default Hub subnet. It must be in the Hub Virtual Network space.
+`parHub.peerToSpokeVirtualNetwork` | true | This is a switch for peering to an Spoke Network. This is used with the spoke network peering as well. Both parameters either need to be true or false.
 `parHub.subnets.addressPrefix` (Firewall Client Subnet Address Prefix)| '10.0.100.0/26' | The CIDR Subnet Address Prefix for the Azure Firewall Subnet. It must be in the Hub Virtual Network space. It must be /26.
 `parHub.subnets.addressPrefix` (Firewall Management Subnet Address Prefix) | '10.0.100.64/26' | The CIDR Subnet Address Prefix for the Azure Firewall Management Subnet. It must be in the Hub Virtual Network space. It must be /26.
 `parIdentitySpoke.virtualNetworkAddressPrefix` | '10.0.110.0/26' | The CIDR Virtual Network Address Prefix for the Identity Virtual Network.
 `parIdentitySpoke.subnetAddressPrefix` | '10.0.110.0/27' | The CIDR Subnet Address Prefix for the default Identity subnet. It must be in the Identity Virtual Network space.
+`parIdentitySpoke.peerToHubVirtualNetwork` | true | This is a switch for peering to an Hub Network from a Identity Spoke. This is used with the hub network peering as well. Both parameters either need to be true or false.
 `parOperationsSpoke.virtualNetworkAddressPrefix` | '10.0.115.0/26' | The CIDR Virtual Network Address Prefix for the Operations Virtual Network.
 `parOperationsSpoke.subnetAddressPrefix` | '10.0.115.0/27' | The CIDR Subnet Address Prefix for the default Operations subnet. It must be in the Operations Virtual Network space.
+`parOperationsSpoke.peerToHubVirtualNetwork` | true | This is a switch for peering to an Hub Network from a Operations Spoke. This is used with the hub network peering as well. Both parameters either need to be true or false.
 `parSharedServicesSpoke.virtualNetworkAddressPrefix` | '10.0.120.0/26' | The CIDR Virtual Network Address Prefix for the Shared Services Virtual Network.
 `parSharedServicesSpoke.subnetAddressPrefix` | '10.0.120.0/27' | The CIDR Subnet Address Prefix for the default Shared Services subnet. It must be in the Shared Services Virtual Network space.
+`parSharedServicesSpoke.peerToHubVirtualNetwork` | true | This is a switch for peering to an Hub Network from a Shared Services Spoke. This is used with the hub network peering as well. Both parameters either need to be true or false.
+`parDataSharedServicesSpoke.virtualNetworkAddressPrefix` | '10.0.130.0/26' | The CIDR Virtual Network Address Prefix for the Shared Services Virtual Network.
+`parDataSharedServicesSpoke.subnetAddressPrefix` | '10.0.130.0/27' | The CIDR Subnet Address Prefix for the default Shared Services subnet. It must be in the Shared Services Virtual Network space.
+`parDataSharedServicesSpoke.peerToHubVirtualNetwork` | true | This is a switch for peering to an Hub Network from a Data Shared Services Spoke. This is used with the hub network peering as well. Both parameters either need to be true or false.
 
 ## Optional Features
 
-Hub - 3 Spoke Platform has optional features that can be enabled by setting parameters on the deployment.
+Hub - 4 Spoke Platform has optional features that can be enabled by setting parameters on the deployment.
 
 ### Microsoft Defender for Cloud
 
 By default [Microsoft Defender for Cloud](https://docs.microsoft.com/en-us/azure/defender-for-cloud/defender-for-cloud-introduction) offers a free set of monitoring capabilities that are enabled via an Azure policy when you first set up a subscription and view the Microsoft Defender for Cloud portal blade.
 
-Microsoft Defender for Cloud offers a standard/defender sku which enables a greater depth of awareness including more recomendations and threat analytics. You can enable this higher depth level of security in Hub - 3 Spoke Platform by setting the parameter `parSecurityCenter.enableDefender` during deployment. In addition you can include the `parSecurityCenter.emailSecurityContact` parameter to set a contact email for alerts and `parSecurityCenter.phoneSecurityContact` parameter to set a contact phone for alerts.
+Microsoft Defender for Cloud offers a standard/defender sku which enables a greater depth of awareness including more recomendations and threat analytics. You can enable this higher depth level of security in Hub - 4 Spoke Platform by setting the parameter `parSecurityCenter.enableDefender` during deployment. In addition you can include the `parSecurityCenter.emailSecurityContact` parameter to set a contact email for alerts and `parSecurityCenter.phoneSecurityContact` parameter to set a contact phone for alerts.
 
 Parameter name | Default Value | Description
 -------------- | ------------- | -----------
@@ -176,7 +183,7 @@ Parameter name | Default Value | Description
 
 ### Azure Firewall Premium
 
-By default, Hub - 3 Spoke Platform deploys **[Azure Firewall Premium](https://docs.microsoft.com/en-us/azure/firewall/premium-features). Not all regions support Azure Firewall Premium.** Check here to [see if the region you're deploying to supports Azure Firewall Premium](https://docs.microsoft.com/en-us/azure/firewall/premium-features#supported-regions). If necessary you can set a different firewall SKU or location.
+By default, Hub - 4 Spoke Platform deploys **[Azure Firewall Premium](https://docs.microsoft.com/en-us/azure/firewall/premium-features). Not all regions support Azure Firewall Premium.** Check here to [see if the region you're deploying to supports Azure Firewall Premium](https://docs.microsoft.com/en-us/azure/firewall/premium-features#supported-regions). If necessary you can set a different firewall SKU or location.
 
 You can manually specify which SKU of Azure Firewall to use for your deployment by specifying the `parAzureFirewall.skuTier` parameter. This parameter only accepts values of `Standard` or `Premium`.
 
@@ -207,6 +214,7 @@ parHub | object | {object} | Hub Virtual network configuration. See [azresources
 parOperationsSpoke | object | {object} | Operations Spoke Virtual network configuration. See [See azresources/hub-spoke-core/vdms/operations/readme.md](../../azresources/hub-spoke-core/vdms/operations/readme.md)
 parIdentitySpoke | object | {object} | Identity Spoke Virtual network configuration. See [See azresources/hub-spoke-core/vdss/identity/readme.md](../../azresources/hub-spoke-core/vdss/identity/readme.md)
 parSharedServicesSpoke | object | {object} | Shared Services Spoke Virtual network configuration. See [See azresources/hub-spoke-core/vdms/sharedservices/readme.md](../../azresources/hub-spoke-core/vdms/sharedservices/readme.md)
+parDataSharedServicesSpoke | object | {object} | Data Shared Services Spoke Virtual network configuration. See [See azresources/hub-spoke-core/vdms/dataSharedservices/readme.md](../../azresources/hub-spoke-core/vdms/dataSharedservices/readme.md)
 parAzureFirewall | object | {object} | Azure Firewall configuration. Azure Firewall is deployed in Forced Tunneling mode where a route table must be added as the next hop.
 parLogging | object | {object} | Enables logging parmeters and Microsoft Sentinel within the Log Analytics Workspace created in this deployment. See [azresources/hub-spoke-core/vdms/logging/readme.md](../../azresources/hub-spoke-core/vdms/logging/readme.md)
 parRemoteAccess | object | {object} | Provisions Azure Bastion Host. See [overlays/management-services/bastion/readme.md](../../overlays/management-services/bastion/readme.md)
@@ -238,7 +246,7 @@ az account set --subscription $ConnectivitySubscriptionId
 #log in
 az login
 cd src/bicep
-cd platforms/lz-platform-scca-hub-3spoke
+cd platforms/lz-platform-scca-hub-4spoke
 az deployment sub create \ 
 --name deploy-hub1spoke-network \
 --subscription $ConnectivitySubscriptionId \
@@ -261,7 +269,7 @@ az account set --subscription $ConnectivitySubscriptionId
 
 az login
 cd src/bicep
-cd platforms/lz-platform-scca-hub-3spoke
+cd platforms/lz-platform-scca-hub-4spoke
 az deployment sub create \
   --name deploy-hub1spoke-network \
   --template-file deploy.bicep \
@@ -282,7 +290,7 @@ $ConnectivitySubscriptionId = "[your platform management subscription ID]"
 Select-AzSubscription -SubscriptionId $ConnectivitySubscriptionId
 
 cd src/bicep
-cd platforms/lz-platform-scca-hub-3spoke
+cd platforms/lz-platform-scca-hub-4spoke
 New-AzSubscriptionDeployment `
   -Name deploy-hub1spoke-network `
   -TemplateFile deploy.bicep `
@@ -304,7 +312,7 @@ $ConnectivitySubscriptionId = "[your platform management subscription ID]"
 Select-AzSubscription -SubscriptionId $ConnectivitySubscriptionId
 
 cd src/bicep
-cd platforms/lz-platform-scca-hub-3spoke
+cd platforms/lz-platform-scca-hub-4spoke
 New-AzSubscriptionDeployment `
   -Name deploy-hub1spoke-network `
   -TemplateFile deploy.bicep `
@@ -401,11 +409,11 @@ Remove-AzResourceGroup -Name anoa-eastus-platforms-artifacts-rg
 ### Delete Deployments
 
 ```bash
-az deployment sub delete -n deploy-hub3spoke-network
+az deployment sub delete -n deploy-hub4spoke-network
 ```
 
 ```powershell
-Remove-AzSubscriptionDeployment -Name deploy-hub3spoke-network
+Remove-AzSubscriptionDeployment -Name deploy-hub4spoke-network
 ```
 
 ## Resources

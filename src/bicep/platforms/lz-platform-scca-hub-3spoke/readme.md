@@ -1,4 +1,4 @@
-# NoOps Accelerator - Platforms - SCCA Compliant Hub - 3 Spoke
+# NoOps Accelerator - Platforms - SCCA Compliant Hub - 3 Spoke Landing Zone
 
 ## Overview
 
@@ -120,14 +120,18 @@ Parameter name | Default Value | Description
 -------------- | ------------- | -----------
 `parHub.virtualNetworkAddressPrefix` | '10.0.100.0/24' | The CIDR Virtual Network Address Prefix for the Hub Virtual Network.
 `parHub.subnetAddressPrefix` | '10.0.100.128/27' | The CIDR Subnet Address Prefix for the default Hub subnet. It must be in the Hub Virtual Network space.
+`parHub.peerToSpokeVirtualNetwork` | true | This is a switch for peering to an Spoke Network. This is used with the spoke network peering as well. Both parameters either need to be true or false.
 `parHub.subnets.addressPrefix` (Firewall Client Subnet Address Prefix)| '10.0.100.0/26' | The CIDR Subnet Address Prefix for the Azure Firewall Subnet. It must be in the Hub Virtual Network space. It must be /26.
 `parHub.subnets.addressPrefix` (Firewall Management Subnet Address Prefix) | '10.0.100.64/26' | The CIDR Subnet Address Prefix for the Azure Firewall Management Subnet. It must be in the Hub Virtual Network space. It must be /26.
 `parIdentitySpoke.virtualNetworkAddressPrefix` | '10.0.110.0/26' | The CIDR Virtual Network Address Prefix for the Identity Virtual Network.
 `parIdentitySpoke.subnetAddressPrefix` | '10.0.110.0/27' | The CIDR Subnet Address Prefix for the default Identity subnet. It must be in the Identity Virtual Network space.
+`parIdentitySpoke.peerToHubVirtualNetwork` | true | This is a switch for peering to an Hub Network from a Identity Spoke. This is used with the hub network peering as well. Both parameters either need to be true or false.
 `parOperationsSpoke.virtualNetworkAddressPrefix` | '10.0.115.0/26' | The CIDR Virtual Network Address Prefix for the Operations Virtual Network.
 `parOperationsSpoke.subnetAddressPrefix` | '10.0.115.0/27' | The CIDR Subnet Address Prefix for the default Operations subnet. It must be in the Operations Virtual Network space.
+`parOperationsSpoke.peerToHubVirtualNetwork` | true | This is a switch for peering to an Hub Network from a Operations Spoke. This is used with the hub network peering as well. Both parameters either need to be true or false.
 `parSharedServicesSpoke.virtualNetworkAddressPrefix` | '10.0.120.0/26' | The CIDR Virtual Network Address Prefix for the Shared Services Virtual Network.
 `parSharedServicesSpoke.subnetAddressPrefix` | '10.0.120.0/27' | The CIDR Subnet Address Prefix for the default Shared Services subnet. It must be in the Shared Services Virtual Network space.
+`parSharedServicesSpoke.peerToHubVirtualNetwork` | true | This is a switch for peering to an Hub Network from a SharedServices Spoke. This is used with the hub network peering as well. Both parameters either need to be true or false.
 
 ## Optional Features
 

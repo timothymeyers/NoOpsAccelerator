@@ -587,6 +587,8 @@ module modAzureMonitorPrivateLink '../../../Modules/Microsoft.Network/privateEnd
     logAnalyticsWorkspaceResourceId: parLogAnalyticsWorkspaceResourceId
     privateEndpointSubnetName: varHubSubnetName
     privateEndpointVnetName: modHubVirtualNetwork.outputs.name
+    vnetResourceGroup: varHubResourceGroupName
+    vnetSubscriptionId: parHubSubscriptionId
     location: parLocation
     tags: modTags.outputs.tags     
   }

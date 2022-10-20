@@ -63,7 +63,8 @@
         "subnetAddressPrefix": "10.0.110.0/27",
         "sourceAddressPrefixes": [
           "10.0.115.0/26",
-          "10.0.120.0/26"
+          "10.0.120.0/26",
+          "10.0.130.0/26"
         ],
         "virtualNetworkDiagnosticsLogs": [],
         "virtualNetworkDiagnosticsMetrics": [],
@@ -85,7 +86,8 @@
               "protocol": "*",
               "sourceAddressPrefixes": [
                 "10.0.115.0/26",
-                "10.0.120.0/26"
+                "10.0.120.0/26",
+                "10.0.130.0/26"
               ],
               "sourcePortRange": "*"
             },
@@ -122,7 +124,8 @@
         "subnetAddressPrefix": "10.0.115.0/27",
         "sourceAddressPrefixes": [
           "10.0.110.0/26",
-          "10.0.120.0/26"
+          "10.0.120.0/26",
+          "10.0.130.0/26"
         ],
         "virtualNetworkDiagnosticsLogs": [],
         "virtualNetworkDiagnosticsMetrics": [],
@@ -144,7 +147,8 @@
               "protocol": "*",
               "sourceAddressPrefixes": [
                 "10.0.110.0/26",
-                "10.0.120.0/26"
+                "10.0.120.0/26",
+                "10.0.130.0/26"
               ],
               "sourcePortRange": "*"
             },
@@ -181,7 +185,8 @@
         "subnetAddressPrefix": "10.0.120.0/27",
         "sourceAddressPrefixes": [
           "10.0.115.0/26",
-          "10.0.110.0/26"
+          "10.0.110.0/26",
+          "10.0.130.0/26"
         ],
         "virtualNetworkDiagnosticsLogs": [],
         "virtualNetworkDiagnosticsMetrics": [],
@@ -203,7 +208,69 @@
               "protocol": "*",
               "sourceAddressPrefixes": [
                 "10.0.115.0/26",
-                "10.0.120.0/26"
+                "10.0.110.0/26",
+                "10.0.130.0/26"
+              ],
+              "sourcePortRange": "*"
+            },
+            "type": "string"
+          }
+        ],
+        "publicIPAddressDiagnosticsLogs": [
+          "DDoSProtectionNotifications",
+          "DDoSMitigationFlowLogs",
+          "DDoSMitigationReports"
+        ],
+        "networkSecurityGroupDiagnosticsLogs": [
+          "NetworkSecurityGroupEvent",
+          "NetworkSecurityGroupRuleCounter"
+        ],
+        "subnetServiceEndpoints": [
+          {
+            "service": "Microsoft.Storage"
+          }
+        ],
+        "storageAccountAccess": {
+          "enableRoleAssignmentForStorageAccount": false,
+          "principalIds": [
+            "<<principalId>>"
+          ],
+          "roleDefinitionIdOrName": "Contributor"
+        }
+      }
+    },
+    "parDataSharedServicesSpoke": {
+      "value": {
+        "subscriptionId": "<<subscriptionId>>",
+        "virtualNetworkAddressPrefix": "10.0.130.0/26",
+        "subnetAddressPrefix": "10.0.130.0/27",
+        "sourceAddressPrefixes": [
+          "10.0.115.0/26",
+          "10.0.110.0/26",
+          "10.0.120.0/26"
+        ],
+        "virtualNetworkDiagnosticsLogs": [],
+        "virtualNetworkDiagnosticsMetrics": [],
+        "networkSecurityGroupRules": [
+          {
+            "name": "Allow-Traffic-From-Spokes",
+            "properties": {
+              "access": "Allow",
+              "description": "Allow traffic from spokes",
+              "destinationAddressPrefix": "10.0.130.0/26",
+              "destinationPortRanges": [
+                "22",
+                "80",
+                "443",
+                "3389"
+              ],
+              "direction": "Inbound",
+              "priority": 200,
+              "protocol": "*",
+              "sourceAddressPrefixes": [
+                "10.0.115.0/26",
+                "10.0.120.0/26",
+                "10.0.110.0/26"
               ],
               "sourcePortRange": "*"
             },

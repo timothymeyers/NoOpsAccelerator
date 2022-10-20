@@ -78,15 +78,23 @@ Other differences in Azure IL regions are as follow:
 ```bash
 # For Azure Commerical regions
 
-# Set Platform connectivity subscription ID as the the current subscription 
+# When deploying to Azure cloud, first set the cloud.
+az cloudset --name AzureGovernment
 
+# Set Platform connectivity subscription ID as the the current subscription 
 ConnectivitySubscriptionId="[your platform management subscription ID]"
 az account set --subscription $ConnectivitySubscriptionId
 
+# Log in
+az login
+cd src/bicep
+cd azresources/hub-spoke-core
 az deployment sub create \
+   --name anoa-sharedServices-deploy \
    --location eastus \
-   --template-file src/bicep/common/landingzone/core/vdms/sharedservices/anoa.lz.svcs.bicep \
-   --parameters @src/bicep/common/landingzone/core/vdms/sharedservices/anoa.lz.svcs.parameters.json
+   --template-file vdms/sharedServices/anoa.lz.svcs.network.network.bicep \
+   --parameters @parmeters/sharedServices/anoa.lz.svcs.network.parameters.json
+   --subscription $ConnectivitySubscriptionId
 ```
 
 OR
@@ -95,30 +103,43 @@ OR
 
 # For Azure Government regions
 
-# Set Platform connectivity subscription ID as the the current subscription 
+# When deploying to another cloud, like Azure US Government, first set the cloud.
+az cloudset --name AzureGovernment
 
+# Set Platform connectivity subscription ID as the the current subscription 
 ConnectivitySubscriptionId="[your platform management subscription ID]"
 az account set --subscription $ConnectivitySubscriptionId
 
+# Log in
+az login
+cd src/bicep
+cd azresources/hub-spoke-core
 az deployment sub create \
-   --location virginiaus \
-   --template-file src/bicep/common/landingzone/core/vdms/sharedservices/anoa.lz.svcs.bicep \
-   --parameters @src/bicep/common/landingzone/core/vdms/sharedservices/anoa.lz.svcs.parameters.json
+   --name anoa-sharedServices-deploy \
+   --location usgovvirginia \
+   --template-file vdms/sharedServices/anoa.lz.svcs.network.bicep \
+   --parameters @parmeters/sharedServices/anoa.lz.svcs.network.parameters.json
+   --subscription $ConnectivitySubscriptionId
 ```
 
 ### PowerShell
 
 ```powershell
 # For Azure Commerical regions
+# When deploying to Azure cloud, first set the cloud and log in.
+Connect-AzAccount -EnvironmentName AzureCloud
+
 # Set Platform connectivity subscription ID as the the current subscription 
 $ConnectivitySubscriptionId = "[your platform management subscription ID]"
-
 Select-AzSubscription -SubscriptionId $ConnectivitySubscriptionId
-  
+
+cd src/bicep
+cd azresources/hub-spoke-core
 New-AzDeployment `
-  -TemplateFile src/bicep/common/landingzone/core/vdms/sharedservices/anoa.lz.svcs.bicep `
-  -TemplateParameterFile src/bicep/common/landingzone/core/vdms/sharedservices/anoa.lz.svcs.parameters.json `
+  -TemplateFile vdms/sharedServices/anoa.lz.svcs.network.bicep `
+  -TemplateParameterFile parmeters/sharedServices/anoa.lz.svcs.network.parameters.json `
   -Location 'eastus'
+  -Name 'anoa-sharedServices-deploy'
 ```
 
 OR
@@ -126,15 +147,21 @@ OR
 ```powershell
 
 # For Azure Government regions
+# When deploying to another cloud, like Azure US Government, first set the cloud and log in.
+Connect-AzAccount -EnvironmentName AzureCloud
+
 # Set Platform connectivity subscription ID as the the current subscription 
 $ConnectivitySubscriptionId = "[your platform management subscription ID]"
+Select-AzSubscription -SubscriptionId $ConnectivitySubscriptionId  
 
-Select-AzSubscription -SubscriptionId $ConnectivitySubscriptionId
-  
+
+cd src/bicep
+cd azresources/hub-spoke-core
 New-AzDeployment `
-  -TemplateFile src/bicep/common/landingzone/core/vdms/sharedservices/anoa.lz.svcs.bicep `
-  -TemplateParameterFile src/bicep/common/landingzone/core/vdms/sharedservices/anoa.lz.svcs.parameters.json `
-  -Location 'virginiaus'
+  --TemplateFile vdms/sharedServices/anoa.lz.svcs.network.bicep `
+  -TemplateParameterFile parmeters/sharedServices/anoa.lz.svcs.network.parameters.json `
+  -Location 'usgovvirginia'
+  -Name 'anoa-sharedServices-deploy'
 ```
 
 ## Air-Gapped Clouds
@@ -147,4 +174,4 @@ The Bicep/ARM deployment of NoOps Accelerator Shared Services network deployment
 
 ## Example Output in Azure
 
-![Example Deployment Output](media/sharedservicesNetworkExampleDeploymentOutput.png "Example Deployment Output in Azure global regions")
+![Example Deployment Output](images/sharedServucesExampleDeploymentOutput.png "Example Deployment Output in Azure global regions")

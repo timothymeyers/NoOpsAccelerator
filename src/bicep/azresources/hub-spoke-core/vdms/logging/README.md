@@ -38,17 +38,16 @@ The module requires the following inputs:
 
 The module requires the following inputs:
 
-| Parameter                         | Type   | Default                                                                                              | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | Required                   | Example                                        |
- | --------------------------------- | ------ | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- | ---------------------------------------------- |
-| parDeployAutomationAccount | bool | `aona`                                                                          | Prefix value which will be prepended to all resource names. Default: anoa   | Yes  | `aona` |
-| parLogAnalyticsWorkspaceCappingDailyQuotaGb | int | `-1`                                                                          | Prefix value which will be prepended to all resource names. Default: anoa   | Yes  | `aona` |
-| parLogAnalyticsWorkspaceRetentionInDays | int | `30`                                                                          | Prefix value which will be prepended to all resource names. Default: anoa   | Yes  | `aona` |
-| parLogAnalyticsWorkspaceSkuName | string | `PerGB2018`                                                                          | Prefix value which will be prepended to all resource names. Default: anoa   | Yes  | `PerGB2018` |
-| parDeploySentinel | bool | `false`                                                                          | Prefix value which will be prepended to all resource names. Default: anoa   | Yes  | `false` |
-| parLogStorageSkuName | string | `Standard_GRS`                                                                          | Prefix value which will be prepended to all resource names. Default: anoa   | Yes  | `Standard_GRS` |
-| parAddRoleAssignmentForStorageAccount | bool | `false`                                                                          | Prefix value which will be prepended to all resource names. Default: anoa   | Yes  | `false` |
-| parStorageAccountAccessObjectId | string | `xxxx-xxxx-xxxx-xxxx-xxxx`                                                                          | Prefix value which will be prepended to all resource names. Default: anoa   | No  | `xxxx-xxxx-xxxx-xxxx-xxxx` |
-| parStorageAccountAccessType | string | `Group`                                                                          | Prefix value which will be prepended to all resource names. Default: anoa   | No  | `Group` |
+Parameter name | Default Value | Description
+-------------- | ------------- | -----------
+`parOperationsSubscriptionId` | Deployment subscription | The subscription ID for the Hub Network and resources. It defaults to the deployment subscription.
+`parDeploymentNameSuffix` | utcNow()  | A suffix to use for naming deployments uniquely. It defaults to the Bicep resolution of the "utcNow()" function.
+`parLogAnalyticsWorkspaceCappingDailyQuotaGb` | -1  | The daily quota for Log Analytics Workspace logs in Gigabytes. It defaults to "-1" for no quota.
+`parLogAnalyticsWorkspaceRetentionInDays` | 30  | Number of days of log retention for Log Analytics Workspace. - DEFAULT VALUE: 30
+`parLogAnalyticsWorkspaceSkuName` | 'PerGB2018'  | [Free/Standard/Premium/PerNode/PerGB2018/Standalone] The SKU for the Log Analytics Workspace. It defaults to "PerGB2018". See <https://docs.microsoft.com/en-us/azure/azure-monitor/logs/resource-manager-workspace> for valid settings.
+`parDeploySentinel` | false  | Switch which allows Sentinel deployment to be disabled. Default: false
+`parLogStorageSkuName` | 'Standard_GRS'  | The Storage Account SKU to use for log storage. It defaults to "Standard_GRS". See <https://docs.microsoft.com/en-us/rest/api/storagerp/srp_sku_types> for valid settings.
+`parLoggingStorageAccountAccess` | object | Account settings for role assignement to Storage Account
 
 Parameters file located in the [Deployments](../../../../deployments/HubSpoke/logging/) folder under hub/spoke.
 
@@ -56,9 +55,12 @@ Parameters file located in the [Deployments](../../../../deployments/HubSpoke/lo
 
 The module will generate the following outputs:
 
-Parameters | Type | Allowed Values | Description
-| :-- | :-- | :-- | :-- |
-None
+Parameter name | Default Value | Description
+-------------- | ------------- | -----------
+`outLogAnalyticsWorkspaceName` | 'guid' | Out value for Log Analytics Workspace Name
+`outLogAnalyticsWorkspaceResourceId` | '/subscriptions/<<subscriptionId>>/resourcegroups/anoa-usgovvirginia-dev-logging-rg/providers/microsoft.operationalinsights/workspaces/anoa-usgovvirginia-dev-logging-log' | Out value for Log Analytics ResourceId
+`outLogAnalyticsWorkspaceId` | 'guid' | Out value for Log Analytics Workspace Id
+`outLogAnalyticsSolutions` | array | Out value for Log Analytics Solutions in array format
 
 ## Deployment
 
@@ -80,16 +82,22 @@ Other differences in Azure IL regions are as follow:
 ```bash
 # For Azure Commerical regions
 
-# Set Platform connectivity subscription ID as the the current subscription 
+# When deploying to Azure cloud, first set the cloud.
+az cloudset --name AzureGovernment
 
+# Set Platform connectivity subscription ID as the the current subscription 
 ConnectivitySubscriptionId="[your platform management subscription ID]"
 az account set --subscription $ConnectivitySubscriptionId
 
+# Log in
+az login
+cd src/bicep
+cd azresources/hub-spoke-core
 az deployment sub create \
    --name anoa-logging-deploy \
    --location eastus \
-   --template-file src/bicep/common/landingzone/core/vdms/logging/anoa.lz.logging.bicep \
-   --parameters @src/bicep/common/landingzone/core/vdms/logging/anoa.lz.logging.parameters.json
+   --template-file vdms/logging/anoa.lz.logging.bicep \
+   --parameters @parmeters/logging/anoa.lz.logging.parameters.json
    --subscription $ConnectivitySubscriptionId
 ```
 
@@ -99,30 +107,41 @@ OR
 
 # For Azure Government regions
 
-# Set Platform connectivity subscription ID as the the current subscription 
+# When deploying to another cloud, like Azure US Government, first set the cloud.
+az cloudset --name AzureGovernment
 
+# Set Platform connectivity subscription ID as the the current subscription 
 ConnectivitySubscriptionId="[your platform management subscription ID]"
 az account set --subscription $ConnectivitySubscriptionId
 
+# Log in
+az login
+cd src/bicep
+cd azresources/hub-spoke-core
 az deployment sub create \
    --name anoa-logging-deploy \
-   --location virginiaus \
-   --template-file src/bicep/common/landingzone/core/vdms/logging/anoa.lz.logging.bicep \
-   --parameters @src/bicep/common/landingzone/core/vdms/logging/anoa.lz.logging.parameters.json
+   --location usgovvirginia \
+   --template-file vdms/logging/anoa.lz.logging.bicep \
+   --parameters @parmeters/logging/anoa.lz.logging.parameters.json
+   --subscription $ConnectivitySubscriptionId
 ```
 
 ### PowerShell
 
 ```powershell
 # For Azure Commerical regions
+# When deploying to Azure cloud, first set the cloud and log in.
+Connect-AzAccount -EnvironmentName AzureCloud
+
 # Set Platform connectivity subscription ID as the the current subscription 
 $ConnectivitySubscriptionId = "[your platform management subscription ID]"
-
 Select-AzSubscription -SubscriptionId $ConnectivitySubscriptionId
-  
+
+cd src/bicep
+cd azresources/hub-spoke-core
 New-AzDeployment `
-  -TemplateFile src/bicep/common/landingzone/core/network/vdms/logging/anoa.lz.logging.bicep `
-  -TemplateParameterFile src/bicep/common/landingzone/core/vdms/logging/anoa.lz.logging.parameters.json `
+  -TemplateFile vdms/logging/anoa.lz.logging.bicep `
+  -TemplateParameterFile parmeters/logging/anoa.lz.logging.parameters.json `
   -Location 'eastus'
   -Name 'anoa-logging-deploy'
 ```
@@ -132,15 +151,20 @@ OR
 ```powershell
 
 # For Azure Government regions
+# When deploying to another cloud, like Azure US Government, first set the cloud and log in.
+Connect-AzAccount -EnvironmentName AzureCloud
+
 # Set Platform connectivity subscription ID as the the current subscription 
 $ConnectivitySubscriptionId = "[your platform management subscription ID]"
+Select-AzSubscription -SubscriptionId $ConnectivitySubscriptionId  
 
-Select-AzSubscription -SubscriptionId $ConnectivitySubscriptionId
-  
+
+cd src/bicep
+cd azresources/hub-spoke-core
 New-AzDeployment `
-  -TemplateFile src/bicep/common/landingzone/core/vdms/logging/anoa.lz.logging.bicep `
-  -TemplateParameterFile src/bicep/common/landingzone/core/logging/vdms/logging/anoa.lz.logging.parameters.json `
-  -Location 'virginiaus'
+  --TemplateFile vdms/logging/anoa.lz.logging.bicep `
+  -TemplateParameterFile parmeters/logging/anoa.lz.logging.parameters.json `
+  -Location 'usgovvirginia'
   -Name 'anoa-logging-deploy'
 ```
 

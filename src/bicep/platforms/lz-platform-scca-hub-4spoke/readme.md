@@ -1,8 +1,8 @@
-# NoOps Accelerator - Platforms - SCCA Compliant Hub - 3 Spoke
+# NoOps Accelerator - Platforms - SCCA Compliant Hub - 4 Spoke
 
 ## Overview
 
-This platform module deploys Hub 3 Spoke landing zone.
+This platform module deploys Hub 4 Spoke landing zone.
 
 > NOTE: This is only the landing zone deployment. The workloads will be deployed with the enclave or can be deployed after the landing zone is created.
 
@@ -12,7 +12,7 @@ Read on to understand what this landing zone does, and when you're ready, collec
 
  ![Hub/Spoke landing zone Architecture](./media/hub-3spoke-network-topology-architecture.jpg)
 
-## About Hub 3 Spoke Landing Zone
+## About Hub 4 Spoke Landing Zone
 
 The docs on Hub/Spoke Landing Zone: <https://learn.microsoft.com/en-us/azure/architecture/reference-architectures/hybrid-networking/hub-spoke?tabs=cli>
 
@@ -24,7 +24,7 @@ A **landing zone** is networking infrastructure configured to provide a secure e
 
 ### Hub/Spoke Networking
 
-Hub/ 3 Spoke Networking (like Mission Landing Zone) is set up in a hub and spoke design, separated by tiers: T0 (Identity and Authorization), T1 (Infrastructure Operations), T2 (DevSecOps and Shared Services), and multiple T3s (Workloads). Access control can be configured to allow separation of duties between all tiers.
+Hub/ 4 Spoke Networking (like TMN) is set up in a hub and spoke design, separated by tiers: T0 (Identity and Authorization), T1 (Infrastructure Operations), T2 (DevSecOps and Data Services, Shared Services), and multiple T3s (Workloads). Access control can be configured to allow separation of duties between all tiers.
 
 ### Firewall
 

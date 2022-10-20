@@ -46,28 +46,22 @@ For a quickstart, we suggest a test deployment into the current AZ CLI subscript
     * `--subscription`: The GUID for the subscription to deploy into.
         Multiple subscriptions may be configured (*i.e.*, to have separate subscriptions for each 'tier' in the MLZ architecture) in the `parameters/deploy.parameters.json`
 
+> **IMPORTANT**: All values will need to be updates in the `parameters/deploy.parameters.json`. This allows for consistency in the parameters.  
+
     Here is an example that deploys into a single subscription in the EastUS region of Azure Commercial:
 
     ```plaintext
-    # These will be used in the naming of your resources
-    # e.g., anoa-eastus-dev-hub-rg
-    ORG_PREFIX="anoa"
-    DEPLOY_ENV="dev"
-
     # Replace with your test Azure Subscription ID
     AZ_SUBSCRIPTION="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
 
     az login
+    cd src/bicep
+    cd platforms/lz-platform-scca-hub-3spoke
     az deployment sub create \
         --name deploy-scca-hub-with-3-spokes \
         --location EastUS \
         --template-file deploy.bicep \
         --parameters @parameters/deploy.parameters.json \
-        --parameters parRequired="{ \"orgPrefix\":\"$ORG_PREFIX\", \"templateVersion\":\"v1.0\", \"deployEnvironment\":\"$DEPLOY_ENV\" }" \
-        --parameters parHubSubscriptionId=$AZ_SUBSCRIPTION \
-        --parameters parIdentitySubscriptionId=$AZ_SUBSCRIPTION \
-        --parameters parOperationsSubscriptionId=$AZ_SUBSCRIPTION \
-        --parameters parSharedServicesSubscriptionId=$AZ_SUBSCRIPTION \
         --subscription $AZ_SUBSCRIPTION
     ```
 

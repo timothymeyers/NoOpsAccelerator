@@ -26,6 +26,8 @@
                 "network": {
                     "virtualNetworkAddressPrefix": "10.0.125.0/26",
                     "subnetAddressPrefix": "10.0.125.0/26",
+                    "allowVirtualNetworkAccess": true,
+                    "useRemoteGateway": false,
                     "virtualNetworkDiagnosticsLogs": [],
                     "virtualNetworkDiagnosticsMetrics": [],
                     "networkSecurityGroupRules": [],

@@ -313,6 +313,8 @@ module modWorkloadVirtualNetworkPeerings '../../../azresources/hub-spoke-core/pe
     parSpokeName: parWorkloadSpoke.name
     parSpokeResourceGroupName: modWorkloadResourceGroup.outputs.name
     parSpokeVirtualNetworkName: modWorkloadVirtualNetwork.outputs.name
+    parAllowVirtualNetworkAccess: parWorkloadSpoke.network.allowVirtualNetworkAccess
+    parUseRemoteGateways: parWorkloadSpoke.network.useRemoteGateway
   }
 }
 

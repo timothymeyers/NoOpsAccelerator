@@ -26,6 +26,8 @@
         "network": {
           "virtualNetworkAddressPrefix": "10.0.125.0/26",
           "subnetAddressPrefix": "10.0.125.0/26",
+          "allowVirtualNetworkAccess": true,
+          "useRemoteGateway": false,
           "virtualNetworkDiagnosticsLogs": [],
           "virtualNetworkDiagnosticsMetrics": [],
           "networkSecurityGroupRules": [],
@@ -54,9 +56,9 @@
           }
         },
         "storageAccountAccess": {
-          "enableRoleAssignmentForStorageAccount": true,
+          "enableRoleAssignmentForStorageAccount": false,
           "principalIds": [
-            "47c98c84-d2d0-41ed-b05a-fc5baa5cda78"
+            "<<PrincipalID>>"
           ],
           "roleDefinitionIdOrName": "Contributor"
         }
@@ -97,6 +99,7 @@
         "enablePodIdentity": false,
         "aksClusterSkuTier": "Free",
         "enableIngressApplicationGateway": false,
+        "usePrivateDNSZone": true,
         "primaryAgentPoolProfile": {
           "name": "systempool",
           "vmSize": "Standard_DS2_v2",
@@ -143,7 +146,7 @@
         },
         "servicePrincipalProfile": {
           "clientId": "<<clientId>>",
-          "secret": "<<secret>>"
+          "secret": "<<clientSecret>>"
         }
       }
     }

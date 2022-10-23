@@ -26,6 +26,8 @@ These steps walk through how to use NoOps to deploy a hub and spoke architecture
 * Tier 1 (T1): Infrastructure Operations, and Logging (1 vnet, 2 resource groups)
 * Tier 2 (T2): DevSecOps & Shared Services (1 vnet, 1 resource group)
 
+> **Note:** The deployment requires Bicep CLI version 0.11.1 (030248df55) or later. You can check your version by running `bicep --version`. You can upgrade by running `az bicep upgrade`.
+
 Steps:
 
 1. Clone the repository down and change directory to the `lz-platform-scca-hub-3spoke` directory

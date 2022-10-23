@@ -62,7 +62,7 @@ tags | string |
 
 ## Deploy the Workload
 ### Prerequisites
-You will need an App Registration that AKS can use to manage resources like Node Pools and DNS entries.  Follow the steps below the create an App Registration in Azure Active Directory.
+You will need an App Registration that AKS can use to manage resources like Node Pools and DNS entries.  Follow the steps below the create an App Registration in Azure Active Directory and update the parameters file.
 1. In the Azure Portal, navigate to your Azure Active Directory. 
 1. Click on App Registrations in the left navigation menu. 
 1. Click on +New Registration in the top breadcrumb navigation. 

@@ -61,7 +61,27 @@ workloadResourceGroupName | string |
 tags | string |
 
 ## Deploy the Workload
+### Prerequisites
+You will need an App Registration that AKS can use to manage resources like Node Pools and DNS entries.  Follow the steps below the create an App Registration in Azure Active Directory and update the parameters file.
+1. In the Azure Portal, navigate to your Azure Active Directory. 
+1. Click on App Registrations in the left navigation menu. 
+1. Click on +New Registration in the top breadcrumb navigation. 
+1. Provide the following information:  
+     Name: _A name of your choosing_  
+     Supported Account Types: _do not configure, leave as default_
+1. Click the Register button. 
+1. Click on Overview in the left navigation and record the following information:  
+    Application (client) ID: << client id >> 
+1. Click on Certificates & Secrets in the left navigation . 
+1. Click on +New Client Secret and provide the following information:  
+    Description: _Enter something meaningful_  
+    Expires: _3 months or choose an appropriate time for your organization_ 
+1. Click the Add button. 
+1. Copy and record the _Secret Value_. You will use this in your Kubernetes workload deployment.
+1. Open the ```parameters/deploy.parameters.json``` file and navigate to the ```parKubernetesCluster``` object.  In the ```servicePrincipalProfile``` section, update the ```clientId``` and ```clientSecret``` properties with the values you recorded in the previous steps.  
+1. Save the file.
 
+### Deployment steps
 Connect to the appropriate Azure Environment and set appropriate context, see getting started with Azure CLI/PowerShell for help if needed.  The commands below assume you are deploying in Azure Commercial and show the entire process from deploying Hub/Spoke and then adding an Azure Kubernetes Service - Cluster post-deployment.
 
 > NOTE: Since you can deploy this workload post-deployment, you can also build this workload within other deployment models such as other Platforms & Enlaves.

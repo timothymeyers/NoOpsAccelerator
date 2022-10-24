@@ -319,9 +319,20 @@ module modLinuxNetworkInterface '../../../azresources/Modules/Microsoft.Network/
   }
 }
 
+
+module modLinuxAvSet '../../../azresources/Modules/Microsoft.Compute/availabilitySets/az.com.availabilty.set.bicep' = {
+  name: 'deploy-ra-lx-avset-${parLocation}-${parDeploymentNameSuffix}'
+  params: {
+    name: '${take(toLower(uniqueString(resourceGroup().name)), 10)}-linux-avset'
+    location: parLocation
+    availabilitySetSku: 'Aligned'
+  }
+}
+
 module modLinuxVirtualMachine '../../../azresources/Modules/Microsoft.Compute/virtualmachines/az.com.virtual.machine.bicep' = if (parRemoteAccess.bastion.linux.enable) {
   name: 'deploy-ra-linux-vm-${parLocation}-${parDeploymentNameSuffix}'
-  params: {    
+  params: {   
+    name: parRemoteAccess.bastion.linux.vmName 
     location: parLocation
     tags: (empty(parTags)) ? modTags : parTags
 
@@ -330,7 +341,7 @@ module modLinuxVirtualMachine '../../../azresources/Modules/Microsoft.Compute/vi
     adminPassword: parRemoteAccess.bastion.linux.vmAdminPasswordOrKey
 
     diagnosticWorkspaceId: parLogAnalyticsWorkspaceId
-    availabilitySetResourceId:modAvSet.outputs.resourceId
+    availabilitySetResourceId:modLinuxAvSet.outputs.resourceId
     encryptionAtHost: parRemoteAccess.bastion.encryptionAtHost
     imageReference: {
       offer: parRemoteAccess.bastion.linux.vmImageOffer
@@ -381,10 +392,10 @@ module modWindowsNetworkInterface '../../../azresources/Modules/Microsoft.Networ
   }
 }
 
-module modAvSet '../../../azresources/Modules/Microsoft.Compute/availabilitySets/az.com.availabilty.set.bicep' = {
+module modWinAvSet '../../../azresources/Modules/Microsoft.Compute/availabilitySets/az.com.availabilty.set.bicep' = {
   name: 'deploy-ra-win-avset-${parLocation}-${parDeploymentNameSuffix}'
   params: {
-    name: '${toLower(parRequired.orgPrefix)}-${parRemoteAccess.bastion.windows.vmName}-avset'
+    name: '${take(toLower(uniqueString(resourceGroup().name)), 10)}-windows-avset'
     location: parLocation
     availabilitySetSku: 'Aligned'
   }
@@ -392,14 +403,15 @@ module modAvSet '../../../azresources/Modules/Microsoft.Compute/availabilitySets
 
 module modWindowsVirtualMachine '../../../azresources/Modules/Microsoft.Compute/virtualmachines/az.com.virtual.machine.bicep' = if (parRemoteAccess.bastion.windows.enable) {
   name: 'deploy-ra-windows-vm-${parLocation}-${parDeploymentNameSuffix}'
-  params: {    
+  params: {  
+    name: parRemoteAccess.bastion.windows.vmName  
     location: parLocation
     tags: (empty(parTags)) ? modTags : parTags
 
     adminUsername: parRemoteAccess.bastion.windows.vmAdminUsername
     adminPassword: parRemoteAccess.bastion.windows.vmAdminPassword //kv.getSecret('WindowsVmAdminPassword')
     diagnosticWorkspaceId: parLogAnalyticsWorkspaceId
-    availabilitySetResourceId:modAvSet.outputs.resourceId
+    availabilitySetResourceId:modWinAvSet.outputs.resourceId
     encryptionAtHost: parRemoteAccess.bastion.encryptionAtHost
     imageReference: {
       offer: parRemoteAccess.bastion.windows.vmImageOffer

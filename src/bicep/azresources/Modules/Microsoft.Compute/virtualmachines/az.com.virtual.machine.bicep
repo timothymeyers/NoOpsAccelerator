@@ -1,7 +1,8 @@
 /* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
 // Main resource
 @description('Optional. The name of the virtual machine to be created. You should use a unique prefix to reduce name collisions in Active Directory. If no value is provided, a 10 character long unique string will be generated based on the Resource Group\'s name.')
-param name string = take(toLower(uniqueString(resourceGroup().name)), 10)
+param name string = ''
+param vmName string = take(toLower(uniqueString(name, resourceGroup().name)), 10)
 
 @description('Optional. Specifies whether the computer names should be transformed. The transformation is performed on all computer names. Available transformations are \'none\' (Default), \'uppercase\' and \'lowercase\'.')
 @allowed([
@@ -362,7 +363,7 @@ module vm_nic 'includes/az.com.virtual.machine.network.Interface.bicep' = [for (
 }]
 
 resource vm 'Microsoft.Compute/virtualMachines@2021-07-01' = {
-  name: name
+  name: vmName
   location: location
   identity: identity
   tags: tags
@@ -383,7 +384,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2021-07-01' = {
     storageProfile: {
       imageReference: imageReference
       osDisk: {
-        name: '${name}-disk-os-01'
+        name: '${vmName}-disk-os-01'
         createOption: contains(osDisk, 'createOption') ? osDisk.createOption : 'FromImage'
         deleteOption: contains(osDisk, 'deleteOption') ? osDisk.deleteOption : 'Delete'
         diskSizeGB: osDisk.diskSizeGB
@@ -395,7 +396,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2021-07-01' = {
       }
       dataDisks: [for (dataDisk, index) in dataDisks: {
         lun: index
-        name: '${name}-disk-data-${padLeft((index + 1), 2, '0')}'
+        name: '${vmName}-disk-data-${padLeft((index + 1), 2, '0')}'
         diskSizeGB: dataDisk.diskSizeGB
         createOption: contains(dataDisk, 'createOption') ? dataDisk.createOption : 'Empty'
         deleteOption: contains(dataDisk, 'deleteOption') ? dataDisk.deleteOption : 'Delete'

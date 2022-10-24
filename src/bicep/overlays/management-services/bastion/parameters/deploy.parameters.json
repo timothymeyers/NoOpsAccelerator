@@ -38,8 +38,7 @@
                     "publicIPAddressAvailabilityZones": [],
                     "encryptionAtHost": false,
                     "linux": {
-                        "enable": true,
-                        "vmName": "bastion-linux",
+                        "enable": true,                        
                         "vmAdminUsername": "azureuser",
                         "disablePasswordAuthentication": false,
                         "vmAdminPasswordOrKey": "Rem0te@2020246",
@@ -53,8 +52,7 @@
                         "networkInterfacePrivateIPAddressAllocationMethod": "Dynamic"
                     },
                     "windows": {
-                        "enable": true,
-                        "vmName": "bastion-windows",
+                        "enable": true,                        
                         "vmAdminUsername": "azureuser",
                         "vmAdminPassword": "Rem0te@2020246",
                         "vmSize": "Standard_DS1_v2",

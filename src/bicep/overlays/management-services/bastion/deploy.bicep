@@ -321,8 +321,7 @@ module modLinuxNetworkInterface '../../../azresources/Modules/Microsoft.Network/
 
 module modLinuxVirtualMachine '../../../azresources/Modules/Microsoft.Compute/virtualmachines/az.com.virtual.machine.bicep' = if (parRemoteAccess.bastion.linux.enable) {
   name: 'deploy-ra-linux-vm-${parLocation}-${parDeploymentNameSuffix}'
-  params: {
-    name: '${toLower(parRequired.orgPrefix)}-${toLower(parRemoteAccess.bastion.linux.vmName)}'
+  params: {    
     location: parLocation
     tags: (empty(parTags)) ? modTags : parTags
 
@@ -393,8 +392,7 @@ module modAvSet '../../../azresources/Modules/Microsoft.Compute/availabilitySets
 
 module modWindowsVirtualMachine '../../../azresources/Modules/Microsoft.Compute/virtualmachines/az.com.virtual.machine.bicep' = if (parRemoteAccess.bastion.windows.enable) {
   name: 'deploy-ra-windows-vm-${parLocation}-${parDeploymentNameSuffix}'
-  params: {
-    name: parRemoteAccess.bastion.windows.vmName
+  params: {    
     location: parLocation
     tags: (empty(parTags)) ? modTags : parTags
 

@@ -427,6 +427,7 @@ resource managedCluster 'Microsoft.ContainerService/managedClusters@2022-07-01' 
         }
       }
     }
+#disable-next-line BCP037
     oidcIssuerProfile: enableOidcIssuerProfile ? {
       enabled: enableOidcIssuerProfile
     } : null

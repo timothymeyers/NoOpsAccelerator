@@ -1,12 +1,12 @@
-# Overlay: NoOps Accelerator - Azure Kubernetes Service - Cluster with Optional AGW Ingress Controller
+# Overlay: NoOps Accelerator - Azure Kubernetes Service - Private Cluster - Kubenet
 
 ## Overview
 
-This overlay module deploys a Azure Kubernetes Service - Cluster with Optional AGW Ingress Controller suitable for hosting docker containers apps. The cluster will be deployed to the Hub/Spoke shared services resource group using default naming unless alternative values are provided at run time.
+This overlay module deploys a Azure Kubernetes Service - Private Cluster - Kubenet suitable for hosting docker containers apps. The cluster will be deployed to the Hub/Spoke shared services resource group or Tier 3 spoke using default naming unless alternative values are provided at run time.
 
 Read on to understand what this example does, and when you're ready, collect all of the pre-requisites, then deploy the example.
 
-## Deploy Azure Kubernetes Service - Cluster
+## Deploy Azure Kubernetes Service - Private Cluster - Kubenet
 
 The docs on Azure Kubernetes Service: <https://docs.microsoft.com/en-us/azure/aks/>.  By default, this overlay will deploy resources into standard default hub/spoke subscriptions and resource groups.  
 
@@ -14,16 +14,14 @@ The subscription and resource group can be changed by providing the resource gro
 
 ## Pre-requisites
 
-* A virtual network and subnet is deployed. (a deployment of [deploy.bicep](../../../../bicep/platforms/lz-platform-scca-hub-1spoke/deploy.bicep))
+* A virtual network and subnet is deployed. (a deployment of [deploy.bicep](../../../../bicep/platforms/lz-platform-scca-hub-3spoke/deploy.bicep))
 * Decide if the optional parameters is appropriate for your deployment. If it needs to change, override one of the optional parameters.
 
 ### AKS Service Principal
 
 To access other Azure Active Directory (Azure AD) resources, an AKS cluster requires either an Azure Active Directory (AD) service principal or a managed identity. A service principal or managed identity is needed to dynamically create and manage other Azure resources such as an Azure load balancer or container registry (ACR).
 
-```bash
-az ad sp create-for-rbac --name myAKSClusterServicePrincipal
-```
+> NOTE: The overlay use the userAssignedIdentities parameter by default for the managed identity.
 
 ## Parameters
 
@@ -39,6 +37,62 @@ parTargetSubscriptionId | string | `xxxxxx-xxxx-xxxx-xxxxx-xxxxxx` | The target 
 parTargetResourceGroup | string | `anoa-eastus-platforms-hub-rg` | The name of the resource group in which the Azure Kubernetes Cluster will be deployed. If unchanged or not specified, the NoOps Accelerator will create an resource group to be used.
 parTargetVNetName | string | `anoa-eastus-platforms-hub-vnet` | The name of the VNet in which the aks will be deployed. If unchanged or not specified, the NoOps Accelerator shared services resource group is used.
 parTargetSubnetName | string | `anoa-eastus-platforms-hub-snet` | The name of the Subnet in which the aks will be deployed. If unchanged or not specified, the NoOps Accelerator shared services resource group is used.
+
+### parKubernetesCluster Parameters
+
+Parameters | Type | Allowed Values | Description
+| :-- | :-- | :-- | :-- |
+name | string | {Contoso} | Specifies the name of the AKS cluster.
+enableSystemAssignedIdentity | bool | {false} | Enables system assigned managed identity on the resource.
+aksClusterKubernetesVersion | string | {1.24.3} | Required values used with all resources.
+enableRBAC | bool | {true} | Whether to enable Kubernetes Role-Based Access Control.
+enableResourceLock | bool | {false} | Required values used with all resources.
+enablePodIdentity | bool | {false} | Whether the pod identity addon is enabled.
+aksClusterSkuTier | string | {Free} | Required values used with all resources.
+usePrivateDNSZone | bool | {true} | If AKS will create a Private DNS Zone in the Node Resource Group.
+enableIngressApplicationGateway | bool | {false} | Specifies whether the ingressApplicationGateway (AGIC) add-on is enabled or not.
+
+`primaryAgentPoolProfile` Parameters | Type | Allowed Values | Description
+| :-- | :-- | :-- | :-- |
+name | string | {systempool} | Specifies the name of the AKS AgentPool.
+vmSize | string | {Standard_DS2_v2} | Specifies the name of the AKS AgentPool vmSize.
+osDiskSizeGB | int | {30} | Specifies the name of the AKS AgentPool VM OS Disk Size in GB.
+osDiskType | string | {Managed} | Specifies the name of the AKS AgentPool VM OS Disk type.
+enableAutoScaling | bool | {true} | Enables auto scaling on the agent pool.
+count | int | {10} | Specifies the name of the AKS AgentPool count.
+osType | string | {Linux} |Specifies the name of the AKS AgentPool VM OS type
+osSKU | string | {Ubuntu} | Specifies the name of the AKS AgentPool VM OS Sku.
+type | string | {VirtualMachineScaleSets} | Specifies the name of the AKS AgentPool VM type.
+mode | string | {System} | Specifies the name of the AKS AgentPool mode.
+availabilityZones | string | {string} | Specifies the name of the AKS AgentPool availability Zones.
+
+`networkProfile` Parameters | Type | Allowed Values | Description
+| :-- | :-- | :-- | :-- |
+aksClusterLoadBalancerSku | string | {standard} | Specifies the sku of the load balancer used by the virtual machine scale sets used by nodepools.
+aksClusterPodCidr | string | {10.244.0.0/16} | Specifies the CIDR notation IP range from which to assign pod IPs when kubenet is used.
+aksClusterServiceCidr | string | {172.16.1.0/24} | A CIDR notation IP range from which to assign service cluster IPs. It must not overlap with any Subnet IP ranges.
+aksClusterDnsServiceIP | string | {172.16.1.10} | Specifies the IP address assigned to the Kubernetes DNS service. It must be within the Kubernetes service address range specified in serviceCidr.
+aksClusterDockerBridgeCidr | string | {170.10.0.1/30} | Specifies the CIDR notation IP range assigned to the Docker bridge network. It must not overlap with any Subnet IP ranges or the Kubernetes service address range.
+aksClusterOutboundType | string | {userDefinedRouting} |Specifies outbound (egress) routing method. - loadBalancer or userDefinedRouting.
+
+`apiServerAccessProfile` Parameters | Type | Allowed Values | Description
+| :-- | :-- | :-- | :-- |
+enablePrivateCluster | bool | {true} | Specifies whether to create the cluster as a private cluster or not. Default: True
+enablePrivateClusterPublicFQDN | bool | {false} | Whether to create additional public FQDN for private cluster or not. Default: False
+
+`aadProfile` Parameters | Type | Allowed Values | Description
+| :-- | :-- | :-- | :-- |
+aadProfileTenantId | string | {TenantId} | Specifies the tenant ID of the Azure Active Directory used by the AKS cluster for authentication.
+aadProfileAdminGroupObjectIDs | array | [ "GroupObjectID"] | Specifies the AAD group object IDs that will have admin role of the cluster.
+
+`addonProfiles` Parameters | Type | Allowed Values | Description
+| :-- | :-- | :-- | :-- |
+omsagent | object | {"enable": true,"config": {"logAnalyticsWorkspaceResourceID": "/subscriptions/subscriptionId/resourcegroups/anoa-eastus-dev-logging-rg/providers/microsoft.operationalinsights/workspaces/anoa-eastus-dev-logging-log"} | Specifies whether the OMS agent is enabled.
+
+`servicePrincipalProfile` Parameters | Type | Allowed Values | Description
+| :-- | :-- | :-- | :-- |
+clientId | string | {string} | The client AAD application ID.
+secret | string | {string} | The server AAD application secret.
 
 ## Deploy the Overlay
 
@@ -56,19 +110,30 @@ For example, deploying using the `az deployment group create` command in the Azu
 
 ```bash
 # For Azure Commerical regions
+
+# When deploying to Azure cloud, first set the cloud.
+az cloudset --name AzureCloud
+
+# Set Platform connectivity subscription ID as the the current subscription 
+$ConnectivitySubscriptionId="[your platform management subscription ID]"
+az account set --subscription $ConnectivitySubscriptionId
+
+#log in
 az login
 cd src/bicep
 cd platforms/lz-platform-scca-hub-3spoke
 az deployment sub create \ 
---name contoso \
+--name deploy-aks-metwork \
 --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx \
 --template-file deploy.bicep \
 --location eastus \
 --parameters @parameters/deploy.parameters.json
+
+
 cd overlays
-cd kubernetesCluster
+cd kubernetesPrivateCluster-Kubnet
 az deployment sub create \
-   --name deploy-AKS-Network
+   --name deploy-aks-overlay
    --template-file deploy.bicep \
    --parameters @parameters/deploy.parameters.json \
    --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx \
@@ -79,10 +144,22 @@ OR
 
 ```bash
 # For Azure Government regions
+
+# When deploying to another cloud, like Azure US Government, first set the cloud and log in.
+az cloudset --name AzureGovernment
+
+# Set Platform connectivity subscription ID as the the current subscription
+$ConnectivitySubscriptionId="[your platform management subscription ID]"
+az account set --subscription $ConnectivitySubscriptionId
+
+az login
+cd src/bicep
+cd overlays
+cd kubernetesPrivateCluster-Kubnet
 az deployment group create \
-  --name deploy-AKS-Network
-   --template-file overlays/kubernetesCluster/deploy.bicep \
-   --parameters @overlays/kubernetesCluster/parameters/deploy.parameters.json \
+  --name deploy-aks-overlay
+   --template-file deploy.bicep \
+   --parameters @parameters/deploy.parameters.json \
    --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx \
    --location 'usgovvirginia'
 ```
@@ -91,9 +168,21 @@ az deployment group create \
 
 ```powershell
 # For Azure Commerical regions
+# When deploying to Azure cloud, first set the cloud and log in.
+Connect-AzAccount -EnvironmentName AzureCloud
+
+# Set Platform connectivity subscription ID as the the current subscription
+$ConnectivitySubscriptionId = "[your platform management subscription ID]"
+Select-AzSubscription -SubscriptionId $ConnectivitySubscriptionId
+
+cd src/bicep
+cd overlays
+cd kubernetesPrivateCluster-Kubnet
+
 New-AzSubscriptionDeployment `
-  -TemplateFile overlays/kubernetesCluster/deploy.bicepp `
-  -TemplateParameterFile overlays/kubernetesCluster/parameters/deploy.parameters.json `
+  -Name deploy-aks-overlay `
+  -TemplateFile deploy.bicepp `
+  -TemplateParameterFile parameters/deploy.parameters.json `
   -Subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx `
   -Location 'eastus'
 ```
@@ -102,9 +191,22 @@ OR
 
 ```powershell
 # For Azure Government regions
+
+# When deploying to another cloud, like Azure US Government, first set the cloud and log in.
+Connect-AzAccount -EnvironmentName AzureUSGovernment
+
+# Set Platform connectivity subscription ID as the the current subscription
+$ConnectivitySubscriptionId = "[your platform management subscription ID]"
+Select-AzSubscription -SubscriptionId $ConnectivitySubscriptionId
+
+cd src/bicep
+cd overlays
+cd kubernetesPrivateCluster-Kubnet
+
 New-AzSubscriptionDeployment `
-  -TemplateFile overlays/kubernetesCluster/deploy.bicepp `
-  -TemplateParameterFile overlays/kubernetesCluster/parameters/deploy.parameters.json `
+  -Name deploy-aks-overlay `
+  -TemplateFile deploy.bicepp `
+  -TemplateParameterFile parameters/deploy.parameters.json `
   -Subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx `
   -Location  'usgovvirginia'
 ```
@@ -137,106 +239,6 @@ OR
 Get-AzResource -ResourceGroupName anoa-eastus-workload-aks-rg
 ```
 
-## Set up Application Gateway Ingress Controller
-
-We created and configured a new AKS cluster and an Application Gateway with the overlay. We're now ready to an ingress controller to our new Kubernetes infrastructure.
-
-### Setup Kubernetes Credentials
-
-For the following steps, we need setup kubectl command, which we'll use to connect to our new Kubernetes cluster. Cloud Shell has kubectl already installed. We'll use az CLI to obtain credentials for Kubernetes.
-
-Get credentials for your newly deployed AKS (read more):
-
-```bash
-# use the deployment-outputs.json created after deployment to get the cluster name and resource group name
-aksClusterName=$(jq -r ".aksClusterName.value" deployment-outputs.json)
-resourceGroupName=$(jq -r ".resourceGroupName.value" deployment-outputs.json)
-
-az aks get-credentials --resource-group $resourceGroupName --name $aksClusterName
-```
-
-### Install Azure AD Pod Identity
-
-Azure Active Directory Pod Identity provides token-based access to Azure Resource Manager (ARM).
-
-Azure AD Pod Identity will add the following components to your Kubernetes cluster:
-
-* Kubernetes CRDs: AzureIdentity, AzureAssignedIdentity, AzureIdentityBinding
-* Managed Identity Controller (MIC) component
-* Node Managed Identity (NMI) component
-
-To install Azure AD Pod Identity to your cluster:
-
-* Kubernetes RBAC enabled AKS cluster
-  
-```bash
-kubectl create -f https://raw.githubusercontent.com/Azure/aad-pod-identity/master/deploy/infra/deployment-rbac.yaml
-```
-
-* Kubernetes RBAC disabled  AKS cluster
-  
-```bash
-kubectl create -f https://raw.githubusercontent.com/Azure/aad-pod-identity/master/deploy/infra/deployment.yaml
-```
-
-### Install Helm
-
-Helm is a package manager for Kubernetes. We'll use it to install the application-gateway-kubernetes-ingress package:
-
-1. Install Helm and run the following to add application-gateway-kubernetes-ingress helm package:
-
-* Kubernetes RBAC enabled AKS cluster
-  
-```bash
-kubectl create serviceaccount --namespace kube-system tiller-sa
-kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller-sa
-helm init --tiller-namespace kube-system --service-account tiller-sa
-```
-
-* Kubernetes RBAC disabled  AKS cluster
-  
-```bash
-helm init
-```
-
-2. Add the AGIC Helm repository:
-
-```bash
-helm repo add application-gateway-kubernetes-ingress https://appgwingress.blob.core.windows.net/ingress-azure-helm-package/
-helm repo update
-```
-
-### Install Ingress Controller Helm Chart
-
-1. Use the deployment-outputs.json file created above and create the following variables.
-
-```bash
-applicationGatewayName=$(jq -r ".applicationGatewayName.value" deployment-outputs.json)
-resourceGroupName=$(jq -r ".resourceGroupName.value" deployment-outputs.json)
-subscriptionId=$(jq -r ".subscriptionId.value" deployment-outputs.json)
-identityClientId=$(jq -r ".identityClientId.value" deployment-outputs.json)
-identityResourceId=$(jq -r ".identityResourceId.value" deployment-outputs.json)
-```
-
-2. Edit the helm-config.yaml found in the [helm folder](./helm/) and fill out the sections appgw and armAuth.
-
-```bash
-sed -i "s|<subscriptionId>|${subscriptionId}|g" helm-config.yaml
-sed -i "s|<resourceGroupName>|${resourceGroupName}|g" helm-config.yaml
-sed -i "s|<applicationGatewayName>|${applicationGatewayName}|g" helm-config.yaml
-sed -i "s|<identityResourceId>|${identityResourceId}|g" helm-config.yaml
-sed -i "s|<identityClientId>|${identityClientId}|g" helm-config.yaml
-
-# You can further modify the helm config to enable/disable features
-nano helm-config.yaml
-```
-
-3. Install the Application Gateway ingress controller package:
-
-```bash
-helm install -f helm-config.yaml application-gateway-kubernetes-ingress/ingress-azure
-```
-
 ## Cleanup
 
 The Bicep/ARM deployment of NoOps Accelerator - Azure Kubernetes Service - Cluster deployment can be deleted with these steps:
@@ -256,13 +258,15 @@ Remove-AzResourceGroup -Name anoa-eastus-workload-aks-rg
 ### Delete Deployments
 
 ```bash
-az deployment delete --name deploy-AKS-Network
+az deployment delete --name deploy-AKS-network
+az deployment delete --name deploy-AKS-overlay
 ```
 
 OR
 
 ```powershell
 Remove-AzSubscriptionDeployment -Name deploy-AKS-Network
+Remove-AzSubscriptionDeployment -Name deploy-AKS-overlay
 ```
 
 ## Example Output in Azure

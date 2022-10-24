@@ -12,7 +12,7 @@
     "parTags": {
       "value": {
         "organization": "anoa",
-        "region": "virginiagovus",
+        "region": "<<region>>",
         "templateVersion": "v1.0",
         "deployEnvironment": "dev",
         "deploymentType": "NoOpsBicep"
@@ -20,7 +20,7 @@
     },
     "parHub": {
       "value": {
-        "subscriptionId": "896f5276-df9a-4317-a791-469396bef7fa",
+        "subscriptionId": "<<subscriptionId>>",
         "virtualNetworkAddressPrefix": "10.0.100.0/24",
         "subnetAddressPrefix": "10.0.100.128/27",
         "subnets": [
@@ -48,9 +48,9 @@
           }
         ],
         "storageAccountAccess": {
-          "enableRoleAssignmentForStorageAccount": true,
+          "enableRoleAssignmentForStorageAccount": false,
           "principalIds": [
-            "47c98c84-d2d0-41ed-b05a-fc5baa5cda78"
+            "<<principalId>>"
           ],
           "roleDefinitionIdOrName": "Contributor"
         }
@@ -237,7 +237,7 @@
       "value": {
         "name": "aks",
         "shortName": "aks",
-        "subscriptionId": "896f5276-df9a-4317-a791-469396bef7fa",
+        "subscriptionId": "<<subscriptionId>>",
         "enableDdosProtectionPlan": false,
         "network": {
           "virtualNetworkAddressPrefix": "10.0.125.0/26",
@@ -270,9 +270,9 @@
           }
         },
         "storageAccountAccess": {
-          "enableRoleAssignmentForStorageAccount": true,
+          "enableRoleAssignmentForStorageAccount": false,
           "principalIds": [
-            "47c98c84-d2d0-41ed-b05a-fc5baa5cda78"
+            "<<principalId>>"
           ],
           "roleDefinitionIdOrName": "Contributor"
         }
@@ -321,9 +321,9 @@
           "enablePrivateClusterPublicFQDN": false
         },
         "aadProfile": {
-          "aadProfileTenantId": "ded6b38d-d740-4564-ae25-2e3f041093be",
+          "aadProfileTenantId": "<<tenantId>>",
           "aadProfileAdminGroupObjectIDs": [
-            "47c98c84-d2d0-41ed-b05a-fc5baa5cda78"
+            "<<objectId>>"
           ],
           "enableAadProfileEnableAzureRBAC": true,
           "enableAadProfileManaged": true
@@ -332,7 +332,7 @@
           "omsagent": {
             "enable": true,
             "config": {
-              "logAnalyticsWorkspaceResourceID": "/subscriptions/896f5276-df9a-4317-a791-469396bef7fa/resourcegroups/anoa-eastus-dev-logging-rg/providers/microsoft.operationalinsights/workspaces/anoa-eastus-dev-logging-log"
+              "logAnalyticsWorkspaceResourceID": "/subscriptions/<<subscriptionId>>/resourcegroups/anoa-eastus-dev-logging-rg/providers/microsoft.operationalinsights/workspaces/anoa-eastus-dev-logging-log"
             }
           },
           "enableResourceLock": true,
@@ -340,17 +340,17 @@
           "azureKeyvaultSecretsProvider": true
         },
         "servicePrincipalProfile": {
-          "clientId": "178979fa-74c1-46f2-b451-e8290b78fba3",
-          "secret": "eEv8Q~PMmJpp-_rVruJqCGJHxcElAG0znC3eobxP"
+          "clientId": "<<clientId>>",
+          "secret": "<<secret>>"
         }
       }
     },
     "parNetworkArtifacts": {
       "value": {
-        "enable": true,
+        "enable": false,
         "artifactsKeyVault": {
           "keyVaultPolicies": {
-            "objectId": "47c98c84-d2d0-41ed-b05a-fc5baa5cda78",
+            "objectId": "<<objectId>>",
             "permissions": {
               "keys": [
                 "get",
@@ -363,13 +363,13 @@
                 "set"
               ]
             },
-            "tenantId": "ded6b38d-d740-4564-ae25-2e3f041093be"
+            "tenantId": "<<tenantId>>"
           }
         },
         "storageAccountAccess": {
-          "enableRoleAssignmentForStorageAccount": true,
+          "enableRoleAssignmentForStorageAccount": false,
           "principalIds": [
-            "47c98c84-d2d0-41ed-b05a-fc5baa5cda78"
+            "<<principalId>>"
           ],
           "roleDefinitionIdOrName": "Contributor"
         }
@@ -407,9 +407,9 @@
         ],
         "storageAccountAccess": {
           "value": {
-            "enableRoleAssignmentForStorageAccount": true,
+            "enableRoleAssignmentForStorageAccount": false,
             "principalIds": [
-              "47c98c84-d2d0-41ed-b05a-fc5baa5cda78"
+              "<<principalId>>"
             ],
             "roleDefinitionIdOrName": "Contributor"
           }
@@ -424,9 +424,9 @@
         "logAnalyticsWorkspaceSkuName": "PerGB2018",
         "logStorageSkuName": "Standard_GRS",
         "storageAccountAccess": {
-          "enableRoleAssignmentForStorageAccount": true,
+          "enableRoleAssignmentForStorageAccount": false,
           "principalIds": [
-            "47c98c84-d2d0-41ed-b05a-fc5baa5cda78"
+            "<<principalId>>"
           ],
           "roleDefinitionIdOrName": "Contributor"
         }

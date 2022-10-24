@@ -930,6 +930,6 @@ output hub object = {
 
 output logAnalyticsWorkspaceName string = modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceName
 
-output logAnalyticsWorkspaceResourceId string = modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceId
+output logAnalyticsWorkspaceResourceId string = modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceResourceId
 
 output diagnosticStorageAccountName string = modOperationsNetwork.outputs.operationsLogStorageAccountName

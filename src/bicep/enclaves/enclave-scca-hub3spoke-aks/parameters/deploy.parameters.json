@@ -20,7 +20,7 @@
     },
     "parHub": {
       "value": {
-        "subscriptionId": "896f5276-df9a-4317-a791-469396bef7fa",
+        "subscriptionId": "<<subscriptionId>>",
         "virtualNetworkAddressPrefix": "10.0.100.0/24",
         "subnetAddressPrefix": "10.0.100.128/27",
         "subnets": [

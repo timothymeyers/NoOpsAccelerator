@@ -42,7 +42,7 @@
           ],
           "subnets": [],
           "routeTable": {
-            "disableBgpRoutePropagation": false,
+            "disableBgpRoutePropagation": true,
             "routes": [
               {
                 "name": "wl-routetable",

@@ -192,7 +192,7 @@ module modKubernetesCluster '../../../azresources/Modules/Microsoft.ContainerSer
   scope: resourceGroup(parTargetSubscriptionId, rgKubernetesCluster.name)
   name: 'deploy-aks-${parLocation}-${parDeploymentNameSuffix}'
   params: {
-    name: '${parKubernetesCluster.name}aks'
+    name: '${parKubernetesCluster.name}-aks'
     location: parLocation
     nodeResourceGroup: 'MC${parKubernetesCluster.name}-aksInfraRG'
     aksClusterSkuTier: parKubernetesCluster.aksClusterSkuTier

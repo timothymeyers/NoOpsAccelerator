@@ -55,10 +55,17 @@ param parKubernetesCluster object
 @description('Parmaters Object of the workload, Please review the Read Me for required parameters.')
 param parAksWorkload object
 
-var telemetry = json(loadTextContent('../../azresources/Modules/Global/telemetry.json'))
-module telemetryCustomerUsageAttribution '../../azresources/Modules/Global/partnerUsageAttribution/customer-usage-attribution-subscription.bicep' = if (telemetry.customerUsageAttribution.enabled) {
-  name: 'pid-${telemetry.customerUsageAttribution.modules.enclaves.sccahubspokeaks}'
-  scope: subscription(parHub.subscriptionId)
+var telemetry = json(loadTextContent('../../azresources/Modules/Global/partnerUsageAttribution/telemetry.json'))
+resource defaultTelemetry 'Microsoft.Resources/deployments@2021-04-01' = if (telemetry.customerUsageAttribution.enabled) {
+  name: 'pid-${telemetry.customerUsageAttribution.modules.enclaves.sccahubspokeaks}-${uniqueString(deployment().name, parLocation)}'
+  properties: {
+    mode: 'Incremental'
+    template: {
+      '$schema': 'https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#'
+      contentVersion: '1.0.0.0'
+      resources: []
+    }
+  }
 }
 
 module modHubSpoke '../../platforms/lz-platform-scca-hub-3spoke/deploy.bicep' = {

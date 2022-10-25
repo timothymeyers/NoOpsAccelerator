@@ -20,7 +20,7 @@ targetScope = 'subscription' //Deploying at Subscription scope to allow resource
 //   "value": {
 //     "orgPrefix": "anoa",
 //     "templateVersion": "v1.0",
-//     "deployEnvironment": "mlz"
+//     "deployEnvironment": "platforms"
 //   }
 // }
 @description('Required values used with all resources.')
@@ -152,10 +152,18 @@ param parKubernetesCluster object
 
 // Telemetry - Azure customer usage attribution
 // Reference:  https://docs.microsoft.com/azure/marketplace/azure-partner-customer-usage-attribution
-var telemetry = json(loadTextContent('../../azresources/Modules/Global/telemetry.json'))
-module telemetryCustomerUsageAttribution '../../azresources/Modules/Global/partnerUsageAttribution/customer-usage-attribution-subscription.bicep' = if (telemetry.customerUsageAttribution.enabled) {
-  name: 'pid-${telemetry.customerUsageAttribution.modules.workloads.aks}'
-  scope: subscription(parWorkloadSpoke.subscriptionId)
+var telemetry = json(loadTextContent('../../azresources/Modules/Global/partnerUsageAttribution/telemetry.json'))
+resource defaultTelemetry 'Microsoft.Resources/deployments@2021-04-01' = if (telemetry.customerUsageAttribution.enabled) {
+  name: 'pid-${telemetry.customerUsageAttribution.modules.workloads.aks}-${uniqueString(deployment().name, parLocation)}'
+  location: parLocation
+  properties: {
+    mode: 'Incremental'
+    template: {
+      '$schema': 'https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#'
+      contentVersion: '1.0.0.0'
+      resources: []
+    }
+  }
 }
 
 //=== TAGS === 

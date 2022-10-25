@@ -306,6 +306,7 @@
         "enableRBAC": true,
         "enableResourceLock": false,
         "enablePodIdentity": false,
+        "usePrivateDNSZone": true,
         "aksClusterSkuTier": "Free",
         "enableIngressApplicationGateway": false,
         "primaryAgentPoolProfile": {

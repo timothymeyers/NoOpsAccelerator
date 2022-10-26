@@ -10,25 +10,25 @@ Read on to understand what this enclave does, and when you're ready, collect all
 
 ## Architecture
 
- ![Enclave Hub/Spoke landing zone with a Azure Kubernetes Service Architecture](../enclave-scca-hubspoke-aks/media/hub-1spoke-aks-network-topology-architecture.jpg)
+ ![Enclave Hub/Spoke landing zone with a Azure Kubernetes Service Architecture](../enclave-scca-hub3spoke-aks/media/hub-1spoke-aks-network-topology-architecture.jpg)
 
 ## About Hub 3 Spoke Landing Zone with Azure Kubernetes Service - Private Cluster Workload
 
-The docs on Hub/Spoke Landing Zone: <https://learn.microsoft.com/en-us/azure/architecture/reference-architectures/hybrid-networking/hub-spoke?tabs=cli>.
+Documentation on Hub/Spoke Landing Zone: <https://learn.microsoft.com/en-us/azure/architecture/reference-architectures/hybrid-networking/hub-spoke?tabs=cli>.
 
-The docs on Azure Kubernetes Service: <https://docs.microsoft.com/en-us/azure/aks/>.
+Documentation on Azure Kubernetes Service: <https://docs.microsoft.com/en-us/azure/aks/>.
 
-This Enclave uses the [Azure Kubernetes Service - Cluster workload](../../../bicep/workloads/wl-aks-spoke/readme.md) to deploy resources into [Platform Hub 3 Spoke Network](../../../bicep/platforms/lz-platform-scca-hub-3spoke/readme.md).
+This enclave uses the [Azure Kubernetes Service - Cluster workload](../../../bicep/workloads/wl-aks-spoke/readme.md) to deploy resources into a [Platform Hub 3 Spoke Network](../../../bicep/platforms/lz-platform-scca-hub-3spoke/readme.md).
 
-## Pre-requisites
+## Pre-Requisites
 
 ### Subscriptions
 
-Most customers will deploy each tier to a separate Azure subscription, but multiple subscriptions are not required. A single subscription deployment is good for a testing and evaluation, or possibly a small IT Admin team.
+Most customers will deploy each tier to a separate Azure subscription; however, multiple subscriptions are not required. A single subscription deployment can be used for a testing and evaluation, or possibly a small I.T. administration team.
 
 ### Operational Network Artifacts
 
-If needed, The Operational Network Artifacts are used when operations wants to seperate all key, secrets and operations storage from the hub/spoke model.
+If needed, The Operational Network Artifacts are used when operations wants to seperate all keys, secrets and operations storage from the hub/spoke model.
 
 ### Management Groups
 
@@ -37,7 +37,8 @@ The Enclave Management Groups ovlerlay module deploys a management group hierarc
 Azure NoOps Accelerator recommends the following Management Group structure. This structure can be customized based on your organization's requirements.
 
 * Workloads will be split by 2 groups of archtypes (INTERNAL, PARTNERS).
-* Sandbox management group is used for any new subscriptions that will be created. This will remove the subscription sprawl from the Root Tenant Group and will pull all subscriptions into the security compliance.
+
+* The Sandbox management group is used for any new subscriptions that will be created. This will remove the subscription sprawl from the Root Tenant Group and will pull all subscriptions into the security compliance.
 
 The hierarchy created by the deployment ([Azure Parameters template located in "management-groups/parameters" folder](../../overlays/management-groups/parameters/deploy.parameters.json)) is:
 
@@ -52,32 +53,67 @@ The hierarchy created by the deployment ([Azure Parameters template located in "
 <summary>via Bash</summary>
 
 ```bash
-# For Azure Commerical regions
+# ****************************************
+# For AZURE COMMERCIAL
+# ****************************************
 
-#sign  into AZ CLI, this will redirect you to a web browser for authentication, if required
+# Set the active cloud 
+az cloud set --name 'AzureCloud'
+
+# Set a subscription to be the current active subscription
+subscriptionId="[your platform management subscription ID]"
+az account set --subscription $subscriptionId
+
+# Log in to Azure.
+# By default, this command logs in with a user account. CLI will try to launch a web  browser to log in interactively. If a web browser is not available, CLI will fall back to device code login. To login with a service principal, specify --service-principal.
 az login
-cd src/bicep/overlays
-cd management-groups
-az deployment mg create \
-   --template-file overlays/management-groups/deploy.bicep \
-   --parameters @overlays/management-groups/deploy.parameters.json \
-   --location 'eastus'
+
+# Capture your Tenant ID
+tenantId=$(az account show --query 'tenantId' --output tsv)
+
+# Navigate to the Management Groups structure
+cd src/bicep/overlays/management-groups
+
+# Deploy Management Groups
+az deployment mg create
+--name 'deploy-enclave-mg'
+--template-file 'deploy.bicep'
+--parameters '@parameters/deploy.parameters.json' 
+--management-group-id $tenantId
+--location 'eastus'
+--only-show-errors
 ```
 
 ```bash
-# For Azure Government regions
+# ****************************************
+# For AZURE GOVERNMENT
+# ****************************************
 
-# change Azure Clouds
-az cloud set --name AzureUSGovernment
+# Set the active cloud
+az cloud set --name 'AzureUSGovernment'
 
-#sign  into AZ CLI, this will redirect you to a web browser for authentication, if required
+# Set a subscription to be the current active subscription
+subscriptionId="[your platform management subscription ID]"
+az account set --subscription $subscriptionId
+
+# Log in to Azure.
+# By default, this command logs in with a user account. CLI will try to launch a web  browser to log in interactively. If a web browser is not available, CLI will fall back to device code login. To login with a service principal, specify --service-principal.
 az login
-cd src/bicep/overlays
-cd management-groups
-az deployment mg create \
-  --template-file overlays/management-groups/deploy.bicep \
-  --parameters @overlays/management-groups/deploy.parameters.json \
-  --location 'usgovvirginia'
+
+# Capture your Tenant ID
+tenantId=$(az account show --query 'tenantId' --output tsv)
+
+# Navigate to the Management Groups structure
+cd src/bicep/overlays/management-groups
+
+# Deploy Management Groups
+az deployment mg create
+--name 'deploy-enclave-mg'
+--template-file 'deploy.bicep'
+--parameters '@parameters/deploy.parameters.json' 
+--management-group-id $tenantId
+--location 'usgovvirginia'
+--only-show-errors
 ```
 
 </details>
@@ -88,7 +124,12 @@ az deployment mg create \
 <summary>via Powershell</summary>
 
 ```powershell
-# For Azure Commerical regions
+# ****************************************
+# For AZURE COMMERCIAL
+# ****************************************
+
+# Set the active cloud 
+az cloud set --name 'AzureCloud'
 
 #sign in to Azure  from Powershell, this will redirect you to a web browser for authentication, if required
 Connect-AzAccount
@@ -423,10 +464,6 @@ New-AzSubscriptionDeployment `
   -Subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx `
   -Location  'usgovvirginia'
 ```
-
-## Extending the Overlay
-
-By default, this overlay has the minium parmeters needed to deploy the service. If you like to add addtional parmeters to the service, please refer to the module description located in AzResources here: [`App Service Plans `[Microsoft.Web/serverfarms]`](D:\source\repos\NoOpsAccelerator\src\bicep\azresources\Modules\Microsoft.Web\serverfarms\readme.md)
 
 ## Air-Gapped Clouds
 

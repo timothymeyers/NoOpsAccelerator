@@ -1,135 +1,127 @@
-# NoOps Accelerator - Enclave - SCCA Compliant Hub - 3 Spoke landing zone with a Azure Kubernetes Service workload
+# Enclave Deployment: SCCA Compliant Hub and 3-Spoke Landing Zone with an Azure Kubernetes Service (AKS) Workload
 
 ## Overview
 
 This enclave module deploys Platform Hub - 3 Spoke landing zone with a Azure Kubernetes Service workload.
 
-> NOTE: When deploying enclaves; Management Groups, Policy and Roles need to be deployed first. Please review the Pre-requisites for more information.
+> **NOTE**
+>
+> Prior to deploying an enclave, you must first deploy management groups, policies, and roles. Please review the Pre-requisites for more information.
 
 Read on to understand what this enclave does, and when you're ready, collect all of the pre-requisites, then deploy the enclave.
 
 ## Architecture
 
- ![Enclave Hub/Spoke landing zone with a Azure Kubernetes Service Architecture](../enclave-scca-hubspoke-aks/media/hub-1spoke-aks-network-topology-architecture.jpg)
+ ![Enclave Hub/Spoke landing zone with a Azure Kubernetes Service Architecture](../enclave-scca-hub3spoke-aks/media/hub-1spoke-aks-network-topology-architecture.jpg)
 
-## About Hub 3 Spoke Landing Zone with Azure Kubernetes Service - Private Cluster Workload
+## About
 
-The docs on Hub/Spoke Landing Zone: <https://learn.microsoft.com/en-us/azure/architecture/reference-architectures/hybrid-networking/hub-spoke?tabs=cli>.
+Enclaves are the preferred method for deployment using the NoOps Accelerator.  Enclaves will deploy onto your existing management groups, roles, and policies.  They automatically deploy your operations, logging, monitoring, and workloads from a single command.
 
-The docs on Azure Kubernetes Service: <https://docs.microsoft.com/en-us/azure/aks/>.
+Read more about a [Hub-spoke network topology in Azure](<https://learn.microsoft.com/en-us/azure/architecture/reference-architectures/hybrid-networking/hub-spoke?tabs=cli>).  Additional documentation about [Azure Kubernetes Service (AKS)](https://docs.microsoft.com/en-us/azure/aks/) can be found on Microsoft Learn.
 
-This Enclave uses the [Azure Kubernetes Service - Cluster workload](../../../bicep/workloads/wl-aks-spoke/readme.md) to deploy resources into [Platform Hub 3 Spoke Network](../../../bicep/platforms/lz-platform-scca-hub-3spoke/readme.md).
+This enclave uses the [Azure Kubernetes Service - Cluster workload](../../../bicep/workloads/wl-aks-spoke/readme.md) to deploy resources into a [Platform Hub 3 Spoke Network](../../../bicep/platforms/lz-platform-scca-hub-3spoke/readme.md).
 
-## Pre-requisites
+## Pre-Requisites
 
 ### Subscriptions
-
-Most customers will deploy each tier to a separate Azure subscription, but multiple subscriptions are not required. A single subscription deployment is good for a testing and evaluation, or possibly a small IT Admin team.
+---
+Most customers will deploy each tier to a separate Azure subscription; however, multiple subscriptions are not required. A single subscription deployment can be used for testing and evaluation, or possibly a small I.T. administration team.
 
 ### Operational Network Artifacts
-
-If needed, The Operational Network Artifacts are used when operations wants to seperate all key, secrets and operations storage from the hub/spoke model.
+---
+If needed, The Operational Network Artifacts are used when operations want to separate all keys, secrets and operations storage from the hub/spoke model.  An Azure Key Vault is created in a resource group in the Hub.  If Bastion is deployed, then the credentials to access bastion are automatically secured in key vault.
 
 ### Management Groups
-
-The Enclave Management Groups ovlerlay module deploys a management group hierarchy in a tenant under the `Tenant Root Group`.  This is accomplished through a tenant-scoped Azure Resource Manager (ARM) deployment.  The heirarchy can be modifed by editing [Azure Parameters template located in "management-groups/parameters" folder](../../overlays/management-groups/parameters/deploy.parameters.json).
+---
+The Enclave Management Groups overlay module deploys a management group hierarchy in a tenant under the `Tenant Root Group`.  This is accomplished through a tenant-scoped Azure Resource Manager (ARM) deployment.  The hierarchy  can be modified by editing [Azure Parameters template located in "management-groups/parameters" folder](../../overlays/management-groups/parameters/deploy.parameters.json).
 
 Azure NoOps Accelerator recommends the following Management Group structure. This structure can be customized based on your organization's requirements.
 
-* Workloads will be split by 2 groups of archtypes (INTERNAL, PARTNERS).
-* Sandbox management group is used for any new subscriptions that will be created. This will remove the subscription sprawl from the Root Tenant Group and will pull all subscriptions into the security compliance.
+* Workloads will be split by 2 groups of archetypes (INTERNAL, PARTNERS).
+
+* The Sandbox management group is used for any new subscriptions that will be created. This will remove the subscription sprawl from the Root Tenant Group and will pull all subscriptions into security compliance.
 
 The hierarchy created by the deployment ([Azure Parameters template located in "management-groups/parameters" folder](../../overlays/management-groups/parameters/deploy.parameters.json)) is:
 
 ![Enclave Hub/Spoke landing zone with a Azure Kubernetes Service Architecture](./media/01%20-%20Management%20Group%20Design.jpg)
 
->NOTE: Management Group structure can be deployed or modified through [Azure Bicep template located in "management-groups" folder](../../overlays/management-groups).  See [overlays/management-groups/readme.md](../../../overlays/management-groups/readme.md) to update parameters
+> **NOTE**
+>
+> A management group structure can be deployed or modified through [Azure Bicep template located in "management-groups" folder](../../overlays/management-groups).  See [overlays/management-groups/readme.md](../../../overlays/management-groups/readme.md) to update parameters
 
-<h3>Overlay Example: Management Groups</h3>
+
+**Overlay Example: Management Groups**
 
 <details>
 
 <summary>via Bash</summary>
 
 ```bash
-# For Azure Commerical regions
+# Set the active cloud.  Use az cloud list for a list of cloud names.
+az cloud set --name 'AzureCloud'
 
-#sign  into AZ CLI, this will redirect you to a web browser for authentication, if required
+# Set a subscription to be the current active subscription
+subscriptionId="[your platform management subscription ID]"
+az account set --subscription $subscriptionId
+
+# Log in to Azure.
+# By default, this command logs in with a user account. CLI will try to launch a web browser to log in interactively. If a web browser is not available, CLI will fall back to device code login. To login with a service principal, specify --service-principal.
 az login
-cd src/bicep/overlays
-cd management-groups
-az deployment mg create \
-   --template-file overlays/management-groups/deploy.bicep \
-   --parameters @overlays/management-groups/deploy.parameters.json \
-   --location 'eastus'
+
+# Capture your Tenant ID
+tenantId=$(az account show --query 'tenantId' --output tsv)
+
+# Navigate to the Management Groups structure
+cd src/bicep/overlays/management-groups
+
+# Deploy Management Groups
+az deployment mg create
+--name 'deploy-enclave-mg'
+--template-file 'deploy.bicep'
+--parameters '@parameters/deploy.parameters.json' 
+--management-group-id $tenantId
+--location 'eastus'
+--only-show-errors
 ```
-
-```bash
-# For Azure Government regions
-
-# change Azure Clouds
-az cloud set --name AzureUSGovernment
-
-#sign  into AZ CLI, this will redirect you to a web browser for authentication, if required
-az login
-cd src/bicep/overlays
-cd management-groups
-az deployment mg create \
-  --template-file overlays/management-groups/deploy.bicep \
-  --parameters @overlays/management-groups/deploy.parameters.json \
-  --location 'usgovvirginia'
-```
-
 </details>
-<p>
+</p>
 
 <details>
 
-<summary>via Powershell</summary>
+<summary>via Azure CLI (AZ CLI)</summary>
 
 ```powershell
-# For Azure Commerical regions
+# Set the active cloud.  Use az cloud list for a list of cloud names.
+az cloud set --name 'AzureCloud'
 
-#sign in to Azure  from Powershell, this will redirect you to a web browser for authentication, if required
-Connect-AzAccount
+# Set a subscription to be the current active subscription
+$subscriptionId="[your platform management subscription ID]"
+az account set --subscription $subscriptionId
 
-#Fetch the list of available Tenant Ids.
-Get-AzTenant
+# Log in to Azure.
+# By default, this command logs in with a user account. CLI will try to launch a web browser to log in interactively. If a web browser is not available, CLI will fall back to device code login. To login with a service principal, specify --service-principal.
+az login
 
-#Grab the tenant Id Switch to another active directory tenant.
-Set-AzContext -TenantId XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+# Capture your Tenant ID
+$tenantId=$(az account show --query 'tenantId' --output tsv)
 
-New-AzManagementGroupDeployment `
-  -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
-  -TemplateFile overlays/management-groups/deploy.bicepp `
-  -TemplateParameterFile overlays/management-groups/deploy.parameters.json `
-  -Location 'eastus'
-```
+# Navigate to the Management Groups structure
+cd src/bicep/overlays/management-groups
 
-OR
-
-```powershell
-# For Azure Government regions
-
-#sign in to Azure  from Powershell, this will redirect you to a web browser for authentication, if required
-Connect-AzAccount
-
-#Fetch the list of available Tenant Ids.
-Get-AzTenant
-
-#Grab the tenant Id Switch to another active directory tenant.
-Set-AzContext -TenantId XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
-
-New-AzManagementGroupDeployment `
-  -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
-  -TemplateFile overlays/management-groups/deploy.bicepp `
-  -TemplateParameterFile overlays/management-groups/deploy.parameters.json `
-  -Location  'usgovvirginia'
+# Deploy Management Groups
+az deployment mg create
+--name 'deploy-enclave-mg'
+--template-file 'deploy.bicep'
+--parameters '@parameters/deploy.parameters.json' 
+--management-group-id $tenantId
+--location 'eastus'
+--only-show-errors
 ```
 </details>
-<p>
+</p>
 
-### Policy - Security Controls
+### Policy
 
 [Azure Policy](https://docs.microsoft.com/azure/governance/policy/overview) is used to deploy guardrails for your environment. Azure Policy supports organizational standards enforcement and at-scale compliance evaluation.
 
@@ -137,33 +129,56 @@ Implementing governance for resource consistency, legal compliance, security, co
 
 A collection of built-in Azure Policy Sets based on Regulatory Compliance are configured with Azure NoOps Accelerator. To boost compliance for logging, networking, and tagging requirements, custom policy sets have been developed. Through automation, these can be further expanded or eliminated as needed by the department.
 
-> Policy structure can be deployed or modified through [Azure Bicep template located in "policy" folder](../../overlays/policy)
+The NoOps Accelerator includes the following deployable policies found in the [policy](../../overlays/Policy) folder:
 
-![Enclave Hub/Spoke landing zone with a Azure Kubernetes Service Architecture](./media/MgmtGroups_Policies_v0.1.jpg)
+  1. DoD IL/4
 
-<h3>Overlay Example: Policies</h3>
+  1. DoD IL/5
+
+  1. FedRAMP - Moderate Impact Level
+
+  1. NIST 800-53A Rev. 4
+
+  1. NIST 800-53A Rev. 5
+
+> **NOTE**
+>
+> Policy structure can be deployed or modified through [Azure Bicep template located in "policy" folder](../../overlays/policy)  
+
+![Enclave Hub/Spoke landing zone with a Azure Kubernetes Service Architecture](./media/MgmtGroups_Policies_v0.1.jpg)  
+
+**Overlay Example: Policies**
 
 <details>
 
 <summary>via Bash</summary>
 
 ```bash
-# For Azure Commerical regions
-az login
-cd src/bicep/overlays
-cd policy
-az deployment mg create \
-   --template-file overlays/policy/deploy.bicep \
-   --parameters @overlays/policy/deploy.parameters.json \
-   --location 'eastus'
-```
+# Set the active cloud.  Use az cloud list for a list of cloud names.
+az cloud set --name 'AzureCloud'
 
-```bash
-# For Azure Government regions
-az deployment mg create \
-  --template-file overlays/policy/deploy.bicep \
-  --parameters @overlays/policy/deploy.parameters.json \
-  --location 'usgovvirginia'
+# Set a subscription to be the current active subscription
+subscriptionId="[your platform management subscription ID]"
+az account set --subscription $subscriptionId
+
+# Log in to Azure.
+# By default, this command logs in with a user account. CLI will try to launch a web browser to log in interactively. If a web browser is not available, CLI will fall back to device code login. To login with a service principal, specify --service-principal.
+az login
+
+# Capture your Tenant ID
+tenantId=$(az account show --query 'tenantId' --output tsv)
+
+# Navigate to the Policy structure
+cd src/bicep/overlays/Policy/builtin/assignments
+
+# Deploy Policy (example using DoD IL/5 for GOVERNMENT deployment)
+az deployment mg create
+--name 'deploy-policy-dodil5'
+--template-file 'policy-dodil5.bicep'
+--parameters 'policy-dodil5.parameters.json'
+--management-group-id 'ANOA'  # or the name of your INTERMEDIATE MANAGEMENT GROUP
+--location 'usgovvirginia'
+--only-show-errors
 ```
 
 </details>
@@ -171,53 +186,42 @@ az deployment mg create \
 
 <details>
 
-<summary>via Powershell</summary>
+<summary>via Azure CLI (AZ CLI)</summary>
 
-```powershell
-# For Azure Commerical regions
+```bash
+# Set the active cloud.  Use az cloud list for a list of cloud names.
+az cloud set --name 'AzureCloud'
 
-#sign in to Azure  from Powershell, this will redirect you to a web browser for authentication, if required
-Connect-AzAccount
+# Set a subscription to be the current active subscription
+$subscriptionId="[your platform management subscription ID]"
+az account set --subscription $subscriptionId
 
-#Fetch the list of available Tenant Ids.
-Get-AzTenant
+# Log in to Azure.
+# By default, this command logs in with a user account. CLI will try to launch a web browser to log in interactively. If a web browser is not available, CLI will fall back to device code login. To login with a service principal, specify --service-principal.
+az login
 
-#Grab the tenant Id Switch to another active directory tenant.
-Set-AzContext -TenantId XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+# Capture your Tenant ID
+$tenantId=$(az account show --query 'tenantId' --output tsv)
 
-New-AzManagementGroupDeployment `
-  -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
-  -TemplateFile overlays/policy/deploy.bicep `
-  -TemplateParameterFile overlays/policy/deploy.parameters.json `
-  -Location 'eastus'
+# Navigate to the Policy structure
+cd src/bicep/overlays/Policy/builtin/assignments
+
+# Deploy Policy (example using NIST 800-53A R5 for COMMERCIAL deployment)
+az deployment mg create
+--name 'deploy-policy-nist80053r5'
+--template-file 'policy-nist80053r5.bicep'
+--parameters 'policy-nist80053r5.parameters.json'
+--management-group-id 'ANOA'  # or the name of your INTERMEDIATE MANAGEMENT GROUP
+--location 'usgovvirginia'
+--only-show-errors
 ```
 
-OR
-
-```powershell
-# For Azure Government regions
-
-#sign in to Azure  from Powershell, this will redirect you to a web browser for authentication, if required
-Connect-AzAccount
-
-#Fetch the list of available Tenant Ids.
-Get-AzTenant
-
-#Grab the tenant Id Switch to another active directory tenant.
-Set-AzContext -TenantId XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
-
-New-AzManagementGroupDeployment `
-  -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
-  -TemplateFile overlays/policy/deploy.bicep `
-  -TemplateParameterFile overlays/policy/deploy.parameters.json `
-  -Location  'usgovvirginia'
-```
 </details>
 <p>
 
-### RBAC - Roles
+### Roles (RBAC)
 
-The Enclave Roles overlay module deploys a role definitions in a specific `Management Group`.  This is accomplished through a managmenent-group-scoped Azure Resource Manager (ARM) deployment.  The role definitions heirarchy can be modifed by editing ([Azure Parameters template located in "roles/parameters" folder](../../overlays/roles/parameters/deploy.parameters.json)).  
+The roles overlay module deploys a role definition in a specific `Management Group`.  This is accomplished through a managmenent-group-scoped Azure Resource Manager (ARM) deployment.  The role definitions heirarchy can be modifed by editing ([Azure Parameters template located in "roles/parameters" folder](../../overlays/roles/parameters/deploy.parameters.json)).  
 
 Module deploys the following resources:
 
@@ -226,60 +230,71 @@ Module deploys the following resources:
 The definitions created by the deployment is:
 
 * Custom - VM Operator
+
 * Custom - Network Operations (NetOps)
+
 * Custom - Security Operations (SecOps)
+
 * Custom - Landing Zone Application Owner
+
 * Custom - Landing Zone Subscription Owner
+
 * Custom - Storage Operator
 
 Azure NoOps Accelerator assumes that Azure Active Directory has been provisioned and configured based on organization's requirements. It is important to check the following configuration for Azure Active Directory:
 
 * License - Consider Azure PD Premium P2
+
 * Multi-Factor Authentication - Enabled for all users
+
 * Conditional Access Policies - Configured based on location & devices
+
 * Privileged Identity Management (PIM) - Enabled for elevated access control.
+
 * App Registration - Consider disabling for all users and created on-demand by CloudOps teams.
+
 * Sign-In Logs - Logs are exported to Log Analytics workspace & Microsoft Sentinel used for threat hunting (Security Monitoring Team).
+
 * Break-glass procedure - Process documented and implemented including 2 break glass accounts with different MFA devices & split up passwords.
+
 * Azure Directory to Azure Active Directory synchronization - Are the identities synchronized or using cloud only account?
   
+> **NOTE**
+>
 > Roles structure can be deployed or modified through [Azure Bicep template located in "roles" folder](../../overlays/roles/)
 
-<h3>Overlay Example: Roles</h3>
+**Overlay Example: Roles**
 
 <details>
 
 <summary>via Bash</summary>
 
 ```bash
-# For Azure Commerical regions
+# Set the active cloud.  Use az cloud list for a list of cloud names.
+az cloud set --name 'AzureCloud'
 
-#sign  into AZ CLI, this will redirect you to a web browser for authentication, if required
+# Set a subscription to be the current active subscription
+subscriptionId="[your platform management subscription ID]"
+az account set --subscription $subscriptionId
+
+# Log in to Azure.
+# By default, this command logs in with a user account. CLI will try to launch a web browser to log in interactively. If a web browser is not available, CLI will fall back to device code login. To login with a service principal, specify --service-principal.
 az login
-cd src/bicep/overlays
-cd roles
-az deployment mg create \
-   --template-file overlays/roles/deploy.bicep \
-   --parameters @overlays/roles/deploy.parameters.json \
-   --location 'eastus'
+
+# Capture your Tenant ID
+tenantId=$(az account show --query 'tenantId' --output tsv)
+
+# Navigate to the Roles structure
+cd src/bicep/overlays/roles
+
+# Deploy Roles
+az deployment mg create
+--name 'deploy-enclave-roles'
+--template-file 'deploy.bicep'
+--parameters '@parameters/deploy.parameters.all.json'
+--management-group-id 'ANOA' # or the name of your INTERMEDIATE MANAGEMENT GROUP
+--location 'eastus' --only-show-errors
 ```
-
-```bash
-# For Azure Government regions
-
-# change Azure Clouds
-az cloud set --name AzureUSGovernment
-
-#sign  into AZ CLI, this will redirect you to a web browser for authentication, if required
-az login
-cd src/bicep/overlays
-cd roles
-az deployment mg create \
-  --template-file overlays/roles/deploy.bicep \
-  --parameters @overlays/roles/deploy.parameters.json \
-  --location 'usgovvirginia'
-```
-
 </details>
 <p>
 
@@ -288,43 +303,30 @@ az deployment mg create \
 <summary>via Powershell</summary>
 
 ```powershell
-# For Azure Commerical regions
+# Set the active cloud.  Use az cloud list for a list of cloud names.
+az cloud set --name 'AzureCloud'
 
-#sign in to Azure  from Powershell, this will redirect you to a web browser for authentication, if required
-Connect-AzAccount
+# Set a subscription to be the current active subscription
+$subscriptionId="[your platform management subscription ID]"
+az account set --subscription $subscriptionId
 
-#Fetch the list of available Tenant Ids.
-Get-AzTenant
+# Log in to Azure.
+# By default, this command logs in with a user account. CLI will try to launch a web browser to log in interactively. If a web browser is not available, CLI will fall back to device code login. To login with a service principal, specify --service-principal.
+az login
 
-#Grab the tenant Id Switch to another active directory tenant.
-Set-AzContext -TenantId XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+# Capture your Tenant ID
+$tenantId=$(az account show --query 'tenantId' --output tsv)
 
-New-AzManagementGroupDeployment `
-  -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
-  -TemplateFile overlays/roles/deploy.bicepp `
-  -TemplateParameterFile overlays/roles/deploy.parameters.json `
-  -Location 'eastus'
-```
+# Navigate to the Roles structure
+cd src/bicep/overlays/roles
 
-OR
-
-```powershell
-# For Azure Government regions
-
-#sign in to Azure  from Powershell, this will redirect you to a web browser for authentication, if required
-Connect-AzAccount
-
-#Fetch the list of available Tenant Ids.
-Get-AzTenant
-
-#Grab the tenant Id Switch to another active directory tenant.
-Set-AzContext -TenantId XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
-
-New-AzManagementGroupDeployment `
-  -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
-  -TemplateFile overlays/roles/deploy.bicepp `
-  -TemplateParameterFile overlays/roles/deploy.parameters.json `
-  -Location  'usgovvirginia'
+# Deploy Roles
+az deployment mg create
+--name 'deploy-enclave-roles'
+--template-file 'deploy.bicep'
+--parameters '@parameters/deploy.parameters.all.json'
+--management-group-id 'ANOA' # or the name of your INTERMEDIATE MANAGEMENT GROUP
+--location 'eastus' --only-show-errors
 ```
 </details>
 <p>
@@ -341,8 +343,8 @@ parLocation | string | `[deployment().location]` | The region to deploy resource
 parHub | object | {object} | Hub Virtual network configuration. See [azresources/hub-spoke-core/vdss/hub/readme.md](../../azresources/hub-spoke-core/vdss/hub/readme.md)
 parOperationsSpoke | object | {object} | Operations Spoke Virtual network configuration. See [See azresources/hub-spoke-core/vdms/operations/readme.md](../../azresources/hub-spoke-core/vdms/operations/readme.md)
 parAzureFirewall | object | {object} | Azure Firewall configuration. Azure Firewall is deployed in Forced Tunneling mode where a route table must be added as the next hop.
-parLogging | object | {object} | Enables logging parmeters and Microsoft Sentinel within the Log Analytics Workspace created in this deployment.
-parRemoteAccess | object | {object} | When set to "true", provisions Azure Bastion Host. It defaults to "false".
+parLogging | object | {object} | Enables logging parameters and Microsoft Sentinel within the Log Analytics Workspace created in this deployment.
+parRemoteAccess | object | {object} | When set too "true", provisions Azure Bastion Host. It defaults to "false".
 parWorkload | object | {object} | Required values used for workloads.
 parHubSubscriptionId | string | `xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxx` | The subscription ID for the Hub Network.
 parHubResourceGroupName | string | `anoa-eastus-platforms-hub-rg` | The resource group name for the Hub Network.
@@ -363,119 +365,106 @@ parNetworkArtifacts | object | {object} | Optional. Enables Operations Network A
 parSecurityCenter | object | {object} | Microsoft Defender for Cloud.  It includes email and phone.
 parDdosStandard | bool | `false` | DDOS Standard configuration.
 
-## Deploy the Enclave
+## Deploying the Enclave
 
-Connect to the appropriate Azure Environment and set appropriate context, see getting started with Azure PowerShell or Azure CLI for help if needed. The commands below assume you are deploying in Azure Commercial and show the entire process of deploying Encalve.
+Connect to the appropriate Azure Environment and set appropriate context, see getting started with Azure PowerShell or Azure CLI for help if needed. The commands below assume you are deploying in Azure Commercial and show the entire process of deploying enclave.
 
 For example, deploying using the `az deployment sub create` command in the Azure CLI:
 
-### Azure CLI
+> **NOTE**:
+>
+> The output of bicep build may yield a .json file that is greater than 4Mb which is the limit for the maximum file size bicep can process.   Employ the following commands to remove space from the .json file:
+>
+>    **PowerShell**
+>    ```powershell
+>    # Remove the file if it exists
+>    Remove-Item -Path .\DeployCompressed.json -Force
+>
+>    # Build the deploy.bicep into deploy.json
+>    az bicep build --file '.\deploy.bicep'
+>
+>    # Remove excess space
+>    Get-Content .\deploy.json | ConvertFrom-Json | ConvertTo-Json -Depth 100 -Compress | Out-File .\DeployCompressed.json
+>    ```
 
+**BASH**
 ```bash
-# For Azure Commerical regions
+# Set the active cloud.  Use az cloud list for a list of cloud names.
+az cloud set --name 'AzureCloud'
+
+# Set a subscription to be the current active subscription
+subscriptionId="[your platform management subscription ID]"
+az account set --subscription $subscriptionId
+
+# Log in to Azure.
+# By default, this command logs in with a user account. CLI will try to launch a web browser to log in interactively. If a web browser is not available, CLI will fall back to device code login. To login with a service principal, specify --service-principal.
 az login
-cd src/bicep
-cd enclaves/enclave-scca-hub3spoke-aks
-az deployment sub create \ 
---name deploy-scca-enclave-with-aks \
---subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx \
---template-file deploy.bicep \
---location eastus \
---parameters @parameters/deploy.parameters.json
+
+# Capture your Tenant ID
+tenantId=$(az account show --query 'tenantId' --output tsv)
+
+# Navigate to the Enclaves structure
+cd src/bicep/enclaves/enclave-scca-hub3spoke-aks
+
+# Deploy an Enclave
+az deployment sub create
+--name 'deploy-scca-enclave-with-aks'
+--template-file 'DeployCompressed.json'
+--parameters '@parameters/deploy.parameters.json'
+--location 'eastus'
+--subscription $subscriptionId
+--only-show-errors
 ```
 
-OR
+**PowerShell**
+```powershell
+# Set the active cloud.  Use az cloud list for a list of cloud names.
+az cloud set --name 'AzureCloud'
 
-```bash
-# For Azure Government regions
-az cloud set --name AzureGovernment
+# Set a subscription to be the current active subscription
+$subscriptionId="[your platform management subscription ID]"
+az account set --subscription $subscriptionId
+
+# Log in to Azure.
+# By default, this command logs in with a user account. CLI will try to launch a web browser to log in interactively. If a web browser is not available, CLI will fall back to device code login. To login with a service principal, specify --service-principal.
 az login
-cd src/bicep
-cd enclaves/enclave-scca-hub3spoke-aks
-az deployment sub create \
-  --name deploy-scca-enclave-with-aks \
-  --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx \
-  --template-file deploy.bicep \
-  --parameters @parameters/deploy.parameters.json
-  --location 'usgovvirginia'
+
+# Capture your Tenant ID
+$tenantId=$(az account show --query 'tenantId' --output tsv)
+
+# Navigate to the Enclaves structure
+cd src/bicep/enclaves/enclave-scca-hub3spoke-aks
+
+# Deploy an Enclave
+az deployment sub create
+--name 'deploy-scca-enclave-with-aks'
+--template-file 'DeployCompressed.json'
+--parameters '@parameters/deploy.parameters.json'
+--location 'eastus'
+--subscription $subscriptionId
+--only-show-errors
 ```
-
-### PowerShell
-
-```powershell
-# For Azure Commerical regions
-New-AzSubscriptionDeployment `
-  -Name deploy-scca-enclave-with-aks `
-  -TemplateFile enclaves/enclave-scca-hubspoke-aks/deploy.bicep `
-  -TemplateParameterFile enclaves/enclave-scca-hubspoke-aks/parameters/deploy.parameters.json `
-  -Subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx `
-  -Location 'eastus'
-```
-
-OR
-
-```powershell
-# For Azure Government regions
-New-AzSubscriptionDeployment `
-  -Name deploy-scca-enclave-with-aks `
-  -TemplateFile enclaves/enclave-scca-hubspoke-aks/deploy.bicep `
-  -TemplateParameterFile enclaves/enclave-scca-hubspoke-aks/parameters/deploy.parameters.json `
-  -Subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx `
-  -Location  'usgovvirginia'
-```
-
-## Extending the Overlay
-
-By default, this overlay has the minium parmeters needed to deploy the service. If you like to add addtional parmeters to the service, please refer to the module description located in AzResources here: [`App Service Plans `[Microsoft.Web/serverfarms]`](D:\source\repos\NoOpsAccelerator\src\bicep\azresources\Modules\Microsoft.Web\serverfarms\readme.md)
 
 ## Air-Gapped Clouds
 
 For air-gapped clouds it may be convenient to transfer and deploy the compiled ARM template instead of the Bicep template if the Bicep CLI tools are not available or if it is desirable to transfer only one file into the air gap.
 
-## Validate the deployment
+Use the **az bicep build** command to compile your .bicep files to a .json file.
 
-Use the Azure portal, Azure CLI, or Azure PowerShell to list the deployed resources in the resource group.
+## Validate the Deployment
 
-Configure the default group using:
+Use the Azure portal, Azure CLI, or Azure PowerShell to list the deployed resources in the resource group.  Configure the default group using:
 
+**AZ CLI**
 ```bash
-az configure --defaults group=anoa-eastus-dev-aks-rg.
+az configure --defaults group=anoa-eastus-dev-aks-rg
 ```
 
 ```bash
-az resource list --location eastus --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxx --resource-group anoa-eastus-dev-aks-rg
+az resource list --location 'eastus' --subscription 'xxxxxx-xxxx-xxxx-xxxx-xxxxxxxx' --resource-group 'anoa-eastus-dev-aks-rg'
 ```
 
-OR
-
+**PowerShell**
 ```powershell
 Get-AzResource -ResourceGroupName anoa-eastus-dev-aks-rg
-```
-
-## Cleanup
-
-The Bicep/ARM deployment of NoOps Accelerator - Azure App Service Plan deployment can be deleted with these steps:
-
-### Delete Resource Groups
-
-```bash
-az group delete --name anoa-eastus-dev-aks-rg
-```
-
-OR
-
-```powershell
-Remove-AzResourceGroup -Name anoa-eastus-dev-aks-rg
-```
-
-### Delete Deployments
-
-```bash
-az deployment delete --name deploy-scca-enclave-with-aks
-```
-
-OR
-
-```powershell
-Remove-AzSubscriptionDeployment -Name deploy-scca-enclave-with-aks
 ```

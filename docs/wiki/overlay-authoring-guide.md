@@ -10,10 +10,9 @@ The goal of this authoring guide is to provide step-by-step instructions to crea
   - [Table of Contents](#table-of-contents)
   - [Folder structure](#folder-structure)
   - [Create a new overlays](#create-a-new-overlays)
-    - [Build new or reuse existing overlays?](#build-new-or-reuse-existing-overlays)
+    - [Build new overlays](#build-new-overlays)
     - [Requirements for overlays](#requirements-for-overlays)
     - [Approach](#approach)
-  - [Update a overlay](#update-a-overlay)
   - [Common features](#common-features)
   
 ---
@@ -23,27 +22,35 @@ The goal of this authoring guide is to provide step-by-step instructions to crea
 Overlays are located in [`overlays`](../../overlays) folder and organized as folder per overlay.  Here are the current overlays with links to documentation:
 
 - Management Group overlay
-  - [`management-groups`](readme.md) - Deploys a management group hierarchy in a tenant under the `Tenant Root Group`.  
+  - [`management-groups`](../src/bicep/../../../src/bicep/overlays/management-groups/readme.md) - Deploys a management group hierarchy in a tenant under the `Tenant Root Group`.  
 - Management Service overlays
-  - [`app-service-plan`](readme.md) - configures a subscription for general purpose use.
-  - [`applicationGateway`](readme.md) - configures a subscription for healthcare scenarios.
-  - [`lz-machinelearning`](readme.md) - configures a subscription for machine learning scenarios.
+  - [`app-service-plan`](../src/bicep/../../../src/bicep/overlays/management-services/app-service-plan/readme.md) - Deploys a app service plan.
+  - [`applicationGateway`](../src/bicep/../../../src/bicep/overlays/management-services/applicationGateway/readme.md) - Deploys a application gateway.
+  - [`automation`](../src/bicep/../../../src/bicep/overlays/management-services/automation/readme.md) - Deploys a automation account.
+  - [`azureSecurityCenter`](../src/bicep/../../../src/bicep/overlays/management-services/azureSecurityCenter/readme.md) - Deploys Azure Security Center.
+  - [`bastion`](../src/bicep/../../../src/bicep/overlays/management-services/bastion/readme.md) - Deploys a Bastion host for Remote Access.
+  - [`containerRegistry`](../src/bicep/../../../src/bicep/overlays/management-services/containerRegistry/readme.md) - Deploys a Azure Container Registry.
+  - [`dataBricksWorkspace`](readme.md) - Deploys a Azure Data Bricks Workspace.
+  - [`keyVault`](../src/bicep/../../../src/bicep/overlays/management-services/keyvault/readme.md) - Deploys a Azure Key Vault.
+  - [`KubernetesPrivateCluster-Kubenet`](../src/bicep/../../../src/bicep/overlays/management-services/kubernetesPrivateCluster-Kubnet/readme.md) - Deploys a Azure Kubernetes Private Cluster with Kubenet.
 - Policy overlay
-  - [`policy`](readme.md) - Deploys a policy definitions/assignments in a specific `Management Group`.  
+  - [`policy`](../src/bicep/../../../src/bicep/overlays/policy/readme.md) - Deploys a policy definitions/assignments in a specific `Management Group`.  
 - Roles overlay
-  - [`roles`](readme.md) - Deploys a role definitions in a specific `Management Group`.  
+  - [`roles`](../src/bicep/../../../src/bicep/overlays/roles/readme.md) - Deploys a role definitions in a specific `Management Group`.  
   
 ---
 
 ## Create a new overlays
 
-Overlays are are self-contained Bicep deployment templates that allows to extend AzResources with specific configurations or combine them to create more useful objects.  Overlays provide the ability to build new azure resources with an use case specific architecture in a repeatable method. One Overlay can be used to configure many different deployment sceniros.
+Overlays are are self-contained Bicep deployment templates that allows you to extend AzResources services with specific configurations or combine them to create more useful objects.
 
-### Build new or reuse existing overlays?
+Overlays provide the ability to build new azure resources with an use case specific architecture in a repeatable method. One Overlay can be used to configure many different deployment sceniros.
+
+### Build new overlays
 
 You should develop new overlays when a common deployment need or azure service need emerges within your organization. The return on investment increases when the overlays is used in workloads and deployed to 10s or 100s of subscriptions.
 
-You should start by evaluating the [existing overlays for enhancement opportunities](#update-a-overlay).  New features can be placed behind feature flags to provide customization/choices of Azure services to configure at deployment time.  For example, we use feature flags to control Bastion and VM Instance deployment in the Remote Access - Bastion Overlay.
+New features can be placed behind feature flags to provide customization/choices of Azure services to configure at deployment time.  For example, we use feature flags to control Bastion and VM Instance deployment in the Remote Access - Bastion Overlay.
 
 The `parRemoteAccess.enable` feature flag for Bastion deployment:
 
@@ -74,7 +81,9 @@ The `parRemoteAccess.linux.enable` feature flag for VM Instance deployment:
 
 ### Requirements for overlays
 
-Each overlay is intended to be self-contained and provides all deployment templates required to configure a subscription.  Key requirements for each overlay are:
+Each overlay is intended to be self-contained and provides all deployment templates required to deployed to a subscription.
+
+Key requirements for each overlay are:
 
 - overlay folder must contain the overlay name.  For example `app-service-plan`.
 - Entrypoint for an overlay is `deploy.bicep`. Every overlay must provide `deploy.bicep` in its respective folder.
@@ -86,83 +95,35 @@ Each overlay is intended to be self-contained and provides all deployment templa
     ```
 
 - Implements [common features](#common-features).
-- Implements [JSON Schema for deployment JSON parameters](#json-schema-for-deployment-parameters).
-- Implements spoke virtual network with support for virtual network peering to Hub Virtual Network.
-- Implements Private DNS Zones for private endpoints with support for spoke-managed and hub-managed Private DNS Zones.
-- Validated with Azure Firewall for routing & traffic filtering.  Additional Firewall rules may need to be implemented to support control plane & data plane integration.
 
 ### Approach
 
-1. Identify at least 5 use cases that can benefit from an archetype and label all common features.  This is the MVP for the archetype.  An application team would receive the implementation of the MVP features deployed in their subscription. Use case specific features can be added to a deployment by the application team as they adapt their environment.
+1. Identify at least 5 use cases that can benefit from an overlay and label all common features.  This is the MVP for the overlay.  An application team would receive the implementation of the MVP features deployed in their subscription. Use case specific features can be added to a deployment by the application team as they adapt their environment.
 
-2. Design the spoke virtual network to support the archetype.  You must consider Hub & Spoke network topology, Private Endpoints, Private DNS Zones, Network egress from the spoke virtual network (i.e. to Azure, to on-premises, to Internet)
+2. Design what spoke virtual network to support the overlay.  You must consider Hub & Spoke network topology or another network topology.
 
-3. Scaffold the archetype:
+3. Scaffold the overlay:
 
-      - Create a new folder under `landingzones` prefixed with `lz-`.  For example, `lz-cloudnative`.
-      - Create `main.bicep`, set the `targetScope` as `subscription`
+      - Create a new folder under `management-services` prefixed with the name.  For example, `sqlServer`.
+      - Create `deploy.bicep`, set the `targetScope` as `subscription`
       - Create required parameters for [common features](#common-features)
-      - Create a test parameters.json and run a subscription scoped deployment through Azure CLI.  You may place the test parameters.json in `/tests/schemas/` based on the archetype.
+      - Create a deploy.parameters.json and run a subscription scoped deployment through Azure CLI.
 
         ```bash
-        az deployment sub create --template-file <path to archetype main.bicep> --parameters @<path to archetype test parameters file> --subscription-id <subscription id> --location canadacentral
+        az deployment sub create --template-file <path to overlay deploy.bicep> --parameters @<path to overlay parameters file> --subscription-id <subscription id> --location eastus
         ```
 
-          This is a validation that the archetype scaffolding is in-place.
+          This is a validation that the overlay scaffolding is in-place.
 
-4. Add [telemetry tracking](#telemetry).
+4. Add overlay specific deployment instructions and incrementally verify through deployment.
 
-5. Add archetype specific deployment instructions and incrementally verify through test deployment.
-
-6. Create a JSON Schema definition for the archetype.  Consider using a tool such as [JSON to Jsonschema](https://jsonformatter.org/json-to-jsonschema) to generate the initial schema definition that you customize.  For all common features, you must reference the existing definitions for the types. See example: [schemas/latest/landingzones/lz-generic-subscription.json](../../schemas/latest/landingzones/lz-generic-subscription.json)
-
-7. Verify archetype deployment through `subscriptions-ci` Azure DevOps Pipeline.  More information on the pipeline can be found in [Azure DevOps Onboarding Guide](../onboarding/ado.md#step-8--configure-subscription-archetypes).
-
-      - Create a subscription JSON Parameters file per [deployment instructions](#deployment-instructions).
-      - Run the pipeline by providing the subscription guid
-
-    `subscriptions-ci` pipeline will automatically identify the archetype, the subscription and region based on the file name.  The JSON Schema is located by the archetype name and used for pre-deployment verification.  
-
-    Once verifications are complete, the pipeline will move the subscription to the target management group (based on the folder structure) and execute `main.bicep`.
-
-8. Debug deployment failures.
+5. Debug deployment failures.
 
     - Navigate to the subscription in Azure Portal
     - Navigate to **Deployments** under **Settings**
     - Identify the failed deployment step & troubleshoot
 
-9. Update documentation.
-
----
-
-## Update a overlay
-
-It is common to update existing archetypes to evolve and adapt the implementation based on your organization's requirements.
-
-Following changes are required when updating:
-
-- Update archetype deployment template(s) through `main.bicep` or one of its dependent Bicep template(s).
-- Update Visio diagrams in `docs\visio` (if required).
-- Update documentation in `docs\archetypes` and revise Visio diagram images.
-- When parameters are added, updated or removed:
-  - Modify JSON Schema
-    - Update definitions in `schemas\latest\landingzones`
-    - Update changelog in `schemas\latest\readme.md`
-    - Update existing unit tests in `tests\schemas`
-    - Update existing deployment JSON parameter files to match new schema definition in `config\subscriptions\*.json`.  This is required for compatibility for subscriptions that have already been configured.
-  - Unit test
-    - Unit tests are based on the scenarios.  Provide only valid scenarios.  These should be added to the appropriate landingzone folder in `tests\schemas`
-    - Verify JSON parameter files conform to the updated schema
-
-      ```bash
-        cd tests/schemas
-        ./run-tests.sh
-      ```
-
-  - Documentation
-    - Unit tests are treated as deployment scenarios.  Therefore, reference these in the appropriate archetype document in `docs\archetypes` under the **Deployment Scenarios** section.
-
----
+6. Update documentation.
 
 ## Common features
 

@@ -1,4 +1,4 @@
-# Overlays:   NoOps Accelerator - Automation Account
+# Overlays: Automation Account
 
 ## Overview
 

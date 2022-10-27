@@ -1,4 +1,4 @@
-# Overlay: NoOps Accelerator - Azure Key Vault
+# Overlays: Azure Key Vault
 
 ## Overview
 

@@ -1,4 +1,4 @@
-# Overlays:   NoOps Accelerator - Application Gateway
+# Overlays: Application Gateway
 
 ## Overview
 

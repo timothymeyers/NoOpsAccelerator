@@ -1,8 +1,8 @@
-# Module: NoOps Accelerator - Management Services
+# Overlays: Management Services
 
 ## Overview
 
-NoOps Accelerator management services overlays are module templates that can be deployed to extend an existing Platform Landing Zones or Enclave. 
+NoOps Accelerator management services overlays are module templates that can be deployed to extend an existing Platform Landing Zones or Enclave.
 
 ## Management Services Explanations
 

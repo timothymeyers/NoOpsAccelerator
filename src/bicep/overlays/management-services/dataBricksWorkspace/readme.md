@@ -1,4 +1,4 @@
-# Overlay: NoOps Accelerator - Azure Data Bricks Workspace
+# Overlays: Azure Data Bricks Workspace
 
 ## Overview
 

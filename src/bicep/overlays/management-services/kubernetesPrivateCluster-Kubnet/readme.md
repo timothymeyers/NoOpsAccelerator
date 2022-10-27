@@ -1,4 +1,4 @@
-# Overlay: NoOps Accelerator - Azure Kubernetes Service - Private Cluster - Kubenet
+# Overlays: Azure Kubernetes Service - Private Cluster - Kubenet
 
 ## Overview
 

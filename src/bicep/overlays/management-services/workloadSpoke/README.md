@@ -1,4 +1,4 @@
-# Module:   NoOps Accelerator - Tier 3 Workload Network
+# Overlay: Tier 3 Workload Spoke Network
 
 ## Overview
 

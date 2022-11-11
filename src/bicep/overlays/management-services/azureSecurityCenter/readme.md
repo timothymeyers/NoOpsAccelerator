@@ -1,4 +1,4 @@
-# Overlay:   NoOps Accelerator - Microsoft Azure Security Center
+# Overlays: Microsoft Azure Security Center
 
 ## Overview
 

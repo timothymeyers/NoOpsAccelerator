@@ -1,4 +1,4 @@
-# Module:   NoOps Accelerator - Azure Storage Account
+# Overlays: Azure Storage Account
 
 ## Overview
 

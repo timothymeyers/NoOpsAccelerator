@@ -1,4 +1,4 @@
-# Overlays: NoOps Accelerator - Azure Policy for Guardrails
+# Overlays: Azure Policy for Guardrails
 
 > **IMPORTANT: This is currenly work in progress.**
 

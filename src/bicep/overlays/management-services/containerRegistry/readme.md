@@ -1,4 +1,4 @@
-# Overlay: NoOps Accelerator - Azure Container Registry
+# Overlays: Azure Container Registry
 
 ## Overview
 

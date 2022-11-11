@@ -1,4 +1,4 @@
-# Module:   NoOps Accelerator - Subscription Budgets
+# Overlays: Subscription Budgets
 
 ## Overview
 

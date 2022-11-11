@@ -1,4 +1,4 @@
-# Overlays: NoOps Accelerator - App Service Plan
+# Overlays: App Service Plan
 
 ## Overview
 

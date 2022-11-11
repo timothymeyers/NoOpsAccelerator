@@ -1,4 +1,4 @@
-# Overlays: NoOps Accelerator - Remote Access - Bastion
+# Overlays: Remote Access - Bastion
 
 ## Overview
 

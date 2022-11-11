@@ -1,4 +1,4 @@
-# Overlay: NoOps Accelerator - Microsoft Service Health Alerts
+# Overlays: Microsoft Service Health Alerts
 
 ## Overview
 

@@ -480,6 +480,7 @@ param parRemoteAccess object
 var telemetry = json(loadTextContent('../../azresources/Modules/Global/partnerUsageAttribution/telemetry.json'))
 resource defaultTelemetry 'Microsoft.Resources/deployments@2021-04-01' = if (telemetry.customerUsageAttribution.enabled) {
   name: 'pid-${telemetry.customerUsageAttribution.modules.platforms.hubspoke3}-${uniqueString(deployment().name, parLocation)}'
+  location: parLocation
   properties: {
     mode: 'Incremental'
     template: {

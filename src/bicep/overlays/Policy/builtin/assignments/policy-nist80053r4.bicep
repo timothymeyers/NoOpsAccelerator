@@ -38,9 +38,18 @@ var varPolicyScopedId = resourceId('Microsoft.Authorization/policySetDefinitions
 
 // Telemetry - Azure customer usage attribution
 // Reference:  https://docs.microsoft.com/azure/marketplace/azure-partner-customer-usage-attribution
-var telemetry = json(loadTextContent('../../../../azresources/Modules/Global/telemetry.json'))
-module telemetryCustomerUsageAttribution '../../../../azresources//Modules/Global/partnerUsageAttribution/customer-usage-attribution-management-group.bicep' = if (telemetry.customerUsageAttribution.enabled) {
-  name: 'pid-${telemetry.customerUsageAttribution.modules.policy}-nist-80053-r4'
+var telemetry = json(loadTextContent('../../../../azresources/Modules/Global/partnerUsageAttribution/telemetry.json'))
+resource defaultTelemetry 'Microsoft.Resources/deployments@2021-04-01' = if (telemetry.customerUsageAttribution.enabled) {
+  name: 'pid-${telemetry.customerUsageAttribution.modules.policy}-nist-80053-r4-${uniqueString(deployment().name, parLocation)}'
+  location: parLocation
+  properties: {
+    mode: 'Incremental'
+    template: {
+      '$schema': 'https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#'
+      contentVersion: '1.0.0.0'
+      resources: []
+    }
+  }
 }
 
 resource resPolicySetAssignment 'Microsoft.Authorization/policyAssignments@2020-03-01' = {

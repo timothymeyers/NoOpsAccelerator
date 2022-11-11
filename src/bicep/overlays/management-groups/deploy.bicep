@@ -11,7 +11,6 @@ SUMMARY: The Management Groups module deploys a management group hierarchy in a 
 DESCRIPTION: Management Group hierarchy is created through a tenant-scoped Azure Resource Manager (ARM) deployment.  
 
 AUTHOR/S: John Spinella
-VERSION: 1.0.0
 */
 
 targetScope = 'managementGroup'
@@ -31,6 +30,9 @@ param parSubscriptions array
 @description('Provide prefix for the management group structure.')
 param parTenantId string
 
+@description('The region to deploy resources into. It defaults to the deployment location.')
+param parLocation string = deployment().location
+
 // RESOURCE NAMING PARAMETERS
 
 @description('A suffix to use for naming deployments uniquely. It defaults to the Bicep resolution of the "utcNow()" function.')
@@ -38,9 +40,18 @@ param parDeploymentNameSuffix string = utcNow()
 
 // Telemetry - Azure customer usage attribution
 // Reference:  https://docs.microsoft.com/azure/marketplace/azure-partner-customer-usage-attribution
-var telemetry = json(loadTextContent('../../azresources/Modules/Global/telemetry.json'))
-module telemetryCustomerUsageAttribution '../../azresources/Modules/Global//partnerUsageAttribution/customer-usage-attribution-management-group.bicep' = if (telemetry.customerUsageAttribution.enabled) {
-  name: 'pid-${telemetry.customerUsageAttribution.modules.managementGroups}'
+var telemetry = json(loadTextContent('../../azresources/Modules/Global/partnerUsageAttribution/telemetry.json'))
+resource defaultTelemetry 'Microsoft.Resources/deployments@2021-04-01' = if (telemetry.customerUsageAttribution.enabled) {
+  name: 'pid-${telemetry.customerUsageAttribution.modules.managementGroups}-${uniqueString(deployment().name, parLocation)}'
+  location: parLocation
+  properties: {
+    mode: 'Incremental'
+    template: {
+      '$schema': 'https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#'
+      contentVersion: '1.0.0.0'
+      resources: []
+    }
+  }
 }
 
 // Create Management Groups

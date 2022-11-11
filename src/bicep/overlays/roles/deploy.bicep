@@ -20,7 +20,6 @@ DESCRIPTION: The following components will be options in this deployment
                 * Custom - Storage Operator
               
 AUTHOR/S: jspinella
-VERSION: 1.x.x
 */
 
 targetScope = 'managementGroup'
@@ -29,6 +28,7 @@ targetScope = 'managementGroup'
 param parRoleDefinitionInfo object
 param parAssignableScopeManagementGroupId string
 
+@description('The region to deploy resources into. It defaults to the deployment location.')
 param parLocation string = deployment().location
 
 // RESOURCE NAMING PARAMETERS
@@ -38,9 +38,18 @@ param parDeploymentNameSuffix string = utcNow()
 
 // Telemetry - Azure customer usage attribution
 // Reference:  https://docs.microsoft.com/azure/marketplace/azure-partner-customer-usage-attribution
-var telemetry = json(loadTextContent('../../azresources/Modules/Global/telemetry.json'))
-module telemetryCustomerUsageAttribution '../../azresources//Modules/Global/partnerUsageAttribution/customer-usage-attribution-management-group.bicep' = if (telemetry.customerUsageAttribution.enabled) {
-  name: 'pid-${telemetry.customerUsageAttribution.modules.roles}-${uniqueString(parLocation)}'
+var telemetry = json(loadTextContent('../../azresources/Modules/Global/partnerUsageAttribution/telemetry.json'))
+resource defaultTelemetry 'Microsoft.Resources/deployments@2021-04-01' = if (telemetry.customerUsageAttribution.enabled) {
+  name: 'pid-${telemetry.customerUsageAttribution.modules.roles}-${uniqueString(deployment().name, parLocation)}'
+  location: parLocation
+  properties: {
+    mode: 'Incremental'
+    template: {
+      '$schema': 'https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#'
+      contentVersion: '1.0.0.0'
+      resources: []
+    }
+  }
 }
 
 //module to trigger custom role vm_operator 

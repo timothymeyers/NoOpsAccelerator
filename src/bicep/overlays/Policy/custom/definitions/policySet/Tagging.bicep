@@ -23,7 +23,7 @@ param requiredResourceTags array = []
 param policyEnforcement string = 'Deny'
 
 var customPolicyDefinitionMgScope = tenantResourceId('Microsoft.Management/managementGroups', policyDefinitionManagementGroupId)
-
+/*
 // Retrieve the templated azure policies as json object
 var tagsInheritedFromSubscriptionToResourceGroupPolicyTemplate = json(loadTextContent('templates/Tags-Inherit-Tag-From-Subscription-To-ResourceGroup/azurepolicy.json'))
 var tagsInheritedFromResourceGroupPolicyTemplate = json(loadTextContent('templates/Tags-Inherit-Tag-From-ResourceGroup/azurepolicy.json'))
@@ -152,3 +152,4 @@ resource tagsAuditOnResourcePolicySet 'Microsoft.Authorization/policySetDefiniti
     }]
   }
 }
+*/

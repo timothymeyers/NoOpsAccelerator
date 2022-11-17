@@ -158,8 +158,8 @@ var identityType = systemAssignedIdentity ? (!empty(userAssignedIdentities) ? 'S
 
 var identity = identityType != 'None' ? {
   type: identityType
-  userAssignedIdentities: !empty(userAssignedIdentities) ? userAssignedIdentities : null
-} : null
+  userAssignedIdentities: !empty(userAssignedIdentities) ? userAssignedIdentities : {}
+} : {}
 
 resource cMKKeyVault 'Microsoft.KeyVault/vaults@2021-10-01' existing = if (!empty(cMKKeyVaultResourceId)) {
   name: last(split(cMKKeyVaultResourceId, '/'))

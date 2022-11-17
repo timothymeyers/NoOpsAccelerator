@@ -57,14 +57,16 @@ param subscriptionId string = subscription().subscriptionId
 @sys.description('Optional. The Target Scope for the Policy. The name of the resource group for the policy assignment. If not provided, will use the current scope for deployment.')
 param resourceGroupName string = resourceGroup().name
 
-var identity_var = identity == 'SystemAssigned' ? {
+var assignedIdentity = identity == 'SystemAssigned' ? {
   type: identity
 } : identity == 'UserAssigned' ? {
   type: identity
   userAssignedIdentities: {
     '${userAssignedIdentityId}': {}
   }
-} : null
+} : identity == 'None' ? {
+  type: identity
+} : {}
 
 resource policyAssignment 'Microsoft.Authorization/policyAssignments@2021-06-01' = {
   name: name
@@ -79,7 +81,7 @@ resource policyAssignment 'Microsoft.Authorization/policyAssignments@2021-06-01'
     enforcementMode: enforcementMode
     notScopes: !empty(notScopes) ? notScopes : []
   }
-  identity: identity_var
+  identity: assignedIdentity
 }
 
 resource roleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = [for roleDefinitionId in roleDefinitionIds: if (!empty(roleDefinitionIds) && identity == 'SystemAssigned') {

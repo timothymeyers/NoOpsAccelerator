@@ -51,7 +51,7 @@ module privateLinkHub_roleAssignments './rbac/roleAssignments.bicep' = [for (rol
 }]
 
 // Private Endpoints
-module privateLinkHub_privateEndpoints '../../Microsoft.Network/privateEndPoint/az.net.private.endpoint.bicep' = [for (privateEndpoint, index) in privateEndpoints: {
+module privateLinkHub_privateEndpoints '../../Microsoft.Network/privateEndPoints/az.net.private.endpoint.bicep' = [for (privateEndpoint, index) in privateEndpoints: {
   name: '${uniqueString(deployment().name, location)}-PrivateLinkHub-PrivateEndpoint-${index}'
   params: {
     groupIds: [

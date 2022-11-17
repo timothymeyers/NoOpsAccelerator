@@ -52,8 +52,8 @@ var identityType = systemAssignedIdentity ? (!empty(userAssignedIdentities) ? 'S
 
 var identity = identityType != 'None' ? {
   type: identityType
-  userAssignedIdentities: !empty(userAssignedIdentities) ? userAssignedIdentities : null
-} : null
+  userAssignedIdentities: !empty(userAssignedIdentities) ? userAssignedIdentities : {}
+} : {}
 
 @description('Optional. The name of logs that will be streamed.')
 @allowed([

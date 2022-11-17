@@ -254,7 +254,7 @@ module workspace_rbac './rbac/roleAssignments.bicep' = [for (roleAssignment, ind
 }]
 
 // Endpoints
-module workspace_privateEndpoints '../../Microsoft.Network/privateEndPoint/az.net.private.endpoint.bicep' = [for (privateEndpoint, index) in privateEndpoints: {
+module workspace_privateEndpoints '../../Microsoft.Network/privateEndPoints/az.net.private.endpoint.bicep' = [for (privateEndpoint, index) in privateEndpoints: {
   name: '${uniqueString(deployment().name, location)}-Workspace-PrivateEndpoint-${index}'
   params: {
     groupIds: [

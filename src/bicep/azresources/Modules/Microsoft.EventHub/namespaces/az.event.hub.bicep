@@ -159,8 +159,8 @@ var identityType = systemAssignedIdentity ? (!empty(userAssignedIdentities) ? 'S
 
 var identity = identityType != 'None' ? {
   type: identityType
-  userAssignedIdentities: !empty(userAssignedIdentities) ? userAssignedIdentities : null
-} : null
+  userAssignedIdentities: !empty(userAssignedIdentities) ? userAssignedIdentities : {}
+} : {}
 
 resource eventHubNamespace 'Microsoft.EventHub/namespaces@2021-11-01' = {
   name: name_var
@@ -242,7 +242,7 @@ module eventHubNamespace_networkRuleSet './networkRuleSets/az.event.hub.network.
   }
 }
 
-module eventHubNamespace_privateEndpoints '../../Microsoft.Network/privateEndpoint/az.net.private.endpoint.bicep' = [for (privateEndpoint, index) in privateEndpoints: {
+module eventHubNamespace_privateEndpoints '../../Microsoft.Network/privateEndpoints/az.net.private.endpoint.bicep' = [for (privateEndpoint, index) in privateEndpoints: {
   name: '${uniqueString(deployment().name, location)}-EvhbNamespace-PrivateEndpoint-${index}'
   params: {
     groupIds: [

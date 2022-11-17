@@ -44,7 +44,7 @@ resource computePolicySet 'Microsoft.Authorization/policySetDefinitions@2020-03-
         groupNames: [
           'Storage'
         ]
-        policyDefinitionId: builtinPolicies_storage.Storageaccountpublicaccessshouldbedisallowed
+        policyDefinitionId: builtinPolicies_storage.StorageAccountsShouldRestrictNetworkAccess
         policyDefinitionReferenceId: toLower(replace('Storage Account Public Access should be disallowed', ' ', '-'))
         parameters: {}
       }      

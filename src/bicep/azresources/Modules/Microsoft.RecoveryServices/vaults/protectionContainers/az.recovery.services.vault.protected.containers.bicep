@@ -47,6 +47,13 @@ param protectedItems array = []
 ])
 param containerType string = ''
 
+@description('Required. Toggles whether to enable default telemetry.')
+@allowed([
+  true
+  false
+])
+param enableDefaultTelemetry bool = true
+
 
 resource defaultTelemetry 'Microsoft.Resources/deployments@2021-04-01' = if (enableDefaultTelemetry) {
   name: 'pid-47ed15a6-730a-4827-bcb4-0fd963ffbd82-${uniqueString(deployment().name)}'

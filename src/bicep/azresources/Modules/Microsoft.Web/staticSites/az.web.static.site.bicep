@@ -81,8 +81,8 @@ var identityType = systemAssignedIdentity ? (!empty(userAssignedIdentities) ? 'S
 
 var identity = identityType != 'None' ? {
   type: identityType
-  userAssignedIdentities: !empty(userAssignedIdentities) ? userAssignedIdentities : null
-} : null
+  userAssignedIdentities: !empty(userAssignedIdentities) ? userAssignedIdentities : {}
+} : {}
 
 resource staticSite 'Microsoft.Web/staticSites@2021-03-01' = {
   name: name
@@ -124,7 +124,7 @@ module staticSite_roleAssignments './rbac/roleAssignments.bicep' = [for (roleAss
   }
 }]
 
-module staticSite_privateEndpoints '../../Microsoft.Network/privateEndPoint/az.net.private.endpoint.bicep' = [for (privateEndpoint, index) in privateEndpoints: {
+module staticSite_privateEndpoints '../../Microsoft.Network/privateEndPoints/az.net.private.endpoint.bicep' = [for (privateEndpoint, index) in privateEndpoints: {
   name: '${uniqueString(deployment().name, location)}-StaticSite-PrivateEndpoint-${index}'
   params: {
     groupIds: [

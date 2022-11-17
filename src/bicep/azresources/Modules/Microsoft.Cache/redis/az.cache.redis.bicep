@@ -169,7 +169,7 @@ var identityType = systemAssignedIdentity ? 'SystemAssigned' : !empty(userAssign
 
 var identity = {
   type: identityType
-  userAssignedIdentities: !empty(userAssignedIdentities) ? userAssignedIdentities : null
+  userAssignedIdentities: !empty(userAssignedIdentities) ? userAssignedIdentities : {}
 }
 
 
@@ -196,7 +196,7 @@ resource redisCache 'Microsoft.Cache/redis@2021-06-01' = {
       name: skuName
     }
     staticIP: !empty(staticIP) ? staticIP : null
-    subnetId: !empty(subnetId) ? subnetId : null
+    subnetId: !empty(subnetId) ? subnetId : ''
     tenantSettings: tenantSettings
   }
   zones: skuName == 'Premium' ? pickZones('Microsoft.Cache', 'redis', location, 1) : null
@@ -235,7 +235,7 @@ module redisCache_rbac './rbac/roleAssignments.bicep' = [for (roleAssignment, in
   }
 }]
 
-module redisCache_privateEndpoints '../../Microsoft.Network/privateEndpoint/az.net.private.endpoint.bicep' = [for (privateEndpoint, index) in privateEndpoints: {
+module redisCache_privateEndpoints '../../Microsoft.Network/privateEndpoints/az.net.private.endpoint.bicep' = [for (privateEndpoint, index) in privateEndpoints: {
   name: '${uniqueString(deployment().name, location)}-redisCache-PrivateEndpoint-${index}'
   params: {
     groupIds: [

@@ -61,7 +61,7 @@ var identity_var = identity == 'SystemAssigned' ? {
   userAssignedIdentities: {
     '${userAssignedIdentityId}': {}
   }
-} : null
+} : {}
 
 
 resource policyAssignment 'Microsoft.Authorization/policyAssignments@2021-06-01' = {

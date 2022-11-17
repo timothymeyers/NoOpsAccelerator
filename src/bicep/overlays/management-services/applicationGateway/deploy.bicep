@@ -98,6 +98,9 @@ param parDiagnosticStorageAccountName string
 @description('[Free/Standard/Premium/PerNode/PerGB2018/Standalone] The SKU for the Log Analytics Workspace. It defaults to "PerGB2018". See https://docs.microsoft.com/en-us/azure/azure-monitor/logs/resource-manager-workspace for valid settings.')
 param parLogAnalyticsWorkspaceName string
 
+@description('Required. Name of the front end Public IP Address.')
+param publicIPAddressName string
+
 /*
   NAMING CONVENTION
   Here we define a naming conventions for resources.

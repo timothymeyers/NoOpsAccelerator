@@ -67,7 +67,7 @@ If you choose to save and record your values use the table below.  This is sensi
 | Subscription ID(s) | <div style="height: 20px;background-color: #CFD8DC;width: 300px;"></div> | When deploying workloads, overlays, enclaves, or platforms.  You can use multiple subscriptions for your tiers. |
 | Location           | <div style="height: 20px;background-color: #CFD8DC;width: 300px;"></div>                                                                                                                                                           | When deploying workloads, overlays, enclaves, or platforms (eastus, usgovvirgina, etc..).                       |
 
-### Part 1: Create an Workload Folder
+### Part 1: Create an Enclave Folder
 
 > <span class="note">NOTE</span>: For this demonstration we will be using AZ CLI with PowerShell. You can use AZ CLI with Bash or Azure PowerShell.  The commands are the same. The only difference is the syntax.
 
@@ -81,7 +81,7 @@ If you choose to save and record your values use the table below.  This is sensi
 
 1. Open folder directory **/src/bicep/enclaves/**
 
-1. Create a folder called **enclaves-scca-hub3spoke-sqlserver** in the **//src/bicep/enclaves/** by right-click the folder and selecting **new folder**
+1. Create a folder called **enclaves-scca-hub3spoke-sqlserver** in the **/src/bicep/enclaves/** by right-click the folder and selecting **new folder**
 
 > <span class="note">NOTE</span>: The folder name must start with **enclaves-scca-hub3spoke**.  This is how the Azure NoOps Accelerator identifies the folder as a enclave. The rest of the folder name is used to identify the workload. The folder name must be unique. If you have multiple enclaves for the same workload, then you can add a suffix to the folder name.  For example, **enclaves-scca-hub3spoke-sqlserver-1**. The suffix is not used by the Azure NoOps Accelerator, but it is used to identify the folder.
 

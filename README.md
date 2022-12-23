@@ -8,6 +8,49 @@ Delivered as a collection of infrastructure as code (IaC) [module templates](htt
 
 Learn more about the NoOps movement and philosphy here - *[What is NoOps?](https://github.com/Azure/NoOpsAccelerator/tree/main/docs/wiki/What-is-NoOps.md)*.
 
+## Goals and Non-Goals of the Azure NoOps Accelerator Project
+
+### Goals
+
+* Designed for US Government mission customers, with a specific focus on the US Department of Defense, Military Departments and coallition partners.
+* Provide reusable and composable IaC modules that hyper-automate infrastructure deployment using Microsoft best practices.
+* Simplify compliance management through automated audit, reporting, and remediation.
+* Deliver example [Platform modules](./src/bicep/platforms/) that implement SCCA controls and follow [Microsoft's SACA implementation guidance](https://aka.ms/saca).
+* Support deployment to Azure Commercial, Azure Government, Azure Government Secret, and Azure Government Top Secret clouds.
+* Accelerate the US Government's use of Azure by easing the onboarding of mission workloads, spanning mission applications, data, artificial intelligence, and machine learning.
+
+### Non-Goals
+
+* The NoOps Accelerator cannot automate the approval for Authority to Operate (ATO) or equivilant compliance, governance and authorisation process, though it will enable Customers to collect, customize, and submit for ATO based on their departmental requirements.
+* The NoOps Accelerator will not strive for 100% compliance on all deployed Azure Policies for reference implementations. Customers must review [Microsoft Defender for Cloud Regulatory Compliance dashboard](https://ms.portal.azure.com/#view/Microsoft_Azure_Security/SecurityMenuBlade/~/22) and apply appropriate exemptions.
+
+## Getting Started
+
+Definitions of NoOps primitives.
+
+### Architecture
+
+| Primitive | Definition |
+| :---------------| :--------- |
+| **AzResources** | Wrap [Azure Resource Providers](https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/azure-services-resource-providers) so that they understand how to fit and work together. The most basic building blocks in NoOps. |
+| **Overlays** | Extend *AzResources* with specific configurations or combine them to create more useful objects.<BR/><BR/>For example, the `kubernetesCluster` overlay could be used to deploy a Private AKS Cluster rather than using the `Microsoft.ContainerService/managedClusters` AzResource to deploy a vanilla AKS cluster.<BR/><BR/>Similarly, a `virtualMachine` overlay could be created that combines the deployment of a `Microsoft.Network/networkInterfaces` with a `Microsoft.Compute/virtualmachine` since you will rarely if ever deploy a VM without an associated NIC. |
+| **Platforms** | Combine *Overlays* and *AzResources* to lay the networking required to support mission workloads. NoOps is provided with three SCCA-compliant hub-and-spoke landing zone platforms. The [Quickstart](#quickstart) above walks through the deployment of a SCCA-compliant hub-and-3-spoke platform.
+| **Workloads** | Combine *Overlays* and *AzResources* to create solutions that achieve mission and operational goals. For example, a `kubernetesCluster` overlay (Private AKS Cluster) could be combined with a `Microsoft.ContainerRegistry` AzResource to create a **Dev Environment** workload.<BR/><BR/>Workloads can be deployed into either a new or an existing hub-peered virtual network.|
+| **Enclaves** | Bring it all together -- combining a single *Platform* with one or more *Workloads*, mixing in Zero Trust governance and RBAC to enable the rapid, repeatable, auditable, and authorizable deployment of outcome-driven infrastructure. |
+
+<!-- markdownlint-disable MD033 -->
+<!-- allow html for images so that they can be sized -->
+<img src="docs/media/NoOpsPrimitives.png" alt="A diagram that depicts the relationships between the NoOps Primitives, with AzResources on the bottom, flowing through Overlays into both Platforms and Workloads, and finally Enclaves on top." width="800" />
+<!-- markdownlint-enable MD033 -->
+
+### Telemetry
+
+Microsoft can identify the deployments of the Azure Resource Manager and Bicep templates with the deployed Azure resources. Microsoft can correlate these resources used to support the deployments. Microsoft collects this information to provide the best experiences with their products and to operate their business.  The telemetry is collected through [customer usage attribution](https://docs.microsoft.com/azure/marketplace/azure-partner-customer-usage-attribution). The data is collected and governed by Microsoft's privacy policies, located at [https://www.microsoft.com/trustcenter](https://www.microsoft.com/trustcenter).
+
+If you don't wish to send usage data to Microsoft, you can set the `customerUsageAttribution.enabled` setting to `false` in `global/telemetry.json`.
+
+Project Bicep [collects telemetry in some scenarios](https://github.com/Azure/bicep/blob/main/README.md#telemetry) as part of improving the product.
+
 ## Quickstart Deployment
 
 While the NoOps Accelerator can be used to build all sorts of useful solutions, a simple place to start is deploying a workload platform.
@@ -83,49 +126,6 @@ A detailed and complete list of prerequisites is documented in the [wiki](https:
 1. Further example platform deployments and tutorials are available in the **[training](./docs/training/)** folder.
 
 > **Note**: Don't forget to **clean-up your environment** by removing all of the resource groups locks and deleting the resource groups created by the deployment when you are done with this Quickstart.
-
-## Goals and Non-Goals of the Azure NoOps Accelerator Project
-
-### Goals
-
-* Designed for US Government mission customers, with a specific focus on the US Department of Defense, Military Departments and coallition partners.
-* Provide reusable and composable IaC modules that hyper-automate infrastructure deployment using Microsoft best practices.
-* Simplify compliance management through automated audit, reporting, and remediation.
-* Deliver example [Platform modules](./src/bicep/platforms/) that implement SCCA controls and follow [Microsoft's SACA implementation guidance](https://aka.ms/saca).
-* Support deployment to Azure Commercial, Azure Government, Azure Government Secret, and Azure Government Top Secret clouds.
-* Accelerate the US Government's use of Azure by easing the onboarding of mission workloads, spanning mission applications, data, artificial intelligence, and machine learning.
-
-### Non-Goals
-
-* The NoOps Accelerator cannot automate the approval for Authority to Operate (ATO) or equivilant compliance, governance and authorisation process, though it will enable Customers to collect, customize, and submit for ATO based on their departmental requirements.
-* The NoOps Accelerator will not strive for 100% compliance on all deployed Azure Policies for reference implementations. Customers must review [Microsoft Defender for Cloud Regulatory Compliance dashboard](https://ms.portal.azure.com/#view/Microsoft_Azure_Security/SecurityMenuBlade/~/22) and apply appropriate exemptions.
-
-## Getting Started
-
-Definitions of NoOps primitives.
-
-### Architecture
-
-| Primitive | Definition |
-| :---------------| :--------- |
-| **AzResources** | Wrap [Azure Resource Providers](https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/azure-services-resource-providers) so that they understand how to fit and work together. The most basic building blocks in NoOps. |
-| **Overlays** | Extend *AzResources* with specific configurations or combine them to create more useful objects.<BR/><BR/>For example, the `kubernetesCluster` overlay could be used to deploy a Private AKS Cluster rather than using the `Microsoft.ContainerService/managedClusters` AzResource to deploy a vanilla AKS cluster.<BR/><BR/>Similarly, a `virtualMachine` overlay could be created that combines the deployment of a `Microsoft.Network/networkInterfaces` with a `Microsoft.Compute/virtualmachine` since you will rarely if ever deploy a VM without an associated NIC. |
-| **Platforms** | Combine *Overlays* and *AzResources* to lay the networking required to support mission workloads. NoOps is provided with three SCCA-compliant hub-and-spoke landing zone platforms. The [Quickstart](#quickstart) above walks through the deployment of a SCCA-compliant hub-and-3-spoke platform.
-| **Workloads** | Combine *Overlays* and *AzResources* to create solutions that achieve mission and operational goals. For example, a `kubernetesCluster` overlay (Private AKS Cluster) could be combined with a `Microsoft.ContainerRegistry` AzResource to create a **Dev Environment** workload.<BR/><BR/>Workloads can be deployed into either a new or an existing hub-peered virtual network.|
-| **Enclaves** | Bring it all together -- combining a single *Platform* with one or more *Workloads*, mixing in Zero Trust governance and RBAC to enable the rapid, repeatable, auditable, and authorizable deployment of outcome-driven infrastructure. |
-
-<!-- markdownlint-disable MD033 -->
-<!-- allow html for images so that they can be sized -->
-<img src="docs/media/NoOpsPrimitives.png" alt="A diagram that depicts the relationships between the NoOps Primitives, with AzResources on the bottom, flowing through Overlays into both Platforms and Workloads, and finally Enclaves on top." width="800" />
-<!-- markdownlint-enable MD033 -->
-
-### Telemetry
-
-Microsoft can identify the deployments of the Azure Resource Manager and Bicep templates with the deployed Azure resources. Microsoft can correlate these resources used to support the deployments. Microsoft collects this information to provide the best experiences with their products and to operate their business.  The telemetry is collected through [customer usage attribution](https://docs.microsoft.com/azure/marketplace/azure-partner-customer-usage-attribution). The data is collected and governed by Microsoft's privacy policies, located at [https://www.microsoft.com/trustcenter](https://www.microsoft.com/trustcenter).
-
-If you don't wish to send usage data to Microsoft, you can set the `customerUsageAttribution.enabled` setting to `false` in `global/telemetry.json`.
-
-Project Bicep [collects telemetry in some scenarios](https://github.com/Azure/bicep/blob/main/README.md#telemetry) as part of improving the product.
 
 ## Contributing
 

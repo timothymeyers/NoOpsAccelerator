@@ -6,7 +6,7 @@
 
 Delivered as a collection of infrastructure as code (IaC) [module templates](https://github.com/Azure/NoOpsAccelerator/tree/main/src/bicep) written in Bicep, the NoOps Accelerator is intended to empower organizations on their journey towards a continuous deployment and governance model for their cloud infrastructure.
 
-Learn more about the NoOps movement and philosphy here - *[What is NoOps?](https://github.com/Azure/NoOpsAccelerator/tree/main/docs/wiki/What-is-NoOps.md)*.
+Learn more about the NoOps movement and philosophy here - *[What is NoOps?](https://github.com/Azure/NoOpsAccelerator/tree/main/docs/wiki/What-is-NoOps.md)*.
 
 ## Goals and Non-Goals of the Azure NoOps Accelerator Project
 
@@ -21,7 +21,7 @@ Learn more about the NoOps movement and philosphy here - *[What is NoOps?](https
 
 ### Non-Goals
 
-* The NoOps Accelerator cannot automate the approval for Authority to Operate (ATO) or equivilant compliance, governance and authorisation process, though it will enable Customers to collect, customize, and submit for ATO based on their departmental requirements.
+* The NoOps Accelerator cannot automate the approval for Authority to Operate (ATO) or equivalent compliance, governance and authorisation process, though it will enable Customers to collect, customize, and submit for ATO based on their departmental requirements.
 * The NoOps Accelerator will not strive for 100% compliance on all deployed Azure Policies for reference implementations. Customers must review [Microsoft Defender for Cloud Regulatory Compliance dashboard](https://ms.portal.azure.com/#view/Microsoft_Azure_Security/SecurityMenuBlade/~/22) and apply appropriate exemptions.
 
 ## Getting Started
@@ -106,7 +106,7 @@ A detailed and complete list of prerequisites is documented in the [wiki](https:
     * `--template-file`: (required) The file path to the `deploy.bicep` template.
     * `--parameters`: (required for quickstart) The file path to the `parameters/deploy.parameters.json` file
 
-    Here is an example that deploys into a single subscription in the EastUS region of Azure Commercial:
+    Here is an example that deploys the hub and spoke architecture into a single subscription and a chosen region of Azure Commercial:
 
     ```bash
     # Replace with the Azure region you want to deploy to.

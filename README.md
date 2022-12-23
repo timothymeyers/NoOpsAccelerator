@@ -19,61 +19,76 @@ You can use the NoOps Accelerator to deploy [SCCA-compliant landing zones](./src
 
 ### Deploy a SCCA-compliant Landing Zone (SCCA Hub with 3 Spokes) using the Azure CLI
 
-These steps walk through how to use NoOps to deploy a hub and spoke architecture. At the conclusion, you will have five resource groups mapped to the following:
+These steps walk through how to use NoOps to deploy a [hub and spoke](https://learn.microsoft.com/en-us/azure/architecture/reference-architectures/hybrid-networking/hub-spoke) architecture. At the conclusion, you will have five resource groups mapped to the following:
 
 * Hub: SCCA-compliant networking hub (1 vnet, 1 resource group)
 * Tier 0 (T0): Identity & Authorization (1 vnet, 1 resource group)
 * Tier 1 (T1): Infrastructure Operations, and Logging (1 vnet, 2 resource groups)
 * Tier 2 (T2): DevSecOps & Shared Services (1 vnet, 1 resource group)
 
-> **Note:** The deployment requires Bicep CLI version 0.11.1 (030248df55) or later. You can check your version by running `bicep --version`. You can upgrade by running `az bicep upgrade`.
+### Prerequisites
 
-Steps:
+To continue with the quick start you will need the following as a minimum. 
 
-1. Clone the repository down and change directory to the `lz-platform-scca-hub-3spoke` directory
+* Git client
+* Visual Studio Code (or alternative IDE of choice)
+* Azure CLI
+* Azure Bicep version 0.11.1 (030248df55) or later
+
+A detailed and complete list of prerequisites is documented in the [wiki](https://github.com/Azure/NoOpsAccelerator/blob/main/docs/wiki/Deploying-NoOps-Accelerator-Pre-requisites.md).
+
+> Don't have these? Try [Azure Cloud Shell](https://docs.microsoft.com/en-us/azure/cloud-shell/overview) in your browser as an alternative.
+
+#### Steps
+
+1. Clone this repository and change directory to the `/src/bicep/platforms/lz-platform-scca-hub-3spoke` directory
 
     ```plaintext
     git clone https://github.com/Azure/NoOpsAccelerator.git
-    cd NoOpsAccelerator/src/bicep/platforms/lz-platform-scca-hub-3spoke
+    cd /src/bicep/platforms/lz-platform-scca-hub-3spoke
     ```
 
-1. Deploy the landing zone with the `az deployment sub create` command.
-For a quickstart, we suggest a test deployment into the current AZ CLI subscription using these parameters:
+1. Connect to your Azure Account and check the current context is for the subscription, tenant and environment you are deploying to and make changes where necessary.
+
+    ``` bash
+    az login
+    az account show
+    ```
+
+1. Open the `/src/bicep/platforms/lz-platform-scca-hub-3spoke/parameters/deploy.parameters.json` file and replace the following parameters:
+    * `"subscriptionId": "<<subscriptionId>>"` with your SubscriptionId. Ensure all instances of this parameter are changed in this file.
+
+> **Note**: Multiple subscriptions may be configured (*i.e.*, to have separate subscriptions for each 'tier' in the MLZ architecture) in the `parameters/deploy.parameters.json` but a single subscription is used for this quickstart.
+
+1. For the quickstart, a deployment into the current subscription can be completed using the following parameters and the `az sub create command`:
 
     * `--name`: (optional) The deployment name, which is visible in the Azure Portal under Subscription/Deployments.
     * `--location`: (required) The Azure region to store the deployment metadata.
-    * `--template-file`: The file path to the `deploy.bicep` template.
-    * `--parameters`: The file path to the `parameters/deploy.parameters.json` file, preceded by `@`.
-        Individual parameters can be overwritten using `<parameter>=<value>` format as well.
-    * `--subscription`: The GUID for the subscription to deploy into.
-        Multiple subscriptions may be configured (*i.e.*, to have separate subscriptions for each 'tier' in the MLZ architecture) in the `parameters/deploy.parameters.json`
-
-> **IMPORTANT**: All values will need to be updates in the `parameters/deploy.parameters.json`. This allows for consistency in the parameters.  
+    * `--template-file`: (required) The file path to the `deploy.bicep` template.
+    * `--parameters`: (required for quickstart) The file path to the `parameters/deploy.parameters.json` file
 
     Here is an example that deploys into a single subscription in the EastUS region of Azure Commercial:
 
-    ```plaintext
-    # Replace with your test Azure Subscription ID
-    AZ_SUBSCRIPTION="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+    ```bash
+    # Replace with the Azure region you want to deploy to.
+    location="<<your region>>"
 
-    az login
-    cd src/bicep
-    cd platforms/lz-platform-scca-hub-3spoke
     az deployment sub create \
-        --name deploy-scca-hub-with-3-spokes \
-        --location EastUS \
+        --name deploy-noops-quickstart \
+        --location $location \
         --template-file deploy.bicep \
-        --parameters @parameters/deploy.parameters.json \
-        --subscription $AZ_SUBSCRIPTION
+        --parameters @parameters/deploy.parameters.json
     ```
 
-1. After a successful deployment, see the **[enclaves](./src/bicep/enclaves/)** folder for examples of complete, outcome-driven solutions built using the NoOps Accelerator. Also, be sure to take a look through our **[workloads](.src/bicep/workloads)** and **[overlays](./src/bicep/overlays)** folders to get a sense of the available pieces you can put together with the **platform** you just deployed to solve your mission challenges.
+#### Next Steps
 
-1. Don't forget to **clean-up your environment** by removing all of the resource groups created by the deployment when you are done with this Quickstart.
+1. After a successful deployment, take a look at the **[enclaves](./src/bicep/enclaves/)** folder for examples of complete, outcome-driven solutions built using the NoOps Accelerator. Also, be sure to take a look through our **[workloads](./src/bicep/workloads)** and **[overlays](./src/bicep/overlays)** folders explore how you can expand the **platform** you just deployed and solve your mission challenges.
 
-> Don't have Azure CLI? Here's how to get started with Azure Cloud Shell in your browser: <https://docs.microsoft.com/en-us/azure/cloud-shell/overview>
+1. Further example platform deployments and tutorials are available in the **[training](./docs/training/)** folder. 
 
-<!-- For more detailed deployment instructions, see our deployment guides for [Bicep](docs/deployment-guide-bicep.md) and [Terraform](docs/deployment-guide-terraform.md). -->
+<!-- 1. For more detailed deployment instructions, see our deployment guides for [Bicep](docs/deployment-guide-bicep.md) and [Terraform](docs/deployment-guide-terraform.md). -->
+
+> **Note**: Don't forget to **clean-up your environment** by removing all of the resource groups locks and deleting the resource groups created by the deployment when you are done with this Quickstart.
 
 ## Goals and Non-Goals of the Azure NoOps Accelerator Project
 

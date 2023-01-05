@@ -1,0 +1,19 @@
+{
+  "[terraform]": {
+    "editor.formatOnSave": true
+  },
+  "[json]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "editor.detectIndentation": false
+  },
+  "shellcheck.enableQuickFix": true,
+  "markdownlint.config": {
+    "default": true,
+    "MD013": {
+      "line_length": 400
+    },
+    "MD029": false
+  },
+  "terminal.integrated.scrollback": 10000
+}

@@ -36,6 +36,5 @@ The following are the unique ID's (also known as PIDs) used in each of the modul
 | managementGroups                | 55a992b5-9ab1-4b3c-8c14-a9a3e5c1e0c2 |
 | policy                          | 3b7f335c-5580-4035-bc75-c835c15402da |
 | roleAssignments                 | 5dd6ad4b-bc45-4346-9189-7bc46477182a |
-| hubSpoke - Orchestration        | 50ad3b1a-f72c-4de4-8293-8a6399991beb |
-| hubPeeredSpoke - Orchestration  | 8ea6f19a-d698-4c00-9afb-5c92d4766fd2 |
-| SubPlacementAll - Orchestration | bb800623-86ff-4ab4-8901-93c2b70967ae |
+| hub1Spoke - Orchestration        | 50ad3b1a-f72c-4de4-8293-8a6399991beb |
+| hub3Spoke - Orchestration        | 50ad3b1a-f72c-4de4-8293-8a6399991beb |

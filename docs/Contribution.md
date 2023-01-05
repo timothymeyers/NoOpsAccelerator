@@ -1,7 +1,6 @@
-
 # Contribution Guide
 
-## Contribution scope for NoOps Accelerator
+## Contribution scope for Azure NoOps Accelerator
 
 The following is the scope of contributions to this repository:
 
@@ -14,11 +13,11 @@ Primarily, the code contribution would be centered on Azure Policy definitions a
 
 > This guidance supports the [Architecture](https://github.com/Azure/NoOpsAccelerator/docs/NoOpsAccelerator-Architecture.md) guidance, it is not a replacement.
 
-The `NoOps Accelerator` repository (this repository) has been created to help guide DOD/Public Sector customers on building self-service infrastucture in their Azure environment. The reference implementation is a flexible foundation that enables users to develop/maintain an opinionated self-service infrastructure into an Azure AD Tenant utilizing [Bicep](https://aka.ms/bicep) as the Infrastructure-as-Code (IaC) tooling and language.
+The `Azure NoOps Accelerator` repository (this repository) has been created to help guide DOD/Public Sector customers on building self-service infrastucture in their Azure environment. The reference implementation is a flexible foundation that enables users to develop/maintain an opinionated self-service infrastructure into an Azure AD Tenant utilizing [Bicep](https://aka.ms/bicep) as the Infrastructure-as-Code (IaC) tooling and language.
 
-## Ways to Consume NoOps Accelerator
+## Ways to Consume Azure NoOps Accelerator
 
-There are various ways to consume the Bicep modules included in `NoOps Accelerator`.
+There are various ways to consume the Bicep modules included in `Azure NoOps Accelerator`.
 
 The options are:
 
@@ -38,7 +37,7 @@ The options are:
 
 ## Recommended Learning
 
-Before you start contributing to the NoOps Accelerator Bicep code, it is **highly recommended** that you complete the following Microsoft Learn paths, modules & courses:
+Before you start contributing to the Azure NoOps Accelerator Bicep code, it is **highly recommended** that you complete the following Microsoft Learn paths, modules & courses:
 
 ### Bicep
 
@@ -166,13 +165,13 @@ param parExampleResourceGroupNamePrefix string = 'TEST'
 var varExampleResourceGroupName = 'rsg-${parExampleResourceGroupNamePrefix}' // Create name for the example resource group
 
 
-// RESOURCE DEPLOYMENTS 
+// RESOURCE DEPLOYMENTS
 resource resExampleResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: varExampleResourceGroupName
   location: 'uksouth' // Hardcoded as an example of commenting inside a resource
 }
 
-/* 
+/*
 No modules being deployed in this example
 */
 

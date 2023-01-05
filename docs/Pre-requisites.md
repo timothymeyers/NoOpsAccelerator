@@ -1,6 +1,6 @@
-# NoOps Accelerator Prerequisites
+# Azure NoOps Accelerator Prerequisites
 
-NoOps Accelerator can bootstrap an entire Azure tenant without any infrastructure dependencies, and the user must first have Owner permission on the tenant *root* before deploying.
+Azure NoOps Accelerator can bootstrap an entire Azure tenant without any infrastructure dependencies, and the user must first have Owner permission on the tenant *root* before deploying.
 
 *Note: Once you have completed the deployment, you can remove the Owner permission from the tenant root, as it will no longer be needed for any subsequent operations.*
 
@@ -54,3 +54,11 @@ New-AzRoleAssignment -Scope '/' -RoleDefinitionName 'Owner' -ObjectId $user.Id
 ```
 
 > Please note: sometimes it can take up to 15 minutes for permission to propagate at tenant root scope. It is highly recommended that you log out and log back in to refresh the token before you proceed with the deployment.*
+
+## Terraform
+
+Terraform stores state information about the resources it creates locally. This state information is easily readable and contains secrets / passwords in clear text. A more secure way of handling this is to get Terraform to use an encrypted Azure Storage account to store the state information. This also means that the state persists, for example, if you get a new laptop.
+
+For the Terraform state information, you therefore need to have pre-created an Azure Storage Account (blob) before running any of the Terraform scripts. The account will need to have the "Storage Blob Data Owner" role assigned to the account you are signed in with via the Azure CLI.
+
+The backend.hcl file should contain details of the resource group, storage account, container and blob where your state information will be stored.

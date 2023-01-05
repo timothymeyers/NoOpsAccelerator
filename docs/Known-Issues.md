@@ -1,4 +1,4 @@
-# Reference Implementation - Known Issues
+# Azure NoOps Accelerator - Known Issues
 
 The list below summarizes the known issues currently being worked on by the NoOps Accelerator team.
 

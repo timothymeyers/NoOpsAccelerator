@@ -1,10 +1,10 @@
 # Azure NoOps Accelerator
 
-> **"NoOps automates platform administration and broaden communication between developers, cyber, and operations to achieve mission success**." - *John Spinella, Creator of the Azure NoOps Accelerator*
+> **"NoOps automates platform administration and broaden communication between developers, cyber, and operations to achieve mission success**."
 
 **Azure NoOps Accelerator** is a flexible foundation that enables US Department of Defense and other Public Sector customers to quickly develop and maintain opinionated, policy-driven, and self-service enclaves in their Azure environments.
 
-Delivered as a collection of infrastructure as code (IaC) [module templates](https://github.com/Azure/NoOpsAccelerator/tree/main/src/bicep) written in Bicep, the NoOps Accelerator is intended to empower organizations on their journey towards a continuous deployment and governance model for their cloud infrastructure.
+Delivered as a collection of infrastructure as code (IaC) module templates written and maintained in [Bicep](https://github.com/Azure/NoOpsAccelerator/tree/main/src/bicep) and [Tereform](https://github.com/Azure/NoOpsAccelerator/tree/main/src/terraform), the NoOps Accelerator is intended to empower organizations on their journey towards a continuous deployment and governance model for their cloud infrastructure.
 
 Learn more about the NoOps movement and philosophy here - *[What is NoOps?](https://github.com/Azure/NoOpsAccelerator/tree/main/docs/wiki/What-is-NoOps.md)*.
 
@@ -51,7 +51,7 @@ If you don't wish to send usage data to Microsoft, you can set the `customerUsag
 
 Project Bicep [collects telemetry in some scenarios](https://github.com/Azure/bicep/blob/main/README.md#telemetry) as part of improving the product.
 
-## Quickstart Deployment
+## Quickstart Deployment - BICEP
 
 While the NoOps Accelerator can be used to build all sorts of useful solutions, a simple place to start is deploying a workload platform.
 You can use the NoOps Accelerator to deploy [SCCA-compliant landing zones](./src/bicep/platforms/) based on Microsoft's [SACA implementation guidance][saca] and [Mission Landing Zone][mlz] architecture.

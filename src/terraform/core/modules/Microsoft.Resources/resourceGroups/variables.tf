@@ -13,6 +13,10 @@ variable "location" {
   type        = string
 }
 
+###################################
+# Resource Locks
+###################################
+
 variable "enable_resource_lock" {
   description = "Enable resource locks"
   type        = bool

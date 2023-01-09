@@ -70,11 +70,11 @@ module "acr_private_endpoint" {
 module "diagnostic_setting" {
   source = "../../modules/Microsoft.Insights/diagnosticSettings"
 
-  enable_diagnostic_setting    = var.enable_diagnostic_setting
-  name                         = "${var.acr_name}-diagnostic-setting"
-  target_resource_id           = module.acr.id
-  log_analytics_workspace_id   = var.log_analytics_workspace_id
-  log_analytics_retention_days = var.log_analytics_retention_days
+  enable_diagnostic_setting  = var.enable_diagnostic_setting
+  name                       = "${var.acr_name}-diagnostic-setting"
+  target_resource_id         = module.acr.id
+  log_analytics_workspace_id = var.log_analytics_workspace_id
+  retention_policy_days      = 30
 
   logs    = ["ContainerRegistryRepositoryEvents", "ContainerRegistryLoginEvents"]
   metrics = ["AllMetrics"]

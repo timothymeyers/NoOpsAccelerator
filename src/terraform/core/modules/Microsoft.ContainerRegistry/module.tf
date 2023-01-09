@@ -45,38 +45,3 @@ resource "azurerm_container_registry" "acr" {
       ]
   }
 }
-
-resource "azurerm_monitor_diagnostic_setting" "settings" {
-  name                       = "DiagnosticsSettings"
-  target_resource_id         = azurerm_container_registry.acr.id
-  log_analytics_workspace_id = var.log_analytics_workspace_id
-
-  log {
-    category = "ContainerRegistryRepositoryEvents"
-    enabled  = true
-
-    retention_policy {
-      enabled = true
-      days    = var.log_analytics_retention_days
-    }
-  }
-
-  log {
-    category = "ContainerRegistryLoginEvents"
-    enabled  = true
-
-    retention_policy {
-      enabled = true
-      days    = var.log_analytics_retention_days
-    }
-  }
-
-  metric {
-    category = "AllMetrics"
-
-    retention_policy {
-      enabled = true
-      days    = var.log_analytics_retention_days
-    }
-  }
-}

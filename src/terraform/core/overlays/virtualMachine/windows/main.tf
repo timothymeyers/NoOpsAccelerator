@@ -5,6 +5,12 @@ data "azurerm_resource_group" "vm_resource_group" {
   name = var.resource_group_name
 }
 
+data "azurerm_subnet" "vm_subnet" {
+  name                 = var.subnet_name
+  virtual_network_name = var.virtual_network_name
+  resource_group_name  = var.resource_group_name
+}
+
 resource "random_integer" "windows-vm-password" {
   min = 6
   max = 72
@@ -28,7 +34,7 @@ module "mod_virtual_machine" {
   // Global Settings
   resource_group_name  = var.resource_group_name
   location             = var.location
-  subnet_id            = var.subnet_id
+  subnet_id            = data.azurerm_subnet.vm_subnet.id
   virtual_network_name = var.virtual_network_name
 
   // VM Settings

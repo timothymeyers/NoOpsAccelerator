@@ -39,15 +39,11 @@ module "bastion_subnet" { # Bastion Subnet
   resource_group_name  = data.azurerm_resource_group.hub.name
   virtual_network_name = data.azurerm_virtual_network.hub_bastion_host_vnet.name
 
-  subnets = [
-    {
-      name : "AzureBastionSubnet"
-      address_prefixes : [cidrsubnet(var.bastion_address_space, 0, 0)]
-      service_endpoints : var.bastion_subnet_service_endpoints
-      enforce_private_link_endpoint_network_policies : false
-      enforce_private_link_service_network_policies : false
-    }
-  ]
+  name                                          = "AzureBastionSubnet"
+  address_prefixes                              = [cidrsubnet(var.bastion_address_space, 0, 0)]
+  service_endpoints                             = var.bastion_subnet_service_endpoints
+  private_endpoint_network_policies_enabled     = false
+  private_link_service_network_policies_enabled = false
 
   // Subnet Tags
   tags = merge(var.tags, {
@@ -72,7 +68,7 @@ module "mod_bastion_host" {
   public_ip_address_sku_name   = local.bastionHostPublicIPAddressSkuName
   public_ip_address_allocation = local.bastionHostPublicIPAddressAllocationMethod
   ipconfig_name                = local.bastionNetworkInterfaceIpConfigurationName
-  subnet_id                    = module.bastion_subnet.subnet_ids["AzureBastionSubnet"]
+  subnet_id                    = module.bastion_subnet.id
 
   // Bastion Diagnostic Settings
   enable_diagnostic_settings          = var.enable_bastion_diagnostics
@@ -108,7 +104,7 @@ module "mod_linux_jumpbox" {
 
   // Jumpbox Settings
   vm_name                     = local.linuxVmName
-  subnet_id                   = var.subnet_id
+  subnet_name                 = var.subnet_name
   network_interface_name      = local.linuxNetworkInterfaceName
   ip_configuration_name       = local.linuxNetworkInterfaceIpConfigurationName
   network_security_group_name = var.network_security_group_name
@@ -151,7 +147,7 @@ module "mod_windows_jumpbox" {
 
   // Jumpbox Settings
   vm_name                     = local.windowsVmName
-  subnet_id                   = var.subnet_id
+  subnet_name                 = var.subnet_name
   network_interface_name      = local.windowsNetworkInterfaceName
   ip_configuration_name       = local.windowsNetworkInterfaceIpConfigurationName
   network_security_group_name = var.network_security_group_name

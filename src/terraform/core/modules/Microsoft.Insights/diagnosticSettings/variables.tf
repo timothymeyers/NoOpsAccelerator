@@ -9,12 +9,6 @@ variable "name" {
   type        = string
 }
 
-variable "retention_policy_enabled" {
-  description = "(Required) Is this Retention Policy enabled?"
-  type        = bool
-  default     = false
-}
-
 variable "retention_policy_days" {
   description = "(Optional) The number of days for which this Retention Policy should apply."
   type        = number
@@ -34,7 +28,7 @@ variable "log_analytics_workspace_id" {
 variable "log_analytics_destination_type" {
   description = "(Optional) When set to 'Dedicated' logs sent to a Log Analytics workspace will go into resource specific tables, instead of the legacy AzureDiagnostics table."
   type        = string
-  default     = null
+  default     = "Dedicated"
 }
 
 variable "storage_account_id" {

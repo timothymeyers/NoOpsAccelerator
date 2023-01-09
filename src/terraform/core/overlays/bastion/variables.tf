@@ -11,8 +11,8 @@ variable "resource_group_name" {
   default     = ""
 }
 
-variable "subnet_id" {
-  description = "(Required) Specifies the resource id of the subnet hosting the virtual machine"
+variable "subnet_name" {
+  description = "(Required) The name of the subnet the Bastion Host resides in"
   type        = string
 }
 
@@ -79,12 +79,6 @@ variable "create_bastion_windows_jumpbox" {
   description = "Create a bastion host and windows jumpbox VM?"
   type        = bool
   default     = true
-}
-
-variable "bastion_host_name" {
-  description = "The name of the Bastion Host"
-  type        = string
-  default     = "bastionHost"
 }
 
 variable "bastion_address_space" {

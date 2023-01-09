@@ -16,6 +16,11 @@ variable "virtual_network_name" {
   type        = string
 }
 
+variable "firewall_management_subnet_name" {
+  description = "The name of the Azure Firewall Management Subnet. It must be in the Hub Virtual Network space. It must be /26."
+  type        = string
+}
+
 variable "firewall_client_publicIP_address_name" {
   description = "The name of the Azure Firewall Client Public IP Address."
   type        = string
@@ -42,26 +47,24 @@ variable "firewall_config" {
   })
 }
 
+variable "firewall_client_subnet_name" {
+  description = "The name of the Azure Firewall Client Subnet. It must be in the Hub Virtual Network space. It must be /26."
+  type        = string
+}
+
 variable "firewall_client_subnet_address_prefix" {
   description = "The CIDR Subnet Address Prefix for the Azure Firewall Subnet. It must be in the Hub Virtual Network space. It must be /26."
   type        = string
-  default     = "10.0.100.0/26"
 }
 
 variable "firewall_client_subnet_service_endpoints" {
   description = "An array of Service Endpoints to enable for the Azure Firewall Client Subnet. See https://docs.microsoft.com/en-us/azure/virtual-network/virtual-network-service-endpoints-overview for valid settings."
-  type        = list(string)
-  default = [
-    "Microsoft.KeyVault",
-    "Microsoft.Sql",
-    "Microsoft.Storage",
-  ]
+  type        = list(string)  
 }
 
 variable "firewall_management_subnet_address_prefix" {
   description = "The CIDR Subnet Address Prefix for the Azure Firewall Management Subnet. It must be in the Hub Virtual Network space. It must be /26."
   type        = string
-  default     = "10.0.100.64/26"
 }
 
 variable "firewall_management_subnet_service_endpoints" {

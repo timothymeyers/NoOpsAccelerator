@@ -1,24 +1,18 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 ##################################################
 # VARIABLES                                      #
 ##################################################
 variable "scope" {}
 variable "mode" {}
-variable "role_mappings" {}
-variable "custom_roles" {
-  default = {}
+variable "role_definition_name" {
+  default = null
 }
-variable "azuread_apps" {
-  default = {}
+variable "role_definition_id" {
+  default = null
 }
-variable "azuread_groups" {
-  default = {}
-}
-variable "managed_identities" {
-  default = {}
-}
-variable "object_id" {
-  default = {}
-}
-variable "client_config" {
-  description = "Client configuration object (see module README.md)."
+variable "principal_id" {}
+variable "skip_service_principal_aad_check" {
+  default = false
 }

@@ -37,7 +37,7 @@ variable "enable_ddos_protection" {
   default     = false
 }
 
-variable "enable_resource_lock" {
+variable "enable_resource_locks" {
   description = "Enable resource locks"
   type        = bool
 }

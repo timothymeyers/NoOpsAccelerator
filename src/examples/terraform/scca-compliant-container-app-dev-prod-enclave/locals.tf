@@ -122,4 +122,18 @@ locals {
   netartKeyVaultShortName           = replace(local.keyVaultNamingConvention, local.nameToken, local.netartShortName)
   netartKeyVaultUniqueName          = replace(local.netartKeyVaultShortName, "unique_storage_token", "${random_id.uniqueString.hex}")
   netartKeyVaultName                = format("%.24s", lower(replace(local.netartKeyVaultUniqueName, "/[[:^alnum:]]/", "")))
+
+  // WORKLOAD SPOKE NAMES
+  wlName                        = "wl-core"
+  wlShortName                   = "wl"
+  wlResourceGroupName           = replace(local.resourceGroupNamingConvention, local.nameToken, local.wlName)
+  wlLogStorageAccountShortName  = replace(local.storageAccountNamingConvention, local.nameToken, local.wlShortName)
+  wlLogStorageAccountUniqueName = replace(local.wlLogStorageAccountShortName, "unique_storage_token", "${random_id.uniqueString.hex}")
+  wlLogStorageAccountName       = format("%.24s", lower(replace(local.wlLogStorageAccountUniqueName, "/[[:^alnum:]]/", "")))
+  wlVirtualNetworkName          = replace(local.virtualNetworkNamingConvention, local.nameToken, local.wlName)
+  wlNetworkSecurityGroupName    = replace(local.networkSecurityGroupNamingConvention, local.nameToken, local.wlName)
+  wlSubnetName                  = replace(local.subnetNamingConvention, local.nameToken, local.wlName)
+
+  // ROUTETABLE VALUES
+  wlRouteTableName = "${local.svcsSubnetName}-routetable"
 }

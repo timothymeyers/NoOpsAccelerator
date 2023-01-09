@@ -23,14 +23,9 @@ AUTHOR/S: jspinella
 ##################
 data "azurerm_client_config" "current" {}
 
-data "azurerm_log_analytics_workspace" "laws" {
-  name                = var.log_analytics_workspace_name
-  resource_group_name = var.log_analytics_resource_group_name
-}
-
-data "azurerm_storage_account" "laws_storage" {
-  name                = var.log_analytics_storage_account_name
-  resource_group_name = var.log_analytics_resource_group_name
+data "azurerm_virtual_network" "hub" {
+  name                = var.hub_virtual_network_name
+  resource_group_name = var.hub_resource_group_name
 }
 
 ################################
@@ -38,14 +33,14 @@ data "azurerm_storage_account" "laws_storage" {
 ################################
 
 # Resource Group for the Workload Logging
-module "mod_dev_env_workload_resource_group" {
+module "mod_dev_env_workload_spoke_resource_group" {
   source = "../../../../../../terraform/core/modules/Microsoft.Resources/resourceGroups"
 
   //Global Settings
   location = var.location
 
   // Resource Group Parameters
-  name = local.workloadResourceGroupName
+  name = var.wl_resource_group_name
 
   // Resource Group Locks
   enable_resource_lock = false
@@ -61,56 +56,66 @@ module "mod_dev_env_workload_resource_group" {
 ### STAGE 1: Build out workload spoke network   ###
 ###################################################
 
-module "dev_env_aks_workload_network" {
-  source = "../../../../../../terraform/core/overlays/workloadSpokeCore"
-
+module "dev_env_aks_workload_spoke_network" {
+  source = "../../../../../../terraform/core/overlays/hubspoke/spoke"
+  
   // Global Settings
-
-  org_prefix          = var.required.org_prefix
   location            = var.location
-  deploy_environment  = var.required.deploy_environment
-  resource_group_name = module.mod_dev_env_workload_resource_group.name
+  resource_group_name = module.mod_dev_env_workload_spoke_resource_group.name
 
-  // Logging Settings
-  log_analytics_resource_id        = data.azurerm_log_analytics_workspace.laws.id
-  log_analytics_workspace_id       = data.azurerm_log_analytics_workspace.laws.workspace_id
-  log_analytics_storage_id         = data.azurerm_storage_account.laws_storage.id
-  workload_logging_storage_account = var.workload_logging_storage_account
+  // Firewall
+  firewall_private_ip_address = var.firewall_private_ip
 
+  // Operations Spoke Configuration
+  spoke_vnetname           = var.wl_virtual_network_name
+  spoke_vnet_address_space = var.wl_spoke_vnet_address_space
 
-  // Workload Networking Settings
-  workload_virtual_network_name                       = local.workloadVirtualNetworkName
-  workload_vnet_address_space                         = var.workload_vnet_address_space
-  workload_virtual_network_diagnostics_logs           = var.workload_virtual_network_diagnostics_logs
-  workload_virtual_network_diagnostics_metrics        = var.workload_virtual_network_diagnostics_metrics
-  workload_log_storage_account_name                   = local.workloadLogStorageAccountName
-  workload_network_security_group_name                = local.workloadNetworkSecurityGroupName
-  workload_network_security_group_rules               = var.workload_network_security_group_rules
-  workload_network_security_group_diagnostics_logs    = var.workload_network_security_group_diagnostics_logs
-  workload_network_security_group_diagnostics_metrics = var.workload_network_security_group_diagnostics_metrics
-  firewall_private_ip                                 = var.firewall_private_ip
+  // Operations Spoke Subnets
+  spoke_subnets                     = var.wl_spoke_subnets
+  spoke_network_security_group_name = var.wl_network_security_group_name
+  spoke_route_table_name            = var.wl_route_table_name
 
-  // Workload Subnet Settings
-  addtional_workloads_subnets = [
-    {
-      name : var.default_node_pool_subnet_name
-      address_prefixes : var.default_node_pool_subnet_address_prefix
-      enforce_private_link_endpoint_network_policies : true
-      enforce_private_link_service_network_policies : false
-    },
-    {
-      name : var.additional_node_pool_subnet_name
-      address_prefixes : var.additional_node_pool_subnet_address_prefix
-      enforce_private_link_endpoint_network_policies : true
-      enforce_private_link_service_network_policies : false
-    }
-  ]
+  // Loggging Settings
+  spoke_log_storage_account_name       = var.wl_log_storage_account_name
+  spoke_logging_storage_account_config = var.wl_logging_storage_account_config
+
+  // Locks
+  enable_resource_locks = var.enable_resource_locks
+  lock_level            = var.lock_level
 
   // Tags
-  tags = merge(var.tags, {
-    DeployedBy  = format("AzureNoOpsTF [%s]", terraform.workspace)
-    description = format("Workload Network for Azure Kubernetes Cluster %s", local.aks_cluster_name)
-  }) # Tags to be applied to all resources
+  tags = var.tags
+}
+
+####################################
+## STAGE 3: Networking Peering   ###
+####################################
+
+# Peering between the Hub and Spoke
+
+module "mod_hub_to_wl_networking_peering" {
+  depends_on = [
+    module.dev_env_aks_workload_spoke_network
+  ]
+  source = "../../../../../../terraform/core/overlays/hubSpoke/peering"
+
+  count = var.peer_to_hub_virtual_network ? 1 : 0
+
+  // Hub Networking Peering Settings
+  peering_name_1_to_2 = "${var.hub_virtual_network_name}-to-${module.dev_env_aks_workload_spoke_network.virtual_network_name}"
+  vnet_1_id           = data.azurerm_virtual_network.hub.id
+  vnet_1_name         = var.hub_virtual_network_name
+  vnet_1_rg           = var.hub_virtual_network_name
+
+  // Operations Networking Peering Settings
+  peering_name_2_to_1 = "${module.dev_env_aks_workload_spoke_network.virtual_network_name}-to-${var.hub_virtual_network_name}"
+  vnet_2_id           = module.dev_env_aks_workload_spoke_network.virtual_network_id
+  vnet_2_name         = module.dev_env_aks_workload_spoke_network.virtual_network_name
+  vnet_2_rg           = module.dev_env_aks_workload_spoke_network.resource_group_name
+
+  // Settings
+  allow_virtual_network_access = var.allow_virtual_network_access
+  use_remote_gateways          = var.use_remote_gateways
 }
 
 ######################################################################

@@ -48,7 +48,7 @@ module "fw_client_subnet" {
 #----------------------------------------------------------
 module "fw_managment_subnet" {
   source = "../subnets"
-  count = var.enable_forced_tunneling == true ? 1 : 0
+  count = var.enable_forced_tunneling ? 1 : 0
 
   // Global Settings
   location = var.location
@@ -98,7 +98,7 @@ module "mod_firewall_client_publicIP_address" {
 }
 
 module "mod_firewall_management_publicIP_address" {
-  count  = var.enable_forced_tunneling == true ? 1 : 0
+  count  = var.enable_forced_tunneling ? 1 : 0
   source = "../publicIPAddress"
 
   // Global Settings

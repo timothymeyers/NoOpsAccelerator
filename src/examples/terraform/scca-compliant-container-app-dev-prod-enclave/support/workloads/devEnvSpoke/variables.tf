@@ -1,17 +1,10 @@
 
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
+
 #################################
 # Global Configuration
 #################################
-
-variable "required" {
-  description = "Map of services defined in the configuration file you want to disable during a deployment."
-  default = {
-    org_prefix         = "anoa"
-    deploy_environment = "dev"
-  }
-}
 
 variable "tags" {
   description = "A map of key value pairs to apply as tags to resources provisioned in this deployment"
@@ -28,105 +21,142 @@ variable "location" {
   type        = string
 }
 
-variable "resource_group_name" {
-  description = "The name of the resource group the virtual machine resides in"
-  type        = string
+###################################
+# Resource Locks
+###################################
+
+variable "enable_resource_locks" {
+  description = "(Optional) Specifies if a lock should be applied to the Resources."
+  type        = bool
+  default     = true
 }
 
-variable "environment" {
-  description = "The Terraform backend environment e.g. public or usgovernment"
+variable "lock_level" {
+  description = "(Optional) id locks are enabled, Specifies the Level to be used for this Lock."
   type        = string
-  default     = "public"
+  default     = "CanNotDelete"
 }
 
 #################################
-# Logging Configuration
+# Hun Configuration
 #################################
 
-variable "log_analytics_workspace_name" {
-  description = "The name of the Log Analytics Workspace"
+variable "hub_resource_group_name" {
+  description = "Resource Group name for the Hub Virtual Network deployment"
   type        = string
-  default     = "workload-log-analytics"
+  default     = ""
 }
 
-variable "log_analytics_resource_group_name" {
-  description = "The name of the resource group in which the Log Analytics Workspace exists."
+variable "hub_virtual_network_name" {
+  description = "Virtual Network name for the Hub Virtual Network deployment"
   type        = string
-  default     = "log-analytics-rg"
-}
-
-variable "log_analytics_storage_account_name" {
-  description = "The name of the storage account to be used for the Log Analytics Workspace."
-  type        = string
-  default     = "log-analytics-stg"
+  default     = ""
 }
 
 #################################
-# Tier 1 Configuration
+# Spokes Configuration
 #################################
 
-variable "workload_vnet_address_space" {
-  description = "The CIDR Virtual Network Address Prefix for the workload Virtual Network."
-  type        = list(string)
-  default     = ["10.0.125.0/26"]
-}
+#################################
+# Operarions Configuration
+#################################
 
-variable "workload_vnet_subnet_address_space" {
-  description = "The CIDR Subnet Address Prefix for the default workload subnet. It must be in the workload Virtual Network space.'"
+variable "wl_subid" {
+  description = "Subscription ID for the Operations Virtual Network deployment"
   type        = string
-  default     = "10.0.125.0/26"
-}
-
-variable "workload_virtual_network_diagnostics_logs" {
-  description = "An array of Network Diagnostic Logs to enable for the workload Virtual Network. See https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/diagnostic-settings?tabs=CMD#logs for valid settings."
-  type        = list(string)
-  default     = []
-}
-
-variable "workload_virtual_network_diagnostics_metrics" {
-  description = "An array of Network Diagnostic Metrics to enable for the workload Virtual Network. See https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/diagnostic-settings?tabs=CMD#metrics for valid settings."
-  type        = list(string)
-  default     = ["AllMetrics"]
-}
-
-variable "workload_network_security_group_rules" {
-  description = "An array of Network Security Group Rules to apply to the workload Virtual Network. See https://docs.microsoft.com/en-us/azure/templates/microsoft.network/networksecuritygroups/securityrules?tabs=bicep#securityrulepropertiesformat for valid settings."
-  type = map(object({
-    name                       = string
-    priority                   = number
-    direction                  = string
-    access                     = string
-    protocol                   = string
-    source_port_range          = string
-    destination_port_range     = string
-    source_address_prefix      = string
-    destination_address_prefix = string
-  }))
-  default = {}
-}
-
-variable "workload_network_security_group_diagnostics_logs" {
-  description = "An array of Network Security Group diagnostic logs to apply to the Identity Virtual Network. See https://docs.microsoft.com/en-us/azure/virtual-network/virtual-network-nsg-manage-log#log-categories for valid settings."
-  type        = list(string)
-  default     = ["NetworkSecurityGroupEvent", "NetworkSecurityGroupRuleCounter"]
-}
-
-variable "workload_network_security_group_diagnostics_metrics" {
-  description = "An array of Network Security Group Metrics to apply to enable for the Identity Virtual Network. See https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/diagnostic-settings?tabs=CMD#metrics for valid settings."
-  type        = list(string)
-  default     = []
-}
-
-variable "workload_logging_storage_account" {
-  description = "Storage Account variables for the workload deployment"
-  type = object({
-    sku_name = string
-    kind     = string
-  })
-  default = {
-    sku_name = "Standard_LRS"
-    kind     = "StorageV2"
+  
+  validation {
+    condition     = can(regex("^[a-z0-9-]{36}$", var.wl_subid)) || var.wl_subid == ""
+    error_message = "Value must be a valid Subscription ID (GUID)."
   }
+}
+
+variable "wl_resource_group_name" {
+  description = "Resource Group name for the Hub Virtual Network deployment"
+  type        = string  
+}
+
+variable "wl_virtual_network_name" {
+  description = "Virtual Network name for the Operations Virtual Network deployment"
+  type        = string
+}
+
+variable "wl_network_security_group_name" { 
+  description = "Network Security Group name for the Operations Virtual Network deployment"
+  type        = string 
+}
+
+variable "wl_route_table_name" { 
+  description = "Route Table name for the Operations Virtual Network deployment"
+  type        = string
+}
+
+variable "wl_spoke_vnet_address_space" {
+  description = "Address space prefixes for the Operations Virtual Network"
+  type        = list(string)
+}
+
+variable "wl_spoke_subnets" {
+  description = "A complex object that describes subnets for the Operations Virtual Network"
+  type = map(object({
+    subnet_name          = string
+    subnet_address_space = list(string)
+    service_endpoints    = list(string)
+
+    enforce_private_link_endpoint_network_policies = bool
+    enforce_private_link_service_network_policies  = bool
+
+    network_security_group_rules = map(object({
+      name                       = string
+      priority                   = string
+      direction                  = string
+      access                     = string
+      protocol                   = string
+      source_port_range          = string
+      destination_port_range     = list(string)
+      source_address_prefix      = list(string)
+      destination_address_prefix = string
+    }))
+    enable_ddos_protection  = bool
+    ddos_protection_plan_id = string
+  }))  
+}
+
+variable "wl_log_storage_account_name" { 
+  description = "Storage Account name for the Workload Virtual Network deployment"
+  type        = string  
+}
+
+variable "wl_logging_storage_account_config" {
+  description = "Storage Account variables for the Workload Virtual Network deployment"
+  type = object({
+    sku_name                 = string
+    kind                     = string
+    min_tls_version          = string
+    account_replication_type = string
+  })  
+}
+
+##################################
+# Network Peering Configuration ##
+##################################
+
+variable "peer_to_hub_virtual_network" {
+  description = "A boolean value to indicate if the Virtual Network should peer to the hub Virtual Network."
+  type        = bool
+  default     = true
+}
+
+variable "allow_virtual_network_access" {
+  description = "Allow access from the remote virtual network to use this virtual network's gateways. Defaults to false."
+  type        = bool
+  default     = true
+}
+
+variable "use_remote_gateways" {
+  description = "Use remote gateways from the remote virtual network. Defaults to false."
+  type        = bool
+  default     = false
 }
 
 #####################################

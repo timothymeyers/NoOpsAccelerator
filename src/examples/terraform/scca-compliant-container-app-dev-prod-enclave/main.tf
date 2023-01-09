@@ -248,7 +248,7 @@ module "mod_landingzone_hub2spoke" {
   ###########################
 
   // Network Artifacts Settings
-  // enable_network_artifacts = var.enable_services.enable_network_artifacts
+  enable_network_artifacts = var.enable_services.enable_network_artifacts
   //network_artifacts_storage_account = var.network_artifacts_storage_account
 
   ##############
@@ -379,6 +379,47 @@ module "mod_landingzone_hub2spoke" {
 # Storage     ####
 ##################
 
+###############################################
+### STAGE 5: Workload Network Configuations ###
+###############################################
+
+module "dev_env_spoke_network" {
+  source = "./support/workloads/devEnvSpoke"
+
+  # General Settings
+  wl_resource_group_name = local.wlResourceGroupName
+  location               = var.location
+
+  # Network Settings
+  wl_subid                          = var.wl_subid
+  wl_virtual_network_name           = local.wlVirtualNetworkName
+  wl_spoke_vnet_address_space       = var.wl_spoke_vnet_address_space
+  wl_network_security_group_name    = local.wlNetworkSecurityGroupName
+  wl_route_table_name               = local.wlRouteTableName
+  wl_spoke_subnets                  = var.wl_spoke_subnets
+  wl_log_storage_account_name       = local.wlLogStorageAccountName
+  wl_logging_storage_account_config = var.wl_logging_storage_account_config
+
+  // Network Peering Configuration
+  peer_to_hub_virtual_network  = var.peer_to_hub_virtual_network
+  allow_virtual_network_access = var.allow_virtual_network_access
+  use_remote_gateways          = var.use_remote_gateways
+
+  // Firewall Settings
+  firewall_private_ip = module.mod_landingzone_hub2spoke.firewall_private_ip_address
+
+  // Hub Settings
+  hub_resource_group_name  = module.mod_landingzone_hub2spoke.hub_rgname
+  hub_virtual_network_name = module.mod_landingzone_hub2spoke.hub_vnetname
+
+  // Locks
+  enable_resource_locks = var.enable_services.enable_resource_locks
+
+  // Tags
+  tags = merge(var.tags, {
+    DeployedBy = format("AzureNoOpsTF [%s]", terraform.workspace)
+  }) # Tags to be applied to all resources
+}
 
 ###########################################
 ### STAGE 5: AKS Workload Configuations ###

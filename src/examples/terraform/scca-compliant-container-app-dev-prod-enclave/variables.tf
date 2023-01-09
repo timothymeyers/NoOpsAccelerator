@@ -476,7 +476,7 @@ variable "ops_subid" {
   }
 }
 
-variable "ops_hub_resource_group_name" {
+variable "ops_resource_group_name" {
   description = "Resource Group name for the Operations Virtual Network deployment"
   type        = string
   default     = "rg-ops"
@@ -488,16 +488,16 @@ variable "ops_virtual_network_name" {
   default     = "vnet-ops"
 }
 
-variable "ops_network_security_group_name" { 
+variable "ops_network_security_group_name" {
   description = "Network Security Group name for the Operations Virtual Network deployment"
   type        = string
-  default     = "nsg-ops"  
+  default     = "nsg-ops"
 }
 
-variable "ops_route_table_name" { 
+variable "ops_route_table_name" {
   description = "Route Table name for the Operations Virtual Network deployment"
   type        = string
-  default     = "rt-svcs"  
+  default     = "rt-svcs"
 }
 
 variable "ops_spoke_vnet_address_space" {
@@ -509,7 +509,7 @@ variable "ops_spoke_vnet_address_space" {
 variable "ops_spoke_subnets" {
   description = "A complex object that describes subnets for the Operations Virtual Network"
   type = map(object({
-    subnet_name          = string
+    subnet_name                 = string
     subnet_address_space = list(string)
     service_endpoints    = list(string)
 
@@ -532,7 +532,7 @@ variable "ops_spoke_subnets" {
   }))
   default = {
     "operations-snet" = {
-      subnet_name          = "operations-snet"
+      subnet_name                 = "operations-snet"
       subnet_address_space = ["10.0.110.0/27"]
       service_endpoints = [
         "Microsoft.KeyVault",
@@ -551,7 +551,7 @@ variable "ops_spoke_subnets" {
           protocol                   = "*"
           source_port_range          = "*"
           destination_port_range     = ["22", "3389", "5985", "5986"]
-          source_address_prefix      = ["10.0.120.0/26"]
+          source_address_prefix      = ["10.0.120.0/26", "10.0.125.0/27"]
           destination_address_prefix = "10.0.110.0/26"
         }
       }
@@ -561,10 +561,10 @@ variable "ops_spoke_subnets" {
   }
 }
 
-variable "ops_log_storage_account_name" { 
+variable "ops_log_storage_account_name" {
   description = "Storage Account name for the Operations Virtual Network deployment"
   type        = string
-  default     = "stlogsops"  
+  default     = "stlogsops"
 }
 
 variable "ops_logging_storage_account_config" {
@@ -598,7 +598,7 @@ variable "svcs_subid" {
   }
 }
 
-variable "svcs_hub_resource_group_name" {
+variable "svcs_resource_group_name" {
   description = "Resource Group name for the Shared Services Virtual Network deployment"
   type        = string
   default     = "rg-svcs"
@@ -610,16 +610,16 @@ variable "svcs_virtual_network_name" {
   default     = "vnet-ops"
 }
 
-variable "svcs_network_security_group_name" { 
+variable "svcs_network_security_group_name" {
   description = "Network Security Group name for the Shared Services Virtual Network deployment"
   type        = string
-  default     = "nsg-svcs"  
+  default     = "nsg-svcs"
 }
 
-variable "svcs_route_table_name" { 
+variable "svcs_route_table_name" {
   description = "Route Table name for the Shared Services Virtual Network deployment"
   type        = string
-  default     = "rt-svcs"  
+  default     = "rt-svcs"
 }
 
 
@@ -632,7 +632,7 @@ variable "svcs_spoke_vnet_address_space" {
 variable "svcs_spoke_subnets" {
   description = "A complex object that describes subnets for the Shared Services Virtual Network"
   type = map(object({
-    subnet_name          = string
+    subnet_name                 = string
     subnet_address_space = list(string)
     service_endpoints    = list(string)
 
@@ -657,7 +657,7 @@ variable "svcs_spoke_subnets" {
   }))
   default = {
     "sharedservices-snet" = {
-      subnet_name          = "sharedservices-snet"
+      subnet_name                 = "sharedservices-snet"
       subnet_address_space = ["10.0.115.0/27"]
       service_endpoints = [
         "Microsoft.KeyVault",
@@ -676,7 +676,7 @@ variable "svcs_spoke_subnets" {
           protocol                   = "*"
           source_port_range          = "*"
           destination_port_range     = ["22", "3389", "5985", "5986"]
-          source_address_prefix      = ["10.0.110.0/26"]
+          source_address_prefix      = ["10.0.110.0/26", "10.0.125.0/27"]
           destination_address_prefix = "10.0.120.0/26"
         }
       }
@@ -686,14 +686,136 @@ variable "svcs_spoke_subnets" {
   }
 }
 
-variable "svcs_log_storage_account_name" { 
+variable "svcs_log_storage_account_name" {
   description = "Storage Account name for the Operations Virtual Network deployment"
   type        = string
-  default     = "stlogsops"  
+  default     = "stlogsops"
 }
 
 variable "svcs_logging_storage_account_config" {
   description = "Storage Account variables for the Shared Services Virtual Network deployment"
+  type = object({
+    sku_name                 = string
+    kind                     = string
+    min_tls_version          = string
+    account_replication_type = string
+  })
+  default = {
+    sku_name                 = "Standard_LRS"
+    kind                     = "StorageV2"
+    min_tls_version          = "TLS1_2"
+    account_replication_type = "LRS"
+  }
+}
+
+########################################
+# Dev Env Workload Spoke Configuration
+########################################
+
+variable "wl_subid" {
+  description = "Subscription ID for the Operations Virtual Network deployment"
+  type        = string
+  default     = "964c406a-1019-48d1-a927-9461123de233"
+
+  validation {
+    condition     = can(regex("^[a-z0-9-]{36}$", var.wl_subid)) || var.wl_subid == ""
+    error_message = "Value must be a valid Subscription ID (GUID)."
+  }
+}
+
+variable "wl_resource_group_name" {
+  description = "Resource Group name for the Hub Virtual Network deployment"
+  type        = string
+  default     = "rg-ops"
+}
+
+variable "wl_virtual_network_name" {
+  description = "Virtual Network name for the Operations Virtual Network deployment"
+  type        = string
+  default     = "vnet-ops"
+}
+
+variable "wl_network_security_group_name" {
+  description = "Network Security Group name for the Operations Virtual Network deployment"
+  type        = string
+  default     = "nsg-ops"
+}
+
+variable "wl_route_table_name" {
+  description = "Route Table name for the Operations Virtual Network deployment"
+  type        = string
+  default     = "rt-ops"
+}
+
+variable "wl_spoke_vnet_address_space" {
+  description = "Address space prefixes for the Operations Virtual Network"
+  type        = list(string)
+  default     = ["10.0.125.0/27"]
+}
+
+variable "wl_spoke_subnets" {
+  description = "A complex object that describes subnets for the Operations Virtual Network"
+  type = map(object({
+    subnet_name          = string
+    subnet_address_space = list(string)
+    service_endpoints    = list(string)
+
+    enforce_private_link_endpoint_network_policies = bool
+    enforce_private_link_service_network_policies  = bool
+
+    network_security_group_rules = map(object({
+      name                       = string
+      priority                   = string
+      direction                  = string
+      access                     = string
+      protocol                   = string
+      source_port_range          = string
+      destination_port_range     = list(string)
+      source_address_prefix      = list(string)
+      destination_address_prefix = string
+    }))
+    enable_ddos_protection  = bool
+    ddos_protection_plan_id = string
+  }))
+  default = {
+    "dev-env-snet" = {
+      subnet_name          = "dev-env-snet"
+      subnet_address_space = ["10.0.115.0/27"]
+      service_endpoints = [
+        "Microsoft.KeyVault",
+        "Microsoft.Sql",
+        "Microsoft.Storage",
+      ]
+      enforce_private_link_endpoint_network_policies = false
+      enforce_private_link_service_network_policies  = false
+
+      network_security_group_rules = {
+        "allow_traffic_from_spokes" = {
+          name                       = "Allow-Traffic-From-Spokes"
+          priority                   = 200
+          direction                  = "Inbound"
+          access                     = "Allow"
+          protocol                   = "*"
+          source_port_range          = "*"
+          destination_port_range     = ["22", "3389", "5985", "5986"]
+          source_address_prefix      = ["10.0.110.0/26","10.0.120.0/26"]
+          destination_address_prefix = "10.0.125.0/27"
+        }
+      }
+      ddos_protection_plan_id = ""
+      enable_ddos_protection  = false
+    }
+  }
+}
+
+variable "wl_log_storage_account_name" {
+  description = "Storage Account name for the Workload Virtual Network deployment"
+  type        = string
+  default     = "stlogsworkload"
+}
+
+variable "wl_logging_storage_account_config" {
+  description = "Storage Account variables for the Workload Virtual Network deployment"
   type = object({
     sku_name                 = string
     kind                     = string
@@ -795,75 +917,6 @@ variable "jumpbox_windows_os_disk_image" {
     offer     = "WindowsServer"
     sku       = "2019-Datacenter"
     version   = "latest"
-  }
-}
-
-
-#####################################
-# Dev Env Workload Configuration  ###
-#####################################
-
-variable "workload_vnet_address_space" {
-  description = "The CIDR Virtual Network Address Prefix for the workload Virtual Network."
-  type        = list(string)
-  default     = ["10.0.125.0/26"]
-}
-
-variable "workload_vnet_subnet_address_space" {
-  description = "The CIDR Subnet Address Prefix for the default workload subnet. It must be in the workload Virtual Network space.'"
-  type        = string
-  default     = "10.0.125.0/26"
-}
-
-variable "workload_virtual_network_diagnostics_logs" {
-  description = "An array of Network Diagnostic Logs to enable for the workload Virtual Network. See https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/diagnostic-settings?tabs=CMD#logs for valid settings."
-  type        = list(string)
-  default     = []
-}
-
-variable "workload_virtual_network_diagnostics_metrics" {
-  description = "An array of Network Diagnostic Metrics to enable for the workload Virtual Network. See https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/diagnostic-settings?tabs=CMD#metrics for valid settings."
-  type        = list(string)
-  default     = ["AllMetrics"]
-}
-
-variable "workload_network_security_group_rules" {
-  description = "An array of Network Security Group Rules to apply to the workload Virtual Network. See https://docs.microsoft.com/en-us/azure/templates/microsoft.network/networksecuritygroups/securityrules?tabs=bicep#securityrulepropertiesformat for valid settings."
-  type = map(object({
-    name                       = string
-    priority                   = number
-    direction                  = string
-    access                     = string
-    protocol                   = string
-    source_port_range          = string
-    destination_port_range     = string
-    source_address_prefix      = string
-    destination_address_prefix = string
-  }))
-  default = {}
-}
-
-variable "workload_network_security_group_diagnostics_logs" {
-  description = "An array of Network Security Group diagnostic logs to apply to the Identity Virtual Network. See https://docs.microsoft.com/en-us/azure/virtual-network/virtual-network-nsg-manage-log#log-categories for valid settings."
-  type        = list(string)
-  default     = ["NetworkSecurityGroupEvent", "NetworkSecurityGroupRuleCounter"]
-}
-
-variable "workload_network_security_group_diagnostics_metrics" {
-  description = "An array of Network Security Group Metrics to apply to enable for the Identity Virtual Network. See https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/diagnostic-settings?tabs=CMD#metrics for valid settings."
-  type        = list(string)
-  default     = []
-}
-
-variable "workload_logging_storage_account" {
-  description = "Storage Account variables for the workload deployment"
-  type = object({
-    sku_name = string
-    kind     = string
-  })
-  default = {
-    sku_name = "Standard_LRS"
-    kind     = "StorageV2"
   }
 }
 

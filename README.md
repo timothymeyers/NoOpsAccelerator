@@ -1,6 +1,6 @@
 # Azure NoOps Accelerator
 
-> **"NoOps automates platform administration and broaden communication between developers, cyber, and operations to achieve mission success**." - *John Spinella, Creator of the Azure NoOps Accelerator*
+> **"NoOps automates platform administration and broaden communication between developers, cyber, and operations to achieve mission success**."
 
 **Azure NoOps Accelerator** is a flexible foundation
 that enables US Department of Defense and other Public Sector customers

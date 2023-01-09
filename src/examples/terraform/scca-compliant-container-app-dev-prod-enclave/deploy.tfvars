@@ -85,7 +85,7 @@ management_groups = {
     display_name               = "transport"
     management_group_name      = "transport"
     parent_management_group_id = "platforms"
-    subscription_ids           = ["964c406a-1019-48d1-a927-9461123de233"]
+    subscription_ids           = []
   },
   "management" = {
     display_name               = "management"

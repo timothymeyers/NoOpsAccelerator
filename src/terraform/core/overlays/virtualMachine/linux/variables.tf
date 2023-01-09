@@ -21,8 +21,8 @@ variable "virtual_network_name" {
   type        = string
 }
 
-variable subnet_id {
-  description = "(Required) Specifies the resource id of the subnet hosting the virtual machine"
+variable subnet_name {
+  description = "(Required) The name of the subnet the virtual machine resides in"
   type        = string
 }
 

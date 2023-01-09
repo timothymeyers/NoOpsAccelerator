@@ -1,6 +1,11 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
+variable "aks_cluster_name" {
+  description = "(Required) Specifies the name of the AKS cluster."
+  type        = string
+}
+
 variable "location" {
   description = "Specifies the location for the resource group and all the resources"
   default     = "eastus"
@@ -184,6 +189,33 @@ variable "default_node_pool_node_count" {
   description = "(Optional) The initial number of nodes which should exist within this Node Pool. Valid values are between 0 and 1000 and must be a value in the range min_count - max_count."
   type        = number
   default     = 3
+}
+
+####################
+# ACR Variables  ###
+####################
+
+variable "acr_name" {
+  description = "(Required) Specifies the name of the Container Registry. Changing this forces a new resource to be created."
+  type        = string
+}
+
+variable "acr_sku" {
+  description = "(Optional) The SKU name of the container registry. Possible values are Basic, Standard and Premium. Defaults to Standard"
+  type        = string
+  default     = "Standard"
+}
+
+variable "acr_admin_enabled" {
+  description = "(Optional) Specifies whether the admin user is enabled. Defaults to false."
+  type        = bool
+  default     = false
+}
+
+variable "virtual_networks_to_link" {
+  description = "(Optional) Specifies the subscription id, resource group name, and name of the virtual networks to which create a virtual network link for private dns zone"
+  type        = map(any)
+  default     = {}
 }
 
 variable "tags" {

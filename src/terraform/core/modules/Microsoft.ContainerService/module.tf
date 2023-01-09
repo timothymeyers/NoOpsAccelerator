@@ -17,6 +17,8 @@ resource "null_resource" "aks_registration_preview" {
 module "aks_identity" {
   source = "../Microsoft.ManagedIdentity"
   name   = var.name
+  location = var.location
+  resource_group_name = var.resource_group_name
 }
 
 ### AKS cluster resource

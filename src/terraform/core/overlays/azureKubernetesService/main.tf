@@ -13,10 +13,12 @@ AUTHOR/S: jspinella
 
 // Create the Azure Container Registry
 module "aks_cluster_container_registry" {
+  count                        = var.enable_container_pull == true ? 1 : 0
   source                       = "../azureContainerRegistry"
   acr_name                     = var.acr_name
   resource_group_name          = var.resource_group_name
   location                     = var.location
+  vnet_subnet_id               = var.vnet_subnet_id
   acr_sku                      = var.acr_sku
   acr_admin_enabled            = var.acr_admin_enabled
   log_analytics_workspace_id   = var.log_analytics_workspace_id
@@ -36,7 +38,7 @@ module "aks_cluster" {
   sku_tier                                 = var.sku_tier
   default_node_pool_name                   = var.default_node_pool_name
   default_node_pool_vm_size                = var.default_node_pool_vm_size
-  vnet_subnet_id                           = module.aks_network.subnet_ids[var.default_node_pool_subnet_name]
+  vnet_subnet_id                           = var.default_node_pool_subnet_name == "" ? var.vnet_subnet_id : null
   default_node_pool_availability_zones     = var.default_node_pool_availability_zones
   default_node_pool_node_labels            = var.default_node_pool_node_labels
   default_node_pool_node_taints            = var.default_node_pool_node_taints
@@ -68,6 +70,7 @@ module "network_contributor" {
   source                           = "../../modules/Microsoft.Authorization/roleAssignment"
   scope                            = data.azurerm_resource_group.aks_rg.id
   role_definition_name             = "Network Contributor"
+  mode                             = "built-in"
   principal_id                     = module.aks_cluster.aks_identity_principal_id
   skip_service_principal_aad_check = true
 }
@@ -77,6 +80,7 @@ module "acr_pull" {
   source                           = "../../modules/Microsoft.Authorization/roleAssignment"
   count                            = var.enable_container_pull ? 1 : 0
   role_definition_name             = "AcrPull"
+  mode                             = "built-in"
   scope                            = module.container_registry.id
   principal_id                     = module.aks_cluster.kubelet_identity_object_id
   skip_service_principal_aad_check = true

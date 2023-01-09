@@ -27,7 +27,7 @@ resource "azurerm_monitor_diagnostic_setting" "settings" {
       enabled  = true
 
       retention_policy {
-        enabled = var.retention_policy_enabled
+        enabled = true
         days    = var.retention_policy_days
       }
     }
@@ -40,8 +40,7 @@ resource "azurerm_monitor_diagnostic_setting" "settings" {
       enabled  = true
 
       retention_policy {
-        enabled = var.retention_policy_enabled
-        days    = var.retention_policy_days
+        enabled = false
       }
     }
   }

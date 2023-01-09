@@ -1,6 +1,11 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
+variable "name" {
+  description = "The name of the subnet"
+  type        = string
+}
+
 variable "location" {
   description = "The location/region to keep all your network resources. To get the list of all locations with table format from azure cli, run 'az account list-locations -o table'"
   type        = string
@@ -16,15 +21,24 @@ variable "virtual_network_name" {
   type        = string
 }
 
-variable "subnets" {
-  description = "Subnets configuration"
-  type = list(object({
-    name                                           = string
-    address_prefixes                               = list(string)
-    service_endpoints                              = list(string)
-    enforce_private_link_endpoint_network_policies = bool
-    enforce_private_link_service_network_policies  = bool
-  }))
+variable "address_prefixes" {
+  description = "The subnet address prefixes"
+  type        = list(string)
+}
+
+variable "service_endpoints" {
+  description = "The service endpoints to optimize for this subnet"
+  type        = list(string)
+}
+
+variable "private_endpoint_network_policies_enabled" {
+  description = "Enable or Disable network policies for the private endpoint on the subnet."
+  type        = bool
+}
+
+variable "private_link_service_network_policies_enabled" {
+  description = "Enable or Disable network policies for the private link service on the subnet."
+  type        = bool
 }
 
 variable "tags" {

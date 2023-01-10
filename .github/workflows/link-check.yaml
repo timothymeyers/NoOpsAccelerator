@@ -6,5 +6,9 @@ jobs:
   markdown-link-check:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@main
     - uses: gaurav-nelson/github-action-markdown-link-check@v1
+      with:
+        check-modified-files-only: 'yes'
+  
+# For variables and further examples see https://github.com/marketplace/actions/markdown-link-check

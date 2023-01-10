@@ -12,6 +12,7 @@ jobs:
         check-modified-files-only: 'yes'
         base-branch: 'main'
         use-quiet-mode: 'yes'
-        use-verbose-mode: 'yes'
-  
+        use-verbose-mode: 'no'
+
+# Potential bug where files in the PR no longer exist in main will cause the workflow to fail  
 # For variables and further examples see https://github.com/marketplace/actions/markdown-link-check

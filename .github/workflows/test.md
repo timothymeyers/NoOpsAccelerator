@@ -1,3 +1,0 @@
-# Test
-
-[broken link](/docz/)

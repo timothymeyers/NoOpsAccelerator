@@ -145,7 +145,7 @@ resource "azurerm_firewall" "firewall" {
     for_each = var.enable_forced_tunneling ? [1] : []
     content {
       name                 = lower("${var.firewall_config.name}-forced-tunnel")
-      subnet_id            = module.fw_managment_subnet.id
+      subnet_id            = module.fw_managment_subnet.0.id
       public_ip_address_id = module.mod_firewall_management_publicIP_address.0.id
     }
   }

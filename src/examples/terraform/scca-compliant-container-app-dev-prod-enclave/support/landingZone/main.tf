@@ -27,7 +27,7 @@ IMPORTANT: This module is not intended to be used as a standalone module. It is 
 
 // Resource Group for the Logging
 module "mod_logging_resource_group" {
-  source    = "../../../../../terraform/core/modules/Microsoft.Resources/resourceGroups"
+  source = "../../../../../terraform/core/modules/Microsoft.Resources/resourceGroups"
 
   //Global Settings
   location = var.location
@@ -36,8 +36,8 @@ module "mod_logging_resource_group" {
   name = var.logging_resource_group_name
 
   // Resource Group Locks
-  enable_resource_lock = var.enable_resource_locks
-  lock_level           = var.lock_level
+  enable_resource_locks = var.enable_resource_locks
+  lock_level            = var.lock_level
 
   // Resource Group Tags
   tags = merge(var.tags, {
@@ -59,8 +59,8 @@ module "mod_hub_resource_group" {
   name = var.hub_resource_group_name
 
   // Resource Group Locks
-  enable_resource_lock = var.enable_resource_locks
-  lock_level           = var.lock_level
+  enable_resource_locks = var.enable_resource_locks
+  lock_level            = var.lock_level
 
   // Resource Group Tags
   tags = merge(var.tags, {
@@ -76,7 +76,7 @@ module "mod_logging" {
   depends_on = [
     module.mod_logging_resource_group
   ]
-  source    = "../../../../../terraform/core/overlays/hubSpoke/logging"
+  source = "../../../../../terraform/core/overlays/hubSpoke/logging"
 
   // Global Settings
   location            = var.location
@@ -191,7 +191,7 @@ module "mod_hub_network" {
 
 // Resources for the Operations Spoke
 module "mod_ops_network" {
-  source    = "../../../../../terraform/core/overlays/hubSpoke/spoke"
+  source = "../../../../../terraform/core/overlays/hubSpoke/spoke"
 
   // Global Settings
   location            = var.location
@@ -223,7 +223,7 @@ module "mod_ops_network" {
 
 // Resources for the Shared Services Spoke
 module "mod_svcs_network" {
-  source    = "../../../../../terraform/core/overlays/hubSpoke/spoke"
+  source = "../../../../../terraform/core/overlays/hubSpoke/spoke"
 
   // Global Settings
   location            = var.location

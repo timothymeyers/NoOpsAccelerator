@@ -38,11 +38,17 @@ variable "lock_level" {
 }
 
 #################################
-# Hun Configuration
+# Hub Configuration
 #################################
 
 variable "hub_resource_group_name" {
   description = "Resource Group name for the Hub Virtual Network deployment"
+  type        = string
+  default     = ""
+}
+
+variable "hub_virtual_network_id" {
+  description = "Virtual Network id for the Hub Virtual Network deployment"
   type        = string
   default     = ""
 }

@@ -551,7 +551,7 @@ variable "ops_spoke_subnets" {
           protocol                   = "*"
           source_port_range          = "*"
           destination_port_range     = ["22", "3389", "5985", "5986"]
-          source_address_prefix      = ["10.0.120.0/26", "10.0.125.0/27"]
+          source_address_prefix      = ["10.0.120.0/26", "10.0.125.0/26"]
           destination_address_prefix = "10.0.110.0/26"
         }
       }
@@ -676,7 +676,7 @@ variable "svcs_spoke_subnets" {
           protocol                   = "*"
           source_port_range          = "*"
           destination_port_range     = ["22", "3389", "5985", "5986"]
-          source_address_prefix      = ["10.0.110.0/26", "10.0.125.0/27"]
+          source_address_prefix      = ["10.0.110.0/26", "10.0.125.0/26"]
           destination_address_prefix = "10.0.120.0/26"
         }
       }
@@ -713,7 +713,7 @@ variable "svcs_logging_storage_account_config" {
 ########################################
 
 variable "wl_subid" {
-  description = "Subscription ID for the Operations Virtual Network deployment"
+  description = "Subscription ID for the Workload Virtual Network deployment"
   type        = string
   default     = "964c406a-1019-48d1-a927-9461123de233"
 
@@ -724,37 +724,37 @@ variable "wl_subid" {
 }
 
 variable "wl_resource_group_name" {
-  description = "Resource Group name for the Hub Virtual Network deployment"
+  description = "Resource Group name for the Workload Virtual Network deployment"
   type        = string
   default     = "rg-ops"
 }
 
 variable "wl_virtual_network_name" {
-  description = "Virtual Network name for the Operations Virtual Network deployment"
+  description = "Virtual Network name for the Workload Virtual Network deployment"
   type        = string
   default     = "vnet-ops"
 }
 
 variable "wl_network_security_group_name" {
-  description = "Network Security Group name for the Operations Virtual Network deployment"
+  description = "Network Security Group name for the Workload Virtual Network deployment"
   type        = string
   default     = "nsg-ops"
 }
 
 variable "wl_route_table_name" {
-  description = "Route Table name for the Operations Virtual Network deployment"
+  description = "Route Table name for the Workload Virtual Network deployment"
   type        = string
   default     = "rt-ops"
 }
 
 variable "wl_spoke_vnet_address_space" {
-  description = "Address space prefixes for the Operations Virtual Network"
+  description = "Address space prefixes for the Workload Virtual Network"
   type        = list(string)
-  default     = ["10.0.125.0/27"]
+  default     = ["10.0.125.0/26"]
 }
 
 variable "wl_spoke_subnets" {
-  description = "A complex object that describes subnets for the Operations Virtual Network"
+  description = "A complex object that describes subnets for the Workload Virtual Network"
   type = map(object({
     subnet_name          = string
     subnet_address_space = list(string)
@@ -778,9 +778,9 @@ variable "wl_spoke_subnets" {
     ddos_protection_plan_id = string
   }))
   default = {
-    "dev-env-snet" = {
-      subnet_name          = "dev-env-snet"
-      subnet_address_space = ["10.0.115.0/27"]
+    "devEnv-snet" = {
+      subnet_name          = "devEnv-snet"
+      subnet_address_space = ["10.0.125.0/27"]
       service_endpoints = [
         "Microsoft.KeyVault",
         "Microsoft.Sql",
@@ -799,7 +799,7 @@ variable "wl_spoke_subnets" {
           source_port_range          = "*"
           destination_port_range     = ["22", "3389", "5985", "5986"]
           source_address_prefix      = ["10.0.110.0/26","10.0.120.0/26"]
-          destination_address_prefix = "10.0.125.0/27"
+          destination_address_prefix = "10.0.125.0/26"
         }
       }
       ddos_protection_plan_id = ""

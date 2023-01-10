@@ -18,50 +18,16 @@ DESCRIPTION: The following components will be options in this deployment
 AUTHOR/S: jspinella
 */
 
-##################
-### DATA       ###
-##################
-data "azurerm_client_config" "current" {}
-
-data "azurerm_virtual_network" "hub" {
-  name                = var.hub_virtual_network_name
-  resource_group_name = var.hub_resource_group_name
-}
-
-################################
-### STAGE 0: Scaffolding     ###
-################################
-
-# Resource Group for the Workload Logging
-module "mod_dev_env_workload_spoke_resource_group" {
-  source = "../../../../../../terraform/core/modules/Microsoft.Resources/resourceGroups"
-
-  //Global Settings
-  location = var.location
-
-  // Resource Group Parameters
-  name = var.wl_resource_group_name
-
-  // Resource Group Locks
-  enable_resource_lock = false
-  lock_level           = "CanNotDelete"
-
-  // Resource Group Tags
-  tags = merge(var.tags, {
-    DeployedBy = format("AzureNoOpsTF [%s]", terraform.workspace)
-  })
-}
-
 ###################################################
 ### STAGE 1: Build out workload spoke network   ###
 ###################################################
 
 module "dev_env_aks_workload_spoke_network" {
   source = "../../../../../../terraform/core/overlays/hubspoke/spoke"
-  
+
   // Global Settings
   location            = var.location
-  resource_group_name = module.mod_dev_env_workload_spoke_resource_group.name
+  resource_group_name = var.wl_resource_group_name
 
   // Firewall
   firewall_private_ip_address = var.firewall_private_ip
@@ -88,7 +54,7 @@ module "dev_env_aks_workload_spoke_network" {
 }
 
 ####################################
-## STAGE 3: Networking Peering   ###
+## STAGE 2: Networking Peering   ###
 ####################################
 
 # Peering between the Hub and Spoke
@@ -103,9 +69,9 @@ module "mod_hub_to_wl_networking_peering" {
 
   // Hub Networking Peering Settings
   peering_name_1_to_2 = "${var.hub_virtual_network_name}-to-${module.dev_env_aks_workload_spoke_network.virtual_network_name}"
-  vnet_1_id           = data.azurerm_virtual_network.hub.id
+  vnet_1_id           = var.hub_virtual_network_id
   vnet_1_name         = var.hub_virtual_network_name
-  vnet_1_rg           = var.hub_virtual_network_name
+  vnet_1_rg           = var.hub_resource_group_name
 
   // Operations Networking Peering Settings
   peering_name_2_to_1 = "${module.dev_env_aks_workload_spoke_network.virtual_network_name}-to-${var.hub_virtual_network_name}"
@@ -119,7 +85,7 @@ module "mod_hub_to_wl_networking_peering" {
 }
 
 ######################################################################
-### STAGE 2: Build out Azure Kubernetes Service with ACR & Jumpbox ###
+### STAGE 3: Build out Azure Kubernetes Service with ACR & Jumpbox ###
 ######################################################################
 
 /* module "dev_env_acr_aks_cluster" {

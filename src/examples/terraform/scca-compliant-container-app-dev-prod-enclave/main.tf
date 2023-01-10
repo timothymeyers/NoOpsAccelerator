@@ -290,7 +290,7 @@ module "mod_landingzone_hub2spoke" {
   firewall_management_subnet_address_prefix               = var.firewall_management_subnet_address_prefix
   firewall_management_subnet_service_endpoints            = var.firewall_management_subnet_service_endpoints
   firewall_management_publicIP_address_availability_zones = var.firewall_management_publicIP_address_availability_zones
-  firewall_management_public_ip_address_name              = local.firewallClientPublicIPAddressName
+  firewall_management_public_ip_address_name              = local.firewallManagementPublicIPAddressName
 
   firewall_supernet_IP_address = var.firewall_supernet_IP_address
 
@@ -385,7 +385,7 @@ module "mod_landingzone_hub2spoke" {
 
 module "dev_env_spoke_network" {
   source = "./support/workloads/devEnvSpoke"
-
+  
   # General Settings
   wl_resource_group_name = local.wlResourceGroupName
   location               = var.location
@@ -409,8 +409,9 @@ module "dev_env_spoke_network" {
   firewall_private_ip = module.mod_landingzone_hub2spoke.firewall_private_ip_address
 
   // Hub Settings
-  hub_resource_group_name  = module.mod_landingzone_hub2spoke.hub_rgname
+  hub_virtual_network_id   = module.mod_landingzone_hub2spoke.hub_vnet_id
   hub_virtual_network_name = module.mod_landingzone_hub2spoke.hub_vnetname
+  hub_resource_group_name  = module.mod_landingzone_hub2spoke.hub_rgname
 
   // Locks
   enable_resource_locks = var.enable_services.enable_resource_locks
@@ -420,8 +421,4 @@ module "dev_env_spoke_network" {
     DeployedBy = format("AzureNoOpsTF [%s]", terraform.workspace)
   }) # Tags to be applied to all resources
 }
-
-###########################################
-### STAGE 5: AKS Workload Configuations ###
-###########################################
 

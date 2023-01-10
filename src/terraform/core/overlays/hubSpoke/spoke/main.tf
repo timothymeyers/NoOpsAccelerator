@@ -24,8 +24,8 @@ module "mod_spoke_resource_group" {
   name = var.resource_group_name
 
   // Resource Group Locks
-  enable_resource_lock = var.enable_resource_locks
-  lock_level           = var.lock_level
+  enable_resource_locks = var.enable_resource_locks
+  lock_level            = var.lock_level
 
   // Resource Group Tags
   tags = merge(var.tags, {
@@ -45,6 +45,10 @@ module "mod_spoke_network" {
   // Logging
   log_storage_account_name       = var.spoke_log_storage_account_name
   logging_storage_account_config = var.spoke_logging_storage_account_config
+
+  // Resource Locks
+  enable_resource_locks = var.enable_resource_locks
+  lock_level            = var.lock_level
 
   tags = var.tags
 }
@@ -72,6 +76,11 @@ module "mod_spoke_subnets" {
 
   routetable_name             = var.spoke_route_table_name
   firewall_private_ip_address = var.firewall_private_ip_address
+
+  // Resource Locks
+  enable_resource_locks = var.enable_resource_locks
+  lock_level            = var.lock_level
+
 
   tags = var.tags
 }

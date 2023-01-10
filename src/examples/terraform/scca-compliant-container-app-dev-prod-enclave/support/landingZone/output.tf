@@ -26,6 +26,11 @@ output "hub_vnetname" {
   value       = module.mod_hub_network.virtual_network_name
 }
 
+output "hub_vnet_id" {
+  description = "The Hub Virtual Network name"
+  value       = module.mod_hub_network.virtual_network_id
+}
+
 /* output "ops_subid" {
   description = "Subscription ID where the Operations Resource Group is provisioned"
   value       = coalesce(var.ops_subid, var.hub_subid)

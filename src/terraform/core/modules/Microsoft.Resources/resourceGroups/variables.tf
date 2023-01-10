@@ -17,7 +17,7 @@ variable "location" {
 # Resource Locks
 ###################################
 
-variable "enable_resource_lock" {
+variable "enable_resource_locks" {
   description = "Enable resource locks"
   type        = bool
   default     = false

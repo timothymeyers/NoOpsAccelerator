@@ -1,40 +1,41 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-variable name {
-    type        = string
-    description = "The name of the Redis Cache. The Name used for Redis needs to be globally unique"
-}
-
 variable "resource_group_name" {
+  description = "(Required) The name of the resource group where to create the resource."
   type        = string
-  description = "The name of the resource group in which to create the Redis Cache"
 }
 
 variable "location" {
+  description = "(Required) Specifies the supported Azure location where to create the resource. Changing this forces a new resource to be created."
   type        = string
-  description = "The Azure Region in which to create the Redis Cache."
 }
 
-variable sku_name {
-    type = string
-    default = "Premium" 
-}
-variable family {
-    type = string
-    default = "P"
-}
-variable capacity {
-    type = number
-    default = 1
+variable "tags" {
+  description = "(Required) Map of tags to be applied to the resource"
+  type        = map(any)
 }
 
-variable minimum_tls_version {
-    type = number 
-    default = 1.2
+variable "redis" {}
+
+variable "subnet_id" {
+  description = "The ID of the Subnet within which the Redis Cache should be deployed"
+  type        = string
+  default     = null
 }
 
-variable enable_non_ssl_port {
-    type = bool
-    default  = true
+variable "tags" {
+  description = "Base tags for the resource to be inherited from the resource group."
+  type        = map(any)
 }
+
+variable "vnets" {
+  default = {}
+}
+variable "private_endpoints" {
+  default = {}
+}
+variable "private_dns" {
+  default = {}
+}
+

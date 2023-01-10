@@ -253,6 +253,8 @@ module "mod_svcs_network" {
   tags = var.tags
 }
 
+// Resources for the Data Shared Services Spoke
+
 ####################################
 ## STAGE 3: Networking Peering   ###
 ####################################

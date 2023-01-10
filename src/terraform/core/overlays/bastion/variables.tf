@@ -187,7 +187,13 @@ variable "ssh_key_name" {
   description = "The name of the Key Vault secret that holds the SSH public key to be used"
 }
 
-variable "size_jumpbox" {
+variable "size_linux_jumpbox" {
+  description = "The size of the windows virtual machine"
+  type        = string
+  default     = "Standard_B2s"
+}
+
+variable "size_windows_jumpbox" {
   description = "The size of the windows virtual machine"
   type        = string
   default     = "Standard_D2s_v3"

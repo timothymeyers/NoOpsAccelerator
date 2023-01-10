@@ -27,3 +27,8 @@ output "storage_account_name" {
   description = "The name of the storage account"
   value       = module.mod_spoke_network.storage_account_name
 }
+
+output "subnets" {
+  description = "Returns all the subnets objects in the Virtual Network. As a map of keys, ID"
+  value       = merge(var.spoke_subnets, module.mod_spoke_subnets)
+}

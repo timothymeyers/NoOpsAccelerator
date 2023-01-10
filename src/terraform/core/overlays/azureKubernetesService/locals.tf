@@ -22,13 +22,15 @@ locals {
   networkInterfaceNamingConvention     = replace(local.namingConvention, local.resourceToken, "nic")
   IpConfigurationNamingConvention      = replace(local.namingConvention, local.resourceToken, "ipconfig")
   virtualMachineNamingConvention       = replace(local.namingConvention, local.resourceToken, "vm")
+  kubernetesNamingConvention           = replace(local.namingConvention, local.resourceToken, "aks")
 
-  linuxNetworkInterfaceName                  = replace(local.networkInterfaceNamingConvention, local.nameToken, "linux")
-  linuxNetworkInterfaceIpConfigurationName   = replace(local.IpConfigurationNamingConvention, local.nameToken, "linux")
-  
+  linuxNetworkInterfaceName                = replace(local.networkInterfaceNamingConvention, local.nameToken, "linux")
+  linuxNetworkInterfaceIpConfigurationName = replace(local.IpConfigurationNamingConvention, local.nameToken, "linux")
+
   //  AKS NAMES
-
-  //  VM NAMES
-  linuxVmName   = replace(local.virtualMachineNamingConvention, local.nameToken, "bas-linux")
+  clusterName = replace(local.kubernetesNamingConvention, local.nameToken, var.name)
   
+  //  VM NAMES
+  linuxVmName = replace(local.virtualMachineNamingConvention, local.nameToken, "aks-linux")
+
 }

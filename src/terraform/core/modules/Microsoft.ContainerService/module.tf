@@ -23,87 +23,85 @@ module "aks_identity" {
 
 ### AKS cluster resource
 resource "azurerm_kubernetes_cluster" "aks_cluster" {
-  name                      = var.name
-  location                  = var.location
-  resource_group_name       = var.resource_group_name
-  kubernetes_version        = var.kubernetes_version
-  dns_prefix                = var.dns_prefix
-  private_cluster_enabled   = var.private_cluster_enabled
-  automatic_channel_upgrade = var.automatic_channel_upgrade
-  sku_tier                  = var.sku_tier
+  for_each                = var.aks_clusters
+  name                    = each.value["name"]
+  resource_group_name     = var.resource_group_name
+  location                = var.location
+  sku_tier                = lookup(each.value, "sku_tier", null)
+  dns_prefix              = each.value["dns_prefix"]
+  private_cluster_enabled = true
+  kubernetes_version      = each.value["kubernetes_version"]
+  disk_encryption_set_id  = coalesce(lookup(each.value, "cmk_enabled"), false) == true ? lookup(azurerm_disk_encryption_set.this, each.key)["id"] : null
 
-  default_node_pool {
-    name                   = var.default_node_pool_name
-    vm_size                = var.default_node_pool_vm_size
-    vnet_subnet_id         = var.vnet_subnet_id
-    availability_zones     = var.default_node_pool_availability_zones
-    node_labels            = var.default_node_pool_node_labels
-    node_taints            = var.default_node_pool_node_taints
-    enable_auto_scaling    = var.default_node_pool_enable_auto_scaling
-    enable_host_encryption = var.default_node_pool_enable_host_encryption
-    enable_node_public_ip  = var.default_node_pool_enable_node_public_ip
-    max_pods               = var.default_node_pool_max_pods
-    max_count              = var.default_node_pool_max_count
-    min_count              = var.default_node_pool_min_count
-    node_count             = var.default_node_pool_node_count
-    os_disk_type           = var.default_node_pool_os_disk_type
-    tags                   = var.tags
-  }
+  api_server_authorized_ip_ranges = lookup(each.value, "api_server_authorized_ip_ranges", null)
 
-  linux_profile {
-    admin_username = var.admin_username
-    ssh_key {
-        key_data = var.ssh_public_key
+  dynamic "default_node_pool" {
+    for_each = list(each.value["aks_default_pool"])
+    content {
+      name                = default_node_pool.value.name
+      vm_size             = default_node_pool.value.vm_size
+      availability_zones  = lookup(default_node_pool.value, "availability_zones", null)
+      enable_auto_scaling = coalesce(default_node_pool.value.enable_auto_scaling, true)
+      max_pods            = lookup(default_node_pool.value, "max_pods", null)
+      os_disk_size_gb     = lookup(default_node_pool.value, "os_disk_size_gb", null)
+      type                = "VirtualMachineScaleSets"
+      node_count          = coalesce(default_node_pool.value.enable_auto_scaling, true) == true ? lookup(default_node_pool.value, "node_count", null) : default_node_pool.value.node_count
+      min_count           = coalesce(default_node_pool.value.enable_auto_scaling, true) == true ? default_node_pool.value.min_count : null
+      max_count           = coalesce(default_node_pool.value.enable_auto_scaling, true) == true ? default_node_pool.value.max_count : null
+      vnet_subnet_id      = lookup(default_node_pool.value, "subnet_name", null) == null ? null : (local.networking_state_exists == true ? lookup(data.terraform_remote_state.networking.outputs.map_subnet_ids, default_node_pool.value.subnet_name) : lookup(data.azurerm_subnet.default_pool, each.key)["id"]) # Required for advanced networking
+      tags                = local.tags
     }
   }
 
-  identity {
-    type = "UserAssigned"
-    user_assigned_identity_id = module.aks_identity.user_assigned_identity_principal_id
+  dynamic "service_principal" {
+    for_each = coalesce(lookup(each.value, "assign_identity"), false) == false ? [true] : []
+    content {
+      client_id     = var.aks_client_id
+      client_secret = var.aks_client_secret
+    }
   }
 
-  network_profile {
-    docker_bridge_cidr = var.network_docker_bridge_cidr
-    dns_service_ip     = var.network_dns_service_ip
-    network_plugin     = var.network_plugin
-    outbound_type      = var.outbound_type
-    service_cidr       = var.network_service_cidr
+  dynamic "identity" {
+    for_each = coalesce(lookup(each.value, "assign_identity"), false) == false ? [] : list(coalesce(lookup(each.value, "assign_identity"), false))
+    content {
+      type = "SystemAssigned"
+    }
   }
 
   addon_profile {
     oms_agent {
-      enabled                    = var.oms_agent.enabled
-      log_analytics_workspace_id = coalesce(var.oms_agent.log_analytics_workspace_id, var.log_analytics_workspace_id)
+      enabled                    = local.oms_agent_enabled
+      log_analytics_workspace_id = local.oms_agent_enabled == true ? (local.loganalytics_state_exists == true ? data.terraform_remote_state.loganalytics.outputs.law_id : data.azurerm_log_analytics_workspace.this.0.id) : null
     }
-    ingress_application_gateway {
-      enabled                    = var.ingress_application_gateway.enabled
-      gateway_id                 = var.ingress_application_gateway.gateway_id
-      subnet_cidr                = var.ingress_application_gateway.subnet_cidr
-      subnet_id                  = var.ingress_application_gateway.subnet_id
-    }
-    aci_connector_linux {
-      enabled                    = var.aci_connector_linux.enabled
-      subnet_name                = var.aci_connector_linux.subnet_name
-    }
-    azure_policy {
-      enabled                    = var.azure_policy.enabled
-    }
-    http_application_routing {
-      enabled                    = var.http_application_routing.enabled
-    }
+
     kube_dashboard {
-      enabled                    = var.kube_dashboard.enabled
+      enabled = true
     }
   }
 
-  role_based_access_control {
-    enabled = var.role_based_access_control_enabled
-
-    azure_active_directory {
-      managed                = true
-      tenant_id              = var.tenant_id
-      admin_group_object_ids = var.admin_group_object_ids
-      azure_rbac_enabled     = var.azure_rbac_enabled
+  linux_profile {
+    admin_username = each.value.admin_username
+    ssh_key {
+      key_data = lookup(tls_private_key.this, each.key)["public_key_openssh"]
+    }
+  }
+    
+  network_profile {
+    network_plugin     = coalesce(each.value.network_plugin, "azure")
+    network_policy     = coalesce(each.value.network_policy, "azure")
+    docker_bridge_cidr = lookup(each.value, "docker_bridge_cidr", null)
+    service_cidr       = lookup(each.value, "service_address_range", null)
+    dns_service_ip     = lookup(each.value, "dns_ip", null)
+    pod_cidr           = coalesce(each.value.network_plugin, "azure") == "kubenet" ? lookup(each.value, "pod_cidr", null) : null
+    load_balancer_sku  = "Standard"
+    dynamic "load_balancer_profile" {
+      for_each = lookup(each.value, "load_balancer_profile", null) != null ? list(each.value.load_balancer_profile) : []
+      content {
+        outbound_ports_allocated  = lookup(load_balancer_profile.value, "outbound_ports_allocated", null)
+        idle_timeout_in_minutes   = lookup(load_balancer_profile.value, "idle_timeout_in_minutes", null)
+        managed_outbound_ip_count = coalesce(lookup(load_balancer_profile.value, "managed_outbound_ip_count"), [])
+        outbound_ip_address_ids   = coalesce(lookup(load_balancer_profile.value, "outbound_ip_address_ids"), [])
+      }
     }
   }
 
@@ -112,91 +110,5 @@ resource "azurerm_kubernetes_cluster" "aks_cluster" {
       kubernetes_version,
       tags
     ]
-  }
-}
-
-resource "azurerm_monitor_diagnostic_setting" "settings" {
-  count =  var.enable_diagnostic_setting == true ? 1 : 0
-  name                       = "AKS-DiagnosticsSettings"
-  target_resource_id         = azurerm_kubernetes_cluster.aks_cluster.id
-  log_analytics_workspace_id = var.log_analytics_workspace_id
-
-  log {
-    category = "kube-apiserver"
-    enabled  = true
-
-    retention_policy {
-      enabled = true
-      days    = var.log_analytics_retention_days
-    }
-  }
-
-  log {
-    category = "kube-audit"
-    enabled  = true
-
-    retention_policy {
-      enabled = true
-      days    = var.log_analytics_retention_days
-    }
-  }
-
-  log {
-    category = "kube-audit-admin"
-    enabled  = true
-
-    retention_policy {
-      enabled = true
-      days    = var.log_analytics_retention_days
-    }
-  }
-
-  log {
-    category = "kube-controller-manager"
-    enabled  = true
-
-    retention_policy {
-      enabled = true
-      days    = var.log_analytics_retention_days
-    }
-  }
-
-  log {
-    category = "kube-scheduler"
-    enabled  = true
-
-    retention_policy {
-      enabled = true
-      days    = var.log_analytics_retention_days
-    }
-  }
-
-  log {
-    category = "cluster-autoscaler"
-    enabled  = true
-
-    retention_policy {
-      enabled = true
-      days    = var.log_analytics_retention_days
-    }
-  }
-
-  log {
-    category = "guard"
-    enabled  = true
-
-    retention_policy {
-      enabled = true
-      days    = var.log_analytics_retention_days
-    }
-  }
-
-  metric {
-    category = "AllMetrics"
-
-    retention_policy {
-      enabled = true
-      days    = var.log_analytics_retention_days
-    }
   }
 }

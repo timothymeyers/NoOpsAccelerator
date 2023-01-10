@@ -110,7 +110,7 @@ module "mod_linux_jumpbox" {
   network_security_group_name = var.network_security_group_name
 
   // OS Settings
-  size           = var.size_jumpbox
+  size           = var.size_linux_jumpbox
   admin_username = var.admin_username
   admin_password = var.use_random_password ? null : var.admin_password
 
@@ -153,7 +153,7 @@ module "mod_windows_jumpbox" {
   network_security_group_name = var.network_security_group_name
 
   // OS Settings
-  size           = var.size_jumpbox
+  size           = var.size_windows_jumpbox
   admin_username = var.admin_username
   admin_password = var.use_random_password ? null : var.admin_password
 

@@ -39,18 +39,13 @@ module "aks_cluster" {
   default_node_pool_name                   = var.default_node_pool_name
   default_node_pool_vm_size                = var.default_node_pool_vm_size
   vnet_subnet_id                           = var.default_node_pool_subnet_name == "" ? var.vnet_subnet_id : null
-  default_node_pool_availability_zones     = var.default_node_pool_availability_zones
-  default_node_pool_node_labels            = var.default_node_pool_node_labels
-  default_node_pool_node_taints            = var.default_node_pool_node_taints
   default_node_pool_enable_auto_scaling    = var.default_node_pool_enable_auto_scaling
   default_node_pool_enable_host_encryption = var.default_node_pool_enable_host_encryption
   default_node_pool_enable_node_public_ip  = var.default_node_pool_enable_node_public_ip
-  default_node_pool_max_pods               = var.default_node_pool_max_pods
   default_node_pool_max_count              = var.default_node_pool_max_count
   default_node_pool_min_count              = var.default_node_pool_min_count
   default_node_pool_node_count             = var.default_node_pool_node_count
   default_node_pool_os_disk_type           = var.default_node_pool_os_disk_type
-  tags                                     = var.tags
   network_docker_bridge_cidr               = var.network_docker_bridge_cidr
   network_dns_service_ip                   = var.network_dns_service_ip
   network_plugin                           = var.network_plugin
@@ -97,7 +92,7 @@ module "aks_cluster_virtual_machine" {
 
   // Jumpbox Settings
   vm_name                     = local.linuxVmName
-  subnet_id                   = var.subnet_id
+  subnet_name                 = var.subnet_id
   network_interface_name      = local.linuxNetworkInterfaceName
   ip_configuration_name       = local.linuxNetworkInterfaceIpConfigurationName
   network_security_group_name = var.network_security_group_name

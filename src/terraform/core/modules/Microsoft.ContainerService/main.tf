@@ -10,25 +10,36 @@ terraform {
 
 }
 
-locals {  
-  default_pool_subnets = {
-    for aks_k, aks_v in var.aks_clusters : aks_k => {
-      subnet_name               = aks_v.aks_default_pool.subnet_name
-      vnet_name                 = aks_v.aks_default_pool.vnet_name
-      networking_resource_group = aks_v.aks_default_pool.networking_resource_group
-    } if(aks_v.aks_default_pool.subnet_name != null && aks_v.aks_default_pool.vnet_name != null)
-  }
+locals {
+ /*  # automatic upgrades are either:
+  # - null
+  # - patch, but then the kubernetes_version must not specify a patch number and orchestrator_version must be null
+  # - rapid/stable/node-image, but then the kubernetes_version and the orchestrator_version must be null
+  automatic_channel_upgrade_check = var.automatic_channel_upgrade == null ? true : var.orchestrator_version == null && (
+    (contains(["patch"], var.automatic_channel_upgrade) && can(regex("^[0-9]{1,}\\.[0-9]{1,}$", var.kubernetes_version)))
+    || (contains(["rapid", "stable", "node-image"], var.automatic_channel_upgrade) && var.kubernetes_version == null
+  ))
 
-  extra_pool_subnets = {
-    for np_k, np_v in var.aks_extra_node_pools : np_k => {
-      subnet_name               = np_v.subnet_name
-      vnet_name                 = np_v.vnet_name
-      networking_resource_group = np_v.networking_resource_group
-    } if(np_v.subnet_name != null && np_v.vnet_name != null)
-  }
-
-  oms_agent_enabled = data.terraform_remote_state.loganalytics.outputs.law_ids != null ? true : false
-
+  # Abstract the decision whether to create an Analytics Workspace or not.
+  create_analytics_solution  = var.log_analytics_workspace_enabled && var.log_analytics_solution_id == null
+  create_analytics_workspace = var.log_analytics_workspace_enabled && var.log_analytics_workspace == null
+  # Abstract the decision whether to use an Analytics Workspace supplied via vars, provision one ourselves or leave it null.
+  # This guarantees that local.log_analytics_workspace will contain a valid `id` and `name` IFF log_analytics_workspace_enabled
+  # is set to `true`.
+  log_analytics_workspace = var.log_analytics_workspace_enabled ? (
+    # The Log Analytics Workspace should be enabled:
+    var.log_analytics_workspace == null ? {
+      # `log_analytics_workspace_enabled` is `true` but `log_analytics_workspace` was not supplied.
+      # Create an `azurerm_log_analytics_workspace` resource and use that.
+      id   = local.azurerm_log_analytics_workspace_id
+      name = local.azurerm_log_analytics_workspace_name
+      } : {
+      # `log_analytics_workspace` is supplied. Let's use that.
+      id   = var.log_analytics_workspace.id
+      name = var.log_analytics_workspace.name
+    }
+  ) : null # Fin ally, the Log Analytics Workspace should be disabled.*/
+  
   module_tag = {
     "module" = basename(abspath(path.module))
   }

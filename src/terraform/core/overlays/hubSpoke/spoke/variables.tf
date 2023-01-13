@@ -28,34 +28,34 @@ variable "spoke_vnet_address_space" {
 
 variable "spoke_subnets" {
   description = "A complex object that describes subnets for the spoke network"
-  type = map(object({
-    subnet_name                 = string
-    subnet_address_space = list(string)
-    service_endpoints    = list(string)
+  type = list(object({
+    name              = string
+    address_prefixes  = list(string)
+    service_endpoints = list(string)
 
     enforce_private_link_endpoint_network_policies = bool
     enforce_private_link_service_network_policies  = bool
-
-    network_security_group_rules = map(object({
-      name                       = string
-      priority                   = string
-      direction                  = string
-      access                     = string
-      protocol                   = string
-      source_port_range          = string
-      destination_port_range     = list(string)
-      source_address_prefix      = list(string)
-      destination_address_prefix = string
-    }))   
-
-    enable_ddos_protection  = bool
-    ddos_protection_plan_id = string
   }))
 }
 
 variable "spoke_network_security_group_name" {
   description = "The name of the network security group"
   type        = string
+}
+
+variable "spoke_network_security_group_rules" {
+  description = "A complex object that describes network security group rules for the spoke network"
+  type = map(object({
+    name                       = string
+    priority                   = string
+    direction                  = string
+    access                     = string
+    protocol                   = string
+    source_port_range          = string
+    destination_port_range     = list(string)
+    source_address_prefix      = list(string)
+    destination_address_prefix = string
+  }))
 }
 
 variable "spoke_route_table_name" {

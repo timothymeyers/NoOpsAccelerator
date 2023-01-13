@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 /*
-SUMMARY: Module Example to deploy an SCCA Compliant Hub/ 1 Spoke Mission Enclave with Azure Kubernetes Service (AKS) and Azure Firewall
+SUMMARY: Module Example to deploy an SCCA Compliant Hub/ 2 Spoke Mission Enclave with Azure Kubernetes Service (AKS) and Azure Firewall
 DESCRIPTION: The following components will be options in this deployment
             * Mission Enclave - Management Groups and Subscriptions
               * Management Group
@@ -229,6 +229,11 @@ module "mod_landingzone_hub2spoke" {
   metadata_host     = var.metadata_host
   disable_telemetry = var.disable_telemetry
 
+  // Subscription Settings
+  hub_subscription_id  = var.hub_subscription_id
+  ops_subscription_id  = var.ops_subscription_id
+  svcs_subscription_id = var.svcs_subscription_id
+
   // Enabling Services. This will enable/disable the deployment of the services
   enable_services = var.enable_services
 
@@ -256,14 +261,14 @@ module "mod_landingzone_hub2spoke" {
   ##############
 
   // Hub Networking Settings
-  hub_subid                       = var.hub_subid
-  hub_resource_group_name         = local.hubResourceGroupName
-  hub_virtual_network_name        = local.hubVirtualNetworkName
-  hub_vnet_address_space          = var.hub_vnet_address_space
-  hub_subnets                     = var.hub_subnets
-  hub_network_security_group_name = local.hubNetworkSecurityGroupName
-  hub_route_table_name            = local.hubRouteTableName
-  hub_log_storage_account_name    = local.hubLogStorageAccountName
+  hub_resource_group_name          = local.hubResourceGroupName
+  hub_virtual_network_name         = local.hubVirtualNetworkName
+  hub_vnet_address_space           = var.hub_vnet_address_space
+  hub_subnets                      = var.hub_subnets
+  hub_network_security_group_name  = local.hubNetworkSecurityGroupName
+  hub_network_security_group_rules = var.hub_network_security_group_rules
+  hub_route_table_name             = local.hubRouteTableName
+  hub_log_storage_account_name     = local.hubLogStorageAccountName
 
   hub_logging_storage_account_config = var.hub_logging_storage_account_config
 
@@ -273,14 +278,16 @@ module "mod_landingzone_hub2spoke" {
   #################
 
   // Hub Firewall Settings
-  enable_firewall                = var.enable_services.enable_firewall
-  enable_forced_tunneling        = var.enable_services.enable_forced_tunneling
-  firewall_name                  = local.firewallName
-  firewall_sku_tier              = var.firewall_sku_tier
-  firewall_sku_name              = var.firewall_sku_name
-  firewall_threat_intel_mode     = var.firewall_threat_intel_mode
-  firewall_threat_detection_mode = var.firewall_threat_detection_mode
-  firewall_policy_name           = local.firewallPolicyName
+  enable_firewall                             = var.enable_services.enable_firewall
+  enable_forced_tunneling                     = var.enable_services.enable_forced_tunneling
+  firewall_name                               = local.firewallName
+  firewall_sku_tier                           = var.firewall_sku_tier
+  firewall_sku_name                           = var.firewall_sku_name
+  firewall_threat_intel_mode                  = var.firewall_threat_intel_mode
+  firewall_threat_detection_mode              = var.firewall_threat_detection_mode
+  firewall_policy_name                        = local.firewallPolicyName
+  firewall_policy_network_rule_collection     = var.firewall_policy_network_rule_collection
+  firewall_policy_application_rule_collection = var.firewall_policy_application_rule_collection
 
   firewall_client_subnet_address_prefix               = var.firewall_client_subnet_address_prefix
   firewall_client_subnet_service_endpoints            = var.firewall_client_subnet_service_endpoints
@@ -299,24 +306,24 @@ module "mod_landingzone_hub2spoke" {
   ################
 
   // Operations Settings
-  ops_subid                          = var.ops_subid
   ops_resource_group_name            = local.opsResourceGroupName
   ops_virtual_network_name           = local.opsVirtualNetworkName
   ops_network_security_group_name    = local.opsNetworkSecurityGroupName
   ops_route_table_name               = local.opsRouteTableName
   ops_spoke_vnet_address_space       = var.ops_spoke_vnet_address_space
   ops_spoke_subnets                  = var.ops_spoke_subnets
+  ops_network_security_group_rules   = var.ops_network_security_group_rules
   ops_log_storage_account_name       = local.opsLogStorageAccountName
   ops_logging_storage_account_config = var.ops_logging_storage_account_config
 
   // Shared Services Settings
-  svcs_subid                          = var.svcs_subid
   svcs_resource_group_name            = local.svcsResourceGroupName
   svcs_virtual_network_name           = local.svcsVirtualNetworkName
   svcs_network_security_group_name    = local.svcsNetworkSecurityGroupName
   svcs_route_table_name               = local.svcsRouteTableName
   svcs_spoke_vnet_address_space       = var.svcs_spoke_vnet_address_space
   svcs_spoke_subnets                  = var.svcs_spoke_subnets
+  svcs_network_security_group_rules   = var.svcs_network_security_group_rules
   svcs_log_storage_account_name       = local.svcsLogStorageAccountName
   svcs_logging_storage_account_config = var.svcs_logging_storage_account_config
 
@@ -340,7 +347,7 @@ module "mod_landingzone_hub2spoke" {
   // Jumpbox Settings
   jumpbox_admin_username = var.jumpbox_admin_username # The admin username for the jumpbox
   use_random_password    = var.use_random_password    # If true, a random password will be generated and stored in the Azure Key Vault
-  
+
   // Linux Jumpbox Settings  
   jumpbox_linux_os_disk_image = var.jumpbox_linux_os_disk_image
   size_linux_jumpbox          = var.size_linux_jumpbox
@@ -388,24 +395,34 @@ module "mod_landingzone_hub2spoke" {
 # AKS Deploy  ####
 ##################
 
-###############################################
-### STAGE 6: Workload Network Configuations ###
-###############################################
+#################################################
+### STAGE 6: Dev Teams Network Configuations ###
+#################################################
 
-module "dev_env_spoke_network" {
+# Dev Team 1 Environment Spoke Network. 
+# This is the network for the Dev Team 1 environment. 
+# This is a spoke network that is peered to the hub network. 
+module "mod_dev_team1_env_spoke_network" {
   source = "./support/workloads/devEnvSpoke"
- 
+
   # General Settings
+  environment            = var.environment
+  metadata_host          = var.metadata_host
   wl_resource_group_name = local.wlResourceGroupName
   location               = var.location
+  required               = var.required
+
+  // Subscription Settings
+  hub_subscription_id = var.hub_subscription_id
+  wl_subscription_id  = var.wl_subscription_id
 
   # Network Settings
-  wl_subid                          = var.wl_subid
   wl_virtual_network_name           = local.wlVirtualNetworkName
   wl_spoke_vnet_address_space       = var.wl_spoke_vnet_address_space
   wl_network_security_group_name    = local.wlNetworkSecurityGroupName
-  wl_route_table_name               = local.wlRouteTableName
+  wl_route_table_name               = local.devRouteTableName
   wl_spoke_subnets                  = var.wl_spoke_subnets
+  wl_network_security_group_rules   = var.wl_network_security_group_rules
   wl_log_storage_account_name       = local.wlLogStorageAccountName
   wl_logging_storage_account_config = var.wl_logging_storage_account_config
 
@@ -422,6 +439,14 @@ module "dev_env_spoke_network" {
   hub_virtual_network_name = module.mod_landingzone_hub2spoke.hub_vnetname
   hub_resource_group_name  = module.mod_landingzone_hub2spoke.hub_rgname
 
+  // AKS Settings
+  aks_prefix_name = local.wlShortName
+  use_user_defined_identity = var.use_user_defined_identity
+
+  // ACR Settings
+  acr_name = local.wlContainerRegName
+  acr_sku  = var.acr_sku
+
   // Locks
   enable_resource_locks = var.enable_services.enable_resource_locks
 
@@ -430,4 +455,62 @@ module "dev_env_spoke_network" {
     DeployedBy = format("AzureNoOpsTF [%s]", terraform.workspace)
   }) # Tags to be applied to all resources
 }
+
+# Dev Team 2 Environment Spoke Network. 
+# This is the network for the Dev Team 2 environment. 
+# This is a spoke network that is peered to the hub network. 
+module "mod_dev_team2_env_spoke_network" {
+  source = "./support/workloads/devEnvSpoke"
+
+  # General Settings
+  environment            = var.environment
+  metadata_host          = var.metadata_host
+  wl_resource_group_name = local.dev2ResourceGroupName
+  location               = var.location
+  required               = var.required
+
+  // Subscription Settings
+  hub_subscription_id = var.hub_subscription_id
+  wl_subscription_id  = var.wl_subscription_id
+
+  # Network Settings
+  wl_virtual_network_name           = local.dev2VirtualNetworkName
+  wl_spoke_vnet_address_space       = var.dev2_spoke_vnet_address_space
+  wl_network_security_group_name    = local.dev2NetworkSecurityGroupName
+  wl_route_table_name               = local.devRouteTableName
+  wl_spoke_subnets                  = var.dev2_spoke_subnets
+  wl_network_security_group_rules   = var.dev2_network_security_group_rules
+  wl_log_storage_account_name       = local.dev2LogStorageAccountName
+  wl_logging_storage_account_config = var.dev2_logging_storage_account_config
+
+  // Network Peering Configuration
+  peer_to_hub_virtual_network  = var.peer_to_hub_virtual_network
+  allow_virtual_network_access = var.allow_virtual_network_access
+  use_remote_gateways          = var.use_remote_gateways
+
+  // Firewall Settings
+  firewall_private_ip = module.mod_landingzone_hub2spoke.firewall_private_ip_address
+
+  // Hub Settings
+  hub_virtual_network_id   = module.mod_landingzone_hub2spoke.hub_vnet_id
+  hub_virtual_network_name = module.mod_landingzone_hub2spoke.hub_vnetname
+  hub_resource_group_name  = module.mod_landingzone_hub2spoke.hub_rgname
+
+  // AKS Settings
+  aks_prefix_name = local.dev2ShortName
+  use_user_defined_identity = var.use_user_defined_identity
+
+  // ACR Settings
+  acr_name = local.dev2ContainerRegName
+  acr_sku  = var.acr_sku
+
+  // Locks
+  enable_resource_locks = var.enable_services.enable_resource_locks
+
+  // Tags
+  tags = merge(var.tags, {
+    DeployedBy = format("AzureNoOpsTF [%s]", terraform.workspace)
+  }) # Tags to be applied to all resources
+}
+
 

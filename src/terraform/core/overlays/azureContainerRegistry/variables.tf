@@ -17,26 +17,9 @@ variable "location" {
   type        = string
 }
 
-variable "enable_diagnostic_setting" {
-  type        = bool
-  description = "Boolean flag to specify whether the logs should be sent to Log Analytics Workspace."
-  default     = false
-}
-
-variable "log_analytics_workspace_id" {
-  description = "(Required) Specifies the log analytics workspace id"
-  type        = string
-}
-
 variable "vnet_subnet_id" {
   description = "(Optional) Specifies the subnet id of the virtual network to which create a virtual network link for private dns zone"
   type        = string
-}
-
-variable "log_analytics_retention_days" {
-  description = "(Optional) Specifies the number of days of the retention policy. Possible values are 0-365. 0 means Unlimited retention for the Unlimited Sku. 30 days is the default for all other Skus."
-  type        = string
-  default     = "30"
 }
 
 variable "acr_sku" {

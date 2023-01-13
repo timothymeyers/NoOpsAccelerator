@@ -228,13 +228,13 @@ variable "logging_log_analytics" {
 # Hub Configuration
 #################################
 
-variable "hub_subid" {
+variable "hub_subscription_id" {
   description = "Subscription ID for the Hub deployment"
   type        = string
   default     = "964c406a-1019-48d1-a927-9461123de233"
 
   validation {
-    condition     = can(regex("^[a-z0-9-]{36}$", var.hub_subid)) || var.hub_subid == ""
+    condition     = can(regex("^[a-z0-9-]{36}$", var.hub_subscription_id)) || var.hub_subscription_id == ""
     error_message = "Value must be a valid Subscription ID (GUID)."
   }
 }
@@ -245,41 +245,20 @@ variable "hub_vnet_address_space" {
   default     = ["10.0.100.0/24"]
 }
 
-variable "hub_vnet_subnet_address_space" {
-  description = "The CIDR Subnet Address Prefix for the default Hub subnet. It must be in the Hub Virtual Network space.'"
-  type        = string
-  default     = "10.0.100.128/27"
-}
-
 variable "hub_subnets" {
-  description = "A complex object that describes subnets for the Operations network"
-  type = map(object({
-    name                 = string
-    subnet_address_space = list(string)
-    service_endpoints    = list(string)
+  description = "A complex object that describes subnets for the Hub network"
+  type = list(object({
+    name              = string
+    address_prefixes  = list(string)
+    service_endpoints = list(string)
 
     enforce_private_link_endpoint_network_policies = bool
     enforce_private_link_service_network_policies  = bool
-
-    network_security_group_rules = map(object({
-      name                       = string
-      priority                   = string
-      direction                  = string
-      access                     = string
-      protocol                   = string
-      source_port_range          = string
-      destination_port_range     = list(string)
-      source_address_prefix      = list(string)
-      destination_address_prefix = string
-    }))
-
-    enable_ddos_protection  = bool
-    ddos_protection_plan_id = string
   }))
-  default = {
-    "hub-snet" = {
-      name                 = "hub-snet"
-      subnet_address_space = ["10.0.100.128/27"]
+  default = [
+    {
+      name             = "hub-snet"
+      address_prefixes = ["10.0.100.128/26"]
       service_endpoints = [
         "Microsoft.KeyVault",
         "Microsoft.Sql",
@@ -287,13 +266,24 @@ variable "hub_subnets" {
       ]
       enforce_private_link_endpoint_network_policies = false
       enforce_private_link_service_network_policies  = true
-
-      network_security_group_rules = {}
-
-      ddos_protection_plan_id = ""
-      enable_ddos_protection  = false
     }
-  }
+  ]
+}
+
+variable "hub_network_security_group_rules" {
+  description = "A complex object that describes network security group rules for the Hub network"
+  type = map(object({
+    name                       = string
+    priority                   = string
+    direction                  = string
+    access                     = string
+    protocol                   = string
+    source_port_range          = string
+    destination_port_range     = list(string)
+    source_address_prefix      = list(string)
+    destination_address_prefix = string
+  }))
+  default = {}
 }
 
 variable "hub_logging_storage_account_config" {
@@ -435,6 +425,179 @@ variable "firewall_threat_detection_mode" {
   }
 }
 
+variable "firewall_policy_application_rule_collection" {
+  description = "The SKU for Azure Firewall Public IP Address. It defaults to Standard."
+  type = list(object({
+    name     = string
+    priority = number
+    action   = string
+    rules = list(object({
+      name = string
+      protocols = list(object({
+        port = number
+        type = string
+      }))
+      source_addresses      = list(string)
+      destination_fqdns     = list(string)
+      destination_fqdn_tags = list(string)
+      source_ip_groups      = list(string)
+    }))
+  }))
+  default = [{
+    name     = "AzureAuth"
+    priority = 300
+    action   = "Allow"
+    rules = [{
+      name = "msftauth"
+      protocols = [{
+        type = "Https"
+        port = 443
+      }]
+      source_addresses      = ["*"]
+      destination_fqdns     = ["aadcdn.msftauth.net", "aadcdn.msauth.net"]
+      destination_fqdn_tags = []
+      source_ip_groups      = []
+    }]
+    },
+    {
+      name     = "ApplicationRules"
+      priority = 500
+      action   = "Allow"
+      rules = [{
+        name = "AllowMicrosoftFqdns"
+        protocols = [{
+          type = "Https"
+          port = 443
+          },
+          {
+            type = "Http"
+            port = 80
+          }
+        ]
+        source_addresses = ["*"]
+        destination_fqdns = [
+          "*.cdn.mscr.io",
+          "mcr.microsoft.com",
+          "*.data.mcr.microsoft.com",
+          "management.azure.com",
+          "login.microsoftonline.com",
+          "acs-mirror.azureedge.net",
+          "dc.services.visualstudio.com",
+          "*.opinsights.azure.com",
+          "*.oms.opinsights.azure.com",
+          "*.microsoftonline.com",
+          "*.monitoring.azure.com",
+        ]
+        destination_fqdn_tags = []
+        source_ip_groups      = []
+        },
+        {
+          name = "AllowFqdnsForOsUpdates"
+          protocols = [{
+            type = "Https"
+            port = 443
+            },
+            {
+              type = "Http"
+              port = 80
+            }
+          ]
+          source_addresses = ["*"]
+          destination_fqdns = [
+            "download.opensuse.org",
+            "security.ubuntu.com",
+            "ntp.ubuntu.com",
+            "packages.microsoft.com",
+            "snapcraft.io"
+          ]
+          destination_fqdn_tags = []
+          source_ip_groups      = []
+      }]
+    }
+  ]
+}
+
+variable "firewall_policy_network_rule_collection" {
+  description = "The SKU for Azure Firewall Public IP Address. It defaults to Standard."
+  type = list(object({
+    name     = string
+    priority = number
+    action   = string
+    rules = list(object({
+      description           = string
+      destination_address   = string
+      destination_addresses = list(string)
+      destination_fqdns     = list(string)
+      destination_ports     = list(string)
+      destination_ip_groups = list(string)
+      name                  = string
+      protocols             = list(string)
+      source_addresses      = list(string)
+      source_ip_groups      = list(string)
+      translated_address    = string
+      translated_port       = string
+    }))
+  }))
+  default = [{
+    action   = "Allow"
+    name     = "AzureCloud"
+    priority = 100
+    rules = [{
+      description           = "Allow traffic to Azure Cloud"
+      destination_address   = null
+      destination_addresses = ["AzureCloud"]
+      destination_fqdns     = []
+      destination_ports     = ["*"]
+      destination_ip_groups = []
+      name                  = "AllowAzureCloud"
+      protocols             = ["Any"]
+      source_addresses      = ["*"]
+      source_ip_groups      = []
+      translated_address    = null
+      translated_port       = null
+    }]
+    },
+    {
+      action   = "Allow"
+      name     = "AllSpokeTraffic"
+      priority = 200
+      rules = [{
+        description           = "Allow traffic between spokes"
+        destination_address   = null
+        destination_ports     = ["*"]
+        destination_addresses = ["*"]
+        destination_fqdns     = []
+        destination_ip_groups = []
+        name                  = "AllowTrafficBetweenSpokes"
+        protocols             = ["Any"]
+        source_addresses      = ["10.96.0.0/19"]
+        source_ip_groups      = []
+        translated_address    = null
+        translated_port       = null
+      }]
+    },
+    {
+      action   = "Allow"
+      name     = "AksEgressNetworkPolicyRule"
+      priority = 200
+      rules = [{
+        description           = "Allow traffic to AKS Egress Network Policy Rule"
+        destination_address   = null
+        destination_ports     = ["123"]
+        destination_addresses = ["*"]
+        destination_fqdns     = []
+        destination_ip_groups = []
+        name                  = "Time"
+        protocols             = ["UDP"]
+        source_addresses      = ["*"]
+        source_ip_groups      = []
+        translated_address    = null
+        translated_port       = null
+      }]
+    }
+  ]
+}
+
 variable "firewall_client_subnet_address_prefix" {
   description = "The CIDR Subnet Address Prefix for the Azure Firewall Subnet. It must be in the Hub Virtual Network space. It must be /26."
   type        = string
@@ -474,7 +637,7 @@ variable "firewall_management_publicIP_address_availability_zones" {
 variable "firewall_supernet_IP_address" {
   description = "The IP address range that is used to allow traffic from the Azure Firewall to the Internet. It must be in the Hub Virtual Network space. It must be /19."
   type        = string
-  default     = "10.0.96.0/19"
+  default     = "10.96.0.0/19"
 }
 
 #################################
@@ -485,13 +648,13 @@ variable "firewall_supernet_IP_address" {
 # Tier 1 - Operations Configuration ##
 ######################################
 
-variable "ops_subid" {
+variable "ops_subscription_id" {
   description = "Subscription ID for the Operations Virtual Network deployment"
   type        = string
   default     = "964c406a-1019-48d1-a927-9461123de233"
 
   validation {
-    condition     = can(regex("^[a-z0-9-]{36}$", var.ops_subid)) || var.ops_subid == ""
+    condition     = can(regex("^[a-z0-9-]{36}$", var.ops_subscription_id)) || var.ops_subscription_id == ""
     error_message = "Value must be a valid Subscription ID (GUID)."
   }
 }
@@ -523,37 +686,23 @@ variable "ops_route_table_name" {
 variable "ops_spoke_vnet_address_space" {
   description = "Address space prefixes for the Operations Virtual Network"
   type        = list(string)
-  default     = ["10.0.110.0/26"]
+  default     = ["10.0.115.0/24"]
 }
 
 variable "ops_spoke_subnets" {
   description = "A complex object that describes subnets for the Operations Virtual Network"
-  type = map(object({
-    subnet_name          = string
-    subnet_address_space = list(string)
-    service_endpoints    = list(string)
+  type = list(object({
+    name              = string
+    address_prefixes  = list(string)
+    service_endpoints = list(string)
 
     enforce_private_link_endpoint_network_policies = bool
     enforce_private_link_service_network_policies  = bool
-
-    network_security_group_rules = map(object({
-      name                       = string
-      priority                   = string
-      direction                  = string
-      access                     = string
-      protocol                   = string
-      source_port_range          = string
-      destination_port_range     = list(string)
-      source_address_prefix      = list(string)
-      destination_address_prefix = string
-    }))
-    enable_ddos_protection  = bool
-    ddos_protection_plan_id = string
   }))
-  default = {
-    "operations-snet" = {
-      subnet_name          = "operations-snet"
-      subnet_address_space = ["10.0.110.0/27"]
+  default = [
+    {
+      name             = "operations-snet"
+      address_prefixes = ["10.0.115.0/26"]
       service_endpoints = [
         "Microsoft.KeyVault",
         "Microsoft.Sql",
@@ -561,22 +710,34 @@ variable "ops_spoke_subnets" {
       ]
       enforce_private_link_endpoint_network_policies = false
       enforce_private_link_service_network_policies  = false
+    }
+  ]
+}
 
-      network_security_group_rules = {
-        "allow_traffic_from_spokes" = {
-          name                       = "Allow-Traffic-From-Spokes"
-          priority                   = 200
-          direction                  = "Inbound"
-          access                     = "Allow"
-          protocol                   = "*"
-          source_port_range          = "*"
-          destination_port_range     = ["22", "3389", "5985", "5986"]
-          source_address_prefix      = ["10.0.120.0/26", "10.0.125.0/26"]
-          destination_address_prefix = "10.0.110.0/26"
-        }
-      }
-      ddos_protection_plan_id = ""
-      enable_ddos_protection  = false
+variable "ops_network_security_group_rules" {
+  description = "A complex object that describes Network Security Group rules for the Operations Virtual Network"
+  type = map(object({
+    name                       = string
+    priority                   = string
+    direction                  = string
+    access                     = string
+    protocol                   = string
+    source_port_range          = string
+    destination_port_range     = list(string)
+    source_address_prefix      = list(string)
+    destination_address_prefix = string
+  }))
+  default = {
+    "allow_traffic_from_spokes" = {
+      name                       = "Allow-Traffic-From-Spokes"
+      priority                   = 200
+      direction                  = "Inbound"
+      access                     = "Allow"
+      protocol                   = "*"
+      source_port_range          = "*"
+      destination_port_range     = ["22", "3389", "5985", "5986"]
+      source_address_prefix      = ["10.0.120.0/24", "10.0.130.0/24", "10.0.125.0/24"]
+      destination_address_prefix = "10.0.110.0/24"
     }
   }
 }
@@ -607,13 +768,13 @@ variable "ops_logging_storage_account_config" {
 # Tier 2 - Shared Services Configuration ##
 ###########################################
 
-variable "svcs_subid" {
+variable "svcs_subscription_id" {
   description = "Subscription ID for the Shared Services Virtual Network deployment"
   type        = string
   default     = "964c406a-1019-48d1-a927-9461123de233"
 
   validation {
-    condition     = can(regex("^[a-z0-9-]{36}$", var.svcs_subid)) || var.svcs_subid == ""
+    condition     = can(regex("^[a-z0-9-]{36}$", var.svcs_subscription_id)) || var.svcs_subscription_id == ""
     error_message = "Value must be a valid Subscription ID (GUID)."
   }
 }
@@ -646,39 +807,23 @@ variable "svcs_route_table_name" {
 variable "svcs_spoke_vnet_address_space" {
   description = "Address space prefixes for the Shared Services Virtual Network"
   type        = list(string)
-  default     = ["10.0.115.0/26"]
+  default     = ["10.0.120.0/24"]
 }
 
 variable "svcs_spoke_subnets" {
   description = "A complex object that describes subnets for the Shared Services Virtual Network"
-  type = map(object({
-    subnet_name          = string
-    subnet_address_space = list(string)
-    service_endpoints    = list(string)
+  type = list(object({
+    name              = string
+    address_prefixes  = list(string)
+    service_endpoints = list(string)
 
     enforce_private_link_endpoint_network_policies = bool
     enforce_private_link_service_network_policies  = bool
-
-    network_security_group_rules = map(object({
-      name                       = string
-      priority                   = string
-      direction                  = string
-      access                     = string
-      protocol                   = string
-      source_port_range          = string
-      destination_port_range     = list(string)
-      source_address_prefix      = list(string)
-      destination_address_prefix = string
-    }))
-
-    enable_ddos_protection  = bool
-    ddos_protection_plan_id = string
-
   }))
-  default = {
-    "sharedservices-snet" = {
-      subnet_name          = "sharedservices-snet"
-      subnet_address_space = ["10.0.115.0/27"]
+  default = [
+    {
+      name             = "sharedservices-snet"
+      address_prefixes = ["10.0.120.0/26"]
       service_endpoints = [
         "Microsoft.KeyVault",
         "Microsoft.Sql",
@@ -686,22 +831,34 @@ variable "svcs_spoke_subnets" {
       ]
       enforce_private_link_endpoint_network_policies = false
       enforce_private_link_service_network_policies  = false
+    }
+  ]
+}
 
-      network_security_group_rules = {
-        "allow_traffic_from_spokes" = {
-          name                       = "Allow-Traffic-From-Spokes"
-          priority                   = 200
-          direction                  = "Inbound"
-          access                     = "Allow"
-          protocol                   = "*"
-          source_port_range          = "*"
-          destination_port_range     = ["22", "3389", "5985", "5986"]
-          source_address_prefix      = ["10.0.110.0/26", "10.0.125.0/26"]
-          destination_address_prefix = "10.0.120.0/26"
-        }
-      }
-      ddos_protection_plan_id = ""
-      enable_ddos_protection  = false
+variable "svcs_network_security_group_rules" {
+  description = "A complex object that describes Network Security Group rules for the Operations Virtual Network"
+  type = map(object({
+    name                       = string
+    priority                   = string
+    direction                  = string
+    access                     = string
+    protocol                   = string
+    source_port_range          = string
+    destination_port_range     = list(string)
+    source_address_prefix      = list(string)
+    destination_address_prefix = string
+  }))
+  default = {
+    "allow_traffic_from_spokes" = {
+      name                       = "Allow-Traffic-From-Spokes"
+      priority                   = 200
+      direction                  = "Inbound"
+      access                     = "Allow"
+      protocol                   = "*"
+      source_port_range          = "*"
+      destination_port_range     = ["22", "3389", "5985", "5986"]
+      source_address_prefix      = ["10.0.110.0/24", "10.0.130.0/24", "10.0.125.0/24"]
+      destination_address_prefix = "10.0.120.0/24"
     }
   }
 }
@@ -728,17 +885,17 @@ variable "svcs_logging_storage_account_config" {
   }
 }
 
-########################################
-# Dev Env Workload Spoke Configuration
-########################################
+###############################################
+# Dev Team 1 Env Workload Spoke Configuration
+##############################################
 
-variable "wl_subid" {
+variable "wl_subscription_id" {
   description = "Subscription ID for the Workload Virtual Network deployment"
   type        = string
   default     = "964c406a-1019-48d1-a927-9461123de233"
 
   validation {
-    condition     = can(regex("^[a-z0-9-]{36}$", var.wl_subid)) || var.wl_subid == ""
+    condition     = can(regex("^[a-z0-9-]{36}$", var.wl_subscription_id)) || var.wl_subscription_id == ""
     error_message = "Value must be a valid Subscription ID (GUID)."
   }
 }
@@ -770,114 +927,80 @@ variable "wl_route_table_name" {
 variable "wl_spoke_vnet_address_space" {
   description = "Address space prefixes for the Workload Virtual Network"
   type        = list(string)
-  default     = ["10.0.125.0/26"]
+  default     = ["10.0.125.0/24"]
 }
 
 variable "wl_spoke_subnets" {
   description = "A complex object that describes subnets for the Workload Virtual Network"
-  type = map(object({
-    subnet_name          = string
-    subnet_address_space = list(string)
-    service_endpoints    = list(string)
+  type = list(object({
+    name              = string
+    address_prefixes  = list(string)
+    service_endpoints = list(string)
 
     enforce_private_link_endpoint_network_policies = bool
     enforce_private_link_service_network_policies  = bool
+  }))
+  default = [
+    {
+      name             = "clusternodes-snet"
+      address_prefixes = ["10.0.125.64/26"]
+      service_endpoints = [
+        "Microsoft.KeyVault",
+        "Microsoft.Sql",
+        "Microsoft.Storage",
+      ]
+      enforce_private_link_endpoint_network_policies = false
+      enforce_private_link_service_network_policies  = false
+    },
+    {
+      name             = "privatelinks-snet"
+      address_prefixes = ["10.0.125.128/28"]
+      service_endpoints = [
+        "Microsoft.KeyVault",
+        "Microsoft.Sql",
+        "Microsoft.Storage",
+      ]
+      enforce_private_link_endpoint_network_policies = false
+      enforce_private_link_service_network_policies  = false
+    },
+    {
+      name             = "default-snet"
+      address_prefixes = ["10.0.125.0/26"]
+      service_endpoints = [
+        "Microsoft.KeyVault",
+        "Microsoft.Sql",
+        "Microsoft.Storage",
+      ]
+      enforce_private_link_endpoint_network_policies = false
+      enforce_private_link_service_network_policies  = false
+    }
+  ]
+}
 
-    network_security_group_rules = map(object({
-      name                       = string
-      priority                   = string
-      direction                  = string
-      access                     = string
-      protocol                   = string
-      source_port_range          = string
-      destination_port_range     = list(string)
-      source_address_prefix      = list(string)
-      destination_address_prefix = string
-    }))
-    enable_ddos_protection  = bool
-    ddos_protection_plan_id = string
+variable "wl_network_security_group_rules" {
+  description = "A complex object that describes network security group rules for the Workload Virtual Network"
+  type = map(object({
+    name                       = string
+    priority                   = string
+    direction                  = string
+    access                     = string
+    protocol                   = string
+    source_port_range          = string
+    destination_port_range     = list(string)
+    source_address_prefix      = list(string)
+    destination_address_prefix = string
   }))
   default = {
-    "system-snet" = {
-      subnet_name          = "system-snet"
-      subnet_address_space = ["10.0.125.0/27"]
-      service_endpoints = [
-        "Microsoft.KeyVault",
-        "Microsoft.Sql",
-        "Microsoft.Storage",
-      ]
-      enforce_private_link_endpoint_network_policies = false
-      enforce_private_link_service_network_policies  = false
-
-      network_security_group_rules = {
-        "allow_traffic_from_spokes" = {
-          name                       = "Allow-Traffic-From-Spokes"
-          priority                   = 200
-          direction                  = "Inbound"
-          access                     = "Allow"
-          protocol                   = "*"
-          source_port_range          = "*"
-          destination_port_range     = ["22", "3389", "5985", "5986"]
-          source_address_prefix      = ["10.0.110.0/26", "10.0.120.0/26"]
-          destination_address_prefix = "10.0.125.0/26"
-        }
-      }
-      ddos_protection_plan_id = ""
-      enable_ddos_protection  = false
-    }
-    "user-snet" = {
-      subnet_name          = "user-snet"
-      subnet_address_space = ["10.0.125.0/27"]
-      service_endpoints = [
-        "Microsoft.KeyVault",
-        "Microsoft.Sql",
-        "Microsoft.Storage",
-      ]
-      enforce_private_link_endpoint_network_policies = false
-      enforce_private_link_service_network_policies  = false
-
-      network_security_group_rules = {
-        "allow_traffic_from_spokes" = {
-          name                       = "Allow-Traffic-From-Spokes"
-          priority                   = 200
-          direction                  = "Inbound"
-          access                     = "Allow"
-          protocol                   = "*"
-          source_port_range          = "*"
-          destination_port_range     = ["22", "3389", "5985", "5986"]
-          source_address_prefix      = ["10.0.110.0/26", "10.0.120.0/26"]
-          destination_address_prefix = "10.0.125.0/26"
-        }
-      }
-      ddos_protection_plan_id = ""
-      enable_ddos_protection  = false
-    }
-    "devEnv-snet" = {
-      subnet_name          = "devEnv-snet"
-      subnet_address_space = ["10.0.125.0/27"]
-      service_endpoints = [
-        "Microsoft.KeyVault",
-        "Microsoft.Sql",
-        "Microsoft.Storage",
-      ]
-      enforce_private_link_endpoint_network_policies = false
-      enforce_private_link_service_network_policies  = false
-
-      network_security_group_rules = {
-        "allow_traffic_from_spokes" = {
-          name                       = "Allow-Traffic-From-Spokes"
-          priority                   = 200
-          direction                  = "Inbound"
-          access                     = "Allow"
-          protocol                   = "*"
-          source_port_range          = "*"
-          destination_port_range     = ["22", "3389", "5985", "5986"]
-          source_address_prefix      = ["10.0.110.0/26", "10.0.120.0/26"]
-          destination_address_prefix = "10.0.125.0/26"
-        }
-      }
-      ddos_protection_plan_id = ""
-      enable_ddos_protection  = false
+    "allow_traffic_from_spokes_default" = {
+      name                       = "Allow-Traffic-From-Spokes"
+      priority                   = 200
+      direction                  = "Inbound"
+      access                     = "Allow"
+      protocol                   = "*"
+      source_port_range          = "*"
+      destination_port_range     = ["22", "3389", "5985", "5986"]
+      source_address_prefix      = ["10.0.110.0/24", "10.0.130.0/24", "10.0.120.0/24"]
+      destination_address_prefix = "10.0.125.0/24"
     }
   }
 }
@@ -889,6 +1012,137 @@ variable "wl_log_storage_account_name" {
 }
 
 variable "wl_logging_storage_account_config" {
+  description = "Storage Account variables for the Workload Virtual Network deployment"
+  type = object({
+    sku_name                 = string
+    kind                     = string
+    min_tls_version          = string
+    account_replication_type = string
+  })
+  default = {
+    sku_name                 = "Standard_LRS"
+    kind                     = "StorageV2"
+    min_tls_version          = "TLS1_2"
+    account_replication_type = "LRS"
+  }
+}
+
+###############################################
+# Dev Team 1 Env Workload Spoke Configuration
+##############################################
+
+variable "dev2_resource_group_name" {
+  description = "Resource Group name for the Workload Virtual Network deployment"
+  type        = string
+  default     = "rg-ops"
+}
+
+variable "dev2_virtual_network_name" {
+  description = "Virtual Network name for the Workload Virtual Network deployment"
+  type        = string
+  default     = "vnet-ops"
+}
+
+variable "dev2_network_security_group_name" {
+  description = "Network Security Group name for the Workload Virtual Network deployment"
+  type        = string
+  default     = "nsg-ops"
+}
+
+variable "dev2_route_table_name" {
+  description = "Route Table name for the Workload Virtual Network deployment"
+  type        = string
+  default     = "rt-ops"
+}
+
+variable "dev2_spoke_vnet_address_space" {
+  description = "Address space prefixes for the Workload Virtual Network"
+  type        = list(string)
+  default     = ["10.0.130.0/24"]
+}
+
+variable "dev2_spoke_subnets" {
+  description = "A complex object that describes subnets for the Workload Virtual Network"
+  type = list(object({
+    name              = string
+    address_prefixes  = list(string)
+    service_endpoints = list(string)
+
+    enforce_private_link_endpoint_network_policies = bool
+    enforce_private_link_service_network_policies  = bool
+  }))
+  default = [
+    {
+      name             = "clusternodes-snet"
+      address_prefixes = ["10.0.130.64/26"]
+      service_endpoints = [
+        "Microsoft.KeyVault",
+        "Microsoft.Sql",
+        "Microsoft.Storage",
+      ]
+      enforce_private_link_endpoint_network_policies = false
+      enforce_private_link_service_network_policies  = false
+    },
+    {
+      name             = "privatelinks-snet"
+      address_prefixes = ["10.0.130.128/28"]
+      service_endpoints = [
+        "Microsoft.KeyVault",
+        "Microsoft.Sql",
+        "Microsoft.Storage",
+      ]
+      enforce_private_link_endpoint_network_policies = false
+      enforce_private_link_service_network_policies  = false
+    },
+    {
+      name             = "default-snet"
+      address_prefixes = ["10.0.130.0/26"]
+      service_endpoints = [
+        "Microsoft.KeyVault",
+        "Microsoft.Sql",
+        "Microsoft.Storage",
+      ]
+      enforce_private_link_endpoint_network_policies = false
+      enforce_private_link_service_network_policies  = false
+    }
+  ]
+}
+
+variable "dev2_network_security_group_rules" {
+  description = "A complex object that describes network security group rules for the Workload Virtual Network"
+  type = map(object({
+    name                       = string
+    priority                   = string
+    direction                  = string
+    access                     = string
+    protocol                   = string
+    source_port_range          = string
+    destination_port_range     = list(string)
+    source_address_prefix      = list(string)
+    destination_address_prefix = string
+  }))
+  default = {
+    "allow_traffic_from_spokes_default" = {
+      name                       = "Allow-Traffic-From-Spokes"
+      priority                   = 200
+      direction                  = "Inbound"
+      access                     = "Allow"
+      protocol                   = "*"
+      source_port_range          = "*"
+      destination_port_range     = ["22", "3389", "5985", "5986"]
+      source_address_prefix      = ["10.0.110.0/24", "10.0.120.0/24", "10.0.125.0/24"]
+      destination_address_prefix = "10.0.130.0/24"
+    }
+  }
+}
+
+variable "dev2_log_storage_account_name" {
+  description = "Storage Account name for the Workload Virtual Network deployment"
+  type        = string
+  default     = "stlogsworkload"
+}
+
+variable "dev2_logging_storage_account_config" {
   description = "Storage Account variables for the Workload Virtual Network deployment"
   type = object({
     sku_name                 = string
@@ -933,7 +1187,7 @@ variable "use_remote_gateways" {
 variable "bastion_address_space" {
   description = "The address space to be used for the Bastion Host subnet (must be /27 or larger)."
   type        = string
-  default     = "10.0.100.160/27"
+  default     = "10.0.100.200/26"
 }
 
 variable "bastion_subnet_service_endpoints" {
@@ -1035,9 +1289,22 @@ variable "acr_georeplication_locations" {
   default     = []
 }
 
+variable "acr_dns_virtual_networks_to_link" {
+  type        = list(string)
+  description = "(Optional) A list of Virtual Network IDs to link to the Azure Container Registry DNS Zone. Changing this forces a new resource to be created."
+  default     = []
+}  
+
 ####################################################
 # Azure Kuvernates Cluster configuration section  ##
 ####################################################
+
+variable "aks_prefix_name" {
+  description = "Specifies the prefix of the AKS cluster"
+  type        = string
+  default     = "msft"
+}
+
 variable "aks_vnet_name" {
   description = "Specifies the name of the AKS subnet"
   default     = "AksVNet"
@@ -1060,6 +1327,12 @@ variable "role_based_access_control_enabled" {
   description = "(Required) Is Role Based Access Control Enabled? Changing this forces a new resource to be created."
   default     = true
   type        = bool
+}
+
+variable "use_user_defined_identity" {
+  type        = bool
+  description = "Use user defined identity"
+  default     = true
 }
 
 variable "automatic_channel_upgrade" {

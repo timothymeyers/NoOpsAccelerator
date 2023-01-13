@@ -39,11 +39,15 @@ module "bastion_subnet" { # Bastion Subnet
   resource_group_name  = data.azurerm_resource_group.hub.name
   virtual_network_name = data.azurerm_virtual_network.hub_bastion_host_vnet.name
 
-  name                                          = "AzureBastionSubnet"
-  address_prefixes                              = [cidrsubnet(var.bastion_address_space, 0, 0)]
-  service_endpoints                             = var.bastion_subnet_service_endpoints
-  private_endpoint_network_policies_enabled     = false
-  private_link_service_network_policies_enabled = false
+  subnets = [
+    {
+      name : "AzureBastionSubnet"
+      address_prefixes : [cidrsubnet(var.bastion_address_space, 0, 0)]
+      service_endpoints = var.bastion_subnet_service_endpoints
+      enforce_private_link_endpoint_network_policies : false
+      enforce_private_link_service_network_policies : false
+    }
+  ]
 
   // Subnet Tags
   tags = merge(var.tags, {
@@ -68,7 +72,7 @@ module "mod_bastion_host" {
   public_ip_address_sku_name   = local.bastionHostPublicIPAddressSkuName
   public_ip_address_allocation = local.bastionHostPublicIPAddressAllocationMethod
   ipconfig_name                = local.bastionNetworkInterfaceIpConfigurationName
-  subnet_id                    = module.bastion_subnet.id
+  subnet_id                    = module.bastion_subnet.subnet_ids["AzureBastionSubnet"]
 
   // Bastion Diagnostic Settings
   enable_diagnostic_settings          = var.enable_bastion_diagnostics

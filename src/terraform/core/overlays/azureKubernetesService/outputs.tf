@@ -1,4 +1,9 @@
-output "kube_config" {
+output "kubelet_identity_object_id" {
+  value       = module.aks_cluster.kubelet_identity_object_id
+  description = "Specifies the object id of the kubelet identity of the AKS cluster."
+}
+
+/* output "kube_config" {
   value = azurerm_kubernetes_cluster.aks.kube_config_raw
 }
 
@@ -33,3 +38,4 @@ output "client_key" {
 output "cluster_ca_certificate" {
   value = base64decode(azurerm_kubernetes_cluster.aks.kube_config.0.cluster_ca_certificate)
 }
+ */

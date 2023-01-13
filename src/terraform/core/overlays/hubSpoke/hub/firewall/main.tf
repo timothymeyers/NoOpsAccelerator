@@ -37,59 +37,11 @@ module "mod_firewall_policy" {
   firewall_sku                          = var.firewall_sku_tier
 
   // Rules Collections
-  application_rule_collection = [{
-    name     = "AzureAuth"
-    priority = 300
-    action   = "Allow"
-    rule = [{
-      name = "msftauth"
-      protocols = [{
-        type = "Https"
-        port = 443
-      }]
-      source_addresses      = ["*"]
-      destination_fqdns     = ["aadcdn.msftauth.net", "aadcdn.msauth.net"]
-      destination_fqdn_tags = []
-      source_ip_groups      = []
-    }]
-  }]
-
-  network_rule_collection = [{
-    action   = "Allow"
-    name     = "AzureCloud"
-    priority = 100
-    rule = [{
-      destination_address   = null
-      destination_addresses = ["AzureCloud"]
-      destination_fqdns     = []
-      destination_ports     = ["*"]
-      destination_ip_groups = []
-      name                  = "AllowAzureCloud"
-      protocols             = ["Any"]
-      source_addresses      = ["*"]
-      source_ip_groups      = []
-      translated_address    = null
-      translated_port       = null
-    }]
-    },
-    {
-      action   = "Allow"
-      name     = "AllSpokeTraffic"
-      priority = 200
-      rule = [{
-        destination_address   = null
-        destination_ports     = ["*"]
-        destination_addresses = ["*"]
-        destination_fqdns     = []
-        destination_ip_groups = []
-        name                  = "AllowTrafficBetweenSpokes"
-        protocols             = ["Any"]
-        source_addresses      = ["${var.firewall_supernet_IP_address}"]
-        source_ip_groups      = []
-        translated_address    = null
-        translated_port       = null
-      }]
-  }]
+  // App Rules
+  application_rule_collection = var.firewall_application_rule_collection
+  
+  // Network Rules
+  network_rule_collection = var.firewall_network_rule_collection
 }
 
 #

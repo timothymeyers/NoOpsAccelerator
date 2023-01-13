@@ -68,6 +68,49 @@ variable "enable_forced_tunneling" {
   default     = false
 }
 
+variable "firewall_application_rule_collection" {
+  description = "The SKU for Azure Firewall Public IP Address. It defaults to Standard."
+  type = list(object({
+    name     = string
+    priority = number
+    action   = string
+    rules = list(object({
+      name = string
+      protocols = list(object({
+        port = number
+        type = string
+      }))
+      source_addresses      = list(string)
+      destination_fqdns     = list(string)
+      destination_fqdn_tags = list(string)
+      source_ip_groups      = list(string)
+    }))
+  }))
+}
+
+variable "firewall_network_rule_collection" {
+  description = "The SKU for Azure Firewall Public IP Address. It defaults to Standard."
+  type = list(object({
+    name     = string
+    priority = number
+    action   = string
+    rules = list(object({
+      description           = string
+      destination_address   = string
+      destination_addresses = list(string)
+      destination_fqdns     = list(string)
+      destination_ports     = list(string)
+      destination_ip_groups = list(string)
+      name                  = string
+      protocols             = list(string)
+      source_addresses      = list(string)
+      source_ip_groups      = list(string)
+      translated_address    = string
+      translated_port       = string
+    }))
+  }))
+}
+
 variable "firewall_sku_tier" {
   description = "[Standard/Premium] The SKU for Azure Firewall. It defaults to Premium."
   type        = string

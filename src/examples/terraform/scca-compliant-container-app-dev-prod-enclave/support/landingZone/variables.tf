@@ -6,16 +6,16 @@
 #################################
 
 variable "required" {
-  description = "A map of required variables for the deployment"  
+  description = "A map of required variables for the deployment"
 }
 
 variable "tags" {
   description = "A map of key value pairs to apply as tags to resources provisioned in this deployment"
-  type        = map(string)  
+  type        = map(string)
 }
 
 variable "enable_services" {
-  description = "Map of services you woul like to enable during a deployment."  
+  description = "Map of services you woul like to enable during a deployment."
 }
 
 variable "environment" {
@@ -80,11 +80,11 @@ variable "logging_storage_account_config" {
     kind                     = string
     min_tls_version          = string
     account_replication_type = string
-  })  
+  })
 }
 
 variable "logging_log_analytics_config" {
-  description = "Log Analytics Workspace variables for the deployment"  
+  description = "Log Analytics Workspace variables for the deployment"
 }
 
 variable "enable_network_artifacts" {
@@ -96,12 +96,12 @@ variable "enable_network_artifacts" {
 # Hub Configuration
 #################################\
 
-variable "hub_subid" {
+variable "hub_subscription_id" {
   description = "Subscription ID for the Hub deployment"
-  type        = string  
+  type        = string
 
   validation {
-    condition     = can(regex("^[a-z0-9-]{36}$", var.hub_subid)) || var.hub_subid == ""
+    condition     = can(regex("^[a-z0-9-]{36}$", var.hub_subscription_id)) || var.hub_subscription_id == ""
     error_message = "Value must be a valid Subscription ID (GUID)."
   }
 }
@@ -133,34 +133,34 @@ variable "hub_route_table_name" {
 
 variable "hub_subnets" {
   description = "A complex object that describes subnets for the Operations network"
-  type = map(object({
-    name                 = string
-    subnet_address_space = list(string)
-    service_endpoints    = list(string)
+  type = list(object({
+    name              = string
+    address_prefixes  = list(string)
+    service_endpoints = list(string)
 
     enforce_private_link_endpoint_network_policies = bool
     enforce_private_link_service_network_policies  = bool
-
-    network_security_group_rules = map(object({
-      name                       = string
-      priority                   = string
-      direction                  = string
-      access                     = string
-      protocol                   = string
-      source_port_range          = string
-      destination_port_range     = list(string)
-      source_address_prefix      = list(string)
-      destination_address_prefix = string
-    }))
-
-    enable_ddos_protection  = bool
-    ddos_protection_plan_id = string
-  }))  
+  }))
 }
 
 variable "hub_log_storage_account_name" {
   description = "Storage Account Name for the Hub deployment"
   type        = string
+}
+
+variable "hub_network_security_group_rules" {
+  description = "A complex object that describes network security group rules for the spoke network"
+  type = map(object({
+    name                       = string
+    priority                   = string
+    direction                  = string
+    access                     = string
+    protocol                   = string
+    source_port_range          = string
+    destination_port_range     = list(string)
+    source_address_prefix      = list(string)
+    destination_address_prefix = string
+  }))
 }
 
 variable "hub_logging_storage_account_config" {
@@ -170,7 +170,7 @@ variable "hub_logging_storage_account_config" {
     kind                     = string
     min_tls_version          = string
     account_replication_type = string
-  })  
+  })
 }
 
 #################################
@@ -195,6 +195,49 @@ variable "firewall_name" {
 variable "firewall_policy_name" {
   description = "Name of the Azure Firewall Policy"
   type        = string
+}
+
+variable "firewall_policy_application_rule_collection" {
+  description = "The SKU for Azure Firewall Public IP Address. It defaults to Standard."
+  type = list(object({
+    name     = string
+    priority = number
+    action   = string
+    rules = list(object({
+      name = string
+      protocols = list(object({
+        port = number
+        type = string
+      }))
+      source_addresses      = list(string)
+      destination_fqdns     = list(string)
+      destination_fqdn_tags = list(string)
+      source_ip_groups      = list(string)
+    }))
+  }))
+}
+
+variable "firewall_policy_network_rule_collection" {
+  description = "The SKU for Azure Firewall Public IP Address. It defaults to Standard."
+  type = list(object({
+    name     = string
+    priority = number
+    action   = string
+    rules = list(object({
+      description           = string
+      destination_address   = string
+      destination_addresses = list(string)
+      destination_fqdns     = list(string)
+      destination_ports     = list(string)
+      destination_ip_groups = list(string)
+      name                  = string
+      protocols             = list(string)
+      source_addresses      = list(string)
+      source_ip_groups      = list(string)
+      translated_address    = string
+      translated_port       = string
+    }))
+  }))
 }
 
 variable "firewall_sku_tier" {
@@ -239,7 +282,7 @@ variable "firewall_client_publicIP_address_availability_zones" {
   default     = []
 }
 
- 
+
 variable "firewall_management_subnet_address_prefix" {
   description = "The CIDR Address Prefix for the Azure Firewall Management Subnet."
   type        = string
@@ -277,19 +320,19 @@ variable "firewall_supernet_IP_address" {
 # Operarions Configuration
 #################################
 
-variable "ops_subid" {
+variable "ops_subscription_id" {
   description = "Subscription ID for the Operations Virtual Network deployment"
   type        = string
-  
+
   validation {
-    condition     = can(regex("^[a-z0-9-]{36}$", var.ops_subid)) || var.ops_subid == ""
+    condition     = can(regex("^[a-z0-9-]{36}$", var.ops_subscription_id)) || var.ops_subscription_id == ""
     error_message = "Value must be a valid Subscription ID (GUID)."
   }
 }
 
 variable "ops_resource_group_name" {
   description = "Resource Group name for the Hub Virtual Network deployment"
-  type        = string  
+  type        = string
 }
 
 variable "ops_virtual_network_name" {
@@ -297,12 +340,12 @@ variable "ops_virtual_network_name" {
   type        = string
 }
 
-variable "ops_network_security_group_name" { 
+variable "ops_network_security_group_name" {
   description = "Network Security Group name for the Operations Virtual Network deployment"
-  type        = string 
+  type        = string
 }
 
-variable "ops_route_table_name" { 
+variable "ops_route_table_name" {
   description = "Route Table name for the Operations Virtual Network deployment"
   type        = string
 }
@@ -314,33 +357,34 @@ variable "ops_spoke_vnet_address_space" {
 
 variable "ops_spoke_subnets" {
   description = "A complex object that describes subnets for the Operations Virtual Network"
-  type = map(object({
-    subnet_name          = string
-    subnet_address_space = list(string)
-    service_endpoints    = list(string)
+  type = list(object({
+    name              = string
+    address_prefixes  = list(string)
+    service_endpoints = list(string)
 
     enforce_private_link_endpoint_network_policies = bool
     enforce_private_link_service_network_policies  = bool
-
-    network_security_group_rules = map(object({
-      name                       = string
-      priority                   = string
-      direction                  = string
-      access                     = string
-      protocol                   = string
-      source_port_range          = string
-      destination_port_range     = list(string)
-      source_address_prefix      = list(string)
-      destination_address_prefix = string
-    }))
-    enable_ddos_protection  = bool
-    ddos_protection_plan_id = string
-  }))  
+  }))
 }
 
-variable "ops_log_storage_account_name" { 
+variable "ops_network_security_group_rules" {
+  description = "A complex object that describes Network Security Group rules for the Operations Virtual Network"
+  type = map(object({
+    name                       = string
+    priority                   = string
+    direction                  = string
+    access                     = string
+    protocol                   = string
+    source_port_range          = string
+    destination_port_range     = list(string)
+    source_address_prefix      = list(string)
+    destination_address_prefix = string
+  }))
+}
+
+variable "ops_log_storage_account_name" {
   description = "Storage Account name for the Operations Virtual Network deployment"
-  type        = string  
+  type        = string
 }
 
 variable "ops_logging_storage_account_config" {
@@ -350,26 +394,26 @@ variable "ops_logging_storage_account_config" {
     kind                     = string
     min_tls_version          = string
     account_replication_type = string
-  })  
+  })
 }
 
 #################################
 # Shared Services Configuration
 #################################
 
-variable "svcs_subid" {
+variable "svcs_subscription_id" {
   description = "Subscription ID for the Shared Services Virtual Network deployment"
   type        = string
-  
+
   validation {
-    condition     = can(regex("^[a-z0-9-]{36}$", var.svcs_subid)) || var.svcs_subid == ""
+    condition     = can(regex("^[a-z0-9-]{36}$", var.svcs_subscription_id)) || var.svcs_subscription_id == ""
     error_message = "Value must be a valid Subscription ID (GUID)."
   }
 }
 
 variable "svcs_resource_group_name" {
   description = "Resource Group name for the Shared Services Virtual Network deployment"
-  type        = string  
+  type        = string
 }
 
 variable "svcs_virtual_network_name" {
@@ -377,14 +421,14 @@ variable "svcs_virtual_network_name" {
   type        = string
 }
 
-variable "svcs_network_security_group_name" { 
+variable "svcs_network_security_group_name" {
   description = "Network Security Group name for the Shared Services Virtual Network deployment"
-  type        = string  
+  type        = string
 }
 
-variable "svcs_route_table_name" { 
+variable "svcs_route_table_name" {
   description = "Route Table name for the Shared Services Virtual Network deployment"
-  type        = string 
+  type        = string
 }
 
 
@@ -395,33 +439,32 @@ variable "svcs_spoke_vnet_address_space" {
 
 variable "svcs_spoke_subnets" {
   description = "A complex object that describes subnets for the Shared Services Virtual Network"
-  type = map(object({
-    subnet_name          = string
-    subnet_address_space = list(string)
-    service_endpoints    = list(string)
+  type = list(object({
+    name              = string
+    address_prefixes  = list(string)
+    service_endpoints = list(string)
 
     enforce_private_link_endpoint_network_policies = bool
     enforce_private_link_service_network_policies  = bool
-
-    network_security_group_rules = map(object({
-      name                       = string
-      priority                   = string
-      direction                  = string
-      access                     = string
-      protocol                   = string
-      source_port_range          = string
-      destination_port_range     = list(string)
-      source_address_prefix      = list(string)
-      destination_address_prefix = string
-    }))
-
-    enable_ddos_protection  = bool
-    ddos_protection_plan_id = string
-
-  }))  
+  }))
 }
 
-variable "svcs_log_storage_account_name" { 
+variable "svcs_network_security_group_rules" {
+  description = "A complex object that describes Network Security Group rules for the Operations Virtual Network"
+  type = map(object({
+    name                       = string
+    priority                   = string
+    direction                  = string
+    access                     = string
+    protocol                   = string
+    source_port_range          = string
+    destination_port_range     = list(string)
+    source_address_prefix      = list(string)
+    destination_address_prefix = string
+  }))
+}
+
+variable "svcs_log_storage_account_name" {
   description = "Storage Account name for the Operations Virtual Network deployment"
   type        = string
 }
@@ -433,7 +476,7 @@ variable "svcs_logging_storage_account_config" {
     kind                     = string
     min_tls_version          = string
     account_replication_type = string
-  })  
+  })
 }
 
 
@@ -499,7 +542,7 @@ variable "size_linux_jumpbox" {
 
 variable "jumpbox_linux_os_disk_image" {
   type        = map(string)
-  description = "Specifies the os disk image of the virtual machine"  
+  description = "Specifies the os disk image of the virtual machine"
 }
 
 #########################################

@@ -6,6 +6,11 @@ output "private_ip" {
   value       = module.mod_networking_hub_firewall.private_ip
 }
 
+output "resource_group_name" {
+  description = "The name of the resource group in which resources are created"
+  value       = var.resource_group_name
+}
+
 output "virtual_network_name" {
   description = "The name of the virtual network"
   value       = module.mod_hub_network.virtual_network_name
@@ -29,4 +34,9 @@ output "storage_account_id" {
 output "storage_account_name" {
   description = "The name of the storage account"
   value       = module.mod_hub_network.storage_account_name
+}
+
+output "subnet_ids" {
+  description = "Returns all the subnets ids in the Virtual Network. As a map of ID"
+  value       = module.mod_hub_subnet.subnet_ids
 }

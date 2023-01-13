@@ -7,7 +7,7 @@
 #
 #
 module "mod_subnet" {
-  source     = "../../../../modules/Microsoft.Network/subnets"
+  source = "../../../../modules/Microsoft.Network/subnets"
 
   // Global Settings
   location = var.location
@@ -16,16 +16,12 @@ module "mod_subnet" {
   resource_group_name  = var.resource_group_name
   virtual_network_name = var.virtual_network_name
 
-  name                                          = var.name
-  address_prefixes                              = var.vnet_subnet_address_space
-  service_endpoints                             = var.subnet_service_endpoints
-  private_endpoint_network_policies_enabled     = var.private_endpoint_network_policies_enabled
-  private_link_service_network_policies_enabled = var.private_link_service_network_policies_enabled
+  // Subnets
+  subnets = var.spoke_subnets
 
   // Subnet Tags
   tags = merge(var.tags, {
-    DeployedBy  = format("AzureNoOpsTF [%s]", terraform.workspace)
-    description = format("Spoke Network Resource: %s", var.name)
+    DeployedBy = format("AzureNoOpsTF [%s]", terraform.workspace)
   }) # Tags to be applied to all resources
 }
 
@@ -44,7 +40,7 @@ module "mod_network_nsg" {
   // NSG Parameters
   name                = var.network_security_group_name
   resource_group_name = var.resource_group_name
- 
+
   // NSG Rules Parameters
   nsg_rules = var.network_security_group_rules
 
@@ -65,7 +61,8 @@ resource "azurerm_subnet_network_security_group_association" "nsg" {
     module.mod_network_nsg,
     time_sleep.wait_30_seconds
   ]
-  subnet_id                 = module.mod_subnet.id
+  for_each                  = module.mod_subnet.subnet_ids
+  subnet_id                 = module.mod_subnet.subnet_ids[each.key]
   network_security_group_id = module.mod_network_nsg.id
 }
 
@@ -106,7 +103,7 @@ module "mod_default_route" {
   source = "../../../../modules/Microsoft.Network/routeTables/route"
 
   // Route Table Route Parameters
-  name                   = "${var.name}_route"
+  name                   = "default_route"
   resource_group_name    = var.resource_group_name
   location               = var.location
   routetable_name        = module.mod_routetable.name
@@ -128,8 +125,8 @@ resource "azurerm_subnet_route_table_association" "routetable_association" {
     module.mod_routetable,
     time_sleep.wait_30_seconds
   ]
-
-  subnet_id      = module.mod_subnet.id
+  for_each       = module.mod_subnet.subnet_ids
+  subnet_id      = module.mod_subnet.subnet_ids[each.key]
   route_table_id = module.mod_routetable.id
 }
 

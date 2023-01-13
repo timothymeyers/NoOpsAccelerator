@@ -1,10 +1,6 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-data "azurerm_resource_group" "rg" {
-  name = var.resource_group_name
-}
-
 // Spoke Network
 module "mod_spoke_network" {
   source = "../../../../modules/Microsoft.Network/virtualNetworks"
@@ -15,7 +11,7 @@ module "mod_spoke_network" {
   // VNET Parameters
   vnet_name           = var.vnet_name
   vnet_address_space  = var.vnet_address_space
-  resource_group_name = data.azurerm_resource_group.rg.name
+  resource_group_name = var.resource_group_name
 
   // VNET Resource Lock Parameters
   enable_resource_locks = var.enable_resource_locks

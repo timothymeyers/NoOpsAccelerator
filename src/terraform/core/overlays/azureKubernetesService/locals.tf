@@ -28,7 +28,7 @@ locals {
   linuxNetworkInterfaceIpConfigurationName = replace(local.IpConfigurationNamingConvention, local.nameToken, "linux")
 
   //  AKS NAMES
-  clusterName = replace(local.kubernetesNamingConvention, local.nameToken, var.name)
+  clusterName = replace(local.kubernetesNamingConvention, local.nameToken, var.aks_name)
   
   //  VM NAMES
   linuxVmName = replace(local.virtualMachineNamingConvention, local.nameToken, "aks-linux")

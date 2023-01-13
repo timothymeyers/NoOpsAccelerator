@@ -68,21 +68,14 @@ module "mod_hub_subnet" {
     module.mod_hub_network,
     module.mod_networking_hub_firewall
   ]
-  source   = "./subnet"
-  for_each = var.hub_subnets
+  source = "./subnet"
 
-  name                      = each.value.name
-  location                  = var.location
-  resource_group_name       = var.resource_group_name
-  virtual_network_name      = module.mod_hub_network.virtual_network_name
-  vnet_subnet_address_space = each.value.subnet_address_space
-  subnet_service_endpoints  = lookup(each.value, "service_endpoints", [])
-
-  private_endpoint_network_policies_enabled     = lookup(each.value, "private_endpoint_network_policies_enabled", null)
-  private_link_service_network_policies_enabled = lookup(each.value, "private_link_service_network_policies_enabled", null)
-
+  location                     = var.location
+  resource_group_name          = var.resource_group_name
+  virtual_network_name         = module.mod_hub_network.virtual_network_name
+  hub_subnets                  = var.hub_subnets
   network_security_group_name  = var.hub_network_security_group_name
-  network_security_group_rules = each.value.network_security_group_rules
+  network_security_group_rules = var.hub_network_security_group_rules
 
   routetable_name             = var.hub_route_table_name
   firewall_private_ip_address = module.mod_networking_hub_firewall.private_ip
@@ -119,8 +112,10 @@ module "mod_networking_hub_firewall" {
   firewall_management_subnet_service_endpoints = var.firewall_management_subnet_service_endpoints
   firewall_supernet_IP_address                 = var.firewall_supernet_IP_address
 
-  firewall_policy_name       = var.firewall_policy_name
-  firewall_threat_intel_mode = var.firewall_threat_intel_mode
+  firewall_policy_name                 = var.firewall_policy_name
+  firewall_threat_intel_mode           = var.firewall_threat_intel_mode
+  firewall_application_rule_collection = var.firewall_policy_application_rule_collection
+  firewall_network_rule_collection     = var.firewall_policy_network_rule_collection
 
   // Firewall Policy Settings
   enable_forced_tunneling = var.enable_forced_tunneling # Enable Forced Tunneling

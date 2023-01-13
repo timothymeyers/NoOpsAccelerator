@@ -12,16 +12,12 @@ DESCRIPTION: The following components will be options in this deployment
 AUTHOR/S: jspinella
 */
 
-data "azurerm_resource_group" "acr_rg" {
-  name = var.resource_group_name
-}
-
 # Create a user assigned managed identity for the ACR
 module "acr_identity" {
   source = "../../modules/Microsoft.ManagedIdentity"
 
   location            = var.location
-  resource_group_name = data.azurerm_resource_group.acr_rg.name
+  resource_group_name = var.resource_group_name
   name                = var.acr_name # This is the name of the ACR
   tags = merge(var.tags, {
     DeployedBy = format("AzureNoOpsTF [%s]", terraform.workspace)
@@ -33,11 +29,11 @@ module "acr" {
   source = "../../modules/Microsoft.ContainerRegistry"
 
   location            = var.location
-  resource_group_name = data.azurerm_resource_group.acr_rg.name
+  resource_group_name = var.resource_group_name
   name                = var.acr_name
   sku                 = coalesce(var.acr_sku, "Premium")
   admin_enabled       = coalesce(var.acr_admin_enabled, false)
-  acr_identity_id     = module.acr_identity.user_assigned_identity_principal_id
+  acr_identity_id     = module.acr_identity.identity_id
   tags = merge(var.tags, {
     DeployedBy = format("AzureNoOpsTF [%s]", terraform.workspace)
   })
@@ -47,7 +43,7 @@ module "acr" {
 module "acr_private_dns_zone" {
   source                   = "../../modules/Microsoft.Network/privateDnsZone"
   name                     = "privatelink.azurecr.io"
-  resource_group_name      = data.azurerm_resource_group.acr_rg.name
+  resource_group_name      = var.resource_group_name
   virtual_networks_to_link = var.virtual_networks_to_link
 }
 
@@ -56,7 +52,7 @@ module "acr_private_endpoint" {
   source                         = "../../modules/Microsoft.Network/privateEndpoints"
   name                           = "${module.acr.name}PrivateEndpoint"
   location                       = var.location
-  resource_group_name            = data.azurerm_resource_group.acr_rg.name
+  resource_group_name            = var.resource_group_name
   subnet_id                      = var.vnet_subnet_id
   tags                           = var.tags
   private_connection_resource_id = module.acr.id
@@ -66,21 +62,3 @@ module "acr_private_endpoint" {
   private_dns_zone_group_ids     = [module.acr_private_dns_zone.id]
 }
 
-# Create the diagnostic setting for the ACR
-module "diagnostic_setting" {
-  source = "../../modules/Microsoft.Insights/diagnosticSettings"
-
-  enable_diagnostic_setting  = var.enable_diagnostic_setting
-  name                       = "${var.acr_name}-diagnostic-setting"
-  target_resource_id         = module.acr.id
-  log_analytics_workspace_id = var.log_analytics_workspace_id
-  retention_policy_days      = 30
-
-  logs    = ["ContainerRegistryRepositoryEvents", "ContainerRegistryLoginEvents"]
-  metrics = ["AllMetrics"]
-
-  tags = merge(var.tags, {
-    DeployedBy = format("AzureNoOpsTF [%s]", terraform.workspace)
-  })
-
-}

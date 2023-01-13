@@ -29,7 +29,7 @@ resource "random_password" "centos-vm-password" {
 }
 
 module "mod_virtual_machine" {
-  source = "../../../modules/Microsoft.Compute/centosVirtualMachines"
+  source = "../../../modules/Microsoft.Compute/linuxVirtualMachines"
 
   // Global Settings
   resource_group_name  = var.resource_group_name

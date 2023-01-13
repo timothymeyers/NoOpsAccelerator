@@ -34,34 +34,34 @@ variable "hub_vnet_address_space" {
 
 variable "hub_subnets" {
   description = "A complex object that describes subnets for the Hub Virtual Network"
-  type = map(object({
-    name          = string
-    subnet_address_space = list(string)
-    service_endpoints    = list(string)
+  type = list(object({
+    name              = string
+    address_prefixes  = list(string)
+    service_endpoints = list(string)
 
     enforce_private_link_endpoint_network_policies = bool
     enforce_private_link_service_network_policies  = bool
-
-    network_security_group_rules = map(object({
-      name                       = string
-      priority                   = string
-      direction                  = string
-      access                     = string
-      protocol                   = string
-      source_port_range          = string
-      destination_port_range     = list(string)
-      source_address_prefix      = list(string)
-      destination_address_prefix = string
-    }))
-
-    enable_ddos_protection  = bool
-    ddos_protection_plan_id = string
   }))
 }
 
 variable "hub_network_security_group_name" {
   description = "The name of the Network Security Group."
   type        = string
+}
+
+variable "hub_network_security_group_rules" {
+  description = "A complex object that describes network security group rules for the spoke network"
+  type = map(object({
+    name                       = string
+    priority                   = string
+    direction                  = string
+    access                     = string
+    protocol                   = string
+    source_port_range          = string
+    destination_port_range     = list(string)
+    source_address_prefix      = list(string)
+    destination_address_prefix = string
+  }))
 }
 
 variable "hub_route_table_name" {
@@ -164,6 +164,49 @@ variable "firewall_management_subnet_address_prefix" {
 variable "firewall_policy_name" {
   description = "The name of the Azure Firewall Policy."
   type        = string
+}
+
+variable "firewall_policy_application_rule_collection" {
+  description = "The SKU for Azure Firewall Public IP Address. It defaults to Standard."
+  type = list(object({
+    name     = string
+    priority = number
+    action   = string
+    rules = list(object({
+      name = string
+      protocols = list(object({
+        port = number
+        type = string
+      }))
+      source_addresses      = list(string)
+      destination_fqdns     = list(string)
+      destination_fqdn_tags = list(string)
+      source_ip_groups      = list(string)
+    }))
+  }))
+}
+
+variable "firewall_policy_network_rule_collection" {
+  description = "The SKU for Azure Firewall Public IP Address. It defaults to Standard."
+  type = list(object({
+    name     = string
+    priority = number
+    action   = string
+    rules = list(object({
+      description           = string
+      destination_address   = string
+      destination_addresses = list(string)
+      destination_fqdns     = list(string)
+      destination_ports     = list(string)
+      destination_ip_groups = list(string)
+      name                  = string
+      protocols             = list(string)
+      source_addresses      = list(string)
+      source_ip_groups      = list(string)
+      translated_address    = string
+      translated_port       = string
+    }))
+  }))
 }
 
 variable "publicIP_address_diagnostics_logs" {

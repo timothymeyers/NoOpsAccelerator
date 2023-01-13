@@ -33,7 +33,7 @@ variable "application_rule_collection" {
       action   = string
       name     = string
       priority = number
-      rule = set(object(
+      rules = set(object(
         {
           destination_fqdn_tags = set(string)
           destination_fqdns     = set(string)
@@ -60,7 +60,7 @@ variable "network_rule_collection" {
       action   = string
       name     = string
       priority = number
-      rule = set(object(
+      rules = set(object(
         {
           destination_addresses = set(string)
           destination_fqdns     = set(string)

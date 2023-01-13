@@ -19,19 +19,14 @@ module "mod_subnet" {
   location = var.location
 
   // Subnet Parameters
-  resource_group_name  = data.azurerm_resource_group.rg.name
+  resource_group_name  = var.resource_group_name
   virtual_network_name = var.virtual_network_name
 
-  name                                          = var.name
-  address_prefixes                              = var.vnet_subnet_address_space
-  service_endpoints                             = var.subnet_service_endpoints
-  private_endpoint_network_policies_enabled     = var.private_endpoint_network_policies_enabled
-  private_link_service_network_policies_enabled = var.private_link_service_network_policies_enabled
+  subnets = var.hub_subnets
 
   // Subnet Tags
   tags = merge(var.tags, {
     DeployedBy  = format("AzureNoOpsTF [%s]", terraform.workspace)
-    description = format("Hub Network Resource: %s", var.name)
   }) # Tags to be applied to all resources
 }
 
@@ -71,7 +66,7 @@ resource "azurerm_subnet_network_security_group_association" "nsg" {
     module.mod_network_nsg,
     time_sleep.wait_30_seconds
   ]
-  subnet_id                 = module.mod_subnet.id
+  subnet_id                 = module.mod_subnet.subnet_ids["hub-snet"]
   network_security_group_id = module.mod_network_nsg.id
 }
 
@@ -135,6 +130,6 @@ resource "azurerm_subnet_route_table_association" "routetable_association" {
     time_sleep.wait_30_seconds
   ]
 
-  subnet_id      = module.mod_subnet.id
+  subnet_id      = module.mod_subnet.subnet_ids["hub-snet"]
   route_table_id = module.mod_routetable.id
 }

@@ -21,13 +21,21 @@ AUTHOR/S: jspinella
 IMPORTANT: This module is not intended to be used as a standalone module. It is intended to be used as a module within a Misson Enclave deployment. Please see the Mission Enclave documentation for more information.
 */
 
+##################
+### DATA       ###
+##################
+# Azure Provider
+data "azurerm_subscription" "primary" {}
+data "azurerm_client_config" "current_client" {}
+
 ################################
 ### STAGE 0: Scaffolding     ###
 ################################
 
 // Resource Group for the Logging
 module "mod_logging_resource_group" {
-  source = "../../../../../terraform/core/modules/Microsoft.Resources/resourceGroups"
+  providers = { azurerm = azurerm.ops }
+  source    = "../../../../../terraform/core/modules/Microsoft.Resources/resourceGroups"
 
   //Global Settings
   location = var.location
@@ -47,6 +55,7 @@ module "mod_logging_resource_group" {
 
 // Resource Group for the Hub
 module "mod_hub_resource_group" {
+  providers = { azurerm = azurerm.hub }
   depends_on = [
     module.mod_logging_resource_group
   ]
@@ -68,11 +77,60 @@ module "mod_hub_resource_group" {
   })
 }
 
+// Resource Group for the Operations
+module "mod_ops_resource_group" {
+  providers = { azurerm = azurerm.ops }
+  depends_on = [
+    module.mod_logging_resource_group
+  ]
+  source = "../../../../../terraform/core/modules/Microsoft.Resources/resourceGroups"
+
+  //Global Settings
+  location = var.location
+
+  // Resource Group Parameters
+  name = var.ops_resource_group_name
+
+  // Resource Group Locks
+  enable_resource_locks = var.enable_resource_locks
+  lock_level            = var.lock_level
+
+  // Resource Group Tags
+  tags = merge(var.tags, {
+    DeployedBy = format("AzureNoOpsTF [%s]", terraform.workspace)
+  })
+}
+
+// Resource Group for the Operations
+module "mod_svcs_resource_group" {
+  providers = { azurerm = azurerm.svcs }
+  depends_on = [
+    module.mod_logging_resource_group
+  ]
+  source = "../../../../../terraform/core/modules/Microsoft.Resources/resourceGroups"
+
+  //Global Settings
+  location = var.location
+
+  // Resource Group Parameters
+  name = var.svcs_resource_group_name
+
+  // Resource Group Locks
+  enable_resource_locks = var.enable_resource_locks
+  lock_level            = var.lock_level
+
+  // Resource Group Tags
+  tags = merge(var.tags, {
+    DeployedBy = format("AzureNoOpsTF [%s]", terraform.workspace)
+  })
+}
+
 #########################################
 ### STAGE 1: Logging Configuration    ###
 #########################################
 
 module "mod_logging" {
+  providers = { azurerm = azurerm.ops }
   depends_on = [
     module.mod_logging_resource_group
   ]
@@ -101,6 +159,7 @@ module "mod_logging" {
 #######################################
 
 module "mod_hub_network" {
+  providers = { azurerm = azurerm.hub }
   depends_on = [
     module.mod_hub_resource_group
   ]
@@ -118,7 +177,8 @@ module "mod_hub_network" {
   hub_subnets = var.hub_subnets
 
   // Hub Network Security Group
-  hub_network_security_group_name = var.hub_network_security_group_name
+  hub_network_security_group_name  = var.hub_network_security_group_name
+  hub_network_security_group_rules = var.hub_network_security_group_rules
 
   // Hub Route Table
   hub_route_table_name = var.hub_route_table_name
@@ -140,7 +200,9 @@ module "mod_hub_network" {
   firewall_supernet_IP_address                 = var.firewall_supernet_IP_address
 
   // Firewall Rules
-  enable_forced_tunneling = var.enable_forced_tunneling
+  enable_forced_tunneling                     = var.enable_forced_tunneling
+  firewall_policy_network_rule_collection     = var.firewall_policy_network_rule_collection
+  firewall_policy_application_rule_collection = var.firewall_policy_application_rule_collection
 
   // Loggging Settings
   hub_log_storage_account_name       = var.hub_log_storage_account_name
@@ -191,11 +253,12 @@ module "mod_hub_network" {
 
 // Resources for the Operations Spoke
 module "mod_ops_network" {
-  source = "../../../../../terraform/core/overlays/hubSpoke/spoke"
+  providers = { azurerm = azurerm.ops }
+  source    = "../../../../../terraform/core/overlays/hubSpoke/spoke"
 
   // Global Settings
   location            = var.location
-  resource_group_name = var.ops_resource_group_name
+  resource_group_name = module.mod_ops_resource_group.name
 
   // Firewall
   firewall_private_ip_address = module.mod_hub_network.private_ip
@@ -205,9 +268,10 @@ module "mod_ops_network" {
   spoke_vnet_address_space = var.ops_spoke_vnet_address_space
 
   // Operations Spoke Subnets
-  spoke_subnets                     = var.ops_spoke_subnets
-  spoke_network_security_group_name = var.ops_network_security_group_name
-  spoke_route_table_name            = var.ops_route_table_name
+  spoke_subnets                      = var.ops_spoke_subnets
+  spoke_network_security_group_name  = var.ops_network_security_group_name
+  spoke_network_security_group_rules = var.ops_network_security_group_rules
+  spoke_route_table_name             = var.ops_route_table_name
 
   // Loggging Settings
   spoke_log_storage_account_name       = var.ops_log_storage_account_name
@@ -223,11 +287,12 @@ module "mod_ops_network" {
 
 // Resources for the Shared Services Spoke
 module "mod_svcs_network" {
-  source = "../../../../../terraform/core/overlays/hubSpoke/spoke"
+  providers = { azurerm = azurerm.svcs }
+  source    = "../../../../../terraform/core/overlays/hubSpoke/spoke"
 
   // Global Settings
   location            = var.location
-  resource_group_name = var.svcs_resource_group_name
+  resource_group_name = module.mod_svcs_resource_group.name
 
   // Firewall
   firewall_private_ip_address = module.mod_hub_network.private_ip
@@ -237,9 +302,10 @@ module "mod_svcs_network" {
   spoke_vnet_address_space = var.svcs_spoke_vnet_address_space
 
   // Shared Services Spoke Subnets
-  spoke_subnets                     = var.svcs_spoke_subnets
-  spoke_network_security_group_name = var.svcs_network_security_group_name
-  spoke_route_table_name            = var.svcs_route_table_name
+  spoke_subnets                      = var.svcs_spoke_subnets
+  spoke_network_security_group_name  = var.svcs_network_security_group_name
+  spoke_network_security_group_rules = var.svcs_network_security_group_rules
+  spoke_route_table_name             = var.svcs_route_table_name
 
   // Loggging Settings
   spoke_log_storage_account_name       = var.svcs_log_storage_account_name
@@ -314,6 +380,7 @@ module "mod_hub_to_svcs_networking_peering" {
 ########################################
 
 module "mod_azure_security_center" {
+  providers  = { azurerm = azurerm.hub }
   depends_on = [module.mod_hub_network]
   source     = "../../../../../terraform/core/modules/Microsoft.Security/azureSecurityCenter"
 
@@ -350,6 +417,7 @@ module "mod_azure_security_center" {
 #########################################################################
 
 module "mod_bastion_host" {
+  providers  = { azurerm = azurerm.hub }
   depends_on = [module.mod_hub_network]
   source     = "../../../../../terraform/core/overlays/bastion"
 

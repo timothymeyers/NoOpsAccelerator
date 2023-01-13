@@ -12,7 +12,7 @@ output "firewall_private_ip_address" {
 
 output "hub_subid" {
   description = "Subscription ID where the Hub Resource Group is provisioned"
-  value       = var.hub_subid
+  value       = var.hub_subscription_id
 }
 
 output "hub_rgname" {
@@ -27,12 +27,12 @@ output "hub_vnetname" {
 
 output "ops_subid" {
   description = "Subscription ID where the Tier 1 Resource Group is provisioned"
-  value       = coalesce(var.ops_subid, var.hub_subid)
+  value       = coalesce(var.ops_subscription_id, var.hub_subscription_id)
 }
 
 output "svcs_subid" {
   description = "Subscription ID where the Tier 2 Resource Group is provisioned"
-  value       = coalesce(var.svcs_subid, var.hub_subid)
+  value       = coalesce(var.svcs_subscription_id, var.hub_subscription_id)
 }
 
 output "laws_name" {

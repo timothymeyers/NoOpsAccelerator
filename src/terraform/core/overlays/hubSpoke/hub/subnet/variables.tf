@@ -11,44 +11,26 @@ variable "resource_group_name" {
   type        = string
 }
 
-variable "name" {
-  description = "Subnet Name for this subnet"
-  type        = string
-}
-
 variable "virtual_network_name" {
   description = "The name of the subnet's virtual network"
   type        = string
 }
 
-variable "vnet_subnet_address_space" {
-  description = "The CIDR Subnet Address Prefix for the this subnet. It must be in the workload Virtual Network space.'"
-  type        = list(string)
-}
+variable "hub_subnets" {
+  description = "A complex object that describes subnets for the spoke network"
+  type = list(object({
+    name              = string
+    address_prefixes  = list(string)
+    service_endpoints = list(string)
 
-variable "subnet_service_endpoints" {
-  description = "The service endpoints to optimize for this subnet"
-  type        = list(string)
-}
-
-variable "private_endpoint_network_policies_enabled" {
-  description = "Enable or Disable network policies for the private endpoint on the subnet."
-  type        = bool
-}
-
-variable "private_link_service_network_policies_enabled" {
-  description = "Enable or Disable network policies for the private link service on the subnet."
-  type        = bool
+    enforce_private_link_endpoint_network_policies = bool
+    enforce_private_link_service_network_policies  = bool
+  }))
 }
 
 variable "network_security_group_name" {
   description = "The name of the subnet's virtual network"
   type        = string
-}
-
-variable "tags" {
-  description = "A map of tags to add to all resources"
-  type        = map(string)
 }
 
 variable "network_security_group_rules" {
@@ -65,6 +47,11 @@ variable "network_security_group_rules" {
     destination_address_prefix = string
   }))
   default = {}
+}
+
+variable "tags" {
+  description = "A map of tags to add to all resources"
+  type        = map(string)
 }
 
 variable "routetable_name" {

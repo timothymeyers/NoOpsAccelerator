@@ -31,11 +31,15 @@ module "fw_client_subnet" {
   resource_group_name  = var.resource_group_name
   virtual_network_name = var.virtual_network_name
 
-  name                                          = var.firewall_client_subnet_name
-  address_prefixes                              = [cidrsubnet(var.firewall_client_subnet_address_prefix, 0, 0)]
-  service_endpoints                             = var.firewall_client_subnet_service_endpoints
-  private_link_service_network_policies_enabled = false
-  private_endpoint_network_policies_enabled     = false
+   subnets = [
+    {
+      name : var.firewall_client_subnet_name
+      address_prefixes : [cidrsubnet(var.firewall_client_subnet_address_prefix, 0, 0)]
+      service_endpoints = var.firewall_client_subnet_service_endpoints
+      enforce_private_link_endpoint_network_policies : false
+      enforce_private_link_service_network_policies : false
+    }
+  ]
 
   // Subnet Tags
   tags = merge(var.tags, {
@@ -48,7 +52,7 @@ module "fw_client_subnet" {
 #----------------------------------------------------------
 module "fw_managment_subnet" {
   source = "../subnets"
-  count = var.enable_forced_tunneling ? 1 : 0
+  count  = var.enable_forced_tunneling ? 1 : 0
 
   // Global Settings
   location = var.location
@@ -57,12 +61,15 @@ module "fw_managment_subnet" {
   resource_group_name  = var.resource_group_name
   virtual_network_name = var.virtual_network_name
 
-  name                                          = var.firewall_management_subnet_name
-  address_prefixes                              = [cidrsubnet(var.firewall_management_subnet_address_prefix, 0, 0)]
-  service_endpoints                             = var.firewall_management_subnet_service_endpoints
-  private_link_service_network_policies_enabled = false
-  private_endpoint_network_policies_enabled     = false
-
+  subnets = [
+    {
+      name : var.firewall_management_subnet_name
+      address_prefixes : [cidrsubnet(var.firewall_management_subnet_address_prefix, 0, 0)]
+      service_endpoints = var.firewall_management_subnet_service_endpoints
+      enforce_private_link_endpoint_network_policies : false
+      enforce_private_link_service_network_policies : false
+    }
+  ]
 
   // Subnet Tags
   tags = merge(var.tags, {
@@ -137,7 +144,7 @@ resource "azurerm_firewall" "firewall" {
 
   ip_configuration {
     name                 = lower("${var.firewall_config.name}-ipconfig")
-    subnet_id            = module.fw_client_subnet.id
+    subnet_id            = module.fw_client_subnet.subnet_ids[var.firewall_client_subnet_name]
     public_ip_address_id = module.mod_firewall_client_publicIP_address.id
   }
 
@@ -145,7 +152,7 @@ resource "azurerm_firewall" "firewall" {
     for_each = var.enable_forced_tunneling ? [1] : []
     content {
       name                 = lower("${var.firewall_config.name}-forced-tunnel")
-      subnet_id            = module.fw_managment_subnet.0.id
+      subnet_id            = module.fw_managment_subnet.0.subnet_ids[var.firewall_management_subnet_name]
       public_ip_address_id = module.mod_firewall_management_publicIP_address.0.id
     }
   }

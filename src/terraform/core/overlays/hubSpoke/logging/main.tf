@@ -10,14 +10,6 @@ DESCRIPTION: The following components will be options in this deployment
 AUTHOR/S: jrspinella
 */
 
-terraform {
-  required_providers {
-    azurerm = {
-      source = "hashicorp/azurerm"
-    }
-  }
-}
-
 ###################################
 ### STAGE 1: Build out Logging  ###
 ###################################

@@ -1,6 +1,6 @@
 output "resource_group_name" {
   description = "The name of the resource group in which resources are created"
-  value       = module.mod_spoke_resource_group.name
+  value       = var.resource_group_name
 }
 
 output "virtual_network_name" {
@@ -18,6 +18,11 @@ output "virtual_network_id" {
   value       = module.mod_spoke_network.virtual_network_id
 }
 
+output "route_table_id" {
+  description = "The id of the route table"
+  value       = module.mod_spoke_subnets.route_table_id
+}
+
 output "storage_account_id" {
   description = "The id of the storage account"
   value       = module.mod_spoke_network.storage_account_id
@@ -28,7 +33,7 @@ output "storage_account_name" {
   value       = module.mod_spoke_network.storage_account_name
 }
 
-output "subnets" {
-  description = "Returns all the subnets objects in the Virtual Network. As a map of keys, ID"
-  value       = merge(var.spoke_subnets, module.mod_spoke_subnets)
+output "subnet_ids" {
+  description = "Returns all the subnets ids in the Virtual Network. As a map of ID"
+  value       = module.mod_spoke_subnets.subnet_ids
 }

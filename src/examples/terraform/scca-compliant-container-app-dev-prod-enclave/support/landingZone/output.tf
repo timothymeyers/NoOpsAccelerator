@@ -8,7 +8,7 @@ output "firewall_private_ip_address" {
 
 output "hub_subid" {
   description = "Subscription ID where the Hub Resource Group is provisioned"
-  value       = var.hub_subid
+  value       = var.hub_subscription_id
 }
 
 output "hub_resource_group_resource_id" {

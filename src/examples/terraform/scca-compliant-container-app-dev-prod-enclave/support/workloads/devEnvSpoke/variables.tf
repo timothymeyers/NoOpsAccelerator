@@ -6,6 +6,14 @@
 # Global Configuration
 #################################
 
+variable "required" {
+  description = "A map of required variables for the deployment"
+  default = {
+    org_prefix         = "anoa"
+    deploy_environment = "dev"
+  }
+}
+
 variable "tags" {
   description = "A map of key value pairs to apply as tags to resources provisioned in this deployment"
   type        = map(string)
@@ -14,6 +22,16 @@ variable "tags" {
     "Region" : "eastus",
     "DeployEnvironment" : "dev"
   }
+}
+
+variable "environment" {
+  description = "The Terraform backend environment e.g. public or usgovernment"
+  type        = string
+}
+
+variable "metadata_host" {
+  description = "The metadata host for the Azure Cloud e.g. management.azure.com or management.usgovcloudapi.net."
+  type        = string
 }
 
 variable "location" {
@@ -41,6 +59,16 @@ variable "lock_level" {
 # Hub Configuration
 #################################
 
+variable "hub_subscription_id" {
+  description = "Subscription ID for the Hub deployment"
+  type        = string
+
+  validation {
+    condition     = can(regex("^[a-z0-9-]{36}$", var.hub_subscription_id)) || var.hub_subscription_id == ""
+    error_message = "Value must be a valid Subscription ID (GUID)."
+  }
+}
+
 variable "hub_resource_group_name" {
   description = "Resource Group name for the Hub Virtual Network deployment"
   type        = string
@@ -64,22 +92,22 @@ variable "hub_virtual_network_name" {
 #################################
 
 #################################
-# Operarions Configuration
+# Workload Configuration
 #################################
 
-variable "wl_subid" {
+variable "wl_subscription_id" {
   description = "Subscription ID for the Development Environment Virtual Network deployment"
   type        = string
-  
+
   validation {
-    condition     = can(regex("^[a-z0-9-]{36}$", var.wl_subid)) || var.wl_subid == ""
+    condition     = can(regex("^[a-z0-9-]{36}$", var.wl_subscription_id)) || var.wl_subscription_id == ""
     error_message = "Value must be a valid Subscription ID (GUID)."
   }
 }
 
 variable "wl_resource_group_name" {
   description = "Resource Group name for the Hub Virtual Network deployment"
-  type        = string  
+  type        = string
 }
 
 variable "wl_virtual_network_name" {
@@ -87,12 +115,12 @@ variable "wl_virtual_network_name" {
   type        = string
 }
 
-variable "wl_network_security_group_name" { 
+variable "wl_network_security_group_name" {
   description = "Network Security Group name for the Development Environment Virtual Network deployment"
-  type        = string 
+  type        = string
 }
 
-variable "wl_route_table_name" { 
+variable "wl_route_table_name" {
   description = "Route Table name for the Development Environment Virtual Network deployment"
   type        = string
 }
@@ -104,33 +132,34 @@ variable "wl_spoke_vnet_address_space" {
 
 variable "wl_spoke_subnets" {
   description = "A complex object that describes subnets for the Development Environment Virtual Network"
-  type = map(object({
-    subnet_name          = string
-    subnet_address_space = list(string)
-    service_endpoints    = list(string)
+  type = list(object({
+    name              = string
+    address_prefixes  = list(string)
+    service_endpoints = list(string)
 
     enforce_private_link_endpoint_network_policies = bool
     enforce_private_link_service_network_policies  = bool
-
-    network_security_group_rules = map(object({
-      name                       = string
-      priority                   = string
-      direction                  = string
-      access                     = string
-      protocol                   = string
-      source_port_range          = string
-      destination_port_range     = list(string)
-      source_address_prefix      = list(string)
-      destination_address_prefix = string
-    }))
-    enable_ddos_protection  = bool
-    ddos_protection_plan_id = string
-  }))  
+  }))
 }
 
-variable "wl_log_storage_account_name" { 
+variable "wl_network_security_group_rules" {
+  description = "A complex object that describes network security group rules for the spoke network"
+  type = map(object({
+    name                       = string
+    priority                   = string
+    direction                  = string
+    access                     = string
+    protocol                   = string
+    source_port_range          = string
+    destination_port_range     = list(string)
+    source_address_prefix      = list(string)
+    destination_address_prefix = string
+  }))
+}
+
+variable "wl_log_storage_account_name" {
   description = "Storage Account name for the Development Environment Virtual Network deployment"
-  type        = string  
+  type        = string
 }
 
 variable "wl_logging_storage_account_config" {
@@ -140,7 +169,7 @@ variable "wl_logging_storage_account_config" {
     kind                     = string
     min_tls_version          = string
     account_replication_type = string
-  })  
+  })
 }
 
 ##################################
@@ -181,7 +210,7 @@ variable "firewall_private_ip" {
 variable "acr_name" {
   description = "Specifies the name of the container registry"
   type        = string
-  default     = "BaboAcr"
+  default     = "Acr"
 }
 
 variable "acr_sku" {
@@ -190,7 +219,7 @@ variable "acr_sku" {
   default     = "Premium"
 
   validation {
-    condition = contains(["Basic", "Standard", "Premium"], var.acr_sku)
+    condition     = contains(["Basic", "Standard", "Premium"], var.acr_sku)
     error_message = "The container registry sku is invalid."
   }
 }
@@ -207,52 +236,41 @@ variable "acr_georeplication_locations" {
   default     = []
 }
 
+variable "acr_dns_virtual_networks_to_link" {
+  type        = list(string)
+  description = "(Optional) A list of Virtual Network IDs to link to the Azure Container Registry DNS Zone. Changing this forces a new resource to be created."
+  default     = []
+}  
+
 ####################################################
 # Azure Kuvernates Cluster configuration section  ##
 ####################################################
-variable "aks_vnet_name" {
-  description = "Specifies the name of the AKS subnet"
-  default     = "AksVNet"
+variable "aks_prefix_name" {
+  description = "Specifies the prefix of the AKS cluster"
   type        = string
+  default     = "msft"
 }
 
-variable "aks_vnet_address_space" {
-  description = "Specifies the address prefix of the AKS subnet"
-  default     =  ["10.0.0.0/16"]
-  type        = list(string)
+variable "agents_max_count" {
+  type        = number
+  description = "Maximum number of nodes in a pool"
+  default     = 10
 }
 
-variable "aks_cluster_name" {
-  description = "(Required) Specifies the name of the AKS cluster."
-  default     = "BaboAks"
-  type        = string
+variable "agents_min_count" {
+  type        = number
+  description = "Minimum number of nodes in a pool"
+  default     = 3
 }
 
-variable "role_based_access_control_enabled" {
-  description = "(Required) Is Role Based Access Control Enabled? Changing this forces a new resource to be created."
-  default     = true
+variable "use_user_defined_identity" {
   type        = bool
+  description = "Use user defined identity"
+  default     = true
 }
 
-variable "automatic_channel_upgrade" {
-  description = "(Optional) The upgrade channel for this Kubernetes Cluster. Possible values are patch, rapid, and stable."
-  default     = "stable"
-  type        = string
-
-  validation {
-    condition = contains( ["patch", "rapid", "stable"], var.automatic_channel_upgrade)
-    error_message = "The upgrade mode is invalid."
-  }
-}
-
-variable "admin_group_object_ids" {
-  description = "(Optional) A list of Object IDs of Azure Active Directory Groups which should have Admin Role on the Cluster."
-  default     = ["6e5de8c1-5a4b-409b-994f-0706e4403b77", "78761057-c58c-44b7-aaa7-ce1639c6c4f5"]
-  type        = list(string)
-}
-
-variable "azure_rbac_enabled" {
-  description = "(Optional) Is Role Based Access Control based on Azure AD enabled?"
+variable "enable_container_pull" {
+  description = "(Optional) Should the cluster pull container images from the Azure Container Registry specified by the `var.acr_name` variable? Defaults to `true`."
   default     = true
   type        = bool
 }
@@ -263,14 +281,14 @@ variable "sku_tier" {
   type        = string
 
   validation {
-    condition = contains( ["Free", "Paid"], var.sku_tier)
+    condition     = contains(["Free", "Paid"], var.sku_tier)
     error_message = "The sku tier is invalid."
   }
 }
 
-variable "kubernetes_version" {
+variable "control_plane_kubernetes_version" {
   description = "Specifies the AKS Kubernetes version"
-  default     = "1.21.1"
+  default     = "1.23.12"
   type        = string
 }
 
@@ -286,214 +304,69 @@ variable "default_node_pool_availability_zones" {
   type        = list(string)
 }
 
-variable "network_docker_bridge_cidr" {
+variable "net_profile_docker_bridge_cidr" {
   description = "Specifies the Docker bridge CIDR"
-  default     = "172.17.0.1/16"
+  default     = "172.18.0.1/16"
   type        = string
 }
 
-variable "network_dns_service_ip" {
+variable "net_profile_dns_service_ip" {
   description = "Specifies the DNS service IP"
-  default     = "10.2.0.10"
+  default     = "172.16.0.10"
   type        = string
 }
 
-variable "network_service_cidr" {
+variable "net_profile_service_cidr" {
   description = "Specifies the service CIDR"
-  default     = "10.2.0.0/24"
+  default     = "172.16.0.0/16"
+  type        = string
+}
+
+variable "net_profile_pod_cidr" {
+  description = "Specifies the service CIDR"
+  default     = "172.15.0.0/16"
   type        = string
 }
 
 variable "network_plugin" {
   description = "Specifies the network plugin of the AKS cluster"
-  default     = "azure"
+  default     = "kubenet"
   type        = string
 }
 
-variable "default_node_pool_name" {
-  description = "Specifies the name of the default node pool"
-  default     =  "system"
-  type        = string
+variable "private_cluster_enabled" {
+  type    = bool
+  default = false
 }
 
-variable "default_node_pool_subnet_name" {
-  description = "Specifies the name of the subnet that hosts the default node pool"
-  default     =  "SystemSubnet"
-  type        = string
-}
-
-variable "default_node_pool_subnet_address_prefix" {
-  description = "Specifies the address prefix of the subnet that hosts the default node pool"
-  default     =  ["10.0.0.0/21"]
-  type        = list(string)
-}
-
-variable "default_node_pool_enable_auto_scaling" {
+variable "enable_auto_scaling" {
   description = "(Optional) Whether to enable auto-scaler. Defaults to false."
-  type          = bool
-  default       = true
+  type        = bool
+  default     = true
 }
 
-variable "default_node_pool_enable_host_encryption" {
-  description = "(Optional) Should the nodes in this Node Pool have host encryption enabled? Defaults to false."
-  type          = bool
-  default       = false
-}
-
-variable "default_node_pool_enable_node_public_ip" {
-  description = "(Optional) Should each node have a Public IP Address? Defaults to false. Changing this forces a new resource to be created."
-  type          = bool
-  default       = false
-}
-
-variable "default_node_pool_max_pods" {
+variable "agent_max_pods" {
   description = "(Optional) The maximum number of pods that can run on each agent. Changing this forces a new resource to be created."
-  type          = number
-  default       = 50
+  type        = number
+  default     = 50
 }
 
-variable "default_node_pool_node_labels" {
+variable "agent_node_labels" {
   description = "(Optional) A list of Kubernetes taints which should be applied to nodes in the agent pool (e.g key=value:NoSchedule). Changing this forces a new resource to be created."
-  type          = map(any)
-  default       = {}
+  type        = map(any)
+  default     = {}
 }
 
-variable "default_node_pool_node_taints" {
-  description = "(Optional) A map of Kubernetes labels which should be applied to nodes in this Node Pool. Changing this forces a new resource to be created."
-  type          = list(string)
-  default       = []
-}
-
-variable "default_node_pool_os_disk_type" {
+variable "agent_os_disk_type" {
   description = "(Optional) The type of disk which should be used for the Operating System. Possible values are Ephemeral and Managed. Defaults to Managed. Changing this forces a new resource to be created."
-  type          = string
-  default       = "Ephemeral"
+  type        = string
+  default     = "Ephemeral"
 }
 
-variable "default_node_pool_max_count" {
-  description = "(Required) The maximum number of nodes which should exist within this Node Pool. Valid values are between 0 and 1000 and must be greater than or equal to min_count."
-  type          = number
-  default       = 10
-}
-
-variable "default_node_pool_min_count" {
-  description = "(Required) The minimum number of nodes which should exist within this Node Pool. Valid values are between 0 and 1000 and must be less than or equal to max_count."
-  type          = number
-  default       = 3
-}
-
-variable "default_node_pool_node_count" {
+variable "agent_node_count" {
   description = "(Optional) The initial number of nodes which should exist within this Node Pool. Valid values are between 0 and 1000 and must be a value in the range min_count - max_count."
-  type          = number
-  default       = 3
-}
-
-variable "additional_node_pool_subnet_name" {
-  description = "Specifies the name of the subnet that hosts the default node pool"
-  default     =  "UserSubnet"
-  type        = string
-}
-
-variable "additional_node_pool_subnet_address_prefix" {
-  description = "Specifies the address prefix of the subnet that hosts the additional node pool"
-  type        = list(string)
-  default     = ["10.0.16.0/20"]
-}
-
-variable "additional_node_pool_name" {
-  description = "(Required) Specifies the name of the node pool."
-  type        = string
-  default     = "user"
-}
-
-variable "additional_node_pool_vm_size" {
-  description = "(Required) The SKU which should be used for the Virtual Machines used in this Node Pool. Changing this forces a new resource to be created."
-  type        = string
-  default     = "Standard_F8s_v2"
-}
-
-variable "additional_node_pool_availability_zones" {
-  description = "(Optional) A list of Availability Zones where the Nodes in this Node Pool should be created in. Changing this forces a new resource to be created."
-  type        = list(string)
-  default = ["1", "2", "3"]
-}
-
-variable "additional_node_pool_enable_auto_scaling" {
-  description = "(Optional) Whether to enable auto-scaler. Defaults to false."
-  type          = bool
-  default       = true
-}
-
-variable "additional_node_pool_enable_host_encryption" {
-  description = "(Optional) Should the nodes in this Node Pool have host encryption enabled? Defaults to false."
-  type          = bool
-  default       = false
-}
-
-variable "additional_node_pool_enable_node_public_ip" {
-  description = "(Optional) Should each node have a Public IP Address? Defaults to false. Changing this forces a new resource to be created."
-  type          = bool
-  default       = false
-}
-
-variable "additional_node_pool_max_pods" {
-  description = "(Optional) The maximum number of pods that can run on each agent. Changing this forces a new resource to be created."
-  type          = number
-  default       = 50
-}
-
-variable "additional_node_pool_mode" {
-  description = "(Optional) Should this Node Pool be used for System or User resources? Possible values are System and User. Defaults to User."
-  type          = string
-  default       = "User"
-}
-
-variable "additional_node_pool_node_labels" {
-  description = "(Optional) A list of Kubernetes taints which should be applied to nodes in the agent pool (e.g key=value:NoSchedule). Changing this forces a new resource to be created."
-  type          = map(any)
-  default       = {}
-}
-
-variable "additional_node_pool_node_taints" {
-  description = "(Optional) A map of Kubernetes labels which should be applied to nodes in this Node Pool. Changing this forces a new resource to be created."
-  type          = list(string)
-  default       = ["CriticalAddonsOnly=true:NoSchedule"]
-}
-
-variable "additional_node_pool_os_disk_type" {
-  description = "(Optional) The type of disk which should be used for the Operating System. Possible values are Ephemeral and Managed. Defaults to Managed. Changing this forces a new resource to be created."
-  type          = string
-  default       = "Ephemeral"
-}
-
-variable "additional_node_pool_os_type" {
-  description = "(Optional) The Operating System which should be used for this Node Pool. Changing this forces a new resource to be created. Possible values are Linux and Windows. Defaults to Linux."
-  type          = string
-  default       = "Linux"
-}
-
-variable "additional_node_pool_priority" {
-  description = "(Optional) The Priority for Virtual Machines within the Virtual Machine Scale Set that powers this Node Pool. Possible values are Regular and Spot. Defaults to Regular. Changing this forces a new resource to be created."
-  type          = string
-  default       = "Regular"
-}
-
-variable "additional_node_pool_max_count" {
-  description = "(Required) The maximum number of nodes which should exist within this Node Pool. Valid values are between 0 and 1000 and must be greater than or equal to min_count."
-  type          = number
-  default       = 10
-}
-
-variable "additional_node_pool_min_count" {
-  description = "(Required) The minimum number of nodes which should exist within this Node Pool. Valid values are between 0 and 1000 and must be less than or equal to max_count."
-  type          = number
-  default       = 3
-}
-
-variable "additional_node_pool_node_count" {
-  description = "(Optional) The initial number of nodes which should exist within this Node Pool. Valid values are between 0 and 1000 and must be a value in the range min_count - max_count."
-  type          = number
-  default       = 3
+  type        = number
+  default     = 3
 }
 
 ######################################
@@ -507,8 +380,8 @@ variable "vm_name" {
 
 variable "vm_public_ip" {
   description = "(Optional) Specifies whether create a public IP for the virtual machine"
-  type = bool
-  default = false
+  type        = bool
+  default     = false
 }
 
 variable "vm_size" {
@@ -523,7 +396,7 @@ variable "vm_os_disk_storage_account_type" {
   type        = string
 
   validation {
-    condition = contains(["Premium_LRS", "Premium_ZRS", "StandardSSD_LRS", "StandardSSD_ZRS",  "Standard_LRS"], var.vm_os_disk_storage_account_type)
+    condition     = contains(["Premium_LRS", "Premium_ZRS", "StandardSSD_LRS", "StandardSSD_ZRS", "Standard_LRS"], var.vm_os_disk_storage_account_type)
     error_message = "The storage account type of the OS disk is invalid."
   }
 }
@@ -532,7 +405,7 @@ variable "vm_os_disk_storage_account_type" {
 variable "vm_os_disk_image" {
   type        = map(string)
   description = "Specifies the os disk image of the virtual machine"
-  default     = {
+  default = {
     publisher = "microsoft-dsvm"
     offer     = "ubuntu-2004"
     sku       = "2004-gen2"
@@ -575,8 +448,8 @@ variable "storage_account_tier" {
   default     = "Standard"
   type        = string
 
-   validation {
-    condition = contains(["Standard", "Premium"], var.storage_account_tier)
+  validation {
+    condition     = contains(["Standard", "Premium"], var.storage_account_tier)
     error_message = "The account tier of the storage account is invalid."
   }
 }
@@ -590,19 +463,19 @@ variable "admin_username" {
 variable "ssh_public_key" {
   description = "(Required) Specifies the SSH public key for the jumpbox virtual machine and AKS worker nodes."
   type        = string
-  default = ""
+  default     = ""
 }
 
 variable "script_storage_account_name" {
   description = "(Required) Specifies the name of the storage account that contains the custom script."
   type        = string
-  default = ""
+  default     = ""
 }
 
 variable "script_storage_account_key" {
   description = "(Required) Specifies the name of the storage account that contains the custom script."
   type        = string
-  default = ""
+  default     = ""
 }
 
 variable "container_name" {

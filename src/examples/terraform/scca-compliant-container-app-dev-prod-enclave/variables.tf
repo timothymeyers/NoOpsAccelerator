@@ -258,7 +258,7 @@ variable "hub_subnets" {
   default = [
     {
       name             = "hub-snet"
-      address_prefixes = ["10.0.100.128/26"]
+      address_prefixes = ["10.0.100.128/27"]
       service_endpoints = [
         "Microsoft.KeyVault",
         "Microsoft.Sql",
@@ -686,7 +686,7 @@ variable "ops_route_table_name" {
 variable "ops_spoke_vnet_address_space" {
   description = "Address space prefixes for the Operations Virtual Network"
   type        = list(string)
-  default     = ["10.0.115.0/24"]
+  default     = ["10.0.115.0/26"]
 }
 
 variable "ops_spoke_subnets" {
@@ -702,7 +702,7 @@ variable "ops_spoke_subnets" {
   default = [
     {
       name             = "operations-snet"
-      address_prefixes = ["10.0.115.0/26"]
+      address_prefixes = ["10.0.115.0/27"]
       service_endpoints = [
         "Microsoft.KeyVault",
         "Microsoft.Sql",
@@ -735,9 +735,9 @@ variable "ops_network_security_group_rules" {
       access                     = "Allow"
       protocol                   = "*"
       source_port_range          = "*"
-      destination_port_range     = ["22", "3389", "5985", "5986"]
-      source_address_prefix      = ["10.0.120.0/24", "10.0.130.0/24", "10.0.125.0/24"]
-      destination_address_prefix = "10.0.110.0/24"
+      destination_port_range     = ["22", "3389", "80", "443"]
+      source_address_prefix      = ["10.0.120.0/26", "10.0.130.0/26", "10.0.125.0/26"]
+      destination_address_prefix = "10.0.110.0/26"
     }
   }
 }
@@ -807,7 +807,7 @@ variable "svcs_route_table_name" {
 variable "svcs_spoke_vnet_address_space" {
   description = "Address space prefixes for the Shared Services Virtual Network"
   type        = list(string)
-  default     = ["10.0.120.0/24"]
+  default     = ["10.0.120.0/26"]
 }
 
 variable "svcs_spoke_subnets" {
@@ -823,7 +823,7 @@ variable "svcs_spoke_subnets" {
   default = [
     {
       name             = "sharedservices-snet"
-      address_prefixes = ["10.0.120.0/26"]
+      address_prefixes = ["10.0.120.0/27"]
       service_endpoints = [
         "Microsoft.KeyVault",
         "Microsoft.Sql",
@@ -856,9 +856,9 @@ variable "svcs_network_security_group_rules" {
       access                     = "Allow"
       protocol                   = "*"
       source_port_range          = "*"
-      destination_port_range     = ["22", "3389", "5985", "5986"]
-      source_address_prefix      = ["10.0.110.0/24", "10.0.130.0/24", "10.0.125.0/24"]
-      destination_address_prefix = "10.0.120.0/24"
+      destination_port_range     = ["22", "3389", "80", "443"]
+      source_address_prefix      = ["10.0.110.0/26", "10.0.130.0/26", "10.0.125.0/26"]
+      destination_address_prefix = "10.0.120.0/26"
     }
   }
 }
@@ -927,7 +927,7 @@ variable "wl_route_table_name" {
 variable "wl_spoke_vnet_address_space" {
   description = "Address space prefixes for the Workload Virtual Network"
   type        = list(string)
-  default     = ["10.0.125.0/24"]
+  default     = ["10.0.125.0/26"]
 }
 
 variable "wl_spoke_subnets" {
@@ -965,7 +965,7 @@ variable "wl_spoke_subnets" {
     },
     {
       name             = "default-snet"
-      address_prefixes = ["10.0.125.0/26"]
+      address_prefixes = ["10.0.125.0/27"]
       service_endpoints = [
         "Microsoft.KeyVault",
         "Microsoft.Sql",
@@ -998,9 +998,9 @@ variable "wl_network_security_group_rules" {
       access                     = "Allow"
       protocol                   = "*"
       source_port_range          = "*"
-      destination_port_range     = ["22", "3389", "5985", "5986"]
-      source_address_prefix      = ["10.0.110.0/24", "10.0.130.0/24", "10.0.120.0/24"]
-      destination_address_prefix = "10.0.125.0/24"
+      destination_port_range     = ["22", "3389", "80", "443"]
+      source_address_prefix      = ["10.0.110.0/26", "10.0.130.0/26", "10.0.120.0/26"]
+      destination_address_prefix = "10.0.125.0/26"
     }
   }
 }
@@ -1096,7 +1096,7 @@ variable "dev2_spoke_subnets" {
     },
     {
       name             = "default-snet"
-      address_prefixes = ["10.0.130.0/26"]
+      address_prefixes = ["10.0.130.0/27"]
       service_endpoints = [
         "Microsoft.KeyVault",
         "Microsoft.Sql",
@@ -1129,9 +1129,9 @@ variable "dev2_network_security_group_rules" {
       access                     = "Allow"
       protocol                   = "*"
       source_port_range          = "*"
-      destination_port_range     = ["22", "3389", "5985", "5986"]
-      source_address_prefix      = ["10.0.110.0/24", "10.0.120.0/24", "10.0.125.0/24"]
-      destination_address_prefix = "10.0.130.0/24"
+      destination_port_range     = ["22", "3389", "80", "443"]
+      source_address_prefix      = ["10.0.110.0/26", "10.0.120.0/26", "10.0.125.0/26"]
+      destination_address_prefix = "10.0.130.0/26"
     }
   }
 }
@@ -1187,7 +1187,7 @@ variable "use_remote_gateways" {
 variable "bastion_address_space" {
   description = "The address space to be used for the Bastion Host subnet (must be /27 or larger)."
   type        = string
-  default     = "10.0.100.200/26"
+  default     = "10.0.100.160/27"
 }
 
 variable "bastion_subnet_service_endpoints" {

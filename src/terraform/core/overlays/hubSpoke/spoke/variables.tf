@@ -38,6 +38,16 @@ variable "spoke_subnets" {
   }))
 }
 
+variable "spoke_route_table_routes" {
+  type = list(object({
+    name                   = string
+    address_prefix         = string
+    next_hop_type          = string
+    next_hop_in_ip_address = string
+  }))
+  description = "The route tables routes with their properties."
+}
+
 variable "spoke_network_security_group_name" {
   description = "The name of the network security group"
   type        = string
@@ -63,19 +73,15 @@ variable "spoke_route_table_name" {
   type        = string
 }
 
+variable "spoke_route_table_subnet_associations" {
+  description = "A complex object that describes subnet associations for the spoke network"
+  type        = map(any)
+  default     = {}
+}
+
 variable "tags" {
   description = "A map of tags to add to all resources"
   type        = map(string)
-}
-
-#################################
-# Firewall configuration section
-#################################
-
-variable "firewall_private_ip_address" {
-  description = "The private IP address of the firewall"
-  type        = string
-  default     = ""
 }
 
 #################################

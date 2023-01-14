@@ -78,9 +78,10 @@ module "mod_routetable" {
   location = var.location
 
   // Route Table Parameters
-  name                          = var.routetable_name
+  route_table_name              = var.routetable_name
   resource_group_name           = var.resource_group_name
   disable_bgp_route_propagation = true
+  subnets_to_associate          = var.subnets_to_associate
 
   // Routetable Resource Lock Parameters
   enable_resource_lock = var.enable_resource_locks
@@ -100,16 +101,18 @@ module "mod_routetable" {
 #
 #
 module "mod_default_route" {
-  source = "../../../../modules/Microsoft.Network/routeTables/route"
+  source   = "../../../../modules/Microsoft.Network/routeTables/route"
+  for_each = { for route in var.route_table_routes : route.name => route }
 
   // Route Table Route Parameters
-  name                   = "default_route"
+  name                   = each.value.name
   resource_group_name    = var.resource_group_name
   location               = var.location
   routetable_name        = module.mod_routetable.name
-  address_prefix         = "0.0.0.0/0"
-  next_hop_type          = "VirtualAppliance"
-  next_hop_in_ip_address = var.firewall_private_ip_address
+  address_prefix         = each.value.address_prefix
+  next_hop_type          = each.value.next_hop_type
+  next_hop_in_ip_address = each.value.next_hop_in_ip_address
+
 }
 
 resource "time_sleep" "wait_30_seconds" {

@@ -1,14 +1,14 @@
 ##################################################
 # VARIABLES                                      #
 ##################################################
-variable initiative {
+variable definition {
   type        = any
-  description = "Policy Initiative resource node"
+  description = "Policy Definition resource node"
 }
 
 variable assignment_scope {
   type        = string
-  description = "The scope at which the policy initiative will be assigned. Must be full resource IDs. Changing this forces a new resource to be created"
+  description = "The scope at which the policy will be assigned. Must be full resource IDs. Changing this forces a new resource to be created"
 }
 
 variable assignment_not_scopes {
@@ -19,19 +19,19 @@ variable assignment_not_scopes {
 
 variable assignment_name {
   type        = string
-  description = "The name which should be used for this Policy Assignment, defaults to initiative name. Changing this forces a new Policy Assignment to be created"
+  description = "The name which should be used for this Policy Assignment, defaults to definition name. Changing this forces a new Policy Assignment to be created"
   default     = ""
 }
 
 variable assignment_display_name {
   type        = string
-  description = "The policy assignment display name, defaults to initiative display_name. Changing this forces a new resource to be created"
+  description = "The policy assignment display name, defaults to definition display_name. Changing this forces a new resource to be created"
   default     = ""
 }
 
 variable assignment_description {
   type        = string
-  description = "A description to use for the Policy Assignment, defaults to initiative description. Changing this forces a new resource to be created"
+  description = "A description to use for the Policy Assignment, defaults to definition description. Changing this forces a new resource to be created"
   default     = ""
 }
 
@@ -65,10 +65,10 @@ variable assignment_location {
   default     = "eastus"
 }
 
-variable non_compliance_messages {
-  type        = any
-  description = "The optional non-compliance message(s). Key/Value pairs map as policy_definition_reference_id = 'content', use null = 'content' to specify the Default non-compliance message for all member definitions."
-  default     = {}
+variable non_compliance_message {
+  type        = string
+  description = "The optional non-compliance message text."
+  default     = ""
 }
 
 variable resource_discovery_mode {
@@ -113,8 +113,8 @@ variable resource_count {
 }
 
 variable role_definition_ids {
-  type        = list(string)
-  description = "List of Role definition ID's for the System Assigned Identity. Omit this to use those located in policy definitions. Changing this forces a new resource to be created"
+  type        = list(any)
+  description = "List of Role definition ID's for the System Assigned Identity, defaults to roles included in the definition. Specify a blank array to skip creating role assignments. Changing this forces a new resource to be created"
   default     = []
 }
 
@@ -135,4 +135,5 @@ variable skip_role_assignment {
   description = "Should the module skip creation of role assignment for policies that DeployIfNotExists and Modify"
   default     = false
 }
+
 

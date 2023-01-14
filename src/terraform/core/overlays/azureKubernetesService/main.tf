@@ -13,14 +13,14 @@ AUTHOR/S: jspinella
 
 // Create the Azure Container Registry
 module "aks_cluster_container_registry" {
-  count               = var.enable_container_pull ? 1 : 0
-  source              = "../azureContainerRegistry"
-  acr_name            = var.acr_name
-  resource_group_name = var.resource_group_name
-  location            = var.location
-  vnet_subnet_id      = var.acr_pe_vnet_subnet_id
-  acr_sku             = var.acr_sku
-  acr_admin_enabled   = var.acr_admin_enabled
+  count                    = var.enable_container_pull ? 1 : 0
+  source                   = "../azureContainerRegistry"
+  acr_name                 = var.acr_name
+  resource_group_name      = var.resource_group_name
+  location                 = var.location
+  vnet_subnet_id           = var.acr_pe_vnet_subnet_id
+  acr_sku                  = var.acr_sku
+  acr_admin_enabled        = var.acr_admin_enabled
   virtual_networks_to_link = var.acr_dns_virtual_networks_to_link
 }
 
@@ -87,9 +87,9 @@ resource "azurerm_role_assignment" "aks_contributor" {
 }
 
 // Create the Azure Kubernetes Cluster Jumpbox
-/* module "aks_cluster_virtual_machine" {
+module "aks_cluster_virtual_machine" {
   source = "../virtualMachine/linux"
-  count                            = var.create_jumpbox ? 1 : 0
+  count  = var.create_jumpbox ? 1 : 0
 
   // Global Settings
   resource_group_name  = var.resource_group_name
@@ -98,29 +98,22 @@ resource "azurerm_role_assignment" "aks_contributor" {
 
   // Jumpbox Settings
   vm_name                     = local.linuxVmName
-  subnet_name                 = var.subnet_id
+  subnet_name                 = var.vm_subnet_id
   network_interface_name      = local.linuxNetworkInterfaceName
   ip_configuration_name       = local.linuxNetworkInterfaceIpConfigurationName
   network_security_group_name = var.network_security_group_name
 
   // OS Settings
-  size           = var.size_linux_jumpbox
-  admin_username = var.admin_username
-  admin_password = var.use_random_password ? null : var.admin_password
-
-  // OS Image Settings
+  size             = var.size_linux_jumpbox
   vm_os_disk_image = var.vm_os_disk_image
-
-  // key vault
-  use_key_vault               = var.use_key_vault
-  log_analytics_workspace_id  = var.log_analytics_workspace_id
-  log_analytics_workspace_key = var.log_analytics_workspace_key
+  admin_username   = var.admin_username
+  admin_password   = var.admin_password
 
   // Tags
   tags = merge(var.tags, {
     DeployedBy  = format("AzureNoOpsTF [%s]", terraform.workspace)
-    description = format("Linux VM for Azure AKS %s", local.linuxVmName)
+    description = format("Jumpbox VM for Azure AKS %s", local.clusterName)
   })
 }
 
- */
+

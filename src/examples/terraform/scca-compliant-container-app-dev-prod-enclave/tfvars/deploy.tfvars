@@ -57,7 +57,7 @@ disable_telemetry = true
 
 # The list of management groups to be created under the root.
 management_groups = {
-  "platform" = {
+  "platforms" = {
     display_name               = "platforms"
     management_group_name      = "platforms"
     parent_management_group_id = "anoa"

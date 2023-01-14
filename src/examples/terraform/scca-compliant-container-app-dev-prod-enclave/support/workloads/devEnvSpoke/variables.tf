@@ -204,6 +204,12 @@ variable "firewall_private_ip" {
   default     = ""
 }
 
+variable "firewall_public_ip" {
+  description = "The public IP address of the firewall"
+  type        = string
+  default     = ""
+}
+
 ####################################################
 # Azure Container Registry configuration section  ##
 ####################################################

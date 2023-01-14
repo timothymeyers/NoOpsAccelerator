@@ -60,9 +60,6 @@ module "mod_dev_env_aks_workload_spoke_network" {
   location            = var.location
   resource_group_name = module.mod_dev_env_aks_workload_spoke_resource_group.name
 
-  // Firewall
-  firewall_private_ip_address = var.firewall_private_ip
-
   // Workload Spoke Configuration
   spoke_vnetname           = var.wl_virtual_network_name
   spoke_vnet_address_space = var.wl_spoke_vnet_address_space
@@ -72,6 +69,20 @@ module "mod_dev_env_aks_workload_spoke_network" {
   spoke_network_security_group_name  = var.wl_network_security_group_name
   spoke_network_security_group_rules = var.wl_network_security_group_rules
   spoke_route_table_name             = var.wl_route_table_name
+  spoke_route_table_routes = [
+    {
+      name                   = "RouteToAzureFirewall"
+      address_prefix         = "0.0.0.0/0"
+      next_hop_type          = "VirtualAppliance"
+      next_hop_in_ip_address = var.firewall_private_ip
+    },
+    {
+      name                   = "RouteToInternet"
+      address_prefix         = "${var.firewall_public_ip}/32"
+      next_hop_type          = "Internet"
+      next_hop_in_ip_address = null
+    }
+  ]
 
   // Loggging Settings
   spoke_log_storage_account_name       = var.wl_log_storage_account_name
@@ -164,6 +175,13 @@ module "dev_env_acr_aks_cluster" {
   private_cluster_enabled          = var.private_cluster_enabled
   identity_type                    = var.use_user_defined_identity ? "UserAssigned" : "SystemAssigned"
 
+  // AKS Jumpbox Settings
+  create_jumpbox              = true
+  size_linux_jumpbox          = var.vm_size
+  vm_os_disk_image            = var.vm_os_disk_image
+  virtual_network_name        = module.mod_dev_env_aks_workload_spoke_network.virtual_network_name
+  vm_subnet_id                = "default-snet"
+  network_security_group_name = module.mod_dev_env_aks_workload_spoke_network.network_security_group_name
 
   // Tags
   tags = merge(var.tags, {

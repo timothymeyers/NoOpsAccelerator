@@ -16,6 +16,8 @@ module "management_groups" {
   })
 }
 
+
+
 output "management_groups" {
   value = module.management_groups.management_groups
 }

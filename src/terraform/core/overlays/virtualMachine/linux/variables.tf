@@ -134,9 +134,11 @@ variable "tags" {
 variable "log_analytics_workspace_id" {
   description = "Specifies the log analytics workspace id"
   type        = string
+  default = ""
 }
 
 variable "log_analytics_workspace_key" {
   description = "Specifies the log analytics workspace key"
   type        = string
+  default = ""
 }

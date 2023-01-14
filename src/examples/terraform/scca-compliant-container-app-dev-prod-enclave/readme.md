@@ -40,3 +40,53 @@ To get started with Terraform on Azure check out their [tutorial](https://learn.
 <!-- markdownlint-disable MD013 -->
 > NOTE: Azure Cloud Shell is often our preferred place to deploy from because the AZ CLI and Terraform are already installed. However, sometimes Cloud Shell has different versions of the dependencies from what we have tested and verified, and sometimes there have been bugs in the Terraform Azure RM provider or the AZ CLI that only appear in Cloud Shell. If you are deploying from Azure Cloud Shell and see something unexpected, try the [development container](../.devcontainer) or deploy from your machine using locally installed AZ CLI and Terraform. We welcome all feedback and [contributions](../CONTRIBUTING.md), so if you see something that doesn't make sense, please [create an issue](https://github.com/Azure/missionlz/issues/new/choose) or open a [discussion thread](https://github.com/Azure/missionlz/discussions).
 <!-- markdownlint-enable MD013 -->
+
+## Planning
+
+The recommended network design achieves the purpose of hosting (cloud only).  This is a simplified network design given all ingress and egress traffic will traverse through the same VIP.
+
+![Hub Spoke Networking with Azure Firewall](../media/architecture/hubnetwork-azfw/hubnetwork-azfw-design.jpg)
+
+* Cloud network topology based on proven **hub-and-spoke design**.
+
+## Management Groups
+
+## Policy As Code
+
+## Custom Roles
+
+## Hub Virtual Network
+
+## Spokes Virtual Network
+
+## User Defined Routes
+
+## Network Security Groups
+
+## Required Routes
+
+## Azure Firewall Rules
+
+## Log Analytics Integration
+
+## Azure Deployment
+
+### Delete Locks
+
+### Service Health
+
+### Deployment Scenarios
+
+#### Deploying a single environment
+
+#### Deploying multiple environments
+
+### Example Deployment Parameters
+
+## Cleanup
+
+## Development Setup
+
+## See Also
+
+

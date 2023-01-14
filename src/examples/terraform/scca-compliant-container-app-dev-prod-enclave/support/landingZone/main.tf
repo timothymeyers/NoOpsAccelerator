@@ -181,7 +181,7 @@ module "mod_hub_network" {
   hub_network_security_group_rules = var.hub_network_security_group_rules
 
   // Hub Route Table
-  hub_route_table_name = var.hub_route_table_name
+  hub_route_table_name = var.hub_route_table_name  
 
   // Firewall Settings
   enable_firewall                              = var.enable_firewall
@@ -260,18 +260,27 @@ module "mod_ops_network" {
   location            = var.location
   resource_group_name = module.mod_ops_resource_group.name
 
-  // Firewall
-  firewall_private_ip_address = module.mod_hub_network.private_ip
-
   // Operations Spoke Configuration
   spoke_vnetname           = var.ops_virtual_network_name
   spoke_vnet_address_space = var.ops_spoke_vnet_address_space
 
   // Operations Spoke Subnets
-  spoke_subnets                      = var.ops_spoke_subnets
+  spoke_subnets = var.ops_spoke_subnets
+
+  // Operations Spoke Network Security Group
   spoke_network_security_group_name  = var.ops_network_security_group_name
   spoke_network_security_group_rules = var.ops_network_security_group_rules
-  spoke_route_table_name             = var.ops_route_table_name
+
+  // Operations Spoke Route Table
+  spoke_route_table_name = var.ops_route_table_name
+  spoke_route_table_routes = [
+    {
+      name                   = "RouteToAzureFirewall"
+      address_prefix         = "0.0.0.0/0"
+      next_hop_type          = "VirtualAppliance"
+      next_hop_in_ip_address = module.mod_hub_network.private_ip
+    }
+  ]
 
   // Loggging Settings
   spoke_log_storage_account_name       = var.ops_log_storage_account_name
@@ -294,18 +303,27 @@ module "mod_svcs_network" {
   location            = var.location
   resource_group_name = module.mod_svcs_resource_group.name
 
-  // Firewall
-  firewall_private_ip_address = module.mod_hub_network.private_ip
-
   // Shared Services Spoke Configuration
   spoke_vnetname           = var.svcs_virtual_network_name
   spoke_vnet_address_space = var.svcs_spoke_vnet_address_space
 
   // Shared Services Spoke Subnets
-  spoke_subnets                      = var.svcs_spoke_subnets
+  spoke_subnets = var.svcs_spoke_subnets
+
+  // Shared Services Spoke Network Security Group
   spoke_network_security_group_name  = var.svcs_network_security_group_name
   spoke_network_security_group_rules = var.svcs_network_security_group_rules
-  spoke_route_table_name             = var.svcs_route_table_name
+
+  // Shared Services Spoke Route Table
+  spoke_route_table_name = var.svcs_route_table_name
+  spoke_route_table_routes = [
+    {
+      name                   = "RouteToAzureFirewall"
+      address_prefix         = "0.0.0.0/0"
+      next_hop_type          = "VirtualAppliance"
+      next_hop_in_ip_address = module.mod_hub_network.private_ip
+    }
+  ]
 
   // Loggging Settings
   spoke_log_storage_account_name       = var.svcs_log_storage_account_name

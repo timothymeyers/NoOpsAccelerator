@@ -6,6 +6,11 @@ output "firewall_private_ip_address" {
   value       = module.mod_hub_network.private_ip
 }
 
+output "firewall_public_ip_address" {
+  description = "The Firewall Public  IP Address"
+  value       = module.mod_hub_network.public_ip
+}
+
 output "hub_subid" {
   description = "Subscription ID where the Hub Resource Group is provisioned"
   value       = var.hub_subscription_id

@@ -70,16 +70,32 @@ module "mod_hub_subnet" {
   ]
   source = "./subnet"
 
-  location                     = var.location
-  resource_group_name          = var.resource_group_name
-  virtual_network_name         = module.mod_hub_network.virtual_network_name
-  hub_subnets                  = var.hub_subnets
+  // Global Settings
+  location             = var.location
+  resource_group_name  = var.resource_group_name
+  virtual_network_name = module.mod_hub_network.virtual_network_name
+
+  // Subnet Parameters
+  subnets = var.hub_subnets
+
+  // Network Security Group Parameters
   network_security_group_name  = var.hub_network_security_group_name
   network_security_group_rules = var.hub_network_security_group_rules
 
-  routetable_name             = var.hub_route_table_name
-  firewall_private_ip_address = module.mod_networking_hub_firewall.private_ip
+  // Hub Route Table Name
+  routetable_name = var.hub_route_table_name
 
+  // Hub Route Table Routes
+  route_table_routes = [
+    {
+      name                   = "RouteToAzureFirewall"
+      address_prefix         = "0.0.0.0/0"
+      next_hop_type          = "VirtualAppliance"
+      next_hop_in_ip_address = module.mod_networking_hub_firewall.private_ip
+    }
+  ]
+
+  // Tags
   tags = var.tags
 }
 

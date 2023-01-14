@@ -117,7 +117,7 @@ variable "management_groups" {
   }))
   description = "The list of management groups to be created under the root."
   default = {
-    "platform" = {
+    "platforms" = {
       display_name               = "platforms"
       management_group_name      = "platforms"
       parent_management_group_id = "anoa"
@@ -579,7 +579,7 @@ variable "firewall_policy_network_rule_collection" {
     {
       action   = "Allow"
       name     = "AksEgressNetworkPolicyRule"
-      priority = 200
+      priority = 210
       rules = [{
         description           = "Allow traffic to AKS Egress Network Policy Rule"
         destination_address   = null

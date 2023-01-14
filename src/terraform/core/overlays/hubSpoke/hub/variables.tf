@@ -50,7 +50,7 @@ variable "hub_network_security_group_name" {
 }
 
 variable "hub_network_security_group_rules" {
-  description = "A complex object that describes network security group rules for the spoke network"
+  description = "A complex object that describes network security group rules for the hub network"
   type = map(object({
     name                       = string
     priority                   = string
@@ -67,6 +67,12 @@ variable "hub_network_security_group_rules" {
 variable "hub_route_table_name" {
   description = "The name of the Route Table."
   type        = string
+}
+
+variable "hub_route_table_subnet_associations" {
+  description = "A complex object that describes subnet associations for the hub network"
+  type        = map(any)
+  default     = {}
 }
 
 #################################

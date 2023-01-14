@@ -18,12 +18,15 @@ AUTHOR/S: jspinella
 ### STAGE 1: Build out workload spoke network   ###
 ###################################################
 module "mod_spoke_network" {
-  source     = "./virtualNetwork"
+  source = "./virtualNetwork"
 
+  // Global Settings
   location            = var.location
   resource_group_name = var.resource_group_name
-  vnet_name           = var.spoke_vnetname
-  vnet_address_space  = var.spoke_vnet_address_space
+
+  // Virtual Network Settings
+  vnet_name          = var.spoke_vnetname
+  vnet_address_space = var.spoke_vnet_address_space
 
   // Logging
   log_storage_account_name       = var.spoke_log_storage_account_name
@@ -33,6 +36,7 @@ module "mod_spoke_network" {
   enable_resource_locks = var.enable_resource_locks
   lock_level            = var.lock_level
 
+  // Tags
   tags = var.tags
 }
 
@@ -42,20 +46,27 @@ module "mod_spoke_subnets" {
   ]
   source = "./subnet"
 
-  location                     = var.location
-  resource_group_name          = var.resource_group_name
-  virtual_network_name         = module.mod_spoke_network.virtual_network_name
-  spoke_subnets                = var.spoke_subnets
+  // Global Settings
+  location             = var.location
+  resource_group_name  = var.resource_group_name
+  virtual_network_name = module.mod_spoke_network.virtual_network_name
+
+  // Subnets
+  spoke_subnets = var.spoke_subnets
+
+  // Network Security Group Settings
   network_security_group_name  = var.spoke_network_security_group_name
   network_security_group_rules = var.spoke_network_security_group_rules
 
-  routetable_name             = var.spoke_route_table_name
-  firewall_private_ip_address = var.firewall_private_ip_address
+  // Route Table Settings
+  routetable_name      = var.spoke_route_table_name
+  route_table_routes   = var.spoke_route_table_routes
+  subnets_to_associate = var.spoke_route_table_subnet_associations
 
   // Resource Locks
   enable_resource_locks = var.enable_resource_locks
   lock_level            = var.lock_level
 
-
+  // Tags
   tags = var.tags
 }

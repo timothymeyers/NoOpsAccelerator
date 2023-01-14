@@ -20,6 +20,12 @@ variable "deploy_environment" {
   default     = "dev"
 }
 
+variable "virtual_network_name" {
+  description = "Specifies the name of the virtual network to use for the jumpbox"
+  default     = "JumpboxVnet"
+  type        = string
+}
+
 variable "resource_group_name" {
   description = "Specifies the resource group name"
   default     = "rG"
@@ -188,3 +194,48 @@ variable "private_cluster_enabled" {
   default = false
 }
 
+#####################################
+# AKS Jumpbox Configuration         #
+#####################################
+
+variable "create_jumpbox" {
+  description = "Specifies whether to create a jumpbox"
+  type        = bool
+  default     = true
+}
+
+variable "vm_subnet_id" {
+  description = "Specifies the subnet id of the jumpbox"
+  type        = string
+  default     = ""
+}
+
+variable "network_security_group_name" {
+  description = "Specifies the name of the network security group"
+  type        = string
+  default     = "jumpbox-nsg"
+}
+
+variable "size_linux_jumpbox" {
+  description = "Specifies the size of the jumpbox"
+  type        = string
+  default     = "Standard_D2s_v3"
+}
+
+variable "vm_os_disk_image" {
+  type        = map(string)
+  description = "Specifies the os disk image of the virtual machine"
+  default     = {}
+}
+
+variable "admin_username" {
+  description = "Specifies the admin username of the jumpbox"
+  type        = string
+  default     = "jumpboxadmin"
+}
+
+variable "admin_password" {
+  description = "Specifies the admin password of the jumpbox"
+  type        = string
+  default     = ""
+}

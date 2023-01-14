@@ -16,7 +16,7 @@ variable "virtual_network_name" {
   type        = string
 }
 
-variable "hub_subnets" {
+variable "subnets" {
   description = "A complex object that describes subnets for the spoke network"
   type = list(object({
     name              = string
@@ -26,6 +26,16 @@ variable "hub_subnets" {
     enforce_private_link_endpoint_network_policies = bool
     enforce_private_link_service_network_policies  = bool
   }))
+}
+
+variable "route_table_routes" {
+  type = list(object({
+    name                   = string
+    address_prefix         = string
+    next_hop_type          = string
+    next_hop_in_ip_address = string
+  }))
+  description = "The route tables routes with their properties."
 }
 
 variable "network_security_group_name" {
@@ -59,8 +69,9 @@ variable "routetable_name" {
   type        = string
 }
 
-variable "firewall_private_ip_address" {
-  description = "The IP Address of the Firewall"
-  type        = string
+variable "subnets_to_associate" {
+  description = "(Optional) Specifies the subscription id, resource group name, and name of the subnets to associate"
+  type        = map(any)
+  default     = {}
 }
 

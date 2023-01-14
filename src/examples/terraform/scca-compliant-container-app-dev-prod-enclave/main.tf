@@ -117,23 +117,24 @@ module "deny_resources_types" {
   depends_on = [
     module.mod_management_group
   ]
-  source          = "../../../terraform/core/modules/Microsoft.Authorization/policyDefinition"
-  file_path       = "../../../policyascode/definitions/custom/general/deny_resources_types.json"
-  policy_name     = "deny_resources_types"
-  display_name    = "Deny Azure Resource types"
-  policy_category = "General"
-  //management_group_id = module.management_group.management_groups[var.root_management_group_id].id
+  source              = "../../../terraform/core/modules/Microsoft.Authorization/policyDefinition"
+  file_path           = "../../../policyascode/definitions/custom/general/deny_resources_types.json"
+  policy_name         = "deny_resources_types"
+  display_name        = "Deny Azure Resource types"
+  policy_category     = "General"
+  management_group_id = module.mod_management_group.management_groups["/providers/Microsoft.Management/managementGroups/anoa"].id
 }
 
 module "allow_regions" {
   depends_on = [
     module.mod_management_group
   ]
-  source          = "../../../terraform/core/modules/Microsoft.Authorization/policyDefinition"
-  file_path       = "../../../policyascode/definitions/custom/general/allow_regions.json"
-  policy_name     = "allow_regions"
-  display_name    = "Allow Azure Regions"
-  policy_category = "General"
+  source              = "../../../terraform/core/modules/Microsoft.Authorization/policyDefinition"
+  file_path           = "../../../policyascode/definitions/custom/general/allow_regions.json"
+  policy_name         = "allow_regions"
+  display_name        = "Allow Azure Regions"
+  policy_category     = "General"
+  management_group_id = module.mod_management_group.management_groups["/providers/Microsoft.Management/managementGroups/anoa"].id
 }
 
 ##################
@@ -145,11 +146,12 @@ module "deploy_resource_diagnostic_setting" {
   depends_on = [
     module.mod_management_group
   ]
-  source          = "../../../terraform/core/modules/Microsoft.Authorization/policyDefinition"
-  for_each        = toset([for p in fileset("../../../policyascode/definitions/custom/Monitoring", "*.json") : trimsuffix(basename(p), ".json")])
-  file_path       = "../../../policyascode/definitions/custom/Monitoring/${each.key}.json"
-  policy_name     = each.key
-  policy_category = "Monitoring"
+  source              = "../../../terraform/core/modules/Microsoft.Authorization/policyDefinition"
+  for_each            = toset([for p in fileset("../../../policyascode/definitions/custom/Monitoring", "*.json") : trimsuffix(basename(p), ".json")])
+  file_path           = "../../../policyascode/definitions/custom/Monitoring/${each.key}.json"
+  policy_name         = each.key
+  policy_category     = "Monitoring"
+  management_group_id = module.mod_management_group.management_groups["/providers/Microsoft.Management/managementGroups/anoa"].id
 }
 
 ##################
@@ -159,11 +161,12 @@ module "deny_nic_public_ip" {
   depends_on = [
     module.mod_management_group
   ]
-  source          = "../../../terraform/core/modules/Microsoft.Authorization/policyDefinition"
-  file_path       = "../../../policyascode/definitions/custom/Network/deny_nic_public_ip.json"
-  policy_name     = "deny_nic_public_ip"
-  display_name    = "Network interfaces should not have public IPs"
-  policy_category = "Network"
+  source              = "../../../terraform/core/modules/Microsoft.Authorization/policyDefinition"
+  file_path           = "../../../policyascode/definitions/custom/Network/deny_nic_public_ip.json"
+  policy_name         = "deny_nic_public_ip"
+  display_name        = "Network interfaces should not have public IPs"
+  policy_category     = "Network"
+  management_group_id = module.mod_management_group.management_groups["/providers/Microsoft.Management/managementGroups/anoa"].id
 }
 
 ##################
@@ -173,24 +176,26 @@ module "storage_enforce_https" {
   depends_on = [
     module.mod_management_group
   ]
-  source          = "../../../terraform/core/modules/Microsoft.Authorization/policyDefinition"
-  file_path       = "../../../policyascode/definitions/custom/Storage/storage_enforce_https.json"
-  policy_name     = "storage_enforce_https"
-  display_name    = "Secure transfer to storage accounts should be enabled"
-  policy_category = "Storage"
-  policy_mode     = "Indexed"
+  source              = "../../../terraform/core/modules/Microsoft.Authorization/policyDefinition"
+  file_path           = "../../../policyascode/definitions/custom/Storage/storage_enforce_https.json"
+  policy_name         = "storage_enforce_https"
+  display_name        = "Secure transfer to storage accounts should be enabled"
+  policy_category     = "Storage"
+  policy_mode         = "Indexed"
+  management_group_id = module.mod_management_group.management_groups["/providers/Microsoft.Management/managementGroups/anoa"].id
 }
 
 module "storage_enforce_minimum_tls1_2" {
   depends_on = [
     module.mod_management_group
   ]
-  source          = "../../../terraform/core/modules/Microsoft.Authorization/policyDefinition"
-  file_path       = "../../../policyascode/definitions/custom/Storage/storage_enforce_minimum_tls1_2.json"
-  policy_name     = "storage_enforce_minimum_tls1_2"
-  display_name    = "Minimum TLS version for data in transit to storage accounts should be set"
-  policy_category = "Storage"
-  policy_mode     = "Indexed"
+  source              = "../../../terraform/core/modules/Microsoft.Authorization/policyDefinition"
+  file_path           = "../../../policyascode/definitions/custom/Storage/storage_enforce_minimum_tls1_2.json"
+  policy_name         = "storage_enforce_minimum_tls1_2"
+  display_name        = "Minimum TLS version for data in transit to storage accounts should be set"
+  policy_category     = "Storage"
+  policy_mode         = "Indexed"
+  management_group_id = module.mod_management_group.management_groups["/providers/Microsoft.Management/managementGroups/anoa"].id
 }
 
 ##################
@@ -201,19 +206,37 @@ module "inherit_resource_group_tags_modify" {
   depends_on = [
     module.mod_management_group
   ]
-  source          = "../../../terraform/core/modules/Microsoft.Authorization/policyDefinition"
-  file_path       = "../../../policyascode/definitions/custom/Tags/inherit_resource_group_tags_modify.json"
-  policy_name     = "inherit_resource_group_tags_modify"
-  display_name    = "Resources should inherit Resource Group Tags and Values with Modify Remediation"
-  policy_category = "Tags"
-  policy_mode     = "Indexed"
+  source              = "../../../terraform/core/modules/Microsoft.Authorization/policyDefinition"
+  file_path           = "../../../policyascode/definitions/custom/Tags/inherit_resource_group_tags_modify.json"
+  policy_name         = "inherit_resource_group_tags_modify"
+  display_name        = "Resources should inherit Resource Group Tags and Values with Modify Remediation"
+  policy_category     = "Tags"
+  policy_mode         = "Indexed"
+  management_group_id = module.mod_management_group.management_groups["/providers/Microsoft.Management/managementGroups/anoa"].id
 }
 
 ##############################################################
 ### STAGE 2.1: Policy Initiative Definitions Configuations ###
 ##############################################################
 
-// view the policy initiative definitions in the policy_initiative.tf file
+#####################################################
+# Monitoring: Resource & Activity Log Forwarders  ###
+#####################################################
+module "platform_diagnostics_initiative" {
+  depends_on = [
+    module.deploy_resource_diagnostic_setting
+  ]
+  source                  = "../../../terraform/core/modules/Microsoft.Authorization/policyInitiative"
+  initiative_name         = "platform_diagnostics_initiative"
+  initiative_display_name = "[Platform]: Diagnostics Settings Policy Initiative"
+  initiative_description  = "Collection of policies that deploy resource and activity log forwarders to logging core resources"
+  initiative_category     = "Monitoring"
+  merge_effects           = false # will not merge "effect" parameters
+  management_group_id     = module.mod_management_group.management_groups["/providers/Microsoft.Management/managementGroups/anoa"].id
+
+  # Populate member_definitions with a for loop (not explicit)
+  member_definitions = [for mon in module.deploy_resource_diagnostic_setting : mon.definition]
+}
 
 #########################################
 ### STAGE 3: Hub/Spoke Configuations  ###
@@ -270,6 +293,7 @@ module "mod_landingzone_hub2spoke" {
   hub_route_table_name             = local.hubRouteTableName
   hub_log_storage_account_name     = local.hubLogStorageAccountName
 
+  // Hub Logging Settings
   hub_logging_storage_account_config = var.hub_logging_storage_account_config
 
 
@@ -289,16 +313,19 @@ module "mod_landingzone_hub2spoke" {
   firewall_policy_network_rule_collection     = var.firewall_policy_network_rule_collection
   firewall_policy_application_rule_collection = var.firewall_policy_application_rule_collection
 
+  // Hub Firewall Client Subnet Settings
   firewall_client_subnet_address_prefix               = var.firewall_client_subnet_address_prefix
   firewall_client_subnet_service_endpoints            = var.firewall_client_subnet_service_endpoints
   firewall_client_publicIP_address_availability_zones = var.firewall_client_publicIP_address_availability_zones
   firewall_client_public_ip_address_name              = local.firewallClientPublicIPAddressName
 
+  // Hub Firewall Management Subnet Settings
   firewall_management_subnet_address_prefix               = var.firewall_management_subnet_address_prefix
   firewall_management_subnet_service_endpoints            = var.firewall_management_subnet_service_endpoints
   firewall_management_publicIP_address_availability_zones = var.firewall_management_publicIP_address_availability_zones
   firewall_management_public_ip_address_name              = local.firewallManagementPublicIPAddressName
 
+  // Hub Firewall Supernet Settings
   firewall_supernet_IP_address = var.firewall_supernet_IP_address
 
   ################
@@ -374,18 +401,65 @@ module "mod_landingzone_hub2spoke" {
 ################################################
 
 ##################
-# General     ####
+# Monitoring    ##
 ##################
 
+module "mod_mg_platform_diagnostics_initiative" {
+  source               = "../../../terraform/core/modules/Microsoft.Authorization/policySetAssignment/managementGroup"
+  initiative           = module.platform_diagnostics_initiative.initiative
+  assignment_scope     = module.mod_management_group.management_groups["/providers/Microsoft.Management/managementGroups/anoa"].id
+  assignment_location  = var.location
+  skip_remediation     = true
+  skip_role_assignment = false
 
-###################
-# Monitoring   ####
-###################
+  role_definition_ids = [
+    data.azurerm_role_definition.contributor.id # using explicit roles
+  ]
+
+  non_compliance_messages = {
+    null                                        = "The Default non-compliance message for all member definitions"
+    "DeployApplicationGatewayDiagnosticSetting" = "The non-compliance message for the deploy_application_gateway_diagnostic_setting definition"
+  }
+
+  assignment_parameters = {
+    workspaceId                                        = module.mod_landingzone_hub2spoke.laws_resource_id
+    storageAccountId                                   = module.mod_landingzone_hub2spoke.laws_storage_account_id
+    eventHubName                                       = null
+    eventHubAuthorizationRuleId                        = null
+    metricsEnabled                                     = "True"
+    logsEnabled                                        = "True"
+    effect_DeployApplicationGatewayDiagnosticSetting   = "DeployIfNotExists"
+    effect_DeployEventhubDiagnosticSetting             = "DeployIfNotExists"
+    effect_DeployFirewallDiagnosticSetting             = "DeployIfNotExists"
+    effect_DeployKeyvaultDiagnosticSetting             = "AuditIfNotExists"
+    effect_DeployLoadbalancerDiagnosticSetting         = "AuditIfNotExists"
+    effect_DeployNetworkInterfaceDiagnosticSetting     = "AuditIfNotExists"
+    effect_DeployNetworkSecurityGroupDiagnosticSetting = "AuditIfNotExists"
+    effect_DeployPublicIpDiagnosticSetting             = "AuditIfNotExists"
+    effect_DeployStorageAccountDiagnosticSetting       = "DeployIfNotExists"
+    effect_DeploySubscriptionDiagnosticSetting         = "DeployIfNotExists"
+    effect_DeployVnetDiagnosticSetting                 = "AuditIfNotExists"
+    effect_DeployVnetGatewayDiagnosticSetting          = "AuditIfNotExists"
+  }
+}
 
 
 ##################
-# Storage     ####
+# Storage
 ##################
+/* module "mod_mg_storage_enforce_https" {
+  source            = "../../../terraform/core/modules/Microsoft.Authorization/policyDefAssignment/managementGroup"
+  definition        = module.storage_enforce_https.definition
+  assignment_scope  = module.mod_management_group.management_groups["/providers/Microsoft.Management/managementGroups/anoa"].id
+  assignment_effect = "Deny"
+}
+
+module "mod_mg_storage_enforce_minimum_tls1_2" {
+  source            = "../../../terraform/core/modules/Microsoft.Authorization/policyDefAssignment/managementGroup"
+  definition        = module.storage_enforce_minimum_tls1_2.definition
+  assignment_scope  = module.mod_management_group.management_groups["/providers/Microsoft.Management/managementGroups/anoa"].id
+  assignment_effect = "Deny"
+} */
 
 ###############################################
 ### STAGE 5: Shared Services Configuations  ###
@@ -402,6 +476,7 @@ module "mod_landingzone_hub2spoke" {
 # Dev Team 1 Environment Spoke Network. 
 # This is the network for the Dev Team 1 environment. 
 # This is a spoke network that is peered to the hub network. 
+# This could be updated to use a object to create multiple spoke networks.
 module "mod_dev_team1_env_spoke_network" {
   source = "./support/workloads/devEnvSpoke"
 
@@ -433,6 +508,7 @@ module "mod_dev_team1_env_spoke_network" {
 
   // Firewall Settings
   firewall_private_ip = module.mod_landingzone_hub2spoke.firewall_private_ip_address
+  firewall_public_ip  = module.mod_landingzone_hub2spoke.firewall_public_ip_address
 
   // Hub Settings
   hub_virtual_network_id   = module.mod_landingzone_hub2spoke.hub_vnet_id
@@ -440,7 +516,7 @@ module "mod_dev_team1_env_spoke_network" {
   hub_resource_group_name  = module.mod_landingzone_hub2spoke.hub_rgname
 
   // AKS Settings
-  aks_prefix_name = local.wlShortName
+  aks_prefix_name           = local.wlShortName
   use_user_defined_identity = var.use_user_defined_identity
 
   // ACR Settings
@@ -490,6 +566,7 @@ module "mod_dev_team2_env_spoke_network" {
 
   // Firewall Settings
   firewall_private_ip = module.mod_landingzone_hub2spoke.firewall_private_ip_address
+  firewall_public_ip  = module.mod_landingzone_hub2spoke.firewall_public_ip_address
 
   // Hub Settings
   hub_virtual_network_id   = module.mod_landingzone_hub2spoke.hub_vnet_id
@@ -497,7 +574,7 @@ module "mod_dev_team2_env_spoke_network" {
   hub_resource_group_name  = module.mod_landingzone_hub2spoke.hub_rgname
 
   // AKS Settings
-  aks_prefix_name = local.dev2ShortName
+  aks_prefix_name           = local.dev2ShortName
   use_user_defined_identity = var.use_user_defined_identity
 
   // ACR Settings

@@ -130,7 +130,7 @@ $location = [your region]
 
     - parAssignableScopeManagementGroupId: **ANOA** (if you are not using the default, change to the name of your intermediate management group)
 
-1.  Issue the command updating the **--management-group-id** paramter to your intermediate management group name or **ANOA** as the default
+1.  Issue the command updating the **--management-group-id** parameter to your intermediate management group name or **ANOA** as the default
 
     **Azure CLI**
     ``` PowerShell

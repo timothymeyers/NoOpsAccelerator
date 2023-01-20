@@ -1,76 +1,63 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-variable "vnet_name" {
-  description = "The name of the virtual network"
-  type        = string
-}
-variable "vnet_address_space" {
-  description = "The address space to be used for the virtual network"
-  type        = list(string)
-}
 variable "resource_group_name" {
-  description = "(Required) Name of the resource group where to create the resource. Changing this forces a new resource to be created. "
-  type        = string
-}
-
-variable "log_analytics_storage_id" {
-  description = "The id of the storage account that stores log analytics diagnostic logs"
-  type        = string
-  default     = ""
-}
-
-variable "log_analytics_workspace_id" {
-  description = "The id of the log analytics workspace"
-  type        = string
-  default     = ""
+  description = "A container that holds related resources for an Azure solution" 
 }
 
 variable "location" {
-  description = "(Required) Specifies the Azure location to deploy the resource. Changing this forces a new resource to be created."
-  type        = string
+  description = "The location/region to keep all your network resources. To get the list of all locations with table format from azure cli, run 'az account list-locations -o table'"
 }
 
-variable "enable_ddos_protection" {
-  description = "Enable DDoS protection"
-  type        = bool
-  default     = false
-}
+####################################
+# Resource Locks Configuration    ##
+####################################
 
 variable "enable_resource_locks" {
-  description = "Enable resource locks"
+  description = "(Optional) Enable resource locks"
   type        = bool
+  default     = false
 }
 
 variable "lock_level" {
   description = "(Optional) id locks are enabled, Specifies the Level to be used for this Lock."
   type        = string
+  default     = "CanNotDelete"
 }
 
-variable "enable_diagnostic_settings" {
-  description = "Enable diagnostic settings on this resource"
-  type        = bool
+####################################
+# Virtual Network Configuration   ##
+####################################
+
+variable "vnetwork_name" {
+  description = "Name of your Azure Virtual Network"
+}
+
+variable "vnet_address_space" {
+  description = "The address space to be used for the Azure virtual network."
+}
+
+variable "create_ddos_plan" {
+  description = "Create an ddos plan - Default is false"
   default     = false
 }
 
-variable "vnet_log_categories" {
-  description = "List of Diagnostic Log Categories"
-  type        = list(string)
+variable "ddos_plan_name" {
+  description = "The name of AzureNetwork DDoS Protection Plan"
+}
+
+variable "dns_servers" {
+  description = "List of dns servers to use for virtual network"
   default     = []
 }
 
-variable "vnet_metric_categories" {
-  description = "List of Diagnostic Metric Categories"
-  type        = list(string)
-  default     = []
+variable "create_network_watcher" {
+  description = "Controls if Network Watcher resources should be created for the Azure subscription"
+  default     = false
 }
-
 
 variable "tags" {
   description = "A map of tags to add to all resources"
   type        = map(string)
   default     = {}
 }
-
-
-

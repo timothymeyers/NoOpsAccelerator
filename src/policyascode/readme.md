@@ -10,17 +10,12 @@
 </p>
 <!-- markdownlint-enable MD033 -->
 
-- [Repo Folder Structure](#repo-folder-structure)
+- [Overview](#overview)
 
-## Repo Folder Structure
+## Overview
 
-The folder structure of this repo is as follows:
+In this folder, you'll find **Azure Policy** (Policy as Code) policies (json) that handles **built-in** and **custom Policies**.
 
-```text 
-├───src
-│   ├───policyascode
-│   │   ├───definations
-│   │   │   └───built-in
-|   |   |   └───custom
-│   │   ├───readme.md
-```
+The **Azure Policy** is a service that helps you manage and enforce your compliance in Azure. It is a service that evaluates your resources against rules that you define and enforces the rules on your resources.
+
+You can use Azure Policy to define rules that are enforced on your resources at deployment time or after deployment. You can also use Azure Policy to define rules that are evaluated against your resources at regular intervals. 

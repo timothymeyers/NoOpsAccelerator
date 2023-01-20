@@ -34,42 +34,6 @@ variable "lock_level" {
   default = "CanNotDelete"
 }
 
-variable "enable_diagnostic_settings" {
-  description = "Enable diagnostic settings"
-  type        = bool
-  default = false
-}
-
-variable "bastion_log_categories" {
-  description = "List of Diagnostic Log Categories"
-  type        = list(string)
-  default = [ "BastionAuditLogs" ]
-}
-
-variable "bastion_metric_categories" {
-  description = "List of Diagnostic Metric Categories"
-  type        = list(string)
-  default = [ "AllMetrics" ]
-}
-
-variable "flow_log_retention_in_days" {
-  description = "The number of days to retain flow log data"
-  default     = "7"
-  type        = number
-}
-
-variable "log_analytics_storage_resource_id" {
-  description = "The id of the storage account that stores log analytics diagnostic logs"
-  type        = string
-  default = ""
-}
-
-variable "log_analytics_workspace_resource_id" {
-  description = "The id of the log analytics workspace"
-  type        = string
-  default = ""
-}
-
 variable "bastion_host_name" {
   description = "The name of the Bastion Host"
   type        = string

@@ -24,7 +24,7 @@ resource "azurerm_firewall_policy_rule_collection_group" "firewallpolicyrulecoll
       priority = application_rule_collection.value["priority"]
 
       dynamic "rule" {
-        for_each = application_rule_collection.value.rule
+        for_each = application_rule_collection.value.rules
         content {
           # destination_fqdn_tags - (optional) is a type of set of string
           destination_fqdn_tags = rule.value["destination_fqdn_tags"]
@@ -64,7 +64,7 @@ resource "azurerm_firewall_policy_rule_collection_group" "firewallpolicyrulecoll
       priority = network_rule_collection.value["priority"]
 
       dynamic "rule" {
-        for_each = network_rule_collection.value.rule
+        for_each = network_rule_collection.value.rules
         content {
           # destination_addresses - (optional) is a type of set of string
           destination_addresses = rule.value["destination_addresses"]
@@ -88,4 +88,11 @@ resource "azurerm_firewall_policy_rule_collection_group" "firewallpolicyrulecoll
     }
   }
 
+  lifecycle {
+    ignore_changes = [
+      application_rule_collection,
+      network_rule_collection,
+      nat_rule_collection
+    ]
+  }
 }

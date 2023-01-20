@@ -21,8 +21,8 @@ variable "virtual_network_name" {
   type        = string
 }
 
-variable subnet_name {
-  description = "(Required) The name of the subnet the virtual machine resides in"
+variable subnet_id {
+  description = "(Required) The id of the subnet the virtual machine resides in"
   type        = string
 }
 
@@ -134,9 +134,11 @@ variable "tags" {
 variable "log_analytics_workspace_id" {
   description = "Specifies the log analytics workspace id"
   type        = string
+  default = ""
 }
 
 variable "log_analytics_workspace_key" {
   description = "Specifies the log analytics workspace key"
   type        = string
+  default = ""
 }

@@ -11,17 +11,6 @@ variable "resource_group_name" {
   default     = ""
 }
 
-variable "subnet_name" {
-  description = "(Required) The name of the subnet the Bastion Host resides in"
-  type        = string
-}
-
-variable "network_security_group_name" {
-  description = "The name of the network security group the virtual machine resides in"
-  type        = string
-  default     = ""
-}
-
 variable "org_prefix" {
   description = "A name for the organization. It defaults to anoa."
   type        = string
@@ -93,34 +82,43 @@ variable "bastion_subnet_service_endpoints" {
   default     = []
 }
 
-/* variable "bastion_nsg_rules" {
-  description = "A list of maps containing the following keys: name, description, access, priority, protocol, direction, source_port_ranges, source_address_prefix, destination_port_ranges, destination_address_prefix"
-  type        = list(object)
-  default = [
-    {
-      name                       = "AllowSshInbound"
-      priority                   = "100"
-      direction                  = "Inbound"
-      access                     = "Allow"
-      protocol                   = "Tcp"
-      source_port_range          = "22"
-      destination_port_range     = ""
-      source_address_prefix      = "*"
-      destination_address_prefix = ""
-    },
-    {
-      name                       = "AllowRdpInbound"
-      priority                   = "101"
-      direction                  = "Inbound"
-      access                     = "Allow"
-      protocol                   = "Tcp"
-      source_port_range          = "3389"
-      destination_port_range     = ""
-      source_address_prefix      = "*"
-      destination_address_prefix = ""
-    }
-  ]
-} */
+variable "bastion_host_nsg_inbound_rules" {
+  type        = list(map(string))
+  default     = []
+  description = "List of objects that represent the configuration of each inbound rule."
+  # inbound_rules = [
+  #   {
+  #     name                       = ""
+  #     priority                   = ""
+  #     access                     = ""
+  #     protocol                   = ""
+  #     source_address_prefix      = ""
+  #     source_port_range          = ""
+  #     destination_address_prefix = ""
+  #     destination_port_range     = ""
+  #     description                = ""
+  #   }
+  # ]
+}
+
+variable "bastion_host_nsg_outbound_rules" {
+  type        = list(map(string))
+  default     = []
+  description = "List of objects that represent the configuration of each outbound rule."
+  # outbound_rules = [
+  #   {
+  #     name                       = ""
+  #     priority                   = ""
+  #     access                     = ""
+  #     protocol                   = ""
+  #     source_address_prefix      = ""
+  #     source_port_range          = ""
+  #     destination_address_prefix = ""
+  #     destination_port_range     = ""
+  #     description                = ""
+  #   }
+  # ]
+}
 
 ##########################################
 # Bastion Diagnostics Configuration    ###
@@ -175,6 +173,12 @@ variable "keyvault_name" {
 # Jumpbox VM Configuration     ##
 #################################
 
+variable "vm_subnet_id" {
+  description = "The subnet id of the virtual machine"
+  type        = string
+  default     = ""
+}
+
 variable "use_random_password" {
   description = "Set this to true to use a random password for the windows VM. If set to false, the password will be stored in the terraform state file."
   type        = bool
@@ -187,7 +191,13 @@ variable "ssh_key_name" {
   description = "The name of the Key Vault secret that holds the SSH public key to be used"
 }
 
-variable "size_jumpbox" {
+variable "size_linux_jumpbox" {
+  description = "The size of the windows virtual machine"
+  type        = string
+  default     = "Standard_B2s"
+}
+
+variable "size_windows_jumpbox" {
   description = "The size of the windows virtual machine"
   type        = string
   default     = "Standard_D2s_v3"

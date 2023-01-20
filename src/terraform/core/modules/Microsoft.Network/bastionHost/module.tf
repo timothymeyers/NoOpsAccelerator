@@ -42,18 +42,6 @@ resource "azurerm_bastion_host" "bastion_host" { # Bastion Host
 ################################################
 # MODULES                                      #
 ################################################
-// Setup Log Analytics for Bastion Host
-module "mod_bastion_host_diagnostics_settings" {
-  count                      = var.enable_diagnostic_settings ? 1 : 0
-  source                     = "../../Microsoft.Insights/diagnosticSettings"
-  name                       = var.enable_diagnostic_settings ? "${var.bastion_host_name}-diagnostics" : ""
-  target_resource_id         = azurerm_bastion_host.bastion_host.id
-  log_analytics_workspace_id = var.log_analytics_workspace_resource_id
-
-  logs    = var.bastion_log_categories
-  metrics = var.bastion_metric_categories
-}
-
 // Setup Public IP for Bastion Host
 module "mod_bastion_host_pip" { # Public IP for Bastion Host
   source = "../publicIPAddress"
@@ -65,9 +53,7 @@ module "mod_bastion_host_pip" { # Public IP for Bastion Host
   public_ip_address_name              = var.public_ip_address_name
   resource_group_name                 = data.azurerm_resource_group.hub.name
   public_ip_address_sku_name          = var.public_ip_address_sku_name
-  public_ip_address_allocation        = var.public_ip_address_allocation
-  log_analytics_workspace_resource_id = var.log_analytics_workspace_resource_id
-  log_analytics_storage_resource_id   = var.log_analytics_storage_resource_id
+  public_ip_address_allocation        = var.public_ip_address_allocation  
 
 
   // Public IP Tags

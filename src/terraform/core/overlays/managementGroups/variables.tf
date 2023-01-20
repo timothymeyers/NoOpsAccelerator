@@ -33,10 +33,10 @@ variable "management_groups" {
   description = "The list of management groups to be created."
   default = {
     "root" = {
-      display_name = "anoa"
-      management_group_name = "anoa"
+      display_name               = "anoa"
+      management_group_name      = "anoa"
       parent_management_group_id = "value"
-      subscription_ids = []
+      subscription_ids           = []
     }
   }
 }

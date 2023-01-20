@@ -28,8 +28,7 @@ data "azurerm_virtual_network" "hub_bastion_host_vnet" {
   resource_group_name = data.azurerm_resource_group.hub.name
 }
 
-
-module "bastion_subnet" { # Bastion Subnet
+module "bastion_subnet" {
   source = "../../modules/Microsoft.Network/subnets"
 
   // Global Settings
@@ -39,17 +38,29 @@ module "bastion_subnet" { # Bastion Subnet
   resource_group_name  = data.azurerm_resource_group.hub.name
   virtual_network_name = data.azurerm_virtual_network.hub_bastion_host_vnet.name
 
-  name                                          = "AzureBastionSubnet"
+  subnet_name                                   = "AzureBastionSubnet"
   address_prefixes                              = [cidrsubnet(var.bastion_address_space, 0, 0)]
   service_endpoints                             = var.bastion_subnet_service_endpoints
   private_endpoint_network_policies_enabled     = false
   private_link_service_network_policies_enabled = false
+}
 
-  // Subnet Tags
-  tags = merge(var.tags, {
-    DeployedBy  = format("AzureNoOpsTF [%s]", terraform.workspace)
-    description = format("Subnet for Azure Bastion %s", local.bastionHostName)
-  })
+// NSG around the Azure Bastion Subnet. This is required for the Azure Bastion to work.
+module "mod_bastion_host_nsg" {
+  depends_on = [data.azurerm_resource_group.hub]
+  source     = "../../modules/Microsoft.Network/networkSecurityGroups"
+
+  // Global Settings  
+  resource_group_name = data.azurerm_resource_group.hub.name
+  location            = var.location
+
+  // Network Security Group Settings
+  name      = local.bastionHostNetworkSecurityGroupName  
+}
+
+resource "azurerm_subnet_network_security_group_association" "this" {
+  subnet_id                 = module.bastion_subnet.id
+  network_security_group_id = module.mod_bastion_host_nsg.network_security_group_id
 }
 
 module "mod_bastion_host" {
@@ -69,11 +80,6 @@ module "mod_bastion_host" {
   public_ip_address_allocation = local.bastionHostPublicIPAddressAllocationMethod
   ipconfig_name                = local.bastionNetworkInterfaceIpConfigurationName
   subnet_id                    = module.bastion_subnet.id
-
-  // Bastion Diagnostic Settings
-  enable_diagnostic_settings          = var.enable_bastion_diagnostics
-  log_analytics_workspace_resource_id = var.log_analytics_workspace_id
-  log_analytics_storage_resource_id   = var.log_analytics_storage_account_id
 
   // Bastion Resource Lock
   enable_resource_lock = var.enable_resource_lock
@@ -104,13 +110,13 @@ module "mod_linux_jumpbox" {
 
   // Jumpbox Settings
   vm_name                     = local.linuxVmName
-  subnet_name                 = var.subnet_name
+  subnet_id                   = var.vm_subnet_id
   network_interface_name      = local.linuxNetworkInterfaceName
   ip_configuration_name       = local.linuxNetworkInterfaceIpConfigurationName
-  network_security_group_name = var.network_security_group_name
+  network_security_group_name = module.mod_bastion_host_nsg.network_security_group_name
 
   // OS Settings
-  size           = var.size_jumpbox
+  size           = var.size_linux_jumpbox
   admin_username = var.admin_username
   admin_password = var.use_random_password ? null : var.admin_password
 
@@ -147,13 +153,13 @@ module "mod_windows_jumpbox" {
 
   // Jumpbox Settings
   vm_name                     = local.windowsVmName
-  subnet_name                 = var.subnet_name
+  subnet_id                   = var.vm_subnet_id
   network_interface_name      = local.windowsNetworkInterfaceName
   ip_configuration_name       = local.windowsNetworkInterfaceIpConfigurationName
-  network_security_group_name = var.network_security_group_name
+  network_security_group_name = module.mod_bastion_host_nsg.network_security_group_name
 
   // OS Settings
-  size           = var.size_jumpbox
+  size           = var.size_windows_jumpbox
   admin_username = var.admin_username
   admin_password = var.use_random_password ? null : var.admin_password
 

@@ -28,18 +28,6 @@ variable "public_ip_address_sku_name" {
   default = "Standard"
 }
 
-variable "log_analytics_workspace_resource_id" {
-  description = "The resource id of the Log Analytics Workspace"
-  type        = string
-  default = ""
-}
-
-variable "log_analytics_storage_resource_id" {
-  description = "The resource id of the Log Analytics Workspace Storage Account"
-  type        = string
-  default = ""
-}
-
 variable "tags" {
   description = "A map of tags to add to all resources"
   type        = map(string)
@@ -54,29 +42,5 @@ variable "disable_snat_ip_range" {
   description = "The address space to be used to ensure that SNAT is disabled."
   default     = ["0.0.0.0/0"]
   type        = list(any)
-}
-
-variable "enable_diagnostic_settings" {
-  description = "Enable diagnostic settings on this resource."
-  type        = bool
-  default = false
-}
-
-variable "pip_log_categories" {
-  description = "List of Diagnostic Log Categories"
-  type        = list(string)
-  default = [  ]
-}
-
-variable "pip_metric_categories" {
-  description = "List of Diagnostic Metric Categories"
-  type        = list(string)
-  default = [  ]
-}
-
-variable "flow_log_retention_in_days" {
-  description = "The number of days to retain flow log data"
-  default     = "7"
-  type        = number
 }
 

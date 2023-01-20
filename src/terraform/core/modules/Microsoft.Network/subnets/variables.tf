@@ -1,11 +1,6 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-variable "name" {
-  description = "The name of the subnet"
-  type        = string
-}
-
 variable "location" {
   description = "The location/region to keep all your network resources. To get the list of all locations with table format from azure cli, run 'az account list-locations -o table'"
   type        = string
@@ -21,28 +16,41 @@ variable "virtual_network_name" {
   type        = string
 }
 
+variable "subnet_name" {
+  description = "The name of the subnet"
+  type        = string
+}
+
 variable "address_prefixes" {
-  description = "The subnet address prefixes"
+  description = "The address prefix to use for the subnet"
   type        = list(string)
+  default     = []
 }
 
 variable "service_endpoints" {
-  description = "The service endpoints to optimize for this subnet"
+  description = "A list of service endpoints to enable on the subnet"
   type        = list(string)
+  default     = []
+}
+
+variable "delegations" {
+  description = "A list of delegations to apply to the subnet"
+  type = list(object({
+    name = string
+    service_delegation = object({
+      name    = string
+      actions = list(string)
+    })
+  }))
+  default = []
 }
 
 variable "private_endpoint_network_policies_enabled" {
-  description = "Enable or Disable network policies for the private endpoint on the subnet."
-  type        = bool
+  description = "Specifies whether network policies are enabled on the subnet"
+  type        = string
 }
 
 variable "private_link_service_network_policies_enabled" {
-  description = "Enable or Disable network policies for the private link service on the subnet."
-  type        = bool
+  description = "Specifies whether network policies are enabled on the subnet"
+  type        = string
 }
-
-variable "tags" {
-  description = "A map of tags to add to all resources"
-  type        = map(string)
-}
-

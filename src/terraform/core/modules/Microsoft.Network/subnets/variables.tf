@@ -16,19 +16,41 @@ variable "virtual_network_name" {
   type        = string
 }
 
-variable "subnets" {
-  description = "Subnets configuration"
+variable "subnet_name" {
+  description = "The name of the subnet"
+  type        = string
+}
+
+variable "address_prefixes" {
+  description = "The address prefix to use for the subnet"
+  type        = list(string)
+  default     = []
+}
+
+variable "service_endpoints" {
+  description = "A list of service endpoints to enable on the subnet"
+  type        = list(string)
+  default     = []
+}
+
+variable "delegations" {
+  description = "A list of delegations to apply to the subnet"
   type = list(object({
-    name                                           = string
-    address_prefixes                               = list(string)
-    service_endpoints                              = list(string)
-    enforce_private_link_endpoint_network_policies = bool
-    enforce_private_link_service_network_policies  = bool
+    name = string
+    service_delegation = object({
+      name    = string
+      actions = list(string)
+    })
   }))
+  default = []
 }
 
-variable "tags" {
-  description = "A map of tags to add to all resources"
-  type        = map(string)
+variable "private_endpoint_network_policies_enabled" {
+  description = "Specifies whether network policies are enabled on the subnet"
+  type        = string
 }
 
+variable "private_link_service_network_policies_enabled" {
+  description = "Specifies whether network policies are enabled on the subnet"
+  type        = string
+}

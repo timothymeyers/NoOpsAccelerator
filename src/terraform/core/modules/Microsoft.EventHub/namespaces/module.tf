@@ -41,7 +41,7 @@ resource "azurerm_eventhub_namespace" "events" {
   tags = var.tags
 }
 
-module "eventHubNamespace_authorizationRules" {
+module "eventHubNamespace_authorizationRuless_events" {
   source   = "./authorizationRules"
   for_each = local.authorization_rules
 
@@ -66,7 +66,7 @@ module "eventHubNamespace_eventHubs" {
   message_retention   = each.value.message_retention
 }
 
-module "eventHubNamespace_authorizationRules" {
+module "eventHubNamespace_authorizationRules_rules" {
   source   = "./authorizationRules"
   for_each = local.keys
 

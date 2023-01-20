@@ -2,48 +2,54 @@
 # Licensed under the MIT License.
 
 
-# NOTE: the Name used for Redis needs to be globally unique
-resource "azurerm_redis_cache" "redis" {
-  name                = var.name
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  capacity            = var.redis.capacity
-  family              = var.redis.family
-  sku_name            = var.redis.sku_name
-  tags                = local.tags
+#------------------------------------------------------------
+# Redis Cache Instance configuration - Default (required). 
+#------------------------------------------------------------
 
-  enable_non_ssl_port           = lookup(var.redis, "enable_non_ssl_port", null)
-  minimum_tls_version           = lookup(var.redis, "minimum_tls_version", "1.2")
-  private_static_ip_address     = lookup(var.redis, "private_static_ip_address", null)
-  public_network_access_enabled = lookup(var.redis, "public_network_access_enabled", null)
-  shard_count                   = lookup(var.redis, "shard_count", null)
-  zones                         = lookup(var.redis, "zones", null)
-  subnet_id                     = try(var.subnet_id, null)
+resource "azurerm_redis_cache" "main" {
+  for_each                      = var.redis_server_settings
+  name                          = format("%s", each.key)
+  resource_group_name           = local.resource_group_name
+  location                      = local.location
+  capacity                      = each.value["capacity"]
+  family                        = lookup(var.redis_family, each.value.sku_name)
+  sku_name                      = each.value["sku_name"]
+  enable_non_ssl_port           = each.value["enable_non_ssl_port"]
+  minimum_tls_version           = each.value["minimum_tls_version"]
+  private_static_ip_address     = each.value["private_static_ip_address"]
+  public_network_access_enabled = each.value["public_network_access_enabled"]
+  replicas_per_master           = each.value["sku_name"] == "Premium" ? each.value["replicas_per_master"] : null
+  shard_count                   = each.value["sku_name"] == "Premium" ? each.value["shard_count"] : null
+  subnet_id                     = each.value["sku_name"] == "Premium" ? var.subnet_id : null
+  zones                         = each.value["zones"]
+  tags                          = merge({ "Name" = format("%s", each.key) }, var.tags, )
 
-  dynamic "redis_configuration" {
-    for_each = lookup(var.redis, "redis_configuration", {}) != {} ? [var.redis.redis_configuration] : []
-
-    content {
-      enable_authentication           = lookup(redis_configuration.value, "enable_authentication", null)
-      maxmemory_reserved              = lookup(redis_configuration.value, "maxmemory_reserved", null)
-      maxmemory_delta                 = lookup(redis_configuration.value, "maxmemory_delta", null)
-      maxmemory_policy                = lookup(redis_configuration.value, "maxmemory_policy", null)
-      maxfragmentationmemory_reserved = lookup(redis_configuration.value, "maxfragmentationmemory_reserved", null)
-      rdb_backup_enabled              = lookup(redis_configuration.value, "rdb_backup_enabled", null)
-      rdb_backup_frequency            = lookup(redis_configuration.value, "rdb_backup_frequency", null)
-      rdb_backup_max_snapshot_count   = lookup(redis_configuration.value, "rdb_backup_max_snapshot_count", null)
-      rdb_storage_connection_string   = lookup(redis_configuration.value, "rdb_storage_connection_string", null)
-      notify_keyspace_events          = lookup(redis_configuration.value, "notify_keyspace_events", null)
-    }
+  redis_configuration {
+    #  aof_backup_enabled              = var.enable_aof_backup
+    #  aof_storage_connection_string_0 = var.enable_aof_backup == true ? azurerm_storage_account.storeacc.0.primary_blob_connection_string : null
+    #  aof_storage_connection_string_1 = var.enable_aof_backup == true ? azurerm_storage_account.storeacc.0.secondary_blob_connection_string : null
+    enable_authentication           = lookup(var.redis_configuration, "enable_authentication", true)
+    maxfragmentationmemory_reserved = each.value["sku_name"] == "Premium" || each.value["sku_name"] == "Standard" ? lookup(var.redis_configuration, "maxfragmentationmemory_reserved") : null
+    maxmemory_delta                 = each.value["sku_name"] == "Premium" || each.value["sku_name"] == "Standard" ? lookup(var.redis_configuration, "maxmemory_delta") : null
+    maxmemory_policy                = lookup(var.redis_configuration, "maxmemory_policy")
+    maxmemory_reserved              = each.value["sku_name"] == "Premium" || each.value["sku_name"] == "Standard" ? lookup(var.redis_configuration, "maxmemory_reserved") : null
+    notify_keyspace_events          = lookup(var.redis_configuration, "notify_keyspace_events")
+    rdb_backup_enabled              = each.value["sku_name"] == "Premium" && var.enable_data_persistence == true ? true : false
+    rdb_backup_frequency            = each.value["sku_name"] == "Premium" && var.enable_data_persistence == true ? var.data_persistence_backup_frequency : null
+    rdb_backup_max_snapshot_count   = each.value["sku_name"] == "Premium" && var.enable_data_persistence == true ? var.data_persistence_backup_max_snapshot_count : null
+    rdb_storage_connection_string   = each.value["sku_name"] == "Premium" && var.enable_data_persistence == true ? azurerm_storage_account.storeacc.0.primary_blob_connection_string : null
   }
 
   dynamic "patch_schedule" {
-    for_each = lookup(var.redis, "patch_schedule", {}) != {} ? [var.redis.patch_schedule] : []
-
+    for_each = var.patch_schedule != null ? [var.patch_schedule] : []
     content {
-      day_of_week    = patch_schedule.value.day_of_week
-      start_hour_utc = lookup(patch_schedule.value, "start_hour_utc", null)
+      day_of_week    = var.patch_schedule.day_of_week
+      start_hour_utc = var.patch_schedule.start_hour_utc
     }
   }
-}
 
+  lifecycle {
+    # A bug in the Redis API where the original storage connection string isn't being returneds
+    ignore_changes = [redis_configuration.0.rdb_storage_connection_string]
+  }
+}

@@ -7,6 +7,12 @@ output "id" {
 
 }
 
+output "name" {
+  description = "The Public IP Name."
+  value       = azurerm_public_ip.pip.name
+
+}
+
 output "ip_address" {
   description = "The IP address value that was allocated."
   value       = azurerm_public_ip.pip.ip_address

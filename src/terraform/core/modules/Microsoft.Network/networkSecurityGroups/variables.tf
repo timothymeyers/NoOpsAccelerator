@@ -22,23 +22,46 @@ variable "tags" {
   default     = {}
 }
 
-variable "nsg_rules" {
-  description = "(Optional) Specifies the security rules of the network security group"
-  type = map(object({
-    name                       = string
-    priority                   = number
-    direction                  = string
-    access                     = string
-    protocol                   = string
-    source_port_range          = string
-    destination_port_range     = list(string)
-    source_address_prefix      = list(string)
-    destination_address_prefix = string
-  }))
-  default = {}
+variable "inbound_rules" {
+  type        = list(map(string))
+  default     = []
+  description = "List of objects that represent the configuration of each inbound rule."
+  # inbound_rules = [
+  #   {
+  #     name                       = ""
+  #     priority                   = ""
+  #     access                     = ""
+  #     protocol                   = ""
+  #     source_address_prefix      = ""
+  #     source_port_range          = ""
+  #     destination_address_prefix = ""
+  #     destination_port_range     = ""
+  #     description                = ""
+  #   }
+  # ]
 }
 
-variable "enable_resource_lock" {
+variable "outbound_rules" {
+  type        = list(map(string))
+  default     = []
+  description = "List of objects that represent the configuration of each outbound rule."
+  # outbound_rules = [
+  #   {
+  #     name                       = ""
+  #     priority                   = ""
+  #     access                     = ""
+  #     protocol                   = ""
+  #     source_address_prefix      = ""
+  #     source_port_range          = ""
+  #     destination_address_prefix = ""
+  #     destination_port_range     = ""
+  #     description                = ""
+  #   }
+  # ]
+}
+
+
+variable "enable_resource_locks" {
   description = "Enable resource locks"
   type        = bool
   default     = false

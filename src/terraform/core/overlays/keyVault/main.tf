@@ -2,29 +2,25 @@
 # Licensed under the MIT License.
 
 /*
-SUMMARY: Module to deploy a Key Vault to an Virutal Network
+SUMMARY: Module to deploy a Key Vault with private endpoints to an Virutal Network
 DESCRIPTION: The following components will be options in this deployment
             * Key Vault
             * Private Endpoint
 AUTHOR/S: jspinella
 */
 
-resource "random_id" "keyvault" {
-  byte_length = 12
-}
-
-data "azurerm_client_config" "current" {}
-
+# If the resource group name is not provided, create a new one
 data "azurerm_resource_group" "kv_rg" {
-  name = var.resource_group_name
+  count = length(var.resource_group_name) > 0 ? 1 : 0
+  name  = var.resource_group_name
 }
 
 module "key_vault" {
-  source = "../../modules/Microsoft.KeyVault"
+  source = "../../../modules/Microsoft.KeyVault"
 
   name                            = var.key_vault_name
   location                        = var.location
-  resource_group_name             = data.azurerm_resource_group.kv_rg.name
+  resource_group_name             = length(var.resource_group_name) > 0 ? data.azurerm_resource_group.kv_rg.name : var.resource_group_name
   tenant_id                       = data.azurerm_client_config.current.tenant_id
   sku_name                        = var.key_vault_sku_name
   enabled_for_deployment          = var.key_vault_enabled_for_deployment
@@ -45,18 +41,18 @@ module "key_vault" {
 
 # Create the private DNS zone for the ACR
 module "key_vault_private_dns_zone" {
-  source                   = "../../modules/Microsoft.Network/privateDnsZone"
+  source                   = "../../../modules/Microsoft.Network/privateDnsZone"
   name                     = "privatelink.vaultcore.azure.net"
-  resource_group_name      = data.azurerm_resource_group.kv_rg.name
+  resource_group_name      = length(var.resource_group_name) > 0 ? data.azurerm_resource_group.kv_rg.name : var.resource_group_name
   virtual_networks_to_link = var.virtual_networks_to_link
 }
 
 # Create the private endpoint for the ACR
 module "key_vault_private_endpoint" {
-  source                         = "../../modules/Microsoft.Network/privateEndpoints"
+  source                         = "../../../modules/Microsoft.Network/privateEndpoints"
   name                           = "${module.key_vault.name}PrivateEndpoint"
   location                       = var.location
-  resource_group_name            = data.azurerm_resource_group.kv_rg.name
+  resource_group_name            = length(var.resource_group_name) > 0 ? data.azurerm_resource_group.kv_rg.name : var.resource_group_name
   subnet_id                      = var.vnet_subnet_id
   tags                           = var.tags
   private_connection_resource_id = module.key_vault.id

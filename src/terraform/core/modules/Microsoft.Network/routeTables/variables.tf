@@ -32,7 +32,7 @@ variable "tags" {
   description = "(Required) Map of tags to be applied to the resource"
   type        = map(any)
 }
-variable "enable_resource_lock" {
+variable "enable_resource_locks" {
   description = "Enable resource locks"
   type        = bool
 }

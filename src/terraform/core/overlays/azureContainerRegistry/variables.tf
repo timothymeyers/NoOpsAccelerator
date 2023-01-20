@@ -25,7 +25,6 @@ variable "vnet_subnet_id" {
 variable "acr_sku" {
   description = "(Optional) The SKU name of the container registry. Possible values are Basic, Standard and Premium. Defaults to Standard"
   type        = string
-  default     = "Standard"
 }
 
 variable "acr_admin_enabled" {

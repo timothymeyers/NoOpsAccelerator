@@ -12,7 +12,7 @@ Learn more about the NoOps movement and philosophy here - *[What is NoOps?](http
 
 ### Goals
 
-* Designed for US Government mission customers, with a specific focus on the US Department of Defense, Military Departments and coallition partners.
+* Designed for US Government mission customers, with a specific focus on the US Department of Defense, Military Departments and coalition partners.
 * Provide reusable and composable IaC modules that hyper-automate infrastructure deployment using Microsoft best practices.
 * Simplify compliance management through automated audit, reporting, and remediation.
 * Deliver example [Platform modules](./src/bicep/platforms/) that implement SCCA controls and follow [Microsoft's SACA implementation guidance](https://aka.ms/saca).
@@ -76,7 +76,7 @@ To continue with the quick start you will need the following as a minimum.
 
 A detailed and complete list of prerequisites is documented in the [wiki](https://github.com/Azure/NoOpsAccelerator/blob/main/docs/wiki/Deploying-NoOps-Accelerator-Pre-requisites.md).
 
-> Don't have these? Try [Azure Cloud Shell](https://docs.microsoft.com/en-us/azure/cloud-shell/overview) in your browser as an alternative.
+> **Note**: Don't have these? Try [Azure Cloud Shell](https://docs.microsoft.com/en-us/azure/cloud-shell/overview) in your browser as an alternative.
 
 #### Steps
 
@@ -96,8 +96,8 @@ A detailed and complete list of prerequisites is documented in the [wiki](https:
 
 1. Open the `/src/bicep/platforms/lz-platform-scca-hub-3spoke/parameters/deploy.parameters.json` file and replace the following parameters:
     * `"subscriptionId": "<<subscriptionId>>"` with your SubscriptionId. Ensure all instances of this parameter are changed in this file.
-
-> **Note**: Multiple subscriptions may be configured (*i.e.*, to have separate subscriptions for each 'tier' in the MLZ architecture) in the `parameters/deploy.parameters.json` but a single subscription is used for this quickstart.
+    
+    > **Note**: Multiple subscriptions may be configured (*i.e.*, to have separate subscriptions for each 'tier' in the MLZ architecture) in the `parameters/deploy.parameters.json` but a single subscription is used for this quickstart.
 
 1. For the quickstart, a deployment into the current subscription can be completed using the following parameters and the `az sub create command`:
 

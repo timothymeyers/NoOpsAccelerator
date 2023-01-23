@@ -12,7 +12,7 @@ resource "random_id" "uniqueString" {
 }
 
 locals {
-  
+
   firewall_premium_environments = ["public", "usgovernment"] # terraform azurerm environments where Azure Firewall Premium is supported
 
   location = var.locations[0] # we use the first location in the list of stamps as the "main" location to root our global resources in, which need it. E.g. Cosmos DB
@@ -39,6 +39,7 @@ locals {
   resourceGroupNamingConvention         = replace(local.namingConvention, local.resourceToken, "rg")
   storageAccountNamingConvention        = lower("${var.required.org_prefix}st${local.nameToken}unique_storage_token")
   subnetNamingConvention                = replace(local.namingConvention, local.resourceToken, "snet")
+  subnetPENamingConvention              = replace(local.namingConvention, local.resourceToken, "pe-snet")
   virtualNetworkNamingConvention        = replace(local.namingConvention, local.resourceToken, "vnet")
   networkSecurityGroupNamingConvention  = replace(local.namingConvention, local.resourceToken, "nsg")
   firewallNamingConvention              = replace(local.namingConvention, local.resourceToken, "afw")
@@ -46,7 +47,9 @@ locals {
   publicIpAddressNamingConvention       = replace(local.namingConvention, local.resourceToken, "pip")
   logAnalyticsWorkspaceNamingConvention = replace(local.namingConvention, local.resourceToken, "log")
   keyVaultNamingConvention              = replace(local.namingConvention, local.resourceToken, "kv")
+  cosmosDbNamingConvention              = replace(local.namingConvention, local.resourceToken, "cosmos")
   containerRegistryNamingConvention     = lower("${var.required.org_prefix}acr${local.nameToken}unique_storage_token")
+  cosmosDbContainerNamingConvention     = replace(local.namingConvention, local.resourceToken, "cosmos-container")
 
   // LOGGING NAMES
   loggingName                        = "logging"
@@ -111,6 +114,9 @@ locals {
   svcsVirtualNetworkName          = replace(local.virtualNetworkNamingConvention, local.nameToken, local.svcsName)
   svcsNetworkSecurityGroupName    = replace(local.networkSecurityGroupNamingConvention, local.nameToken, local.svcsName)
   svcsSubnetName                  = replace(local.subnetNamingConvention, local.nameToken, local.svcsName)
+  svcsCosmosDbName                = replace(local.cosmosDbNamingConvention, local.nameToken, local.svcsName)
+  svcsCosmosDbContainerName       = replace(local.cosmosDbContainerNamingConvention, local.nameToken, local.svcsName)
+  svcsPrivateEndpointSubnetName   = replace(local.subnetPENamingConvention, local.nameToken, local.svcsName)
 
   // ROUTETABLE VALUES
   svcsRouteTableName = "${local.svcsSubnetName}-routetable"

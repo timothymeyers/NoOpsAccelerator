@@ -24,31 +24,28 @@ AUTHOR/S: jspinella
 ### STAGE 4: Hub/Spoke Configuations  ###
 #########################################
 
-################################
-### STAGE 4.1: Scaffolding   ###
-################################
+#############################
+### STAGE 4.1: Scaffolding  ###
+#############################
 
-// Resource Group for the Logging
-resource "azurerm_resource_group" "operational_logging_resource_group" {
-  name     = lower(local.loggingResourceGroupName)
-  location = local.location
-  tags     = merge({ "ResourceName" = format("%s", local.loggingResourceGroupName), DeployedBy = format("AzureNoOpsTF [%s]", terraform.workspace) }, var.tags, )
+module "mod_azure_region" {
+  source       = "../../../terraform/core/overlays/regions"
+  azure_region = local.location
 }
 
 ###########################################
-### STAGE 4.1: Logging Configuration    ###
+### STAGE 4.2: Logging Configuration    ###
 ###########################################
 
 module "mod_operational_logging" {
   providers = { azurerm = azurerm.ops }
-  depends_on = [
-    azurerm_resource_group.operational_logging_resource_group
-  ]
-  source = "../../../terraform/core/overlays/hubSpoke/operationalLogging"
+  source    = "../../../terraform/core/overlays/hubSpokeLandingZone/operationalLogging"
 
   // Global Settings
-  location            = local.location
-  resource_group_name = azurerm_resource_group.operational_logging_resource_group.name
+  location      = module.mod_azure_region.location
+  environment   = var.environment
+  org_prefix    = var.required.org_prefix
+  workload_name = local.loggingName
 
   // Logging Settings 
   logging_log_analytics        = var.log_analytics_config
@@ -64,19 +61,18 @@ module "mod_operational_logging" {
 }
 
 #######################################
-### STAGE 4.2: Hub Configuration    ###
+### STAGE 4.3: Hub Configuration    ###
 #######################################
 
 module "mod_hub_network" {
   providers = { azurerm = azurerm.hub }
-  source    = "../../../terraform/core/overlays/hubSpoke/virtualNetworkHub"
+  source    = "../../../terraform/core/overlays/hubSpokeLandingZone/virtualNetworkHub"
 
   // Global Settings
-  location            = local.location
-  resource_group_name = local.hubResourceGroupName
-
-  # By default, this module should not create a resource group, but if you want to create a resource group, set this to true
-  create_hub_resource_group = true
+  location      = module.mod_azure_region.location
+  environment   = var.environment
+  org_prefix    = var.required.org_prefix
+  workload_name = local.hubName
 
   // Hub Virutal Network Parameters  
   virtual_network_name          = local.hubVirtualNetworkName
@@ -90,8 +86,8 @@ module "mod_hub_network" {
   private_endpoint_service_endpoints_enabled = true
 
   // Hub Network Security Group
-  network_security_group_name  = local.hubNetworkSecurityGroupName
-  network_security_group_inbound_rules = var.hub_network_security_group_inbound_rules
+  network_security_group_name           = local.hubNetworkSecurityGroupName
+  network_security_group_inbound_rules  = var.hub_network_security_group_inbound_rules
   network_security_group_outbound_rules = var.hub_network_security_group_outbound_rules
 
   // Hub Route Table
@@ -131,7 +127,7 @@ module "mod_hub_network" {
 }
 
 ######################################
-### STAGE 4.3: Network Artifacts   ###
+### STAGE 4.4: Network Artifacts   ###
 ######################################
 
 ############################################################################
@@ -142,10 +138,10 @@ module "mod_hub_network" {
   depends_on = [
     module.mod_hub_network
   ]
-  source = "../../../../../terraform/core/overlays/hubSpoke/hub/networkArtifacts"
+  source = "../../../../../terraform/core/overlays/hubSpokeLandingZone/hub/networkArtifacts"
 
   // Global Settings
-  location            = local.location
+  location            = module.mod_azure_region.location
   resource_group_name = module.mod_hub_resource_group.name
 
   // Network Artifacts
@@ -161,20 +157,22 @@ module "mod_hub_network" {
 } */
 
 ########################################
-### STAGE 4.4: Spoke Configuration   ###
+### STAGE 4.5: Spoke Configuration   ###
 ########################################
 
 // Resources for the Operations Spoke
 module "mod_ops_network" {
   providers = { azurerm = azurerm.ops }
-  source    = "../../../terraform/core/overlays/hubSpoke/virtualNetworkSpoke"
+  source    = "../../../terraform/core/overlays/hubSpokeLandingZone/virtualNetworkSpoke"
 
   # Global Settings
-  location            = local.location
-  resource_group_name = local.opsResourceGroupName
+  location      = module.mod_azure_region.location
+  environment   = var.environment
+  org_prefix    = var.required.org_prefix
+  workload_name = local.opsName
 
-  # By default, this module should not create a resource group, but if you want to create a resource group, set this to true
-  create_spoke_resource_group = true
+  # By default, this module should not create a network watcher. If you want to enable this, set this to true
+  create_network_watcher = false
 
   # Operations Spoke Configuration
   virtual_network_name          = local.opsVirtualNetworkName
@@ -188,8 +186,8 @@ module "mod_ops_network" {
   private_endpoint_service_endpoints_enabled = true
 
   # Operations Spoke Network Security Group
-  network_security_group_name  = local.opsNetworkSecurityGroupName
-  network_security_group_inbound_rules = var.ops_network_security_group_inbound_rules
+  network_security_group_name           = local.opsNetworkSecurityGroupName
+  network_security_group_inbound_rules  = var.ops_network_security_group_inbound_rules
   network_security_group_outbound_rules = var.ops_network_security_group_outbound_rules
 
   // Operations Spoke Route Table
@@ -218,14 +216,17 @@ module "mod_ops_network" {
 // Resources for the Shared Services Spoke
 module "mod_svcs_network" {
   providers = { azurerm = azurerm.svcs }
-  source    = "../../../terraform/core/overlays/hubSpoke/virtualNetworkSpoke"
+  source    = "../../../terraform/core/overlays/hubSpokeLandingZone/virtualNetworkSpoke"
 
   # Global Settings
-  location            = local.location
-  resource_group_name = local.svcsResourceGroupName
+  location      = module.mod_azure_region.location
+  environment   = var.environment
+  org_prefix    = var.required.org_prefix
+  workload_name = local.svcsName
 
-  # By default, this module should not create a resource group, but if you want to create a resource group, set this to true
-  create_spoke_resource_group = true
+
+  # By default, this module should not create a network watcher. If you want to enable this, set this to true
+  create_network_watcher = false
 
   # Operations Spoke Configuration
   virtual_network_name          = local.svcsVirtualNetworkName
@@ -239,8 +240,8 @@ module "mod_svcs_network" {
   private_endpoint_service_endpoints_enabled = true
 
   # Operations Spoke Network Security Group
-  network_security_group_name  = local.svcsNetworkSecurityGroupName
-  network_security_group_inbound_rules = var.svcs_network_security_group_inbound_rules
+  network_security_group_name           = local.svcsNetworkSecurityGroupName
+  network_security_group_inbound_rules  = var.svcs_network_security_group_inbound_rules
   network_security_group_outbound_rules = var.svcs_network_security_group_outbound_rules
 
   // Operations Spoke Route Table
@@ -254,7 +255,6 @@ module "mod_svcs_network" {
     }
   }
 
-
   // Loggging Settings
   storage_account_name = local.svcsLogStorageAccountName
 
@@ -267,7 +267,7 @@ module "mod_svcs_network" {
 }
 
 ######################################
-## STAGE 4.5: Networking Peering   ###
+## STAGE 4.6: Networking Peering   ###
 ######################################
 
 module "mod_hub_to_ops_networking_peering" {
@@ -275,7 +275,7 @@ module "mod_hub_to_ops_networking_peering" {
     module.mod_hub_network,
     module.mod_ops_network
   ]
-  source = "../../../terraform/core/overlays/hubSpoke/virtualNetworkPeering"
+  source = "../../../terraform/core/overlays/hubSpokeLandingZone/virtualNetworkPeering"
 
   count = var.peer_to_hub_virtual_network ? 1 : 0
 
@@ -301,7 +301,7 @@ module "mod_hub_to_svcs_networking_peering" {
     module.mod_hub_network,
     module.mod_svcs_network
   ]
-  source = "../../../terraform/core/overlays/hubSpoke/virtualNetworkPeering"
+  source = "../../../terraform/core/overlays/hubSpokeLandingZone/virtualNetworkPeering"
 
   count = var.peer_to_hub_virtual_network ? 1 : 0
 
@@ -323,18 +323,18 @@ module "mod_hub_to_svcs_networking_peering" {
 }
 
 ##########################################
-### STAGE 4.6: Azure Security Center   ###
+### STAGE 4.7: Azure Security Center   ###
 ##########################################
 
 module "mod_azure_security_center" {
   providers  = { azurerm = azurerm.hub }
   depends_on = [module.mod_hub_network]
-  source     = "../../../terraform/core/modules/Microsoft.Security/azureSecurityCenter"
+  source     = "../../../terraform/core/overlays/azureSecurityCenter"
 
   count = var.enable_services.enable_azure_security_center ? 1 : 0
 
   # Logging Resource Group, location, log analytics details
-  resource_group_name          = azurerm_resource_group.operational_logging_resource_group.name
+  resource_group_name          = module.mod_operational_logging.resource_group_name
   log_analytics_workspace_name = module.mod_operational_logging.laws_name
   environment                  = var.environment
 
@@ -356,7 +356,7 @@ module "mod_azure_security_center" {
 }
 
 ################################
-### STAGE 5: Remote Access   ###
+### STAGE 8: Remote Access   ###
 ################################
 
 #########################################################################
@@ -366,30 +366,34 @@ module "mod_azure_security_center" {
 module "mod_bastion_host" {
   providers  = { azurerm = azurerm.hub }
   depends_on = [module.mod_hub_network]
-  source     = "../../../terraform/core/overlays/bastion"
+  source     = "../../../terraform/core/overlays/bastionHosts"
 
   count = var.enable_services.enable_bastion_hosts ? 1 : 0
 
   // Global Settings
   org_prefix          = var.required.org_prefix
   resource_group_name = module.mod_hub_network.resource_group_name
-  location            = local.location
+  location            = module.mod_azure_region.location
+  location_short      = module.mod_azure_region.location_short
+  environment         = var.environment
 
   // Bastion Host Settings
   virtual_network_name             = module.mod_hub_network.virtual_network_name
-  bastion_address_space            = var.bastion_address_space
-  bastion_subnet_service_endpoints = var.bastion_subnet_service_endpoints
+  subnet_bastion_cidr              = var.bastion_address_space
+  subnet_bastion_service_endpoints = var.bastion_subnet_service_endpoints
 
   // Bastions Diagnostics Settings
   enable_bastion_diagnostics       = var.enable_services.enable_bastion_diagnostics
   log_analytics_storage_account_id = module.mod_operational_logging.laws_StorageAccount_Id
+  log_analytics_resource_id        = module.mod_operational_logging.laws_resource_id
 
   // Jumpbox Settings
-  vm_subnet_id                = module.mod_hub_network.default_subnet_id # The subnet ID for the jumpbox
-  admin_username              = var.jumpbox_admin_username               # The admin username for the jumpbox
-  use_random_password         = var.use_random_password                  # If true, a random password will be generated and stored in the Azure Key Vault
-  log_analytics_workspace_id  = module.mod_operational_logging.laws_resource_id
-  log_analytics_workspace_key = module.mod_operational_logging.laws_workspace_key
+  vm_subnet_id                      = module.mod_hub_network.default_subnet_id # The subnet ID for the jumpbox
+  admin_username                    = var.jumpbox_admin_username               # The admin username for the jumpbox
+  use_random_password               = var.use_random_password                  # If true, a random password will be generated and stored in the Azure Key Vault
+  log_analytics_workspace_id        = module.mod_operational_logging.laws_resource_id
+  log_analytics_workspace_key       = module.mod_operational_logging.laws_workspace_key
+  network_security_group_bastion_id = module.mod_hub_network.nsg_id
 
   // Linux Jumpbox Settings
   create_bastion_linux_jumpbox = var.enable_services.bastion_linux_virtual_machines # If true, a Linux jumpbox will be created
@@ -400,6 +404,10 @@ module "mod_bastion_host" {
   create_bastion_windows_jumpbox = var.enable_services.bastion_windows_virtual_machines # If true, a Windows jumpbox will be created
   vm_os_windows_disk_image       = var.jumpbox_windows_os_disk_image
   size_windows_jumpbox           = var.size_windows_jumpbox
+
+  // Locks
+  enable_resource_locks = var.enable_services.enable_resource_locks
+  lock_level            = var.lock_level
 
   // Tags
   tags = var.tags # Tags to be applied to all resources

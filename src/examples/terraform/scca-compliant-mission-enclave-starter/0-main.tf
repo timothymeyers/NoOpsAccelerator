@@ -63,11 +63,11 @@ terraform {
   */
 
   backend "local" {}
-  required_version = ">= 1.2.9"
+  required_version = ">= 1.3"
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 3.38.0"
+      version = "~> 3.22"
     }
     azuread = {
       source  = "hashicorp/azuread"
@@ -76,6 +76,10 @@ terraform {
     azapi = {
       source  = "azure/azapi"
       version = "~> 1.0.0"
+    }
+    azurecaf = {
+      source  = "aztfmod/azurecaf"
+      version = "~> 1.2, >= 1.2.22"
     }
     null = {
       source = "hashicorp/null"

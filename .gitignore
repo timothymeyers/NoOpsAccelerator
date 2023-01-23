@@ -10,6 +10,7 @@
 terraform-provider-azurerm_v*
 terraform-provider-random_v*
 *.terraform.lock.hcl
+terraform.tfvars
 
 # Terraform logs
 crash.log

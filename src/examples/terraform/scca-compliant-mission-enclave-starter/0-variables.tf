@@ -90,7 +90,7 @@ variable "root_management_group_id" {
 variable "root_management_group_display_name" {
   description = "The display name for the root management group."
   type        = string
-  default     = "anoa"
+  default     = "anoa-root"
 
   validation {
     condition     = can(regex("^[a-zA-Z0-9-_\\(\\)\\.]{1,36}$", var.root_management_group_display_name))
@@ -240,7 +240,7 @@ variable "hub_vnet_subnet_service_endpoints" {
 
 variable "hub_network_security_group_inbound_rules" {
   type        = list(map(string))
-  default = []
+  default     = []
   description = "List of objects that represent the configuration of each inbound rule."
   # inbound_rules = [
   #   {
@@ -605,7 +605,7 @@ variable "ops_network_security_group_inbound_rules" {
       protocol                   = "*"
       source_address_prefix      = "10.0.120.0/26" # Shared Services VNET
       source_port_range          = "*"
-      destination_address_prefix = "10.0.115.0/26"  # Operations VNET
+      destination_address_prefix = "10.0.115.0/26" # Operations VNET
       destination_port_range     = "3389"
       description                = "Allow traffic from spokes"
     }
@@ -686,7 +686,7 @@ variable "svcs_vnet_subnet_service_endpoints" {
 }
 
 variable "svcs_network_security_group_inbound_rules" {
-  type        = list(map(string))
+  type = list(map(string))
   default = [
     {
       name                       = "Allow-Traffic-From-Spokes-SSH"
@@ -695,7 +695,7 @@ variable "svcs_network_security_group_inbound_rules" {
       protocol                   = "*"
       source_address_prefix      = "10.0.115.0/26" # Operations VNET
       source_port_range          = "*"
-      destination_address_prefix = "10.0.120.0/26"  # Shared Services VNET
+      destination_address_prefix = "10.0.120.0/26" # Shared Services VNET
       destination_port_range     = "22"
       description                = "Allow traffic from spokes"
     },
@@ -706,7 +706,7 @@ variable "svcs_network_security_group_inbound_rules" {
       protocol                   = "*"
       source_address_prefix      = "10.0.115.0/26" # Operations VNET
       source_port_range          = "*"
-      destination_address_prefix = "10.0.120.0/26"  # Shared Services VNET
+      destination_address_prefix = "10.0.120.0/26" # Shared Services VNET
       destination_port_range     = "80"
       description                = "Allow traffic from spokes"
     },
@@ -717,7 +717,7 @@ variable "svcs_network_security_group_inbound_rules" {
       protocol                   = "*"
       source_address_prefix      = "10.0.115.0/26" # Operations VNET
       source_port_range          = "*"
-      destination_address_prefix = "10.0.120.0/26"  # Shared Services VNET
+      destination_address_prefix = "10.0.120.0/26" # Shared Services VNET
       destination_port_range     = "443"
       description                = "Allow traffic from spokes"
     },
@@ -728,7 +728,7 @@ variable "svcs_network_security_group_inbound_rules" {
       protocol                   = "*"
       source_address_prefix      = "10.0.115.0/26" # Operations VNET
       source_port_range          = "*"
-      destination_address_prefix = "10.0.120.0/26"  # Shared Services VNET
+      destination_address_prefix = "10.0.120.0/26" # Shared Services VNET
       destination_port_range     = "3389"
       description                = "Allow traffic from spokes"
     }
@@ -770,6 +770,75 @@ variable "svcs_storage_account_config" {
     account_replication_type = "LRS"
   }
 }
+
+######################################################
+# Tier 2 - Shared Services Workloads Configuration  ##
+######################################################
+
+#############################
+# Cosmos Configuration    ##
+#############################
+
+variable "create_cosmos_sqldb_resource_group" {
+  description = "Whether to create resource group and use it for all networking resources"
+  default     = false
+  type        = bool
+}
+
+variable "cosmosdb_account_config" {
+  type = map(object({
+    offer_type                            = string
+    kind                                  = optional(string)
+    enable_free_tier                      = optional(bool)
+    analytical_storage_enabled            = optional(bool)
+    enable_automatic_failover             = optional(bool)
+    public_network_access_enabled         = optional(bool)
+    is_virtual_network_filter_enabled     = optional(bool)
+    key_vault_key_id                      = optional(string)
+    enable_multiple_write_locations       = optional(bool)
+    access_key_metadata_writes_enabled    = optional(bool)
+    mongo_server_version                  = optional(string)
+    network_acl_bypass_for_azure_services = optional(bool)
+    network_acl_bypass_ids                = optional(list(string))
+  }))
+  description = "Manages a CosmosDB (formally DocumentDB) Account specifications"
+  default = {
+    demo-cosmosdb = {
+      offer_type = "Standard"
+      kind       = "GlobalDocumentDB"
+    }
+  }
+}
+
+variable "enable_advanced_threat_protection" {
+  description = "Whether to enable Advanced Threat Protection on CosmosDB"
+  default     = false
+  type        = bool
+}
+
+variable "create_cosmosdb_sql_database" {
+  description = "Whether to create a CosmosDB SQL Database"
+  default     = true
+  type        = bool
+}
+
+variable "create_cosmosdb_sql_container" {
+  description = "Whether to create a CosmosDB SQL Container"
+  default     = true
+  type        = bool
+}
+
+#####################################
+# Storage Account Configuration    ##
+#####################################
+
+###############################
+# Key Vault Configuration    ##
+###############################
+
+###############################
+# Event Hub Configuration    ##
+###############################
 
 ###############################################
 # Dev Team 1 Env Workload Spoke Configuration

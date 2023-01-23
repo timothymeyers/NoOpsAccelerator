@@ -16,11 +16,11 @@ AUTHOR/S: jspinella
 # Monitoring    ##
 ##################
 
-/* module "mod_mg_platform_diagnostics_initiative" {
+module "mod_mg_platform_diagnostics_initiative" {
   source               = "../../../terraform/core/modules/Microsoft.Authorization/policySetAssignment/managementGroup"
   initiative           = module.platform_diagnostics_initiative.initiative
   assignment_scope     = module.mod_management_group.management_groups["/providers/Microsoft.Management/managementGroups/anoa"].id
-  assignment_location  = var.location
+  assignment_location  = module.mod_azure_region.location
   skip_remediation     = true
   skip_role_assignment = false
 
@@ -34,10 +34,10 @@ AUTHOR/S: jspinella
   }
 
   assignment_parameters = {
-    workspaceId                                        = module.mod_landingzone_hub2spoke.laws_resource_id
-    storageAccountId                                   = module.mod_landingzone_hub2spoke.laws_storage_account_id
-    eventHubName                                       = null
-    eventHubAuthorizationRuleId                        = null
+    workspaceId                                        = module.mod_operational_logging.laws_resource_id
+    storageAccountId                                   = module.mod_operational_logging.laws_StorageAccount_Id
+    eventHubName                                       = ""
+    eventHubAuthorizationRuleId                        = ""
     metricsEnabled                                     = "True"
     logsEnabled                                        = "True"
     effect_DeployApplicationGatewayDiagnosticSetting   = "DeployIfNotExists"
@@ -53,7 +53,7 @@ AUTHOR/S: jspinella
     effect_DeployVnetDiagnosticSetting                 = "AuditIfNotExists"
     effect_DeployVnetGatewayDiagnosticSetting          = "AuditIfNotExists"
   }
-} */
+}
 
 
 ##################

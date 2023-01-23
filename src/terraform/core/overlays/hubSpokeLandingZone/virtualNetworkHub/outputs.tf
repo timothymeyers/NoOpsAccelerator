@@ -19,6 +19,16 @@ output "virtual_network_address_space" {
   value       = module.mod_vnet.virtual_network_address_space
 }
 
+output "nsg_id" {
+  description = "The id of the virtual network"
+  value       = module.mod_nsg.network_security_group_id
+}
+
+output "nsg_name" {
+  description = "The id of the virtual network"
+  value       = module.mod_nsg.network_security_group_name
+}
+
 output "default_subnet_id" {
   description = "The id of the default subnet"
   value       = module.mod_default_snet.id

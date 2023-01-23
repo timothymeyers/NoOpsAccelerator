@@ -10,30 +10,50 @@ DESCRIPTION: The following components will be options in this deployment
 AUTHOR/S: jrspinella
 */
 
+#---------------------------------------------------------
+# Resource Group Creation
+#----------------------------------------------------------
+module "mod_logging_rg" {
+  source = "../../resourceGroups"
+
+  location       = var.location
+  location_short = "usgovva"
+  org_name       = var.org_prefix
+  environment    = var.environment
+  workload_name  = var.workload_name
+  custom_rg_name = var.custom_resource_group_name != null ? var.custom_resource_group_name : null
+
+  // Tags
+  extra_tags = merge(var.tags, {
+    DeployedBy  = format("AzureNoOpsTF [%s]", terraform.workspace)   
+  }) # Tags to be applied to all resources
+}
+
 ###################################
 ### STAGE 1: Build out Logging  ###
 ###################################
 
 module "mod_logging_storage_account" {
-  source = "../../storageAccount"
+  source = "../../storageAccounts"
 
   //Global Settings
-  resource_group_name = var.resource_group_name
+  resource_group_name = module.mod_logging_rg.resource_group_name
   location            = var.location
+  location_short      = "usgovva"
+  org_name            = var.org_prefix
+  environment         = var.environment
+  workload_name       = var.workload_name
 
-  // Storage Account Parameters
-  storage_account_name = var.storage_account_name
-  account_kind         = "StorageV2"
-  sku_name             = "Standard_LRS"
+  //Storage Account Settings
+  account_replication_type = "LRS"
 
   // Locks
   enable_resource_locks = var.enable_resource_locks
   lock_level            = var.lock_level
 
   // Tags
-  tags = merge(var.tags, {
-    DeployedBy  = format("AzureNoOpsTF [%s]", terraform.workspace)
-    description = format("Operations Logging Resource: %s", var.storage_account_name)
+  extra_tags = merge(var.tags, {
+    DeployedBy  = format("AzureNoOpsTF [%s]", terraform.workspace)    
   }) # Tags to be applied to all resources
 }
 
@@ -50,7 +70,7 @@ module "laws" { # Log Analytics Workspace
 
   // Log Analytics Workspace Parameters
   name                = var.log_analytics_workspace_name
-  resource_group_name = var.resource_group_name
+  resource_group_name = module.mod_logging_rg.resource_group_name
   sku                 = lookup(var.logging_log_analytics, "sku", "PerGB2018")
   retention_in_days   = lookup(var.logging_log_analytics, "retention_in_days", 30)
   daily_quota_gb      = lookup(var.logging_log_analytics, "daily_quota_gb", -1)
@@ -73,7 +93,7 @@ module "mod_law_sentinel" {
 
   //Global Settings
   location            = var.location
-  resource_group_name = var.resource_group_name
+  resource_group_name = module.mod_logging_rg.resource_group_name
 
   // Log Analytics Sentinel Parameters
   solution_name         = "SecurityInsights"

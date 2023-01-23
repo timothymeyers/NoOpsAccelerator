@@ -30,3 +30,8 @@ output "laws_resource_id" {
   description = "LAWS Resource Id"
   value       = module.laws.id
 }
+
+output "resource_group_name" {
+  description = "Logging Resource Group Name"
+  value       = module.mod_logging_rg.resource_group_name
+}

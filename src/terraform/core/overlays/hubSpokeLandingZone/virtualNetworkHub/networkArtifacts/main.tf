@@ -44,7 +44,7 @@ module "mod_netart_resource_group" {
 
 module "mod_netart_logging_storage" {
   count  = var.enable_network_artifacts == true ? 1 : 0
-  source = "../../../../modules/Microsoft.Storage"
+  source = "../../../storageAccounts"
 
   //Global Settings
   location = var.location
@@ -77,7 +77,7 @@ output "storage_accounts" {
 
 module "mod_netart_key_vault" {
   count  = var.enable_network_artifacts == true ? 1 : 0
-  source = "../../../../overlays/keyVault"
+  source = "../../../../overlays/keyVaults"
 
   //Global Settings
   location = var.location

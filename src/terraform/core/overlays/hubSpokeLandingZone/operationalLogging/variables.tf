@@ -18,9 +18,10 @@ variable "location" {
   type        = string
 }
 
-variable "resource_group_name" {
-  description = "The name of the resource group the virtual machine resides in"
+variable "custom_resource_group_name" {
+  description = "The name of the resource group in which the resources will be created. If not provided, a new resource group will be created with the name 'rg-<org_name>-<environment>-<workload_name>'"
   type        = string
+  default     = ""
 }
 
 variable "org_prefix" {
@@ -29,10 +30,15 @@ variable "org_prefix" {
   default     = "anoa"
 }
 
-variable "deploy_environment" {
-  description = "The environment to deploy to. It defaults to dev."
+variable "workload_name" {
+  description = "A name for the workload. It defaults to anoa."
   type        = string
-  default     = "dev"
+  default     = "anoa"
+}
+
+variable "environment" {
+  description = "The Terraform backend environment e.g. public or usgovernment"
+  type        = string
 }
 
 ################################################

@@ -16,8 +16,18 @@ variable "org_prefix" {
   type        = string
 }
 
+variable "environment" {
+  description = "The Terraform backend environment e.g. public or usgovernment"
+  type        = string  
+}
+
 variable "location" {
   description = "The location/region to keep all your network resources. To get the list of all locations with table format from azure cli, run 'az account list-locations -o table'"
+  type        = string
+}
+
+variable "location_short" {
+  description = "The location/region short name to keep all your network resources. To get the list of all locations with table format from azure cli, run 'az account list-locations -o table'"
   type        = string
 }
 
@@ -38,22 +48,6 @@ variable "tags" {
   type        = map(string)
 }
 
-#########################################
-# Bastion Resource Locks Configuration ##
-#########################################
-
-variable "enable_resource_lock" {
-  description = "(Optional) Enable resource locks"
-  type        = bool
-  default     = false
-}
-
-variable "lock_level" {
-  description = "(Optional) id locks are enabled, Specifies the Level to be used for this Lock."
-  type        = string
-  default     = "CanNotDelete"
-}
-
 #################################
 # Bastion Host Configuration
 #################################
@@ -70,16 +64,22 @@ variable "create_bastion_windows_jumpbox" {
   default     = true
 }
 
-variable "bastion_address_space" {
-  description = "The address space to be used for the Bastion Host subnet (must be /27 or larger)."
+variable "subnet_bastion_cidr" {
+  description = "CIDR range for the dedicated Bastion subnet. Must be a range available in the VNet."
   type        = string
   default     = "10.0.100.160/27"
 }
 
-variable "bastion_subnet_service_endpoints" {
+variable "subnet_bastion_service_endpoints" {
   description = "List of service endpoints to be enabled on the Bastion Host subnet."
   type        = list(string)
   default     = []
+}
+
+variable "network_security_group_bastion_id" {
+  description = " The id of the network security group to associate with the Bastion Host subnet."
+  type        = string
+  default     = " "
 }
 
 variable "bastion_host_nsg_inbound_rules" {
@@ -134,6 +134,11 @@ variable "log_analytics_storage_account_id" {
   description = "Specifies the log analytics storage account id"
   type        = string
   default     = ""
+}
+
+variable "log_analytics_resource_id" {
+  description = "Specifies the log analytics resource id"
+  type        = string
 }
 
 variable "log_analytics_workspace_id" {

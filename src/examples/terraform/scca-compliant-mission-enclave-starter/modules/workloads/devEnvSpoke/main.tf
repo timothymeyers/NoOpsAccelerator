@@ -99,7 +99,7 @@ module "mod_hub_to_spoke_networking_peering" {
     module.mod_dev_env_aks_workload_spoke_resource_group,
     module.mod_dev_env_aks_workload_spoke_network
   ]
-  source = "../../../../../../terraform/core/overlays/hubSpoke/peering"
+  source = "../../../../../../terraform/core/overlays/hubSpokeLandingZone/peering"
 
   count = var.peer_to_hub_virtual_network ? 1 : 0
 

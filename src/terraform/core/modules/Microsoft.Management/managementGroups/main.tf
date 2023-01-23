@@ -22,7 +22,7 @@ locals {
   root_subscriptionId = var.root_subscriptionId
 
   # Mandatory foundation Management Groups
-  core_landing_zones = {
+  core_management_groups = {
     (local.root_id) = {
       display_name               = local.root_name
       parent_management_group_id = local.root_parent_id
@@ -32,16 +32,16 @@ locals {
   }
 
   # Map containing all Management Groups to deploy
-  landing_zones_merge = merge(
-    local.core_landing_zones,
-    var.landing_zones
+  management_groups_merge = merge(
+    local.core_management_groups,
+    var.management_groups
   )
 
   # Logic to auto-generate values for Management Groups if needed
   # Allows the user to specify the Management Group ID when working with existing
   # Management Groups, or uses standard naming pattern if set to null
-  anoa_landing_zones_map = {
-    for key, value in local.landing_zones_merge :
+  anoa_management_groups_map = {
+    for key, value in local.management_groups_merge :
     "${local.provider_path.management_groups}${key}" => {
       id                         = key
       display_name               = value.display_name
@@ -59,37 +59,37 @@ locals {
 
   # root Management Group
   azurerm_management_group_level_1 = {
-    for key, value in local.anoa_landing_zones_map :
+    for key, value in local.anoa_management_groups_map :
     key => value
     if value.parent_management_group_id == local.root_parent_id
   }
 
   azurerm_management_group_level_2 = {
-    for key, value in local.anoa_landing_zones_map :
+    for key, value in local.anoa_management_groups_map :
     key => value
     if contains(keys(azurerm_management_group.level_1), try(length(value.parent_management_group_id) > 0, false) ? "${local.provider_path.management_groups}${value.parent_management_group_id}" : local.empty_string)
   }
 
   azurerm_management_group_level_3 = {
-    for key, value in local.anoa_landing_zones_map :
+    for key, value in local.anoa_management_groups_map :
     key => value
     if contains(keys(azurerm_management_group.level_2), try(length(value.parent_management_group_id) > 0, false) ? "${local.provider_path.management_groups}${value.parent_management_group_id}" : local.empty_string)
   }
 
   azurerm_management_group_level_4 = {
-    for key, value in local.anoa_landing_zones_map :
+    for key, value in local.anoa_management_groups_map :
     key => value
     if contains(keys(azurerm_management_group.level_3), try(length(value.parent_management_group_id) > 0, false) ? "${local.provider_path.management_groups}${value.parent_management_group_id}" : local.empty_string)
   }
 
   azurerm_management_group_level_5 = {
-    for key, value in local.anoa_landing_zones_map :
+    for key, value in local.anoa_management_groups_map :
     key => value
     if contains(keys(azurerm_management_group.level_4), try(length(value.parent_management_group_id) > 0, false) ? "${local.provider_path.management_groups}${value.parent_management_group_id}" : local.empty_string)
   }
 
   azurerm_management_group_level_6 = {
-    for key, value in local.anoa_landing_zones_map :
+    for key, value in local.anoa_management_groups_map :
     key => value
     if contains(keys(azurerm_management_group.level_5), try(length(value.parent_management_group_id) > 0, false) ? "${local.provider_path.management_groups}${value.parent_management_group_id}" : local.empty_string)
   }

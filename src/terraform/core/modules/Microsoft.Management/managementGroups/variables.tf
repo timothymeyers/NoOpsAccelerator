@@ -97,13 +97,13 @@ variable "root_subscriptionId" {
   default     = []
 }
 
-variable "landing_zones" {
+variable "management_groups" {
   type        = any
   description = "This will deploy additional Management Groups beneath the root Management Group."
   default     = {}
 
   validation {
-    condition     = can([for k in keys(var.landing_zones) : regex("^[a-z0-9-]{2,36}$", k)]) || length(keys(var.landing_zones)) == 0
-    error_message = "The landing_zones keys must be between 2 to 36 characters long and can only contain lowercase letters, numbers and hyphens."
+    condition     = can([for k in keys(var.management_groups) : regex("^[a-z0-9-]{2,36}$", k)]) || length(keys(var.management_groups)) == 0
+    error_message = "The management_groups keys must be between 2 to 36 characters long and can only contain lowercase letters, numbers and hyphens."
   }
 }

@@ -1,18 +1,11 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-# By default, this module will not create a resource group
-# provide a name to use an existing resource group, specify the existing resource group name,
-# and set the argument to `create_storage_account_resource_group = false`. Location will be same as existing RG.
-resource "azurerm_resource_group" "rg" {
-  count    = var.create_vm_resource_group ? 1 : 0
-  name     = var.resource_group_name
-  location = var.location
-  tags     = merge({ "Name" = format("%s", var.resource_group_name) }, var.tags, )
-}
-
-resource "random_password" "passwd" {
-  count       = (var.os_flavor == "windows" && var.disable_password_authentication == false && var.admin_password == null ? 1 : (var.os_flavor == "windows" && var.admin_password == null ? 1 : 0))
+#----------------------------------------------------------
+# Random Resources
+#----------------------------------------------------------
+resource "random_password" "password" {
+  count       = var.admin_password == null ? 1 :0
   length      = var.random_password_length
   min_upper   = 4
   min_lower   = 2
@@ -37,14 +30,14 @@ resource "tls_private_key" "rsa" {
 # Windows Virutal machine
 #---------------------------------------
 resource "azurerm_windows_virtual_machine" "win_vm" {
-  count                        = var.os_flavor == "windows" ? var.instances_count : 0
+  count                        = var.instances_count >= 1 ? var.instances_count : 0
   name                         = var.instances_count == 1 ? substr(local.vm_hostname, 0, 15) : substr(format("%s%s", lower(replace(local.vm_hostname, "/[[:^alnum:]]/", "")), count.index + 1), 0, 15)
   computer_name                = var.instances_count == 1 ? substr(local.vm_hostname, 0, 15) : substr(format("%s%s", lower(replace(local.vm_hostname, "/[[:^alnum:]]/", "")), count.index + 1), 0, 15)
   resource_group_name          = var.resource_group_name
   location                     = var.location
   size                         = var.virtual_machine_size
   admin_username               = var.admin_username
-  admin_password               = var.admin_password == null ? element(concat(random_password.passwd.*.result, [""]), 0) : var.admin_password
+  admin_password               = var.admin_password == null ? element(concat(random_password.password.*.result, [""]), 0) : var.admin_password
   network_interface_ids        = [element(concat(azurerm_network_interface.nic.*.id, [""]), count.index)]
   source_image_id              = var.source_image_id != null ? var.source_image_id : null
   provision_vm_agent           = true

@@ -20,7 +20,7 @@ module "mod_linux_jumpbox" {
   org_name             = var.org_prefix
   workload_name        = "jumpbox"
   virtual_network_name = data.azurerm_virtual_network.vnet.name
-  vm_subnet_id         = var.vm_subnet_id
+  vm_subnet_name       = var.vm_subnet_name
   virtual_machine_name = "linux"
 
   # This module support multiple Pre-Defined Linux and Windows Distributions.
@@ -29,10 +29,10 @@ module "mod_linux_jumpbox" {
   # Specify `disable_password_authentication = false` to create random admin password
   # Specify a valid password with `admin_password` argument to use your own password 
   # To generate SSH key pair, specify `generate_admin_ssh_key = true`
-  # To use existing key pair, specify `admin_ssh_key_data` to a valid SSH public key path.  
-  os_flavor               = "linux"
+  # To use existing key pair, specify `admin_ssh_key_data` to a valid SSH public key path.
+  # Specify instance_count = 1 to create a single instance, or specify a higher number to create multiple instances  
   linux_distribution_name = "ubuntu2004"
-  virtual_machine_size    = "Standard_B2s"
+  virtual_machine_size    = var.size_linux_jumpbox
   admin_username          = var.admin_username
   generate_admin_ssh_key  = true
   instances_count         = 1
@@ -46,13 +46,13 @@ module "mod_linux_jumpbox" {
   # Network Seurity group port allow definitions for each Virtual Machine
   # NSG association to be added automatically for all network interfaces.
   # Remove this NSG rules block, if `existing_network_security_group_id` is specified
-  existing_network_security_group_id = var.bastion_network_security_group_id
+  existing_network_security_group_id = var.network_security_group_bastion_id
 
   # Boot diagnostics to troubleshoot virtual machines, by default uses managed 
   # To use custom storage account, specify `storage_account_name` with a valid name
   # Passing a `null` value will utilize a Managed Storage Account to store Boot Diagnostics
   enable_boot_diagnostics = true
-  storage_account_name    = var.log_analytics_storage_account_id
+  storage_account_name    = var.log_analytics_storage_account_name
 
   # Attach a managed data disk to a Windows/Linux VM's. Possible Storage account type are: 
   # `Standard_LRS`, `StandardSSD_ZRS`, `Premium_LRS`, `Premium_ZRS`, `StandardSSD_LRS`
@@ -79,20 +79,20 @@ module "mod_linux_jumpbox" {
 
   # Deploy log analytics agents to virtual machine. 
   # Log analytics workspace customer id and primary shared key required.
-  deploy_log_analytics_agent                 = true
+  deploy_log_analytics_agent                 = var.enable_bastion_diagnostics
   log_analytics_customer_id                  = var.log_analytics_workspace_id
   log_analytics_workspace_primary_shared_key = var.log_analytics_workspace_key
 
   // Tags
   extra_tags = merge(var.tags, {
     DeployedBy  = format("AzureNoOpsTF [%s]", terraform.workspace)
-    description = format("Linux VM for Azure Bastion %s", local.bastionHostName)
+    description = format("Linux VM for Azure Bastion %s", coalesce(var.custom_bastion_name, data.azurecaf_name.bastion.result))
   })
 }
 
 #
 #
-# Linux Jumpbox
+# Windows Jumpbox
 #
 #
 module "mod_windows_jumpbox" {
@@ -102,26 +102,24 @@ module "mod_windows_jumpbox" {
   source     = "../virtualMachines/windows"
 
   # Resource Group, location, VNet and Subnet details
-  resource_group_name  = data.azurerm_resource_group.hub.name
+  resource_group_name  = data.azurerm_resource_group.rg.name
   location             = var.location
   location_short       = var.location_short
   environment          = var.environment
   org_name             = var.org_prefix
   workload_name        = "jumpbox"
-  virtual_network_name = data.azurerm_virtual_network.hub_bastion_host_vnet.guid
-  vm_subnet_id         = var.vm_subnet_id
+  virtual_network_name = data.azurerm_virtual_network.vnet.name
+  vm_subnet_name       = var.vm_subnet_name
   virtual_machine_name = "windows"
 
   # This module support multiple Pre-Defined Linux and Windows Distributions.
   # Check the README.md file for more pre-defined images for Ubuntu, Centos, RedHat.
   # Please make sure to use gen2 images supported VM sizes if you use gen2 distributions
-  # Specify `disable_password_authentication = false` to create random admin password
-  # Specify a valid password with `admin_password` argument to use your own password 
-  # To generate SSH key pair, specify `generate_admin_ssh_key = true`
-  # To use existing key pair, specify `admin_ssh_key_data` to a valid SSH public key path.  
-  os_flavor                 = "windows"
+  # Specify `admin_username = null` to create random admin password
+  # Specify a valid password with `admin_password` argument to use your own password   
+  # Specify instance_count = 1 to create a single instance, or specify a higher number to create multiple instances
   windows_distribution_name = "windows2019dc"
-  virtual_machine_size      = "Standard_B2s"
+  virtual_machine_size      = var.size_windows_jumpbox
   admin_username            = var.admin_username
   instances_count           = 1
 
@@ -134,13 +132,13 @@ module "mod_windows_jumpbox" {
   # Network Seurity group port allow definitions for each Virtual Machine
   # NSG association to be added automatically for all network interfaces.
   # Remove this NSG rules block, if `existing_network_security_group_id` is specified
-  existing_network_security_group_id = var.bastion_network_security_group_id
+  existing_network_security_group_id = var.network_security_group_bastion_id
 
   # Boot diagnostics to troubleshoot virtual machines, by default uses managed 
   # To use custom storage account, specify `storage_account_name` with a valid name
   # Passing a `null` value will utilize a Managed Storage Account to store Boot Diagnostics
   enable_boot_diagnostics = true
-  storage_account_name    = var.log_analytics_storage_account_id
+  storage_account_name    = var.log_analytics_storage_account_name
 
   # Attach a managed data disk to a Windows/Linux VM's. Possible Storage account type are: 
   # `Standard_LRS`, `StandardSSD_ZRS`, `Premium_LRS`, `Premium_ZRS`, `StandardSSD_LRS`
@@ -167,13 +165,13 @@ module "mod_windows_jumpbox" {
 
   # Deploy log analytics agents to virtual machine. 
   # Log analytics workspace customer id and primary shared key required.
-  deploy_log_analytics_agent                 = true
+  deploy_log_analytics_agent                 = var.enable_bastion_diagnostics
   log_analytics_customer_id                  = var.log_analytics_workspace_id
   log_analytics_workspace_primary_shared_key = var.log_analytics_workspace_key
 
   // Tags
   extra_tags = merge(var.tags, {
     DeployedBy  = format("AzureNoOpsTF [%s]", terraform.workspace)
-    description = format("Linux VM for Azure Bastion %s", local.bastionHostName)
+    description = format("Windows VM for Azure Bastion %s", coalesce(var.custom_bastion_name, data.azurecaf_name.bastion.result))
   })
 }

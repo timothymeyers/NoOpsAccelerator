@@ -16,6 +16,16 @@ output "laws_StorageAccount_Id" {
   value       = module.mod_logging_storage_account.storage_account_id
 }
 
+output "laws_storage_account_name" {
+  description = "LAWS Name"
+  value       = module.mod_logging_storage_account.storage_account_name
+}
+
+output "laws_storage_account_uri" {
+  description = "LAWS Name"
+  value       = module.mod_logging_storage_account.storage_account_uri
+}
+ 
 output "laws_workspace_id" {
   description = "LAWS Workspace Id"
   value       = module.laws.workspace_id

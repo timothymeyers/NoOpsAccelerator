@@ -16,6 +16,11 @@ output "storage_account_name" {
   value       = azurerm_storage_account.storage.name
 }
 
+output "storage_account_uri" {
+  description = "Created Storage Account name"
+  value       = azurerm_storage_account.storage.primary_blob_endpoint
+}
+
 output "storage_account_identity" {
   description = "Created Storage Account identity block"
   value       = azurerm_storage_account.storage.identity

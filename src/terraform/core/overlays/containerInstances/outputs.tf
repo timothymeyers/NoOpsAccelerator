@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 output "redis_id" {
   value       = azurerm_redis_cache.redis.id
   description = "Redis instance id"

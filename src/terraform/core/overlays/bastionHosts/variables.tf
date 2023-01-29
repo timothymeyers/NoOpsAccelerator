@@ -64,6 +64,11 @@ variable "create_bastion_windows_jumpbox" {
   default     = true
 }
 
+variable "bastion_sku" {
+  description = "The SKU of the bastion host. Accepted values are Basic and Standard. Defaults to Basic"
+  default     = "Basic"
+}
+
 variable "subnet_bastion_cidr" {
   description = "CIDR range for the dedicated Bastion subnet. Must be a range available in the VNet."
   type        = string
@@ -120,6 +125,71 @@ variable "bastion_host_nsg_outbound_rules" {
   # ]
 }
 
+variable "domain_name_label" {
+  description = "Label for the Domain Name. Will be used to make up the FQDN. If a domain name label is specified, an A DNS record is created for the public IP in the Microsoft Azure DNS system"
+  default     = null
+}
+
+variable "enable_copy_paste" {
+  description = "Is Copy/Paste feature enabled for the Bastion Host?"
+  default     = true
+}
+
+variable "enable_file_copy" {
+  description = "Is File Copy feature enabled for the Bastion Host. Only supported whne `sku` is `Standard`"
+  default     = false
+}
+
+variable "bastion_host_sku" {
+  description = "The SKU of the Bastion Host. Accepted values are `Basic` and `Standard`"
+  default     = "Basic"
+}
+
+variable "enable_ip_connect" {
+  description = "Is IP Connect feature enabled for the Bastion Host?"
+  default     = false
+}
+
+variable "enable_shareable_link" {
+  description = "Is Shareable Link feature enabled for the Bastion Host. Only supported whne `sku` is `Standard`"
+  default     = false
+}
+
+variable "enable_tunneling" {
+  description = "Is Tunneling feature enabled for the Bastion Host. Only supported whne `sku` is `Standard`"
+  default     = false
+}
+
+variable "scale_units" {
+  description = "The number of scale units which to provision the Bastion Host. Possible values are between `2` and `50`."
+  type        = number
+  default     = 2
+  validation {
+    condition     = var.scale_units >= 2 && var.scale_units <= 50
+    error_message = "The scale_units must be between 2 and 50."
+  }
+}
+
+################################## 
+# Bastion PIP Configuration    ###
+##################################
+
+variable "public_ip_allocation_method" {
+  description = "Defines the allocation method for this IP address. Possible values are Static or Dynamic"
+  default     = "Static"
+}
+
+variable "public_ip_sku" {
+  description = "The SKU of the Public IP. Accepted values are Basic and Standard. Defaults to Basic"
+  default     = "Standard"
+}
+
+variable "public_ip_zones" {
+  description = "Zones for public IP attached to the Bastion Host. Can be `null` if no zone distpatch."
+  type        = list(number)
+  default     = [1, 2, 3]
+}
+
 ##########################################
 # Bastion Diagnostics Configuration    ###
 ##########################################
@@ -132,6 +202,12 @@ variable "enable_bastion_diagnostics" {
 
 variable "log_analytics_storage_account_id" {
   description = "Specifies the log analytics storage account id"
+  type        = string
+  default     = ""
+}
+
+variable "log_analytics_storage_account_name" {
+  description = "Specifies the log analytics storage account name"
   type        = string
   default     = ""
 }
@@ -178,8 +254,8 @@ variable "keyvault_name" {
 # Jumpbox VM Configuration     ##
 #################################
 
-variable "vm_subnet_id" {
-  description = "The subnet id of the virtual machine"
+variable "vm_subnet_name" {
+  description = "The subnet name of the virtual machine"
   type        = string
   default     = ""
 }

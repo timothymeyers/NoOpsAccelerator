@@ -72,11 +72,6 @@ variable "instances_count" {
   default     = 1
 }
 
-variable "os_flavor" {
-  description = "Specify the flavor of the operating system image to deploy Virtual Machine. Valid values are `windows` and `linux`"
-  default     = "windows"
-}
-
 variable "virtual_machine_size" {
   description = "The Virtual Machine SKU for the Virtual Machine, Default is Standard_A2_V2"
   default     = "Standard_A2_v2"
@@ -188,8 +183,8 @@ variable "ssh_private_key" {
 # VM Network Configuration   ##
 ###############################
 
-variable "vm_subnet_id" {
-  description = "ID of the Subnet in which create the Virtual Machine"
+variable "vm_subnet_name" {
+  description = "Name of the Subnet in which create the Virtual Machine"
   type        = string
 }
 
@@ -632,162 +627,19 @@ variable "linux_distribution_list" {
       sku       = "sqldev"
       version   = "latest"
     },
+
+    githubEnt = {
+      publisher = "GitHub"
+      offer     = "GitHub-Enterprise"
+      sku       = "GitHub-Enterprise"
+      version   = "latest"
+    },
   }
 }
 
 variable "linux_distribution_name" {
   default     = "ubuntu1804"
   description = "Variable to pick an OS flavour for Linux based VM. Possible values include: centos8, ubuntu1804"
-}
-
-variable "windows_distribution_list" {
-  description = "Pre-defined Azure Windows VM images list"
-  type = map(object({
-    publisher = string
-    offer     = string
-    sku       = string
-    version   = string
-  }))
-
-  default = {
-    windows2012r2dc = {
-      publisher = "MicrosoftWindowsServer"
-      offer     = "WindowsServer"
-      sku       = "2012-R2-Datacenter"
-      version   = "latest"
-    },
-
-    windows2016dc = {
-      publisher = "MicrosoftWindowsServer"
-      offer     = "WindowsServer"
-      sku       = "2016-Datacenter"
-      version   = "latest"
-    },
-
-    windows2019dc = {
-      publisher = "MicrosoftWindowsServer"
-      offer     = "WindowsServer"
-      sku       = "2019-Datacenter"
-      version   = "latest"
-    },
-
-    windows2019dc-gensecond = {
-      publisher = "MicrosoftWindowsServer"
-      offer     = "WindowsServer"
-      sku       = "2019-datacenter-gensecond"
-      version   = "latest"
-    },
-
-    windows2019dc-gs = {
-      publisher = "MicrosoftWindowsServer"
-      offer     = "WindowsServer"
-      sku       = "2019-datacenter-gs"
-      version   = "latest"
-    },
-
-    windows2019dc-containers = {
-      publisher = "MicrosoftWindowsServer"
-      offer     = "WindowsServer"
-      sku       = "2019-Datacenter-with-Containers"
-      version   = "latest"
-    },
-
-    windows2019dc-containers-g2 = {
-      publisher = "MicrosoftWindowsServer"
-      offer     = "WindowsServer"
-      sku       = "2019-datacenter-with-containers-g2"
-      version   = "latest"
-    },
-
-    windows2019dccore = {
-      publisher = "MicrosoftWindowsServer"
-      offer     = "WindowsServer"
-      sku       = "2019-Datacenter-Core"
-      version   = "latest"
-    },
-
-    windows2019dccore-g2 = {
-      publisher = "MicrosoftWindowsServer"
-      offer     = "WindowsServer"
-      sku       = "2019-datacenter-core-g2"
-      version   = "latest"
-    },
-
-    windows2016dccore = {
-      publisher = "MicrosoftWindowsServer"
-      offer     = "WindowsServer"
-      sku       = "2016-Datacenter-Server-Core"
-      version   = "latest"
-    },
-
-    mssql2017exp = {
-      publisher = "MicrosoftSQLServer"
-      offer     = "SQL2017-WS2019"
-      sku       = "express"
-      version   = "latest"
-    },
-
-    mssql2017dev = {
-      publisher = "MicrosoftSQLServer"
-      offer     = "SQL2017-WS2019"
-      sku       = "sqldev"
-      version   = "latest"
-    },
-
-    mssql2017std = {
-      publisher = "MicrosoftSQLServer"
-      offer     = "SQL2017-WS2019"
-      sku       = "standard"
-      version   = "latest"
-    },
-
-    mssql2017ent = {
-      publisher = "MicrosoftSQLServer"
-      offer     = "SQL2017-WS2019"
-      sku       = "enterprise"
-      version   = "latest"
-    },
-
-    mssql2019std = {
-      publisher = "MicrosoftSQLServer"
-      offer     = "sql2019-ws2019"
-      sku       = "standard"
-      version   = "latest"
-    },
-
-    mssql2019dev = {
-      publisher = "MicrosoftSQLServer"
-      offer     = "sql2019-ws2019"
-      sku       = "sqldev"
-      version   = "latest"
-    },
-
-    mssql2019ent = {
-      publisher = "MicrosoftSQLServer"
-      offer     = "sql2019-ws2019"
-      sku       = "enterprise"
-      version   = "latest"
-    },
-
-    mssql2019ent-byol = {
-      publisher = "MicrosoftSQLServer"
-      offer     = "sql2019-ws2019-byol"
-      sku       = "enterprise"
-      version   = "latest"
-    },
-
-    mssql2019std-byol = {
-      publisher = "MicrosoftSQLServer"
-      offer     = "sql2019-ws2019-byol"
-      sku       = "standard"
-      version   = "latest"
-    }
-  }
-}
-
-variable "windows_distribution_name" {
-  default     = "windows2019dc"
-  description = "Variable to pick an OS flavour for Windows based VM. Possible values include: winserver, wincore, winsql"
 }
 
 #####################################
@@ -854,11 +706,6 @@ variable "enable_boot_diagnostics" {
   default     = false
 }
 
-variable "storage_account_uri" {
-  description = "The Primary/Secondary Endpoint for the Azure Storage Account which should be used to store Boot Diagnostics, including Console Output and Screenshots from the Hypervisor. Passing a `null` value will utilize a Managed Storage Account to store Boot Diagnostics."
-  default     = null
-}
-
 variable "data_disks" {
   description = "A list of Data Disks which should be attached to the Virtual Machine. Each Data Disk can be configured with the following properties:"
   type = map(object({
@@ -900,6 +747,11 @@ variable "log_analytics_workspace_primary_shared_key" {
 
 variable "storage_account_name" {
   description = "The name of the hub storage account to store logs"
+  default     = null
+}
+
+variable "storage_account_uri" {
+  description = "The Primary/Secondary Endpoint for the Azure Storage Account which should be used to store Boot Diagnostics, including Console Output and Screenshots from the Hypervisor. Passing a `null` value will utilize a Managed Storage Account to store Boot Diagnostics."
   default     = null
 }
 

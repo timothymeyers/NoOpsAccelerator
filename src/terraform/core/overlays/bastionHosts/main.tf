@@ -31,7 +31,7 @@ resource "azurerm_public_ip" "pip" {
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
   allocation_method   = var.public_ip_allocation_method
-  sku                 = "Standard" # Mandatory for Azure Bastion host
+  sku                 = var.public_ip_sku # Mandatory for Azure Bastion host is Standard
   domain_name_label   = var.domain_name_label != null ? var.domain_name_label : format("gw%s%s", lower(replace(coalesce(var.custom_bastion_name, data.azurecaf_name.bastion.result), "/[[:^alnum:]]/", "")), random_string.str.result)
   zones               = var.public_ip_zones
 
@@ -49,17 +49,16 @@ resource "azurerm_public_ip" "pip" {
 # Azure Bastion Service host
 #---------------------------------------------
 resource "azurerm_bastion_host" "main" {
-  name                = coalesce(var.custom_bastion_name, data.azurecaf_name.bastion.result)
-  location            = data.azurerm_resource_group.rg.location
-  resource_group_name = data.azurerm_resource_group.rg.name
-  copy_paste_enabled  = var.copy_paste_enabled
-  file_copy_enabled   = var.sku != "Basic" && var.file_copy_enabled
-  sku         = var.sku
-
-  ip_connect_enabled     = var.sku != "Basic" && var.ip_connect_enabled
-  scale_units            = var.sku == "Standard" ? var.scale_units : 2
-  shareable_link_enabled = var.sku != "Basic" && var.shareable_link_enabled
-  tunneling_enabled      = var.sku != "Basic" && var.tunneling_enabled
+  name                   = coalesce(var.custom_bastion_name, data.azurecaf_name.bastion.result)
+  location               = data.azurerm_resource_group.rg.location
+  resource_group_name    = data.azurerm_resource_group.rg.name
+  copy_paste_enabled     = var.enable_copy_paste
+  file_copy_enabled      = var.bastion_sku == "Standard" ? var.enable_file_copy : null
+  sku                    = var.bastion_sku
+  ip_connect_enabled     = var.bastion_sku == "Standard" ? var.enable_ip_connect : null
+  scale_units            = var.scale_units
+  shareable_link_enabled = var.bastion_sku == "Standard" ? var.enable_shareable_link : null
+  tunneling_enabled      = var.bastion_sku == "Standard" ? var.enable_tunneling : null
   tags                   = merge({ "ResourceName" = lower(coalesce(var.custom_bastion_name, data.azurecaf_name.bastion.result)) }, var.tags, )
 
   ip_configuration {

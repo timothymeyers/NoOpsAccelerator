@@ -844,24 +844,29 @@ variable "create_cosmosdb_sql_container" {
 # Dev Team 1 Env Workload Spoke Configuration
 ##############################################
 
-variable "dev1_subscription_id" {
+variable "dev_team_instances_count" {
+  description = "The number of development teams required."
+  default     = 1
+}
+
+variable "dev_team_subscription_id" {
   description = "Subscription ID for the Workload Virtual Network deployment"
   type        = string
   default     = "964c406a-1019-48d1-a927-9461123de233"
 
   validation {
-    condition     = can(regex("^[a-z0-9-]{36}$", var.dev1_subscription_id)) || var.dev1_subscription_id == ""
+    condition     = can(regex("^[a-z0-9-]{36}$", var.dev_team_subscription_id)) || var.dev_team_subscription_id == ""
     error_message = "Value must be a valid Subscription ID (GUID)."
   }
 }
 
-variable "dev1_spoke_vnet_address_space" {
+variable "dev_team_spoke_vnet_address_space" {
   description = "Address space prefixes for the Workload Virtual Network"
   type        = list(string)
   default     = ["10.0.125.0/24"]
 }
 
-variable "dev1_spoke_subnets" {
+variable "dev_team_spoke_subnets" {
   description = "A complex object that describes subnets for the Workload Virtual Network"
   type = list(object({
     name              = string
@@ -908,7 +913,7 @@ variable "dev1_spoke_subnets" {
   ]
 }
 
-variable "dev1_network_security_group_rules" {
+variable "dev_team_network_security_group_rules" {
   description = "A complex object that describes network security group rules for the Workload Virtual Network"
   type = map(object({
     name                       = string
@@ -936,13 +941,13 @@ variable "dev1_network_security_group_rules" {
   }
 }
 
-variable "dev1_log_storage_account_name" {
+variable "dev_team_log_storage_account_name" {
   description = "Storage Account name for the Workload Virtual Network deployment"
   type        = string
   default     = "stlogsworkload"
 }
 
-variable "dev1_logging_storage_account_config" {
+variable "dev_team_logging_storage_account_config" {
   description = "Storage Account variables for the Workload Virtual Network deployment"
   type = object({
     sku_name                 = string

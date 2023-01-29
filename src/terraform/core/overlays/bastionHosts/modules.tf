@@ -9,5 +9,5 @@ resource "azurerm_subnet" "abs_snet" {
   name                 = "AzureBastionSubnet"
   resource_group_name  = data.azurerm_resource_group.rg.name
   virtual_network_name = data.azurerm_virtual_network.vnet.name
-  address_prefixes     = var.subnet_bastion_cidr
+  address_prefixes     = [var.subnet_bastion_cidr]
 }

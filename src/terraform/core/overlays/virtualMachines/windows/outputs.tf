@@ -3,34 +3,34 @@
 
 output "admin_ssh_key_public" {
   description = "The generated public key data in PEM format"
-  value       = var.disable_password_authentication == true && var.generate_admin_ssh_key == true && var.os_flavor == "linux" ? tls_private_key.rsa[0].public_key_openssh : null
+  value       = var.disable_password_authentication == true && var.generate_admin_ssh_key == true ? tls_private_key.rsa[0].public_key_openssh : null
 }
 
 output "admin_ssh_key_private" {
   description = "The generated private key data in PEM format"
   sensitive   = true
-  value       = var.disable_password_authentication == true && var.generate_admin_ssh_key == true && var.os_flavor == "linux" ? tls_private_key.rsa[0].private_key_pem : null
+  value       = var.disable_password_authentication == true && var.generate_admin_ssh_key == true ? tls_private_key.rsa[0].private_key_pem : null
 }
 
 output "windows_vm_password" {
   description = "Password for the windows VM"
   sensitive   = true
-  value       = var.os_flavor == "windows" ? element(concat(random_password.passwd.*.result, [""]), 0) : null
+  value       = element(concat(random_password.password.*.result, [""]), 0) 
 }
 
 output "windows_vm_public_ips" {
   description = "Public IP's map for the all windows Virtual Machines"
-  value       = var.enable_public_ip_address == true && var.os_flavor == "windows" ? zipmap(azurerm_windows_virtual_machine.win_vm.*.name, azurerm_windows_virtual_machine.win_vm.*.public_ip_address) : null
+  value       = var.enable_public_ip_address == true ? zipmap(azurerm_windows_virtual_machine.win_vm.*.name, azurerm_windows_virtual_machine.win_vm.*.public_ip_address) : null
 }
 
 output "windows_vm_private_ips" {
   description = "Public IP's map for the all windows Virtual Machines"
-  value       = var.os_flavor == "windows" ? zipmap(azurerm_windows_virtual_machine.win_vm.*.name, azurerm_windows_virtual_machine.win_vm.*.private_ip_address) : null
+  value       = zipmap(azurerm_windows_virtual_machine.win_vm.*.name, azurerm_windows_virtual_machine.win_vm.*.private_ip_address)
 }
 
 output "windows_virtual_machine_ids" {
   description = "The resource id's of all Windows Virtual Machine."
-  value       = var.os_flavor == "windows" ? concat(azurerm_windows_virtual_machine.win_vm.*.id, [""]) : null
+  value       = concat(azurerm_windows_virtual_machine.win_vm.*.id, [""]) 
 }
 
 output "existing_network_security_group_id" {

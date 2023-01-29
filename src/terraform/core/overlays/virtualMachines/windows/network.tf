@@ -40,7 +40,7 @@ resource "azurerm_network_interface" "nic" {
   ip_configuration {
     name                          = lower("ipconig-${format("vm%s%s", lower(replace(local.vm_nic_name, "/[[:^alnum:]]/", "")), count.index + 1)}")
     primary                       = true
-    subnet_id                     = var.vm_subnet_id
+    subnet_id                     = data.azurerm_subnet.snet.id
     private_ip_address_allocation = var.static_private_ip == null ? "Dynamic" : "Static"
     private_ip_address            = var.static_private_ip
     public_ip_address_id          = var.enable_public_ip_address == true ? element(concat(azurerm_public_ip.pip.*.id, [""]), count.index) : null

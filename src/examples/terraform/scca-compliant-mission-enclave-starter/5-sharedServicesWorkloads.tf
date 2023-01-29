@@ -15,6 +15,10 @@ AUTHOR/S: jspinella
 ### STAGE 5: Shared Services Workloads Configuations  ###
 #########################################################
 
+#########################################
+### STAGE 5.1: Build out PE Subnet    ###
+#########################################
+
 # Create Subnet for Private Endpoints
 module "mod_svcs_private_ep_snet" {
   depends_on = [
@@ -31,6 +35,10 @@ module "mod_svcs_private_ep_snet" {
   private_link_service_network_policies_enabled = false
 }
 
+
+#########################################
+### STAGE 5.2: Build out CosmosDB     ###
+#########################################
 
 # Build the Shared Cosmos DB
 /* module "mod_svcs_cosmosdb" {
@@ -97,6 +105,10 @@ module "mod_svcs_private_ep_snet" {
 }
  */
 
+#########################################
+### STAGE 5.3: Build out Resis Cache  ###
+#########################################
+
 module "mod_svcs_redis" {
   depends_on = [
     module.mod_svcs_network,
@@ -154,6 +166,10 @@ module "mod_svcs_redis" {
   extra_tags = var.tags
 }
 
+#########################################
+### STAGE 5.4: Build out EventHub     ###
+#########################################
+
 # Build the Shared Event Hub for Policy
 /* module "mod_svcs_eventHub" {
   depends_on = [
@@ -188,6 +204,127 @@ module "mod_svcs_redis" {
   }
 } */
 
-# Build the Shared Key Vault
-//module "mod_svcs_kv" {}
+###########################################
+### STAGE 5.5: Build out Key Vault      ###
+###########################################
 
+# Build the Shared Key Vault
+module "mod_svcs_kv" {
+  depends_on = [
+    module.mod_svcs_network,
+    module.mod_svcs_private_ep_snet # Wait for the network to be built
+  ]
+  source = "../../../terraform/core/overlays/keyVaults"
+
+   # Resource Group, location, VNet and Subnet details
+  resource_group_name  = module.mod_svcs_network.resource_group_name
+  location             = module.mod_azure_region.location
+  location_short       = module.mod_azure_region.location_short
+  environment          = var.environment
+  org_name             = var.required.org_prefix
+  workload_name        = "shared"
+ 
+  # Creating Private Endpoint requires, VNet name to create a Private Endpoint
+  # By default this will create a `privatelink.redis.cache.windows.net` DNS zone. if created in commercial cloud
+  # To use existing subnet, specify `existing_subnet_id` with valid subnet id. 
+  # To use existing private DNS zone specify `existing_private_dns_zone` with valid zone name
+  # Private endpoints doesn't work If using `subnet_id` to create redis inside a specified VNet.
+  enable_private_endpoint = true
+  existing_subnet_id      = module.mod_svcs_private_ep_snet.id
+  virtual_network_name    = module.mod_svcs_network.virtual_network_name
+  #  existing_private_dns_zone     = "demo.example.com"
+
+  # Tags for Azure Resources
+  extra_tags = var.tags
+}
+
+###########################################
+### STAGE 5.6: Build out Github Server  ###
+###########################################
+
+# Build the Shared Github Server
+module "mod_svcs_github_server" {
+
+  depends_on = [
+    module.mod_svcs_network,
+    module.mod_svcs_private_ep_snet # Wait for the network to be built
+  ]
+  source = "../../../terraform/core/overlays/virtualMachines/linux"
+
+  # Resource Group, location, VNet and Subnet details
+  resource_group_name  = module.mod_svcs_network.resource_group_name
+  location             = module.mod_azure_region.location
+  location_short       = module.mod_azure_region.location_short
+  environment          = var.environment
+  org_name             = var.required.org_prefix
+  workload_name        = "github"
+  virtual_network_name = module.mod_svcs_network.virtual_network_name
+  vm_subnet_name       = var.vm_subnet_name
+  virtual_machine_name = "linux"
+
+  # This module support multiple Pre-Defined Linux and Windows Distributions.
+  # Check the README.md file for more pre-defined images for Ubuntu, Centos, RedHat.
+  # Please make sure to use gen2 images supported VM sizes if you use gen2 distributions
+  # Specify `disable_password_authentication = false` to create random admin password
+  # Specify a valid password with `admin_password` argument to use your own password 
+  # To generate SSH key pair, specify `generate_admin_ssh_key = true`
+  # To use existing key pair, specify `admin_ssh_key_data` to a valid SSH public key path.
+  # Specify instance_count = 1 to create a single instance, or specify a higher number to create multiple instances  
+  linux_distribution_name = "githubEnt"
+  virtual_machine_size    = var.size_linux_jumpbox
+  admin_username          = "azureadmin"
+  generate_admin_ssh_key  = true
+  instances_count         = 1
+
+  # Proxymity placement group, Availability Set and adding Public IP to VM's are optional.
+  # remove these argument from module if you dont want to use it.  
+  enable_proximity_placement_group = false
+  enable_vm_availability_set       = true
+  enable_public_ip_address         = true
+
+  # Network Seurity group port allow definitions for each Virtual Machine
+  # NSG association to be added automatically for all network interfaces.
+  # Remove this NSG rules block, if `existing_network_security_group_id` is specified
+  existing_network_security_group_id = module.mod_svcs_network.network_security_group_id
+
+  # Boot diagnostics to troubleshoot virtual machines, by default uses managed 
+  # To use custom storage account, specify `storage_account_name` with a valid name
+  # Passing a `null` value will utilize a Managed Storage Account to store Boot Diagnostics
+  enable_boot_diagnostics = true
+  storage_account_name    = module.mod_svcs_network.storage_account_name
+
+  # Attach a managed data disk to a Windows/Linux VM's. Possible Storage account type are: 
+  # `Standard_LRS`, `StandardSSD_ZRS`, `Premium_LRS`, `Premium_ZRS`, `StandardSSD_LRS`
+  # or `UltraSSD_LRS` (UltraSSD_LRS only available in a region that support availability zones)
+  # Initialize a new data disk - you need to connect to the VM and run diskmanagemnet or fdisk
+  data_disks = {
+    disk1 = {
+      name                 = "disk1"
+      disk_size_gb         = 100
+      lun                  = 0
+      storage_account_type = "StandardSSD_LRS"
+    }
+    disk2 = {
+      name                 = "disk2"
+      disk_size_gb         = 100
+      lun                  = 0
+      storage_account_type = "StandardSSD_LRS"
+    }
+  }
+
+  # (Optional) To enable Azure Monitoring and install log analytics agents
+  # (Optional) Specify `storage_account_name` to save monitoring logs to storage.   
+  log_analytics_resource_id = module.mod_operational_logging.laws_resource_id
+
+  # Deploy log analytics agents to virtual machine. 
+  # Log analytics workspace customer id and primary shared key required.
+  deploy_log_analytics_agent                 = true
+  log_analytics_customer_id                  = module.mod_operational_logging.laws_workspace_id
+  log_analytics_workspace_primary_shared_key = module.mod_operational_logging.laws_workspace_key
+
+  // Tags
+  extra_tags = merge(var.tags, {
+    DeployedBy  = format("AzureNoOpsTF [%s]", terraform.workspace)
+    description = format("Linux VM for Azure Bastion %s", coalesce(var.custom_bastion_name, data.azurecaf_name.bastion.result))
+  })
+}

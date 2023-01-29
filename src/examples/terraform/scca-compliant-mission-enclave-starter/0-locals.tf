@@ -133,39 +133,21 @@ locals {
   netartKeyVaultName                = format("%.24s", lower(replace(local.netartKeyVaultUniqueName, "/[[:^alnum:]]/", "")))
 
   // DEVELOPMENT TEAM WORKLOAD SPOKE NAMES
-  dev1Name                        = "devteam1"
-  dev1ShortName                   = "devt1"
-  dev1ResourceGroupName           = replace(local.resourceGroupNamingConvention, local.nameToken, local.dev1Name)
-  dev1LogStorageAccountShortName  = replace(local.storageAccountNamingConvention, local.nameToken, local.dev1ShortName)
-  dev1LogStorageAccountUniqueName = replace(local.dev1LogStorageAccountShortName, "unique_storage_token", "${random_id.uniqueString.hex}")
-  dev1LogStorageAccountName       = format("%.24s", lower(replace(local.dev1LogStorageAccountUniqueName, "/[[:^alnum:]]/", "")))
-  dev1VirtualNetworkName          = replace(local.virtualNetworkNamingConvention, local.nameToken, local.dev1Name)
-  dev1NetworkSecurityGroupName    = replace(local.networkSecurityGroupNamingConvention, local.nameToken, local.dev1Name)
-  dev1SubnetName                  = replace(local.subnetNamingConvention, local.nameToken, local.dev1Name)
-  dev1ContainerRegShortName       = replace(local.containerRegistryNamingConvention, local.nameToken, local.dev1ShortName)
-  dev1ContainerRegUniqueName      = replace(local.dev1ContainerRegShortName, "unique_storage_token", "${random_id.uniqueString.hex}")
-  dev1ContainerRegName            = format("%.24s", lower(replace(local.dev1ContainerRegUniqueName, "/[[:^alnum:]]/", "")))
+  devTeamName                        = "devteam"
+  devTeamShortName                   = "devt"
+  devTeamResourceGroupName           = replace(local.resourceGroupNamingConvention, local.nameToken, local.devTeamName)
+  devTeamLogStorageAccountShortName  = replace(local.storageAccountNamingConvention, local.nameToken, local.devTeamShortName)
+  devTeamLogStorageAccountUniqueName = replace(local.devTeamLogStorageAccountShortName, "unique_storage_token", "${random_id.uniqueString.hex}")
+  devTeamLogStorageAccountName       = format("%.24s", lower(replace(local.devTeamLogStorageAccountUniqueName, "/[[:^alnum:]]/", "")))
+  devTeamVirtualNetworkName          = replace(local.virtualNetworkNamingConvention, local.nameToken, local.devTeamName)
+  devTeamNetworkSecurityGroupName    = replace(local.networkSecurityGroupNamingConvention, local.nameToken, local.devTeamName)
+  devTeamSubnetName                  = replace(local.subnetNamingConvention, local.nameToken, local.devTeamName)
+  devTeamContainerRegShortName       = replace(local.containerRegistryNamingConvention, local.nameToken, local.devTeamShortName)
+  devTeamContainerRegUniqueName      = replace(local.devTeamContainerRegShortName, "unique_storage_token", "${random_id.uniqueString.hex}")
+  devTeamContainerRegName            = format("%.24s", lower(replace(local.devTeamContainerRegUniqueName, "/[[:^alnum:]]/", "")))
 
   // DEVELOPMENT TEAM ROUTETABLE VALUES
-  dev1RouteTableName = "${local.dev1SubnetName}-routetable"
-
-  // DEVELOPMENT TEAM 2 WORKLOAD SPOKE NAMES
-  dev2Name                        = "devteam2"
-  dev2ShortName                   = "devt2"
-  dev2ResourceGroupName           = replace(local.resourceGroupNamingConvention, local.nameToken, local.dev2Name)
-  dev2LogStorageAccountShortName  = replace(local.storageAccountNamingConvention, local.nameToken, local.dev2ShortName)
-  dev2LogStorageAccountUniqueName = replace(local.dev2LogStorageAccountShortName, "unique_storage_token", "${random_id.uniqueString.hex}")
-  dev2LogStorageAccountName       = format("%.24s", lower(replace(local.dev2LogStorageAccountUniqueName, "/[[:^alnum:]]/", "")))
-  dev2VirtualNetworkName          = replace(local.virtualNetworkNamingConvention, local.nameToken, local.dev2Name)
-  dev2NetworkSecurityGroupName    = replace(local.networkSecurityGroupNamingConvention, local.nameToken, local.dev2Name)
-  dev2SubnetName                  = replace(local.subnetNamingConvention, local.nameToken, local.dev2Name)
-  dev2ContainerRegShortName       = replace(local.containerRegistryNamingConvention, local.nameToken, local.dev2ShortName)
-  dev2ContainerRegUniqueName      = replace(local.dev2ContainerRegShortName, "unique_storage_token", "${random_id.uniqueString.hex}")
-  dev2ContainerRegName            = format("%.24s", lower(replace(local.dev2ContainerRegUniqueName, "/[[:^alnum:]]/", "")))
-
-
-  // DEVELOPMENT TEAM 2 ROUTETABLE VALUES
-  dev2RouteTableName = "${local.dev2SubnetName}-routetable"
+  devTeamRouteTableName = "${local.devTeamSubnetName}-routetable"
 
   // PRODUCTION SPOKE NAMES
   prodName                        = "prod"

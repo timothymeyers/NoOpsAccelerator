@@ -25,7 +25,7 @@ resource "azurerm_managed_disk" "data_disk" {
 resource "azurerm_virtual_machine_data_disk_attachment" "data_disk" {
   for_each           = var.data_disks
   managed_disk_id    = azurerm_managed_disk.data_disk[each.key].id
-  virtual_machine_id = azurerm_windows_virtual_machine.windows_vm[0].id
+  virtual_machine_id = azurerm_windows_virtual_machine.win_vm[0].id
   lun                = coalesce(each.value.lun, index(keys(var.data_disks), each.key))
   caching            = each.value.caching
 }

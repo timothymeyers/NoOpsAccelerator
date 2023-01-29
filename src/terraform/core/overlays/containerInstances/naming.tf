@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 data "azurecaf_name" "redis" {
   name          = var.workload_name
   resource_type = "azurerm_redis_cache"

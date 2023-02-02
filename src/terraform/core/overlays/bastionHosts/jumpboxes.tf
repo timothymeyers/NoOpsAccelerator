@@ -14,8 +14,7 @@ module "mod_linux_jumpbox" {
 
   # Resource Group, location, VNet and Subnet details
   resource_group_name  = data.azurerm_resource_group.rg.name
-  location             = var.location
-  location_short       = var.location_short
+  location             = var.location  
   environment          = var.environment
   org_name             = var.org_prefix
   workload_name        = "jumpbox"
@@ -86,7 +85,7 @@ module "mod_linux_jumpbox" {
   // Tags
   extra_tags = merge(var.tags, {
     DeployedBy  = format("AzureNoOpsTF [%s]", terraform.workspace)
-    description = format("Linux VM for Azure Bastion %s", coalesce(var.custom_bastion_name, data.azurecaf_name.bastion.result))
+    description = format("Linux VM for Azure Bastion %s", coalesce(var.custom_bastion_name, data.azurenoopsutils_resource_name.bastion.result))
   })
 }
 
@@ -103,8 +102,7 @@ module "mod_windows_jumpbox" {
 
   # Resource Group, location, VNet and Subnet details
   resource_group_name  = data.azurerm_resource_group.rg.name
-  location             = var.location
-  location_short       = var.location_short
+  location             = var.location  
   environment          = var.environment
   org_name             = var.org_prefix
   workload_name        = "jumpbox"
@@ -172,6 +170,6 @@ module "mod_windows_jumpbox" {
   // Tags
   extra_tags = merge(var.tags, {
     DeployedBy  = format("AzureNoOpsTF [%s]", terraform.workspace)
-    description = format("Windows VM for Azure Bastion %s", coalesce(var.custom_bastion_name, data.azurecaf_name.bastion.result))
+    description = format("Windows VM for Azure Bastion %s", coalesce(var.custom_bastion_name, data.azurenoopsutils_resource_name.bastion.result))
   })
 }

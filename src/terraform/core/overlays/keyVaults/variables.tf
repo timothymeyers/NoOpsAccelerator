@@ -31,6 +31,11 @@ variable "resource_group_name" {
   type        = string
 }
 
+variable "create_kv_resource_group" {
+  description = "Whether to create a resource group for the key vault"
+  default     = false
+}
+
 variable "enable_private_endpoint" {
   description = "Manages a Private Endpoint to Azure database for Redis"
   default     = false

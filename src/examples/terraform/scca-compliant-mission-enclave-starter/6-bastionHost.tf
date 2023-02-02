@@ -22,7 +22,7 @@ module "mod_bastion_host" {
   depends_on = [
     module.mod_hub_network,
     module.mod_svcs_network,
-    module.mod_svcs_kv
+    //module.mod_svcs_kv
   ]
   source = "../../../terraform/core/overlays/bastionHosts"
 
@@ -31,9 +31,8 @@ module "mod_bastion_host" {
   // Global Settings
   org_prefix          = var.required.org_prefix
   resource_group_name = module.mod_hub_network.resource_group_name
-  location            = module.mod_azure_region.location
-  location_short      = module.mod_azure_region.location_short
-  environment         = var.environment
+  location            = local.location
+  environment         = var.required.deploy_environment
 
   // Bastion Host Settings
   virtual_network_name             = module.mod_hub_network.virtual_network_name

@@ -1,4 +1,4 @@
-data "azurecaf_name" "sa" {
+data "azurenoopsutils_resource_name" "sa" {
   name          = var.workload_name
   resource_type = "azurerm_storage_account"
   prefixes      = var.name_prefix == "" ? null : [local.name_prefix]

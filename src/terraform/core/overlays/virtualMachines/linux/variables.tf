@@ -10,11 +10,6 @@ variable "location" {
   type        = string
 }
 
-variable "location_short" {
-  description = "Azure region short name"
-  type        = string
-}
-
 variable "environment" {
   description = "Name of the workload's environnement"
   type        = string

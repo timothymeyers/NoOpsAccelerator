@@ -24,15 +24,6 @@ AUTHOR/S: jspinella
 ### STAGE 4: Hub/Spoke Configuations  ###
 #########################################
 
-#############################
-### STAGE 4.1: Scaffolding  ###
-#############################
-
-module "mod_azure_region" {
-  source       = "../../../terraform/core/overlays/regions"
-  azure_region = local.location
-}
-
 ###########################################
 ### STAGE 4.2: Logging Configuration    ###
 ###########################################
@@ -42,8 +33,8 @@ module "mod_operational_logging" {
   source    = "../../../terraform/core/overlays/hubSpokeLandingZone/operationalLogging"
 
   // Global Settings
-  location      = module.mod_azure_region.location
-  environment   = var.environment
+  location      = local.location
+  environment   = var.required.deploy_environment
   org_prefix    = var.required.org_prefix
   workload_name = local.loggingName
 
@@ -69,8 +60,8 @@ module "mod_hub_network" {
   source    = "../../../terraform/core/overlays/hubSpokeLandingZone/virtualNetworkHub"
 
   // Global Settings
-  location      = module.mod_azure_region.location
-  environment   = var.environment
+  location      = local.location
+  environment   = var.required.deploy_environment
   org_prefix    = var.required.org_prefix
   workload_name = local.hubName
 
@@ -141,7 +132,7 @@ module "mod_hub_network" {
   source = "../../../../../terraform/core/overlays/hubSpokeLandingZone/hub/networkArtifacts"
 
   // Global Settings
-  location            = module.mod_azure_region.location
+  location            = module.mod_azure_region_lookup.location
   resource_group_name = module.mod_hub_resource_group.name
 
   // Network Artifacts
@@ -166,8 +157,8 @@ module "mod_ops_network" {
   source    = "../../../terraform/core/overlays/hubSpokeLandingZone/virtualNetworkSpoke"
 
   # Global Settings
-  location      = module.mod_azure_region.location
-  environment   = var.environment
+  location      = local.location
+  environment   = var.required.deploy_environment
   org_prefix    = var.required.org_prefix
   workload_name = local.opsName
 
@@ -219,8 +210,8 @@ module "mod_svcs_network" {
   source    = "../../../terraform/core/overlays/hubSpokeLandingZone/virtualNetworkSpoke"
 
   # Global Settings
-  location      = module.mod_azure_region.location
-  environment   = var.environment
+  location      = local.location
+  environment   = var.required.deploy_environment
   org_prefix    = var.required.org_prefix
   workload_name = local.svcsName
 

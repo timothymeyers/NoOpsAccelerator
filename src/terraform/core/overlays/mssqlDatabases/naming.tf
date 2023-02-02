@@ -1,4 +1,4 @@
-data "azurecaf_name" "redis" {
+data "azurenoopsutils_resource_name" "redis" {
   name          = var.workload_name
   resource_type = "azurerm_redis_cache"
   prefixes      = var.name_prefix == "" ? null : [local.name_prefix]
@@ -8,7 +8,7 @@ data "azurecaf_name" "redis" {
   separator     = "-"
 }
 
-data "azurecaf_name" "data_storage" {
+data "azurenoopsutils_resource_name" "data_storage" {
   name          = var.workload_name
   resource_type = "azurerm_storage_account"
   prefixes      = compact([local.name_prefix, "redis"])
@@ -18,7 +18,7 @@ data "azurecaf_name" "data_storage" {
   separator     = "-"
 }
 
-data "azurecaf_name" "redis_fw_rule" {
+data "azurenoopsutils_resource_name" "redis_fw_rule" {
   for_each = var.authorized_cidrs
 
   name          = var.workload_name

@@ -1,4 +1,4 @@
-data "azurecaf_name" "eventhub_namespace" {
+data "azurenoopsutils_resource_name" "eventhub_namespace" {
   name          = var.workload_name
   resource_type = "azurerm_eventhub_namespace"
   prefixes      = var.name_prefix == "" ? null : [local.name_prefix]
@@ -8,7 +8,7 @@ data "azurecaf_name" "eventhub_namespace" {
   separator     = "-"
 }
 
-data "azurecaf_name" "eventhub" {
+data "azurenoopsutils_resource_name" "eventhub" {
   for_each = var.hubs_parameters
 
   name          = var.workload_name
@@ -20,7 +20,7 @@ data "azurecaf_name" "eventhub" {
   separator     = "-"
 }
 
-data "azurecaf_name" "consumer_group" {
+data "azurenoopsutils_resource_name" "consumer_group" {
   for_each = try(var.hubs_parameters, {})
 
   name          = var.workload_name
@@ -32,7 +32,7 @@ data "azurecaf_name" "consumer_group" {
   separator     = "-"
 }
 
-data "azurecaf_name" "eventhub_namespace_auth_rule" {
+data "azurenoopsutils_resource_name" "eventhub_namespace_auth_rule" {
   for_each = toset(["listen", "send", "manage"])
 
   name          = var.workload_name
@@ -44,7 +44,7 @@ data "azurecaf_name" "eventhub_namespace_auth_rule" {
   separator     = "-"
 }
 
-data "azurecaf_name" "eventhub_auth_rule" {
+data "azurenoopsutils_resource_name" "eventhub_auth_rule" {
   for_each = { for a in local.hubs_auth_rules : format("%s.%s", a.hub_name, a.rule) => format("%s-%s", a.hub_name, a.rule) }
 
   name          = var.workload_name

@@ -24,7 +24,7 @@ AUTHOR/S: jspinella
 # This is the network for the Dev Team 1 environment. 
 # This is a spoke network that is peered to the hub network. 
 # This could be updated to use a object to create multiple spoke networks.
-module "mod_dev_team_env_spoke_network" {
+/* module "mod_dev_team_env_spoke_network" {
   //count  = var.dev_team_instances_count >= 1 ? var.dev_team_instances_count : 0 # for each needs a set, cannot work with a list
   source = "../../../terraform/core/overlays/hubSpokeLandingZone/virtualNetworkSpoke"
 
@@ -107,12 +107,12 @@ module "mod_hub_to_dev_team_networking_peering" {
   allow_virtual_network_access = var.allow_virtual_network_access
   use_remote_gateways          = var.use_remote_gateways
 }
-
+ */
 ########################################################################
 ### STAGE 7.2: Build out Azure Kubernetes Service with ACR & Jumpbox ###
 ########################################################################
 
-module "dev_env_acr_aks_cluster" {
+/* module "dev_env_acr_aks_cluster" {
   depends_on = [
     module.mod_dev_env_aks_workload_spoke_resource_group,
     module.mod_dev_env_aks_workload_spoke_network,
@@ -160,14 +160,14 @@ module "dev_env_acr_aks_cluster" {
   size_linux_jumpbox          = var.vm_size
   vm_os_disk_image            = var.vm_os_disk_image
   virtual_network_name        = module.mod_dev_env_aks_workload_spoke_network.virtual_network_name
-  vm_subnet_id                = "default-snet"
+  vm_subnet_name              = "default-snet"
   network_security_group_name = module.mod_dev_env_aks_workload_spoke_network.network_security_group_name
 
   // Tags
   tags = merge(var.tags, {
     DeployedBy = format("AzureNoOpsTF [%s]", terraform.workspace)
   })
-}
+} */
 
 ######################################
 ### STAGE 7.3: Build out ComosDB   ###

@@ -19,7 +19,7 @@ resource "random_string" "str" {
   special = false
   upper   = false
   keepers = {
-    domain_name_label = coalesce(var.custom_bastion_name, data.azurecaf_name.bastion.result)
+    domain_name_label = coalesce(var.custom_bastion_name, data.azurenoopsutils_resource_name.bastion.result)
   }
 }
 
@@ -27,12 +27,12 @@ resource "random_string" "str" {
 # Public IP for Azure Bastion Service
 #---------------------------------------------
 resource "azurerm_public_ip" "pip" {
-  name                = coalesce(var.custom_public_ip_name, data.azurecaf_name.bastion_pip.result)
+  name                = coalesce(var.custom_public_ip_name, data.azurenoopsutils_resource_name.bastion_pip.result)
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
   allocation_method   = var.public_ip_allocation_method
   sku                 = var.public_ip_sku # Mandatory for Azure Bastion host is Standard
-  domain_name_label   = var.domain_name_label != null ? var.domain_name_label : format("gw%s%s", lower(replace(coalesce(var.custom_bastion_name, data.azurecaf_name.bastion.result), "/[[:^alnum:]]/", "")), random_string.str.result)
+  domain_name_label   = var.domain_name_label != null ? var.domain_name_label : format("gw%s%s", lower(replace(coalesce(var.custom_bastion_name, data.azurenoopsutils_resource_name.bastion.result), "/[[:^alnum:]]/", "")), random_string.str.result)
   zones               = var.public_ip_zones
 
   tags = merge(local.default_tags, var.extra_tags)
@@ -49,7 +49,7 @@ resource "azurerm_public_ip" "pip" {
 # Azure Bastion Service host
 #---------------------------------------------
 resource "azurerm_bastion_host" "main" {
-  name                   = coalesce(var.custom_bastion_name, data.azurecaf_name.bastion.result)
+  name                   = coalesce(var.custom_bastion_name, data.azurenoopsutils_resource_name.bastion.result)
   location               = data.azurerm_resource_group.rg.location
   resource_group_name    = data.azurerm_resource_group.rg.name
   copy_paste_enabled     = var.enable_copy_paste
@@ -59,10 +59,10 @@ resource "azurerm_bastion_host" "main" {
   scale_units            = var.scale_units
   shareable_link_enabled = var.bastion_sku == "Standard" ? var.enable_shareable_link : null
   tunneling_enabled      = var.bastion_sku == "Standard" ? var.enable_tunneling : null
-  tags                   = merge({ "ResourceName" = lower(coalesce(var.custom_bastion_name, data.azurecaf_name.bastion.result)) }, var.tags, )
+  tags                   = merge({ "ResourceName" = lower(coalesce(var.custom_bastion_name, data.azurenoopsutils_resource_name.bastion.result)) }, var.tags, )
 
   ip_configuration {
-    name                 = "${lower(coalesce(var.custom_bastion_name, data.azurecaf_name.bastion.result))}-network"
+    name                 = "${lower(coalesce(var.custom_bastion_name, data.azurenoopsutils_resource_name.bastion.result))}-network"
     subnet_id            = azurerm_subnet.abs_snet.0.id
     public_ip_address_id = azurerm_public_ip.pip.id
   }

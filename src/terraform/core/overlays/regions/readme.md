@@ -1,4 +1,4 @@
-# Azure regions module
+# Azure Regions Lookup overlay module
 
 The AzureRM terraform provider is made easier to use with the aid of this Terraform module.
 

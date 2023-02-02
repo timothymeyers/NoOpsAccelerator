@@ -1,4 +1,4 @@
-data "azurecaf_name" "kubernetes_cluster" {
+data "azurenoopsutils_resource_name" "kubernetes_cluster" {
   name          = var.workload_name
   resource_type = "azurerm_key_vault"
   prefixes      = var.name_prefix == "" ? null : [local.name_prefix]
@@ -8,7 +8,7 @@ data "azurecaf_name" "kubernetes_cluster" {
   separator     = "-"
 }
 
-data "azurecaf_name" "keyvault_hsm" {
+data "azurenoopsutils_resource_name" "keyvault_hsm" {
   name          = var.workload_name
   resource_type = "azurerm_key_vault"
   prefixes      = var.name_prefix == "" ? null : [local.name_prefix]

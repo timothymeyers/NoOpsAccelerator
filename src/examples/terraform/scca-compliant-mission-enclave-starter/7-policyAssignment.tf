@@ -20,7 +20,7 @@ module "mod_mg_platform_diagnostics_initiative" {
   source               = "../../../terraform/core/modules/Microsoft.Authorization/policySetAssignment/managementGroup"
   initiative           = module.platform_diagnostics_initiative.initiative
   assignment_scope     = module.mod_management_group.management_groups["/providers/Microsoft.Management/managementGroups/anoa"].id
-  assignment_location  = module.mod_azure_region.location
+  assignment_location  = local.location
   skip_remediation     = true
   skip_role_assignment = false
 

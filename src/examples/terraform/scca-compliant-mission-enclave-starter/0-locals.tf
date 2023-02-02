@@ -54,7 +54,6 @@ locals {
   // LOGGING NAMES
   loggingName                        = "logging"
   loggingShortName                   = "log"
-  loggingResourceGroupName           = replace(local.resourceGroupNamingConvention, local.nameToken, local.loggingName)
   loggingLogStorageAccountShortName  = replace(local.storageAccountNamingConvention, local.nameToken, local.loggingShortName)
   loggingLogStorageAccountUniqueName = replace(local.loggingLogStorageAccountShortName, "unique_storage_token", "${random_id.uniqueString.hex}")
   loggingLogStorageAccountName       = format("%.24s", lower(replace(local.loggingLogStorageAccountUniqueName, "/[[:^alnum:]]/", "")))
@@ -67,7 +66,6 @@ locals {
   // hub NAMES
   hubName                        = "hub-core"
   hubShortName                   = "hub"
-  hubResourceGroupName           = replace(local.resourceGroupNamingConvention, local.nameToken, local.hubName)
   hubLogStorageAccountShortName  = replace(local.storageAccountNamingConvention, local.nameToken, local.hubShortName)
   hubLogStorageAccountUniqueName = replace(local.hubLogStorageAccountShortName, "unique_storage_token", "${random_id.uniqueString.hex}")
   hubLogStorageAccountName       = format("%.24s", lower(replace(local.hubLogStorageAccountUniqueName, "/[[:^alnum:]]/", "")))
@@ -93,7 +91,6 @@ locals {
   // Ops NAMES
   opsName                        = "ops-core"
   opsShortName                   = "ops"
-  opsResourceGroupName           = replace(local.resourceGroupNamingConvention, local.nameToken, local.opsName)
   opsLogStorageAccountShortName  = replace(local.storageAccountNamingConvention, local.nameToken, local.opsShortName)
   opsLogStorageAccountUniqueName = replace(local.opsLogStorageAccountShortName, "unique_storage_token", "${random_id.uniqueString.hex}")
   opsLogStorageAccountName       = format("%.24s", lower(replace(local.opsLogStorageAccountUniqueName, "/[[:^alnum:]]/", "")))
@@ -107,7 +104,6 @@ locals {
   // SHARED SERVICES NAMES
   svcsName                        = "svcs-core"
   svcsShortName                   = "svcs"
-  svcsResourceGroupName           = replace(local.resourceGroupNamingConvention, local.nameToken, local.svcsName)
   svcsLogStorageAccountShortName  = replace(local.storageAccountNamingConvention, local.nameToken, local.svcsShortName)
   svcsLogStorageAccountUniqueName = replace(local.svcsLogStorageAccountShortName, "unique_storage_token", "${random_id.uniqueString.hex}")
   svcsLogStorageAccountName       = format("%.24s", lower(replace(local.svcsLogStorageAccountUniqueName, "/[[:^alnum:]]/", "")))

@@ -7,14 +7,20 @@
 # Resource Group Creation
 #----------------------------------------------------------
 module "mod_hub_rg" {
-  source = "../../resourceGroups"
+  source  = "azurenoops/overlays-resource-group/azurerm"
+  version = "~> 1.0.1"
 
-  location       = var.location
-  location_short = "usgovva"
-  org_name       = var.org_prefix
-  environment    = var.environment
-  workload_name  = var.workload_name
-  custom_rg_name = var.custom_resource_group_name != null ? var.custom_resource_group_name : null
+  location                = var.location
+  use_location_short_name = true # Use the short location name in the resource group name
+  org_name                = var.org_prefix
+  environment             = var.environment
+  workload_name           = var.workload_name
+  custom_rg_name          = var.custom_resource_group_name != null ? var.custom_resource_group_name : null
+
+  // Tags
+  add_tags = merge(var.tags, {
+    DeployedBy = format("AzureNoOpsTF [%s]", terraform.workspace)
+  }) # Tags to be applied to all resources
 }
 
 #---------------------------------------------------------
@@ -50,7 +56,6 @@ module "mod_fw_client_snet" {
   source                                        = "../../../modules/Microsoft.Network/subnets"
   subnet_name                                   = "AzureFirewallSubnet"
   resource_group_name                           = module.mod_hub_rg.resource_group_name
-  location                                      = var.location
   virtual_network_name                          = module.mod_vnet.virtual_network_name
   address_prefixes                              = [cidrsubnet(var.firewall_subnet_address_prefix, 0, 0)]
   service_endpoints                             = var.firewall_service_endpoints
@@ -66,7 +71,6 @@ module "mod_fw_managwment_snet" {
   count                                         = (var.enable_forced_tunneling && var.firewall_management_subnet_address_prefix != null) ? 1 : 0
   subnet_name                                   = "AzureFirewallManagementSubnet"
   resource_group_name                           = module.mod_hub_rg.resource_group_name
-  location                                      = var.location
   virtual_network_name                          = module.mod_vnet.virtual_network_name
   address_prefixes                              = [cidrsubnet(var.firewall_management_subnet_address_prefix, 0, 0)]
   service_endpoints                             = var.firewall_service_endpoints
@@ -79,7 +83,6 @@ module "mod_gw_snet" {
   count                                         = var.gateway_subnet_address_prefix != null ? 1 : 0
   subnet_name                                   = "GatewaySubnet"
   resource_group_name                           = module.mod_hub_rg.resource_group_name
-  location                                      = var.location
   virtual_network_name                          = module.mod_vnet.virtual_network_name
   address_prefixes                              = var.gateway_subnet_address_prefix #[cidrsubnet(element(var.vnet_address_space, 0), 10, 0)]
   service_endpoints                             = var.gateway_service_endpoints
@@ -91,7 +94,6 @@ module "mod_default_snet" {
   source                                        = "../../../modules/Microsoft.Network/subnets"
   subnet_name                                   = var.subnet_name
   resource_group_name                           = module.mod_hub_rg.resource_group_name
-  location                                      = var.location
   virtual_network_name                          = module.mod_vnet.virtual_network_name
   address_prefixes                              = var.subnet_address_prefixes
   service_endpoints                             = var.subnet_service_endpoints

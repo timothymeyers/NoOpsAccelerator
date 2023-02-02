@@ -26,11 +26,6 @@ variable "location" {
   type        = string
 }
 
-variable "location_short" {
-  description = "The location/region short name to keep all your network resources. To get the list of all locations with table format from azure cli, run 'az account list-locations -o table'"
-  type        = string
-}
-
 variable "deploy_environment" {
   description = "The environment to deploy to. It defaults to 'dev'."
   type        = string

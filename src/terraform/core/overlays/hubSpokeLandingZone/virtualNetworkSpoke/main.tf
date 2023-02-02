@@ -7,13 +7,20 @@
 # Resource Group Creation
 #----------------------------------------------------------
 module "mod_spoke_rg" {
-  source = "../../resourceGroups"
+  source  = "azurenoops/overlays-resource-group/azurerm"
+  version = "~> 1.0.1"
 
-  location       = var.location
-  location_short = "usgovva"
-  org_name       = var.org_prefix
-  environment    = var.environment
-  workload_name  = var.workload_name
+  location                = var.location
+  use_location_short_name = true # Use the short location name in the resource group name
+  org_name                = var.org_prefix
+  environment             = var.environment
+  workload_name           = var.workload_name
+  custom_rg_name          = var.custom_resource_group_name != null ? var.custom_resource_group_name : null
+
+  // Tags
+  add_tags = merge(var.tags, {
+    DeployedBy = format("AzureNoOpsTF [%s]", terraform.workspace)
+  }) # Tags to be applied to all resources
 }
 
 #---------------------------------------------------------
@@ -43,7 +50,6 @@ module "mod_default_snet" {
   source                                        = "../../../modules/Microsoft.Network/subnets"
   subnet_name                                   = var.subnet_name
   resource_group_name                           = module.mod_spoke_rg.resource_group_name
-  location                                      = var.location
   virtual_network_name                          = module.mod_vnet.virtual_network_name
   address_prefixes                              = var.subnet_address_prefixes
   service_endpoints                             = var.subnet_service_endpoints

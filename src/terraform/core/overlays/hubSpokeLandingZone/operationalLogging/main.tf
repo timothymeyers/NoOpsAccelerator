@@ -14,18 +14,19 @@ AUTHOR/S: jrspinella
 # Resource Group Creation
 #----------------------------------------------------------
 module "mod_logging_rg" {
-  source = "../../resourceGroups"
+  source  = "azurenoops/overlays-resource-group/azurerm"
+  version = "~> 1.0.1"
 
-  location       = var.location
-  location_short = "usgovva"
-  org_name       = var.org_prefix
-  environment    = var.environment
-  workload_name  = var.workload_name
-  custom_rg_name = var.custom_resource_group_name != null ? var.custom_resource_group_name : null
+  location                = var.location
+  use_location_short_name = true # Use the short location name in the resource group name
+  org_name                = var.org_prefix
+  environment             = var.environment
+  workload_name           = var.workload_name
+  custom_rg_name          = var.custom_resource_group_name != null ? var.custom_resource_group_name : null
 
   // Tags
-  extra_tags = merge(var.tags, {
-    DeployedBy  = format("AzureNoOpsTF [%s]", terraform.workspace)   
+  add_tags = merge(var.tags, {
+    DeployedBy = format("AzureNoOpsTF [%s]", terraform.workspace)
   }) # Tags to be applied to all resources
 }
 
@@ -53,7 +54,7 @@ module "mod_logging_storage_account" {
 
   // Tags
   extra_tags = merge(var.tags, {
-    DeployedBy  = format("AzureNoOpsTF [%s]", terraform.workspace)    
+    DeployedBy = format("AzureNoOpsTF [%s]", terraform.workspace)
   }) # Tags to be applied to all resources
 }
 

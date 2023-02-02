@@ -20,7 +20,7 @@ module "mod_linux_jumpbox" {
   org_name             = var.org_prefix
   workload_name        = "jumpbox"
   virtual_network_name = data.azurerm_virtual_network.hub_bastion_host_vnet.guid
-  vm_subnet_id         = var.vm_subnet_id
+  vm_subnet_name       = var.vm_subnet_name
   virtual_machine_name = "linux"
 
   # This module support multiple Pre-Defined Linux and Windows Distributions.
@@ -30,7 +30,6 @@ module "mod_linux_jumpbox" {
   # Specify a valid password with `admin_password` argument to use your own password 
   # To generate SSH key pair, specify `generate_admin_ssh_key = true`
   # To use existing key pair, specify `admin_ssh_key_data` to a valid SSH public key path.  
-  os_flavor               = "linux"
   linux_distribution_name = "ubuntu2004"
   virtual_machine_size    = "Standard_B2s"
   admin_username          = var.admin_username

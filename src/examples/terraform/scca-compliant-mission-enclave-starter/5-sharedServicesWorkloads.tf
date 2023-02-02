@@ -27,7 +27,6 @@ module "mod_svcs_private_ep_snet" {
   source                                        = "../../../terraform/core/modules/Microsoft.Network/subnets"
   subnet_name                                   = local.svcsPrivateEndpointSubnetName
   resource_group_name                           = module.mod_svcs_network.resource_group_name
-  location                                      = module.mod_azure_region.location
   virtual_network_name                          = module.mod_svcs_network.virtual_network_name
   address_prefixes                              = ["10.0.120.32/28"] # This is a /28 subnet, which allows for 14 private endpoints
   service_endpoints                             = []
@@ -109,7 +108,7 @@ module "mod_svcs_private_ep_snet" {
 ### STAGE 5.3: Build out Resis Cache  ###
 #########################################
 
-module "mod_svcs_redis" {
+/* module "mod_svcs_redis" {
   depends_on = [
     module.mod_svcs_network,
     module.mod_svcs_private_ep_snet # Wait for the network to be built
@@ -123,9 +122,8 @@ module "mod_svcs_redis" {
   # will remain the same if you use the current resource.
   create_redis_resource_group = false
   resource_group_name         = module.mod_svcs_network.resource_group_name
-  location                    = module.mod_azure_region.location
-  location_short              = module.mod_azure_region.location_short
-  environment                 = var.environment
+  location                    = module.mod_azure_region_lookup.location_cli
+  environment                 = var.required.deploy_environment
   org_name                    = var.required.org_prefix
   workload_name               = local.svcsShortName
 
@@ -164,7 +162,7 @@ module "mod_svcs_redis" {
 
   # Tags for Azure Resources
   extra_tags = var.tags
-}
+} */
 
 #########################################
 ### STAGE 5.4: Build out EventHub     ###
@@ -208,7 +206,7 @@ module "mod_svcs_redis" {
 ### STAGE 5.5: Build out Key Vault      ###
 ###########################################
 
-# Build the Shared Key Vault
+/* # Build the Shared Key Vault
 module "mod_svcs_kv" {
   depends_on = [
     module.mod_svcs_network,
@@ -231,19 +229,19 @@ module "mod_svcs_kv" {
   # Private endpoints doesn't work If using `subnet_id` to create redis inside a specified VNet.
   enable_private_endpoint = true
   existing_subnet_id      = module.mod_svcs_private_ep_snet.id
-  virtual_network_name    = module.mod_svcs_network.virtual_network_name
+  //virtual_network_name    = module.mod_svcs_network.virtual_network_name
   #  existing_private_dns_zone     = "demo.example.com"
 
   # Tags for Azure Resources
   extra_tags = var.tags
-}
+} */
 
 ###########################################
 ### STAGE 5.6: Build out Github Server  ###
 ###########################################
 
 # Build the Shared Github Server
-module "mod_svcs_github_server" {
+/* module "mod_svcs_github_server" {
 
   depends_on = [
     module.mod_svcs_network,
@@ -325,6 +323,7 @@ module "mod_svcs_github_server" {
   // Tags
   extra_tags = merge(var.tags, {
     DeployedBy  = format("AzureNoOpsTF [%s]", terraform.workspace)
-    description = format("Linux VM for Azure Bastion %s", coalesce(var.custom_bastion_name, data.azurecaf_name.bastion.result))
+    description = format("Linux VM for Azure Bastion %s", coalesce(var.custom_bastion_name, data.azurenoopsutils_resource_name.bastion.result))
   })
 }
+ */

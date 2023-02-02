@@ -76,10 +76,10 @@ terraform {
     azapi = {
       source  = "azure/azapi"
       version = "~> 1.0.0"
-    }
-    azurecaf = {
-      source  = "aztfmod/azurecaf"
-      version = "~> 1.2, >= 1.2.22"
+    }   
+    azurenoopsutils = {
+      source  = "azurenoops/azurenoopsutils"
+      version = "1.0.4"
     }
     null = {
       source = "hashicorp/null"
@@ -95,6 +95,7 @@ terraform {
   }
 }
 
+provider "azurenoopsutils" {}
 
 provider "azurerm" {
   environment     = var.environment

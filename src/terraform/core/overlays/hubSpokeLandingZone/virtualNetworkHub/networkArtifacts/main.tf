@@ -23,18 +23,19 @@ terraform {
 
 module "mod_netart_resource_group" {
   count  = var.enable_network_artifacts == true ? 1 : 0
-  source = "../../../../modules/Microsoft.Resources/resourceGroups"
+  source  = "azurenoops/overlays-resource-group/azurerm"
+  version = "1.0.0"
 
   //Global Settings
-  location = var.location
+  location       = var.location
+  org_name       = var.org_prefix
+  environment    = var.required.deploy_environment
+  workload_name  = "network-artifacts"
+  custom_rg_name = var.custom_resource_group_name != null ? var.custom_resource_group_name : null
 
-  // Resource Group Parameters
-  name = var.resource_group_name
-
-  // Resource Group Tags
-  tags = merge(var.tags, {
-    DeployedBy  = format("AzureNoOpsTF [%s]", terraform.workspace)
-    description = format("Network Artifacts Resource: %s", var.resource_group_name)
+  // Tags
+  add_tags = merge(var.tags, {
+    DeployedBy  = format("AzureNoOpsTF [%s]", terraform.workspace)   
   }) # Tags to be applied to all resources
 }
 

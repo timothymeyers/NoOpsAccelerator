@@ -251,8 +251,8 @@ variable "create_jumpbox" {
   default     = true
 }
 
-variable "vm_subnet_id" {
-  description = "Specifies the subnet id of the jumpbox"
+variable "vm_subnet_name" {
+  description = "Specifies the subnet name of the jumpbox"
   type        = string
   default     = ""
 }

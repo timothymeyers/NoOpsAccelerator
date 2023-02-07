@@ -13,7 +13,7 @@ AUTHOR/S: jspinella
 ################################################
 
 module "mod_management_group" {
-  source            = "../../../terraform/core/modules/Microsoft.Management/managementGroups"
+  source            = "../../../terraform/core/overlays/managementGroups"
   root_id           = var.root_management_group_id
   root_parent_id    = data.azurerm_subscription.current_client.tenant_id
   root_name         = var.root_management_group_display_name

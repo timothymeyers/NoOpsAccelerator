@@ -17,10 +17,10 @@ AUTHOR/S: jspinella
 ##################
 
 module "mod_mg_platform_diagnostics_initiative" {
-  source               = "../../../terraform/core/modules/Microsoft.Authorization/policySetAssignment/managementGroup"
+  source               = "../../../terraform/core/modules/Microsoft.Authorization/policySetAssignment"
   initiative           = module.platform_diagnostics_initiative.initiative
   assignment_scope     = module.mod_management_group.management_groups["/providers/Microsoft.Management/managementGroups/anoa"].id
-  assignment_location  = local.location
+  assignment_location  = var.location
   skip_remediation     = true
   skip_role_assignment = false
 
@@ -59,16 +59,16 @@ module "mod_mg_platform_diagnostics_initiative" {
 ##################
 # Storage
 ##################
-/* module "mod_mg_storage_enforce_https" {
-  source            = "../../../terraform/core/modules/Microsoft.Authorization/policyDefAssignment/managementGroup"
+module "mod_mg_storage_enforce_https" {
+  source            = "../../../terraform/core/modules/Microsoft.Authorization/policyDefAssignment"
   definition        = module.storage_enforce_https.definition
-  assignment_scope  = module.mod_management_group.management_groups["/providers/Microsoft.Management/managementGroups/anoa"].id
+  assignment_scope  = module.mod_management_group.management_groups["/providers/Microsoft.Management/managementGroups/platforms"].id
   assignment_effect = "Deny"
 }
 
 module "mod_mg_storage_enforce_minimum_tls1_2" {
-  source            = "../../../terraform/core/modules/Microsoft.Authorization/policyDefAssignment/managementGroup"
+  source            = "../../../terraform/core/modules/Microsoft.Authorization/policyDefAssignment"
   definition        = module.storage_enforce_minimum_tls1_2.definition
-  assignment_scope  = module.mod_management_group.management_groups["/providers/Microsoft.Management/managementGroups/anoa"].id
+  assignment_scope  = module.mod_management_group.management_groups["/providers/Microsoft.Management/managementGroups/platforms"].id
   assignment_effect = "Deny"
-} */
+}

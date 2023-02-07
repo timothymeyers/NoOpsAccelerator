@@ -33,7 +33,7 @@ module "mod_operational_logging" {
   source    = "../../../terraform/core/overlays/hubSpokeLandingZone/operationalLogging"
 
   // Global Settings
-  location      = local.location
+  location      = module.mod_azure_region_lookup.location_cli
   environment   = var.required.deploy_environment
   org_prefix    = var.required.org_prefix
   workload_name = local.loggingName
@@ -60,7 +60,7 @@ module "mod_hub_network" {
   source    = "../../../terraform/core/overlays/hubSpokeLandingZone/virtualNetworkHub"
 
   // Global Settings
-  location      = local.location
+  location      = module.mod_azure_region_lookup.location_cli
   environment   = var.required.deploy_environment
   org_prefix    = var.required.org_prefix
   workload_name = local.hubName
@@ -79,8 +79,7 @@ module "mod_hub_network" {
   // Hub Network Security Group
   network_security_group_name           = local.hubNetworkSecurityGroupName
   network_security_group_inbound_rules  = var.hub_network_security_group_inbound_rules
-  network_security_group_outbound_rules = var.hub_network_security_group_outbound_rules
-
+  
   // Hub Route Table
   route_table_name = local.hubRouteTableName
 
@@ -157,7 +156,7 @@ module "mod_ops_network" {
   source    = "../../../terraform/core/overlays/hubSpokeLandingZone/virtualNetworkSpoke"
 
   # Global Settings
-  location      = local.location
+  location      = module.mod_azure_region_lookup.location_cli
   environment   = var.required.deploy_environment
   org_prefix    = var.required.org_prefix
   workload_name = local.opsName
@@ -179,8 +178,7 @@ module "mod_ops_network" {
   # Operations Spoke Network Security Group
   network_security_group_name           = local.opsNetworkSecurityGroupName
   network_security_group_inbound_rules  = var.ops_network_security_group_inbound_rules
-  network_security_group_outbound_rules = var.ops_network_security_group_outbound_rules
-
+  
   // Operations Spoke Route Table
   route_table_name = local.opsRouteTableName
   route_table_routes = {
@@ -210,7 +208,7 @@ module "mod_svcs_network" {
   source    = "../../../terraform/core/overlays/hubSpokeLandingZone/virtualNetworkSpoke"
 
   # Global Settings
-  location      = local.location
+  location      = module.mod_azure_region_lookup.location_cli
   environment   = var.required.deploy_environment
   org_prefix    = var.required.org_prefix
   workload_name = local.svcsName
@@ -233,7 +231,6 @@ module "mod_svcs_network" {
   # Operations Spoke Network Security Group
   network_security_group_name           = local.svcsNetworkSecurityGroupName
   network_security_group_inbound_rules  = var.svcs_network_security_group_inbound_rules
-  network_security_group_outbound_rules = var.svcs_network_security_group_outbound_rules
 
   // Operations Spoke Route Table
   route_table_name = local.svcsRouteTableName

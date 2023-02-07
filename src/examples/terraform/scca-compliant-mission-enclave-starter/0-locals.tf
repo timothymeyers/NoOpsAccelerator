@@ -15,15 +15,13 @@ locals {
 
   firewall_premium_environments = ["public", "usgovernment"] # terraform azurerm environments where Azure Firewall Premium is supported
 
-  location = var.locations[0] # we use the first location in the list of stamps as the "main" location to root our global resources in, which need it. E.g. Cosmos DB
-
   // Central Logging
   centrals_diagnostic_log_categories = ["Administrative", "Security", "ServiceHealth", "Alert", "Recommendation", "Policy", "Autoscale", "ResourceHealth"]
 
   # RESOURCE PREFIXES
   resourceToken    = "resource_token"
   nameToken        = "name_token"
-  namingConvention = "${lower(var.required.org_prefix)}-${local.location}-${lower(var.required.deploy_environment)}-${local.nameToken}-${local.resourceToken}"
+  namingConvention = "${lower(var.required.org_prefix)}-${var.location}-${lower(var.required.deploy_environment)}-${local.nameToken}-${local.resourceToken}"
 
   /*
     NAMING CONVENTION

@@ -7,7 +7,7 @@ DESCRIPTION: The following components will be options in this deployment
             * Azure Cosmos DB
             * Azure Redis Cache
             * Azure Key Vault 
-            * Azure Event Hub for Logging and Policy
+            * GitHub Enterprise Server
 AUTHOR/S: jspinella
 */
 
@@ -47,15 +47,10 @@ module "mod_svcs_private_ep_snet" {
   ]
   source = "../../../terraform/core/overlays/cosmosDbs/sqldb"
 
-  # By default, this module will not create a resource group
-  # provide a name to use an existing resource group, specify the existing resource group name,
-  # and set the argument to `create_resource_group = false`. Location will be same as existing RG.
-  create_cosmos_sqldb_resource_group = var.create_cosmos_sqldb_resource_group
-
   # The name of the resource group in which to create the CosmosDB account.
   resource_group_name         = module.mod_svcs_network.resource_group_name
-  location                    = var.location
-  location_short              = "usgovva"
+  location                    = module.mod_azure_region_lookup.location_cli
+  location_short              = module.mod_azure_region_lookup.location_short
   environment                 = var.environment
   org_name                    = var.org_name
   workload_name               = var.workload_name
@@ -101,14 +96,13 @@ module "mod_svcs_private_ep_snet" {
   existing_subnet_id      = module.mod_svcs_private_ep_snet.id
   virtual_network_name    = module.mod_svcs_network.virtual_network_name
   #  existing_private_dns_zone     = "demo.example.com"
-}
- */
+} */
 
 #########################################
 ### STAGE 5.3: Build out Resis Cache  ###
 #########################################
 
-/* module "mod_svcs_redis" {
+module "mod_svcs_redis" {
   depends_on = [
     module.mod_svcs_network,
     module.mod_svcs_private_ep_snet # Wait for the network to be built
@@ -123,7 +117,8 @@ module "mod_svcs_private_ep_snet" {
   create_redis_resource_group = false
   resource_group_name         = module.mod_svcs_network.resource_group_name
   location                    = module.mod_azure_region_lookup.location_cli
-  environment                 = var.required.deploy_environment
+  environment                 = var.environment
+  deploy_environment          = var.required.deploy_environment
   org_name                    = var.required.org_prefix
   workload_name               = local.svcsShortName
 
@@ -162,52 +157,15 @@ module "mod_svcs_private_ep_snet" {
 
   # Tags for Azure Resources
   extra_tags = var.tags
-} */
+}
 
-#########################################
-### STAGE 5.4: Build out EventHub     ###
-#########################################
-
-# Build the Shared Event Hub for Policy
-/* module "mod_svcs_eventHub" {
-  depends_on = [
-    module.mod_svcs_network,
-    module.mod_svcs_private_ep_snet # Wait for the network to be built
-  ]
-  source = "../../../terraform/core/overlays/eventHubs"
-
-  # By default, this module will create a resource group and 
-  # provide a name for an existing resource group. If you wish 
-  # to use an existing resource group, change the option 
-  # to "create resource group = false." The location of the group 
-  # will remain the same if you use the current resource.
-  create_redis_resource_group = false
-  resource_group_name         = module.mod_svcs_network.resource_group_name
-  location                    = module.mod_azure_region.location
-  location_short              = "usgovva"
-  environment                 = var.environment
-  org_name                    = var.required.org_prefix
-  workload_name               = local.svcsShortName
-
-  create_dedicated_cluster = true
-
-  namespace_parameters = {
-    sku      = "Standard"
-    capacity = 2
-  }
-
-  namespace_authorizations = {
-    listen = true
-    send   = false
-  }
-} */
 
 ###########################################
-### STAGE 5.5: Build out Key Vault      ###
+### STAGE 5.4: Build out Key Vault      ###
 ###########################################
 
-/* # Build the Shared Key Vault
-module "mod_svcs_kv" {
+# Build the Shared Key Vault
+/* module "mod_svcs_kv" {
   depends_on = [
     module.mod_svcs_network,
     module.mod_svcs_private_ep_snet # Wait for the network to be built
@@ -216,8 +174,8 @@ module "mod_svcs_kv" {
 
    # Resource Group, location, VNet and Subnet details
   resource_group_name  = module.mod_svcs_network.resource_group_name
-  location             = module.mod_azure_region.location
-  location_short       = module.mod_azure_region.location_short
+  location             = module.mod_azure_region_lookup.location_cli
+  location_short       = module.mod_azure_region_lookup.location_short
   environment          = var.environment
   org_name             = var.required.org_prefix
   workload_name        = "shared"
@@ -237,11 +195,11 @@ module "mod_svcs_kv" {
 } */
 
 ###########################################
-### STAGE 5.6: Build out Github Server  ###
+### STAGE 5.5: Build out Github Server  ###
 ###########################################
 
 # Build the Shared Github Server
-/* module "mod_svcs_github_server" {
+module "mod_svcs_github_server" {
 
   depends_on = [
     module.mod_svcs_network,
@@ -251,13 +209,12 @@ module "mod_svcs_kv" {
 
   # Resource Group, location, VNet and Subnet details
   resource_group_name  = module.mod_svcs_network.resource_group_name
-  location             = module.mod_azure_region.location
-  location_short       = module.mod_azure_region.location_short
-  environment          = var.environment
+  location             = module.mod_azure_region_lookup.location_cli
+  deploy_environment   = var.required.deploy_environment
   org_name             = var.required.org_prefix
   workload_name        = "github"
   virtual_network_name = module.mod_svcs_network.virtual_network_name
-  vm_subnet_name       = var.vm_subnet_name
+  vm_subnet_name       = module.mod_svcs_network.default_subnet_name
   virtual_machine_name = "linux"
 
   # This module support multiple Pre-Defined Linux and Windows Distributions.
@@ -268,17 +225,18 @@ module "mod_svcs_kv" {
   # To generate SSH key pair, specify `generate_admin_ssh_key = true`
   # To use existing key pair, specify `admin_ssh_key_data` to a valid SSH public key path.
   # Specify instance_count = 1 to create a single instance, or specify a higher number to create multiple instances  
-  linux_distribution_name = "githubEnt"
-  virtual_machine_size    = var.size_linux_jumpbox
-  admin_username          = "azureadmin"
-  generate_admin_ssh_key  = true
-  instances_count         = 1
+  linux_distribution_name         = "ubuntu1805"
+  virtual_machine_size            = var.size_linux_jumpbox
+  admin_username                  = "azureadmin"
+  disable_password_authentication = true
+  generate_admin_ssh_key          = true
+  instances_count                 = 1
 
   # Proxymity placement group, Availability Set and adding Public IP to VM's are optional.
   # remove these argument from module if you dont want to use it.  
   enable_proximity_placement_group = false
-  enable_vm_availability_set       = true
-  enable_public_ip_address         = true
+  enable_vm_availability_set       = false
+  enable_public_ip_address         = false
 
   # Network Seurity group port allow definitions for each Virtual Machine
   # NSG association to be added automatically for all network interfaces.
@@ -288,26 +246,19 @@ module "mod_svcs_kv" {
   # Boot diagnostics to troubleshoot virtual machines, by default uses managed 
   # To use custom storage account, specify `storage_account_name` with a valid name
   # Passing a `null` value will utilize a Managed Storage Account to store Boot Diagnostics
-  enable_boot_diagnostics = true
-  storage_account_name    = module.mod_svcs_network.storage_account_name
-
+  enable_boot_diagnostics = false
+  
   # Attach a managed data disk to a Windows/Linux VM's. Possible Storage account type are: 
   # `Standard_LRS`, `StandardSSD_ZRS`, `Premium_LRS`, `Premium_ZRS`, `StandardSSD_LRS`
   # or `UltraSSD_LRS` (UltraSSD_LRS only available in a region that support availability zones)
   # Initialize a new data disk - you need to connect to the VM and run diskmanagemnet or fdisk
   data_disks = {
     disk1 = {
-      name                 = "disk1"
+      name                 = "gh_disk1"
       disk_size_gb         = 100
       lun                  = 0
       storage_account_type = "StandardSSD_LRS"
-    }
-    disk2 = {
-      name                 = "disk2"
-      disk_size_gb         = 100
-      lun                  = 0
-      storage_account_type = "StandardSSD_LRS"
-    }
+    }    
   }
 
   # (Optional) To enable Azure Monitoring and install log analytics agents
@@ -323,7 +274,5 @@ module "mod_svcs_kv" {
   // Tags
   extra_tags = merge(var.tags, {
     DeployedBy  = format("AzureNoOpsTF [%s]", terraform.workspace)
-    description = format("Linux VM for Azure Bastion %s", coalesce(var.custom_bastion_name, data.azurenoopsutils_resource_name.bastion.result))
   })
 }
- */

@@ -29,10 +29,11 @@ module "mod_bastion_host" {
   count = var.enable_services.enable_bastion_hosts ? 1 : 0
 
   // Global Settings
-  org_prefix          = var.required.org_prefix
+  org_name            = var.required.org_prefix
   resource_group_name = module.mod_hub_network.resource_group_name
-  location            = local.location
-  environment         = var.required.deploy_environment
+  location            = module.mod_hub_network.resource_group_location
+  deploy_environment  = var.required.deploy_environment
+  workload_name       = "hub-core"
 
   // Bastion Host Settings
   virtual_network_name             = module.mod_hub_network.virtual_network_name

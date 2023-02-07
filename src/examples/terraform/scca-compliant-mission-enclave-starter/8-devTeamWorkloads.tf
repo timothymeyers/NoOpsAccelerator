@@ -24,37 +24,35 @@ AUTHOR/S: jspinella
 # This is the network for the Dev Team 1 environment. 
 # This is a spoke network that is peered to the hub network. 
 # This could be updated to use a object to create multiple spoke networks.
-/* module "mod_dev_team_env_spoke_network" {
+module "mod_dev_team_env_spoke_network" {
   //count  = var.dev_team_instances_count >= 1 ? var.dev_team_instances_count : 0 # for each needs a set, cannot work with a list
   source = "../../../terraform/core/overlays/hubSpokeLandingZone/virtualNetworkSpoke"
 
   # Global Settings
-  location      = module.mod_azure_region.location
+  location      = module.mod_azure_region_lookup.location_cli
   environment   = var.environment
   org_prefix    = var.required.org_prefix
   workload_name = local.devTeamName
 
-
   # By default, this module should not create a network watcher. If you want to enable this, set this to true
   create_network_watcher = false
 
-  # Operations Spoke Configuration
+  # Dev Team Environment Spoke Configuration
   virtual_network_name          = local.devTeamVirtualNetworkName
-  virtual_network_address_space = var.devTeam_vnet_address_space
+  virtual_network_address_space = var.dev_team_spoke_vnet_address_space
 
-  # Operations Spoke Subnets
+  # Dev Team Environment Spoke Subnets
   subnet_name                                = local.devTeamSubnetName
   subnet_address_prefixes                    = var.dev_team_vnet_subnet_address_prefixes
   subnet_service_endpoints                   = var.dev_team_vnet_subnet_service_endpoints
   private_endpoint_network_policies_enabled  = false
   private_endpoint_service_endpoints_enabled = true
 
-  # Operations Spoke Network Security Group
+  # Dev Team Environment Spoke Network Security Group
   network_security_group_name           = local.devTeamNetworkSecurityGroupName
-  network_security_group_inbound_rules  = var.dev_team_network_security_group_inbound_rules
-  network_security_group_outbound_rules = var.dev_team_network_security_group_outbound_rules
-
-  // Operations Spoke Route Table
+  network_security_group_inbound_rules  = var.dev_team_network_inbound_security_group_rules
+  
+  // Dev Team Environment Spoke Route Table
   route_table_name = local.devTeamRouteTableName
   route_table_routes = {
     "default_devTeam_route" = {
@@ -97,7 +95,7 @@ module "mod_hub_to_dev_team_networking_peering" {
   vnet_1_name         = module.mod_hub_network.virtual_network_name
   vnet_1_rg           = module.mod_hub_network.resource_group_name
 
-  // Operations Networking Peering Settings
+  // Dev Team Environment Networking Peering Settings
   peering_name_2_to_1 = "${module.mod_dev_team_env_spoke_network.virtual_network_name}-to-${module.mod_hub_network.virtual_network_name}"
   vnet_2_id           = module.mod_dev_team_env_spoke_network.virtual_network_id
   vnet_2_name         = module.mod_dev_team_env_spoke_network.virtual_network_name
@@ -107,7 +105,7 @@ module "mod_hub_to_dev_team_networking_peering" {
   allow_virtual_network_access = var.allow_virtual_network_access
   use_remote_gateways          = var.use_remote_gateways
 }
- */
+
 ########################################################################
 ### STAGE 7.2: Build out Azure Kubernetes Service with ACR & Jumpbox ###
 ########################################################################

@@ -15,6 +15,11 @@ variable "environment" {
   type        = string
 }
 
+variable "deploy_environment" {
+  description = "Name of the workload's environnement"
+  type        = string
+}
+
 variable "workload_name" {
   description = "Name of the workload_name"
   type        = string

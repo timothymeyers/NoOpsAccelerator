@@ -263,5 +263,5 @@ locals {
     uae-north        = "uae-central" # United Arab Emirates
   }
 
-  paired_region = try(local.paired[local.location_slug], null)
+  paired_region = try(local.paired[var.location_slug], null)
 }

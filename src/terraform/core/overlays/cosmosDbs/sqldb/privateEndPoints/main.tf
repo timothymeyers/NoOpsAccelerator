@@ -13,7 +13,7 @@ data "azurerm_virtual_network" "vnet01" {
 resource "azurerm_private_endpoint" "pep1" {
   count               = var.enable_private_endpoint ? 1 : 0
   name                = format("%s-private-endpoint", element([for n in azurerm_cosmosdb_account.main : n.name], 0))
-  location            = local.location
+  location            = var.location
   resource_group_name = local.resource_group_name
   subnet_id           = azurerm_subnet.snet-ep.0.id
   tags                = merge({ "Name" = format("%s-private-endpoint", element([for n in azurerm_cosmosdb_account.main : n.name], 0)) }, var.tags, )

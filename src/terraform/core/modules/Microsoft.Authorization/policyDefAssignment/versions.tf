@@ -3,11 +3,10 @@
 
 terraform {
   required_providers {
-    azurerm = {
+     azurerm = {
       source = "hashicorp/azurerm"
     }
-    azuread = {
-      source = "hashicorp/azuread"
-    }
   }
+
 }
+

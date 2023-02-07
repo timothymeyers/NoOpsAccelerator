@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 ##################################################
 # VARIABLES                                      #
 ##################################################
@@ -62,13 +65,19 @@ variable assignment_enforcement_mode {
 variable assignment_location {
   type        = string
   description = "The Azure location where this policy assignment should exist, required when an Identity is assigned. Defaults to UK South. Changing this forces a new resource to be created"
-  default     = "eastus"
+  default     = "uksouth"
 }
 
 variable non_compliance_messages {
   type        = any
   description = "The optional non-compliance message(s). Key/Value pairs map as policy_definition_reference_id = 'content', use null = 'content' to specify the Default non-compliance message for all member definitions."
   default     = {}
+}
+
+variable "identity_ids" {
+  type        = list(any)
+  description = "Optional list of User Managed Identity IDs which should be assigned to the Policy Initiative"
+  default     = []
 }
 
 variable resource_discovery_mode {
@@ -114,13 +123,13 @@ variable resource_count {
 
 variable role_definition_ids {
   type        = list(string)
-  description = "List of Role definition ID's for the System Assigned Identity. Omit this to use those located in policy definitions. Changing this forces a new resource to be created"
+  description = "List of Role definition ID's for the System Assigned Identity. Omit this to use those located in policy definitions. Ignored when using Managed Identities. Changing this forces a new resource to be created"
   default     = []
 }
 
 variable role_assignment_scope {
   type        = string
-  description = "The scope at which role definition(s) will be assigned, defaults to Policy Assignment Scope. Must be full resource IDs. Changing this forces a new resource to be created"
+  description = "The scope at which role definition(s) will be assigned, defaults to Policy Assignment Scope. Must be full resource IDs. Ignored when using Managed Identities. Changing this forces a new resource to be created"
   default     = null
 }
 
@@ -135,4 +144,3 @@ variable skip_role_assignment {
   description = "Should the module skip creation of role assignment for policies that DeployIfNotExists and Modify"
   default     = false
 }
-

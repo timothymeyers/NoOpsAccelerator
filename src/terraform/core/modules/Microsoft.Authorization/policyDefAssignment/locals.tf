@@ -1,11 +1,5 @@
-terraform {
-  required_providers {
-     azurerm = {
-      source = "hashicorp/azurerm"
-    }
-  }
-
-}
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 
 locals {
   # assignment_name will be trimmed if exceeds 24 characters

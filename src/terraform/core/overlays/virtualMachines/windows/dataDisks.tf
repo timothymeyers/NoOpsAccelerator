@@ -6,12 +6,12 @@
 #---------------------------------------
 resource "azurerm_managed_disk" "data_disk" {
   for_each             = var.data_disks
-  name                 = coalesce(each.value.name, var.use_caf_naming ? data.azurenoopsutils_resource_name.disk[each.key].result : format("%s-datadisk%s", local.vm_name, each.key))
+  name                 = coalesce(each.value.name, var.use_naming ? data.azurenoopsutils_resource_name.disk[each.key].result : format("%s-datadisk%s", local.vm_name, each.key))
   resource_group_name  = var.resource_group_name
   location             = var.location
   storage_account_type = each.value.storage_account_type
   create_option        = each.value.create_option
-  disk_size_gb         = each.value.disk_size_gb
+  disk_size_gb         = each.value.disk_size_gb  
   source_resource_id   = contains(["Copy", "Restore"], each.value.create_option) ? each.value.source_resource_id : null
   tags                 = merge({ "ResourceName" = "${local.vm_name}_DataDisk_${each.value.lun}" }, var.tags, )
 

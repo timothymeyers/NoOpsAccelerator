@@ -10,7 +10,7 @@ variable "location" {
   type        = string
 }
 
-variable "environment" {
+variable "deploy_environment" {
   description = "Name of the workload's environnement"
   type        = string
 }
@@ -318,7 +318,7 @@ variable "enable_proximity_placement_group" {
 
 variable "platform_fault_domain_count" {
   description = "Specifies the number of fault domains that are used"
-  default     = 3
+  default     = 2
 }
 variable "platform_update_domain_count" {
   description = "Specifies the number of update domains that are used"

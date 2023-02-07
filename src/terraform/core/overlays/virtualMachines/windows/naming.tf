@@ -4,19 +4,18 @@
 data "azurenoopsutils_resource_name" "vm" {
   name          = var.workload_name
   resource_type = "azurerm_windows_virtual_machine"
-  prefixes      = var.name_prefix == "" ? null : [local.name_prefix]
-  suffixes      = compact([var.org_name, var.environment, local.name_suffix, var.use_caf_naming ? "" : "vm"])
-  use_slug      = var.use_caf_naming
+  prefixes      = [var.org_name]
+  suffixes      = compact([var.name_prefix == "" ? null : local.name_prefix, var.deploy_environment, local.name_suffix, var.use_naming ? "" : "vm"])
+  use_slug      = var.use_naming
   clean_input   = true
-  separator     = "-"
 }
 
 data "azurenoopsutils_resource_name" "pub_ip" {
   name          = var.workload_name
   resource_type = "azurerm_public_ip"
-  prefixes      = var.name_prefix == "" ? null : [local.name_prefix]
-  suffixes      = compact([var.org_name, var.environment, local.name_suffix, var.use_caf_naming ? "" : "pubip"])
-  use_slug      = var.use_caf_naming
+  prefixes      = [var.org_name]
+  suffixes      = compact([var.name_prefix == "" ? null : local.name_prefix, var.deploy_environment, local.name_suffix, var.use_naming ? "" : "pip"])
+  use_slug      = var.use_naming
   clean_input   = true
   separator     = "-"
 }
@@ -24,9 +23,19 @@ data "azurenoopsutils_resource_name" "pub_ip" {
 data "azurenoopsutils_resource_name" "nic" {
   name          = var.workload_name
   resource_type = "azurerm_network_interface"
-  prefixes      = var.name_prefix == "" ? null : [local.name_prefix]
-  suffixes      = compact([var.org_name, var.environment, local.name_suffix, var.use_caf_naming ? "" : "nic"])
-  use_slug      = var.use_caf_naming
+  prefixes      = [var.org_name]
+  suffixes      = compact([var.name_prefix == "" ? null : local.name_prefix, var.deploy_environment, local.name_suffix, var.use_naming ? "" : "nic"])
+  use_slug      = var.use_naming
+  clean_input   = true
+  separator     = "-"
+}
+
+data "azurenoopsutils_resource_name" "avail_set" {
+  name          = var.workload_name
+  resource_type = "azurerm_availability_set"
+  prefixes      = [var.org_name]
+  suffixes      = compact([var.name_prefix == "" ? null : local.name_prefix, var.deploy_environment, local.name_suffix, var.use_naming ? "" : "nic"])
+  use_slug      = var.use_naming
   clean_input   = true
   separator     = "-"
 }
@@ -36,9 +45,9 @@ data "azurenoopsutils_resource_name" "disk" {
 
   name          = var.workload_name
   resource_type = "azurerm_managed_disk"
-  prefixes      = var.name_prefix == "" ? null : [local.name_prefix]
-  suffixes      = compact([var.org_name, var.environment, each.key])
-  use_slug      = var.use_caf_naming
+  prefixes      = [var.org_name]
+  suffixes      = compact([var.name_prefix == "" ? null : local.name_prefix, var.deploy_environment, local.name_suffix, var.use_naming ? "" : "disk"])
+  use_slug      = var.use_naming
   clean_input   = true
   separator     = "-"
 }

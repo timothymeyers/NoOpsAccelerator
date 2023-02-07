@@ -7,7 +7,7 @@
 
 locals {
   default_tags = var.default_tags_enabled ? {
-    env  = var.environment
+    env  = var.deploy_environment
     core = var.workload_name
   } : {}
 

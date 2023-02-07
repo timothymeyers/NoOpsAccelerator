@@ -52,9 +52,9 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
   tags                            = merge({ "ResourceName" = var.instances_count == 1 ? local.vm_name : format("%s%s", lower(replace(local.vm_name, "/[[:^alnum:]]/", "")), count.index + 1) }, var.tags, )
 
   dynamic "admin_ssh_key" {
-    for_each = var.ssh_public_key != null ? ["fake"] : []
+    for_each = var.disable_password_authentication ? [1] : []
     content {
-      public_key = var.ssh_public_key
+      public_key = var.admin_ssh_key == null ? tls_private_key.rsa[0].public_key_openssh : file(var.admin_ssh_key)
       username   = var.admin_username
     }
   }

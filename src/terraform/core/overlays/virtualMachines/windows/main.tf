@@ -31,7 +31,7 @@ resource "tls_private_key" "rsa" {
 #---------------------------------------
 resource "azurerm_windows_virtual_machine" "win_vm" {
   count                        = var.instances_count >= 1 ? var.instances_count : 0
-  name                         = var.instances_count == 1 ? substr(local.vm_hostname, 0, 15) : substr(format("%s%s", lower(replace(local.vm_hostname, "/[[:^alnum:]]/", "")), count.index + 1), 0, 15)
+  name                         = var.instances_count == 1 ? substr(local.vm_name, 0, 24) : substr(format("%s%s", lower(replace(local.vm_name, "/[[:^alnum:]]/", "")), count.index + 1), 0, 24)
   computer_name                = var.instances_count == 1 ? substr(local.vm_hostname, 0, 15) : substr(format("%s%s", lower(replace(local.vm_hostname, "/[[:^alnum:]]/", "")), count.index + 1), 0, 15)
   resource_group_name          = var.resource_group_name
   location                     = var.location

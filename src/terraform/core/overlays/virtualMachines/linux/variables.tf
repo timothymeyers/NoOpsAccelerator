@@ -10,7 +10,7 @@ variable "location" {
   type        = string
 }
 
-variable "environment" {
+variable "deploy_environment" {
   description = "Name of the workload's environnement"
   type        = string
 }
@@ -131,7 +131,7 @@ variable "generate_admin_ssh_key" {
   default     = false
 }
 
-variable "admin_ssh_key_data" {
+variable "admin_ssh_key" {
   description = "specify the path to the existing SSH key to authenticate Linux virtual machine"
   default     = null
 }
@@ -262,7 +262,7 @@ variable "public_ip_availability_zone" {
 
 variable "private_ip_address_allocation_type" {
   description = "The allocation method used for the Private IP Address. Possible values are Dynamic and Static."
-  default     = "Dynamic"
+  default     = "Static"
 }
 
 variable "private_ip_address" {
@@ -318,7 +318,7 @@ variable "enable_proximity_placement_group" {
 
 variable "platform_fault_domain_count" {
   description = "Specifies the number of fault domains that are used"
-  default     = 3
+  default     = 2
 }
 variable "platform_update_domain_count" {
   description = "Specifies the number of update domains that are used"
@@ -364,6 +364,13 @@ variable "linux_distribution_list" {
   }))
 
   default = {
+    ubuntu1805 = {
+      publisher = "GitHub"
+      offer     = "GitHub-Enterprise"
+      sku       = "GitHub-Enterprise"
+      version   = "latest"
+    },
+
     ubuntu1604 = {
       publisher = "Canonical"
       offer     = "UbuntuServer"
@@ -622,13 +629,6 @@ variable "linux_distribution_list" {
       sku       = "sqldev"
       version   = "latest"
     },
-
-    githubEnt = {
-      publisher = "GitHub"
-      offer     = "GitHub-Enterprise"
-      sku       = "GitHub-Enterprise"
-      version   = "latest"
-    },
   }
 }
 
@@ -765,9 +765,20 @@ variable "backup_policy_id" {
   default     = null
 }
 
+##############################
+# VM Patch Configuration    ##
+##############################
+
 variable "patch_mode" {
-  description = "Specifies the mode of in-guest patching to Linux or Windows Virtual Machine. Possible values are `Manual`, `AutomaticByOS` and `AutomaticByPlatform`"
-  default     = "AutomaticByPlatform"
+  description = "Specifies the mode of in-guest patching to this Linux Virtual Machine. Possible values are `AutomaticByPlatform` and `ImageDefault`. Compatibility list is available here https://learn.microsoft.com/en-us/azure/virtual-machines/automatic-vm-guest-patching#supported-os-images."
+  type        = string
+  default     = "ImageDefault"
+}
+
+variable "maintenance_configuration_ids" {
+  description = "List of maintenance configurations to attach to this VM."
+  type        = list(string)
+  default     = []
 }
 
 

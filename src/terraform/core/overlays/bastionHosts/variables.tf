@@ -11,14 +11,14 @@ variable "resource_group_name" {
   default     = ""
 }
 
-variable "org_prefix" {
+variable "org_name" {
   description = "A name for the organization. It defaults to anoa."
   type        = string
 }
 
-variable "environment" {
-  description = "The Terraform backend environment e.g. public or usgovernment"
-  type        = string  
+variable "workload_name" {
+  description = "A name for the workload. It defaults to 'core'."
+  type        = string
 }
 
 variable "location" {

@@ -27,7 +27,7 @@ resource "random_string" "str" {
 # Public IP for Azure Bastion Service
 #---------------------------------------------
 resource "azurerm_public_ip" "pip" {
-  name                = coalesce(var.custom_public_ip_name, data.azurenoopsutils_resource_name.bastion_pip.result)
+  name                = local.bastion_pip_name
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
   allocation_method   = var.public_ip_allocation_method
@@ -49,7 +49,7 @@ resource "azurerm_public_ip" "pip" {
 # Azure Bastion Service host
 #---------------------------------------------
 resource "azurerm_bastion_host" "main" {
-  name                   = coalesce(var.custom_bastion_name, data.azurenoopsutils_resource_name.bastion.result)
+  name                   = local.bastion_name
   location               = data.azurerm_resource_group.rg.location
   resource_group_name    = data.azurerm_resource_group.rg.name
   copy_paste_enabled     = var.enable_copy_paste

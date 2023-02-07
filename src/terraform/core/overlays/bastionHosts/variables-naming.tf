@@ -24,13 +24,13 @@ variable "use_naming" {
 variable "custom_bastion_name" {
   description = "Custom Bastion name, generated if not set"
   type        = string
-  default     = ""
+  default     = null
 }
 
 variable "custom_public_ip_name" {
   description = "Bastion IP Config resource custom name"
   type        = string
-  default     = ""
+  default     = null
 }
 
 variable "custom_ipconfig_name" {

@@ -17,7 +17,7 @@ AUTHOR/S: jspinella
 ##################
 
 module "mod_mg_platform_diagnostics_initiative" {
-  source               = "../../../terraform/core/modules/Microsoft.Authorization/policySetAssignment"
+  source               = "../../../terraform/core/modules/Microsoft.Authorization/policySetAssignment/managementGroup"
   initiative           = module.platform_diagnostics_initiative.initiative
   assignment_scope     = module.mod_management_group.management_groups["/providers/Microsoft.Management/managementGroups/anoa"].id
   assignment_location  = var.location
@@ -60,14 +60,14 @@ module "mod_mg_platform_diagnostics_initiative" {
 # Storage
 ##################
 module "mod_mg_storage_enforce_https" {
-  source            = "../../../terraform/core/modules/Microsoft.Authorization/policyDefAssignment"
+  source            = "../../../terraform/core/modules/Microsoft.Authorization/policyDefAssignment/managementGroup"
   definition        = module.storage_enforce_https.definition
   assignment_scope  = module.mod_management_group.management_groups["/providers/Microsoft.Management/managementGroups/platforms"].id
   assignment_effect = "Deny"
 }
 
 module "mod_mg_storage_enforce_minimum_tls1_2" {
-  source            = "../../../terraform/core/modules/Microsoft.Authorization/policyDefAssignment"
+  source            = "../../../terraform/core/modules/Microsoft.Authorization/policyDefAssignment/managementGroup"
   definition        = module.storage_enforce_minimum_tls1_2.definition
   assignment_scope  = module.mod_management_group.management_groups["/providers/Microsoft.Management/managementGroups/platforms"].id
   assignment_effect = "Deny"

@@ -29,43 +29,17 @@ locals {
   # try to use policy definition roles if explicit roles are ommitted
   role_definition_ids = var.skip_role_assignment == false && try(values(local.identity_type)[0], "") == "SystemAssigned" ? try(coalescelist(var.role_definition_ids, try(var.initiative.role_definition_ids, [])), []) : []
 
-  # evaluate policy assignment scope from resource identifier
-  assignment_scope = try({
-    mg       = length(regexall("(\\/managementGroups\\/)", var.assignment_scope)) > 0 ? 1 : 0,
-    sub      = length(split("/", var.assignment_scope)) == 3 ? 1 : 0,
-    rg       = length(regexall("(\\/managementGroups\\/)", var.assignment_scope)) < 1 ? length(split("/", var.assignment_scope)) == 5 ? 1 : 0 : 0,
-    resource = length(split("/", var.assignment_scope)) >= 6 ? 1 : 0,
-  })
-
   # evaluate remediation scope from resource identifier
   remediation_scope = try(coalesce(var.remediation_scope, var.assignment_scope), "")
-  remediate = try({
-    mg       = length(regexall("(\\/managementGroups\\/)", local.remediation_scope)) > 0 ? 1 : 0,
-    sub      = length(split("/", local.remediation_scope)) == 3 ? 1 : 0,
-    rg       = length(regexall("(\\/managementGroups\\/)", local.remediation_scope)) < 1 ? length(split("/", local.remediation_scope)) == 5 ? 1 : 0 : 0,
-    resource = length(split("/", local.remediation_scope)) >= 6 ? 1 : 0,
-  })
-
+  
   # retrieve definition references & create a remediation task for policies with DeployIfNotExists and Modify effects
   definitions = var.skip_remediation == false && length(local.identity_type) > 0 ? try(var.initiative.policy_definition_reference, []) : []
-  definition_reference = try({
-    mg       = local.remediate.mg > 0 ? local.definitions : []
-    sub      = local.remediate.sub > 0 ? local.definitions : []
-    rg       = local.remediate.rg > 0 ? local.definitions : []
-    resource = local.remediate.resource > 0 ? local.definitions : []
-  })
-
+  
   # evaluate outputs
   assignment = try(
-    azurerm_management_group_policy_assignment.set[0],
-    azurerm_subscription_policy_assignment.set[0],
-    azurerm_resource_group_policy_assignment.set[0],
-    azurerm_resource_policy_assignment.set[0],
+    azurerm_management_group_policy_assignment.set,
   "")
   remediation_tasks = try(
     azurerm_management_group_policy_remediation.rem,
-    azurerm_subscription_policy_remediation.rem,
-    azurerm_resource_group_policy_remediation.rem,
-    azurerm_resource_policy_remediation.rem,
   {})
 }

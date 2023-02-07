@@ -34,6 +34,11 @@ output "default_subnet_id" {
   value       = module.mod_default_snet.id
 }
 
+output "default_subnet_name" {
+  description = "The name of the default subnet"
+  value       = module.mod_default_snet.name
+}
+
 output "ddos_protection_plan" {
   description = "Ddos protection plan details"
   value       = module.mod_vnet.ddos_protection_plan

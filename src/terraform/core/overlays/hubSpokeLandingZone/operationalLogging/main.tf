@@ -64,7 +64,7 @@ output "storage_accounts" {
 }
 
 module "laws" { # Log Analytics Workspace
-  source = "../../../modules/Microsoft.OperationalInsights/workspaces"
+  source = "../../../overlays/logAnalyticsWorkspaces"
 
   //Global Settings
   location = var.location
@@ -89,7 +89,7 @@ module "laws" { # Log Analytics Workspace
 
 module "mod_law_sentinel" {
   depends_on = [module.laws]
-  source     = "../../../modules/Microsoft.OperationsManagement/logAnalyticsWorkspaceSolutions"
+  source     = "../../../overlays/logAnalyticsWorkspaceSolutions"
   count      = var.deploy_sentinel ? 1 : 0
 
   //Global Settings

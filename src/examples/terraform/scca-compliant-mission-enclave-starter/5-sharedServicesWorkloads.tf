@@ -267,9 +267,7 @@ module "mod_svcs_github_server" {
 
   # Deploy log analytics agents to virtual machine. 
   # Log analytics workspace customer id and primary shared key required.
-  deploy_log_analytics_agent                 = true
-  log_analytics_customer_id                  = module.mod_operational_logging.laws_workspace_id
-  log_analytics_workspace_primary_shared_key = module.mod_operational_logging.laws_workspace_key
+  deploy_log_analytics_agent                 = false
 
   // Tags
   extra_tags = merge(var.tags, {

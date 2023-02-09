@@ -30,6 +30,15 @@ module "mod_logging_rg" {
   }) # Tags to be applied to all resources
 }
 
+#---------------------------------------------------------
+# Azure Region Lookup
+#----------------------------------------------------------
+module "mod_azure_region_lookup" {
+  source = "azurenoops/overlays-azregions-lookup/azurerm"
+  version = "~> 1.0.0"
+  azure_region = var.location
+}
+
 ###################################
 ### STAGE 1: Build out Logging  ###
 ###################################
@@ -40,7 +49,7 @@ module "mod_logging_storage_account" {
   //Global Settings
   resource_group_name = module.mod_logging_rg.resource_group_name
   location            = var.location
-  location_short      = "usgovva"
+  location_short      = module.mod_azure_region_lookup.location_short
   org_name            = var.org_prefix
   environment         = var.environment
   workload_name       = var.workload_name

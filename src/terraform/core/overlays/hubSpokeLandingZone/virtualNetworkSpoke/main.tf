@@ -24,6 +24,16 @@ module "mod_spoke_rg" {
 }
 
 #---------------------------------------------------------
+# Azure Region Lookup
+#----------------------------------------------------------
+module "mod_azure_region_lookup" {
+  source = "azurenoops/overlays-azregions-lookup/azurerm"
+  version = "~> 1.0.0"
+  azure_region = var.location
+}
+
+
+#---------------------------------------------------------
 # Vnet Creation or selection 
 #----------------------------------------------------------
 module "mod_vnet" {
@@ -147,7 +157,7 @@ module "mod_storage_account" {
   //Global Settings
   resource_group_name = module.mod_spoke_rg.resource_group_name
   location            = var.location
-  location_short      = "usgovva"
+  location_short      = module.mod_azure_region_lookup.location_short
   org_name            = var.org_prefix
   environment         = var.environment
   workload_name       = var.workload_name

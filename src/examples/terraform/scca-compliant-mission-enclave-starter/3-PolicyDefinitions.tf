@@ -49,8 +49,8 @@ module "deploy_resource_diagnostic_setting" {
     module.mod_management_group
   ]
   source              = "../../../terraform/core/modules/Microsoft.Authorization/policyDefinition"
-  for_each            = toset([for p in fileset("../../../policyascode/definitions/custom/Monitoring", "*.json") : trimsuffix(basename(p), ".json")])
-  file_path           = "../../../policyascode/definitions/custom/Monitoring/${each.key}.json"
+  for_each            = toset([for p in fileset("../../../policyascode/definitions/custom/monitoring", "*.json") : trimsuffix(basename(p), ".json")])
+  file_path           = "../../../policyascode/definitions/custom/monitoring/${each.key}.json"
   policy_name         = each.key
   policy_category     = "Monitoring"
   management_group_id = module.mod_management_group.management_groups["/providers/Microsoft.Management/managementGroups/anoa"].id
@@ -64,7 +64,7 @@ module "deny_nic_public_ip" {
     module.mod_management_group
   ]
   source              = "../../../terraform/core/modules/Microsoft.Authorization/policyDefinition"
-  file_path           = "../../../policyascode/definitions/custom/Network/deny_nic_public_ip.json"
+  file_path           = "../../../policyascode/definitions/custom/network/deny_nic_public_ip.json"
   policy_name         = "deny_nic_public_ip"
   display_name        = "Network interfaces should not have public IPs"
   policy_category     = "Network"
@@ -79,7 +79,7 @@ module "storage_enforce_https" {
     module.mod_management_group
   ]
   source              = "../../../terraform/core/modules/Microsoft.Authorization/policyDefinition"
-  file_path           = "../../../policyascode/definitions/custom/Storage/storage_enforce_https.json"
+  file_path           = "../../../policyascode/definitions/custom/storage/storage_enforce_https.json"
   policy_name         = "storage_enforce_https"
   display_name        = "Secure transfer to storage accounts should be enabled"
   policy_category     = "Storage"
@@ -92,7 +92,7 @@ module "storage_enforce_minimum_tls1_2" {
     module.mod_management_group
   ]
   source              = "../../../terraform/core/modules/Microsoft.Authorization/policyDefinition"
-  file_path           = "../../../policyascode/definitions/custom/Storage/storage_enforce_minimum_tls1_2.json"
+  file_path           = "../../../policyascode/definitions/custom/storage/storage_enforce_minimum_tls1_2.json"
   policy_name         = "storage_enforce_minimum_tls1_2"
   display_name        = "Minimum TLS version for data in transit to storage accounts should be set"
   policy_category     = "Storage"
@@ -109,7 +109,7 @@ module "inherit_resource_group_tags_modify" {
     module.mod_management_group
   ]
   source              = "../../../terraform/core/modules/Microsoft.Authorization/policyDefinition"
-  file_path           = "../../../policyascode/definitions/custom/Tags/inherit_resource_group_tags_modify.json"
+  file_path           = "../../../policyascode/definitions/custom/tags/inherit_resource_group_tags_modify.json"
   policy_name         = "inherit_resource_group_tags_modify"
   display_name        = "Resources should inherit Resource Group Tags and Values with Modify Remediation"
   policy_category     = "Tags"

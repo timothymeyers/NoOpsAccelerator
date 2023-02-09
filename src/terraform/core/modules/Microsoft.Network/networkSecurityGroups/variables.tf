@@ -23,8 +23,18 @@ variable "tags" {
 }
 
 variable "inbound_rules" {
-  type        = list(map(string))
-  default     = []
+  type = map(object({
+    name                       = string
+    priority                   = string
+    direction                  = string
+    access                     = string
+    protocol                   = string
+    source_port_range          = string
+    destination_port_ranges    = list(string)
+    source_address_prefixes    = list(string)
+    destination_address_prefix = string
+  }))
+  default     = {}
   description = "List of objects that represent the configuration of each inbound rule."
   # inbound_rules = [
   #   {
@@ -42,8 +52,18 @@ variable "inbound_rules" {
 }
 
 variable "outbound_rules" {
-  type        = list(map(string))
-  default     = []
+  type = map(object({
+    name                       = string
+    priority                   = string
+    direction                  = string
+    access                     = string
+    protocol                   = string
+    source_port_range          = string
+    destination_port_ranges    = list(string)
+    source_address_prefixes    = list(string)
+    destination_address_prefix = string
+  }))
+  default     = {}
   description = "List of objects that represent the configuration of each outbound rule."
   # outbound_rules = [
   #   {

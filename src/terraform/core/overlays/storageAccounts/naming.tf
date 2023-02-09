@@ -1,0 +1,9 @@
+data "azurenoopsutils_resource_name" "sa" {
+  name          = var.workload_name
+  resource_type = "azurerm_storage_account"
+  prefixes      = var.name_prefix == "" ? null : [local.name_prefix]
+  suffixes      = compact([var.org_name, var.location_short, var.environment, local.name_suffix, var.use_naming ? "" : "sa"])
+  use_slug      = var.use_naming
+  clean_input   = true
+  separator     = "-"
+}

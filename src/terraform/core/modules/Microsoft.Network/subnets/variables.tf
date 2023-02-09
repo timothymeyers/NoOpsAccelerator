@@ -1,11 +1,6 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-variable "location" {
-  description = "The location/region to keep all your network resources. To get the list of all locations with table format from azure cli, run 'az account list-locations -o table'"
-  type        = string
-}
-
 variable "resource_group_name" {
   description = "The name of the subnet's resource group"
   type        = string

@@ -2,8 +2,13 @@
 # Licensed under the MIT License.
 
 output "resource_group_name" {
-  description = "The name of the virtual network"
+  description = "The name of the virtual network resource group"
   value       = azurerm_virtual_network.vnet.resource_group_name
+}
+
+output "resource_group_location" {
+  description = "The name of the virtual network resource group location"
+  value       = azurerm_virtual_network.vnet.location
 }
 
 output "virtual_network_name" {

@@ -201,7 +201,7 @@ func TestInvalidVarsForAutomaticUpgrades(t *testing.T) {
 
 func dummyRequiredVariables() map[string]interface{} {
 	return map[string]interface{}{
-		"prefix":              "foo",
+		"org_prefix":          "anoa",
 		"resource_group_name": "bar",
 	}
 }

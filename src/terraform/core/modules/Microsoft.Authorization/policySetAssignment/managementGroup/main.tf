@@ -1,37 +1,59 @@
-terraform {
-  required_providers {
-     azurerm = {
-      source = "hashicorp/azurerm"
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+# Description: Creates a Policy Set Assignment
+# Credit: gettek
+##################################################
+# RESOURCES                                      #
+##################################################
+
+resource azurerm_management_group_policy_assignment set {
+  name                 = local.assignment_name
+  display_name         = local.display_name
+  description          = local.description
+  metadata             = local.metadata
+  parameters           = local.parameters
+  management_group_id  = var.assignment_scope
+  not_scopes           = var.assignment_not_scopes
+  enforce              = var.assignment_enforcement_mode
+  policy_definition_id = var.initiative.id
+  location             = var.assignment_location
+
+  dynamic "non_compliance_message" {
+    for_each = local.non_compliance_message
+    content {
+      content                        = non_compliance_message.value
+      policy_definition_reference_id = non_compliance_message.key == "null" ? null : non_compliance_message.key
     }
   }
 
+  dynamic "identity" {
+    for_each = local.identity_type
+    content {
+      type         = identity.value
+      identity_ids = var.identity_ids
+    }
+  }
 }
 
-locals {
-  # assignment_name will be trimmed if exceeds 24 characters
-  assignment_name = try(lower(substr(coalesce(var.assignment_name, var.initiative.name), 0, 24)), "")
-  display_name = try(coalesce(var.assignment_display_name, var.initiative.display_name), "")
-  description = try(coalesce(var.assignment_description, var.initiative.description), "")
-  metadata = jsonencode(try(coalesce(var.assignment_metadata, jsondecode(var.initiative.metadata)), {}))
+## role assignments ##
+resource azurerm_role_assignment rem_role {
+  for_each                         = toset(local.role_definition_ids)
+  scope                            = coalesce(var.role_assignment_scope, var.assignment_scope)
+  role_definition_id               = each.value
+  principal_id                     = local.assignment.identity[0].principal_id
+  skip_service_principal_aad_check = true
+}
 
-  # convert assignment parameters to the required assignment structure
-  parameter_values = var.assignment_parameters != null ? {
-    for key, value in var.assignment_parameters :
-    key => merge({ value = value })
-  } : null
-
-  # merge effect and parameter_values if specified, will use definition default effects if omitted
-  parameters = local.parameter_values != null ? var.assignment_effect != null ? jsonencode(merge(local.parameter_values, { effect = { value = var.assignment_effect } })) : jsonencode(local.parameter_values) : null
-
-  # create the optional non-compliance message content block(s) if present
-  non_compliance_message = var.non_compliance_messages != {} ? {
-    for reference_id, message in var.non_compliance_messages :
-    reference_id => message
-  } : {}
-
-  # determine if a managed identity should be created with this assignment
-  identity_type = length(try(coalescelist(var.role_definition_ids, try(var.initiative.role_definition_ids, [])), [])) > 0 ? { type = "SystemAssigned" } : {}
-
-  # try to use policy definition roles if explicit roles are ommitted
-  role_definition_ids = var.skip_role_assignment == false ? try(coalescelist(var.role_definition_ids, try(var.initiative.role_definition_ids, [])), []) : []
+## remediation tasks ##
+resource azurerm_management_group_policy_remediation rem {
+  for_each                       = { for dr in local.definitions : basename(dr.reference_id) => dr }
+  name                           = lower("${each.key}-${formatdate("DD-MM-YYYY-hh:mm:ss", timestamp())}")
+  management_group_id            = local.remediation_scope
+  policy_assignment_id           = local.assignment.id
+  policy_definition_reference_id = each.key
+  location_filters               = var.location_filters
+  failure_percentage             = var.failure_percentage
+  parallel_deployments           = var.parallel_deployments
+  resource_count                 = var.resource_count
 }

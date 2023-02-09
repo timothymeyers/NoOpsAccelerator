@@ -19,10 +19,10 @@ resource "azurerm_network_security_rule" "inbound" {
   priority                    = each.value.priority
   access                      = each.value.access
   protocol                    = each.value.protocol
-  source_address_prefix       = lookup(each.value, "source_address_prefix", "*")
+  source_address_prefixes     = lookup(each.value, "source_address_prefixes", "*")
   source_port_range           = lookup(each.value, "source_port_range", "*")
   destination_address_prefix  = lookup(each.value, "destination_address_prefix", "*")
-  destination_port_range      = lookup(each.value, "destination_port_range", "*")
+  destination_port_ranges     = lookup(each.value, "destination_port_ranges", "*")
   description                 = lookup(each.value, "description", null)
 }
 
@@ -35,9 +35,9 @@ resource "azurerm_network_security_rule" "outbound" {
   priority                    = each.value.priority
   access                      = each.value.access
   protocol                    = each.value.protocol
-  source_address_prefix       = lookup(each.value, "source_address_prefix", "*")
+  source_address_prefixes     = lookup(each.value, "source_address_prefixes", "*")
   source_port_range           = lookup(each.value, "source_port_range", "*")
   destination_address_prefix  = lookup(each.value, "destination_address_prefix", "*")
-  destination_port_range      = lookup(each.value, "destination_port_range", "*")
+  destination_port_ranges     = lookup(each.value, "destination_port_ranges", "*")
   description                 = lookup(each.value, "description", null)
 }

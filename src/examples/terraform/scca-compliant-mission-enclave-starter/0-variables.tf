@@ -41,7 +41,7 @@ variable "enable_services" {
 
     // Enable Network services
     enable_network_diagnostics = true  // true to create a diagnostics settings for the network
-    enable_bastion_diagnostics = true  // true to create a diagnostics settings for the bastion host
+    enable_bastion_diagnostics = false // true to create a diagnostics settings for the bastion host
     enable_network_artifacts   = false // true to create a network artifacts for operations
     enable_resource_locks      = false // true to enable resource locks
     enable_firewall            = true  // true to create the Azure Firewall
@@ -61,19 +61,19 @@ variable "enable_services" {
 variable "environment" {
   description = "The Terraform backend environment e.g. public or usgovernment"
   type        = string
-  default     = "usgovernment"
+  default     = "public"
 }
 
 variable "metadata_host" {
   description = "The metadata host for the Azure Cloud e.g. management.azure.com or management.usgovcloudapi.net."
   type        = string
-  default     = "management.usgovcloudapi.net"
+  default     = "management.azure.com"
 }
 
-variable "locations" {
+variable "location" {
   description = "List of Azure regions into which stamps are deployed. Important: The first location in this list will be used as the main location for this deployment."
-  type        = list(string)
-  default     = ["usgovvirginia"]
+  type        = string
+  default     = "eastus"
 }
 
 variable "root_management_group_id" {
@@ -90,7 +90,7 @@ variable "root_management_group_id" {
 variable "root_management_group_display_name" {
   description = "The display name for the root management group."
   type        = string
-  default     = "anoa"
+  default     = "anoa-root"
 
   validation {
     condition     = can(regex("^[a-zA-Z0-9-_\\(\\)\\.]{1,36}$", var.root_management_group_display_name))
@@ -155,7 +155,7 @@ variable "management_groups" {
       display_name               = "transport"
       management_group_name      = "transport"
       parent_management_group_id = "platforms"
-      subscription_ids           = ["964c406a-1019-48d1-a927-9461123de233"]
+      subscription_ids           = ["<<subscriptionId>>"]
     },
     "management" = {
       display_name               = "management"
@@ -208,7 +208,7 @@ variable "log_analytics_config" {
 variable "hub_subscription_id" {
   description = "Subscription ID for the Hub deployment"
   type        = string
-  default     = "964c406a-1019-48d1-a927-9461123de233"
+  default     = "<<subscriptionId>>"
 
   validation {
     condition     = can(regex("^[a-z0-9-]{36}$", var.hub_subscription_id)) || var.hub_subscription_id == ""
@@ -239,41 +239,19 @@ variable "hub_vnet_subnet_service_endpoints" {
 }
 
 variable "hub_network_security_group_inbound_rules" {
-  type        = list(map(string))
-  default = []
-  description = "List of objects that represent the configuration of each inbound rule."
-  # inbound_rules = [
-  #   {
-  #     name                       = ""
-  #     priority                   = ""
-  #     access                     = ""
-  #     protocol                   = ""
-  #     source_address_prefix      = ""
-  #     source_port_range          = ""
-  #     destination_address_prefix = ""
-  #     destination_port_range     = ""
-  #     description                = ""
-  #   }
-  # ]
-}
-
-variable "hub_network_security_group_outbound_rules" {
-  type        = list(map(string))
-  default     = []
-  description = "List of objects that represent the configuration of each outbound rule."
-  # outbound_rules = [
-  #   {
-  #     name                       = ""
-  #     priority                   = ""
-  #     access                     = ""
-  #     protocol                   = ""
-  #     source_address_prefix      = ""
-  #     source_port_range          = ""
-  #     destination_address_prefix = ""
-  #     destination_port_range     = ""
-  #     description                = ""
-  #   }
-  # ]
+  description = "A complex object that describes network security group rules for the Workload Virtual Network"
+  type = map(object({
+    name                       = string
+    priority                   = string
+    direction                  = string
+    access                     = string
+    protocol                   = string
+    source_port_range          = string
+    destination_port_ranges    = list(string)
+    source_address_prefixes    = list(string)
+    destination_address_prefix = string
+  }))
+  default = {}
 }
 
 variable "hub_storage_account_config" {
@@ -532,7 +510,7 @@ variable "firewall_supernet_IP_address" {
 variable "ops_subscription_id" {
   description = "Subscription ID for the Operations Virtual Network deployment"
   type        = string
-  default     = "964c406a-1019-48d1-a927-9461123de233"
+  default     = "<<subscriptionId>>"
 
   validation {
     condition     = can(regex("^[a-z0-9-]{36}$", var.ops_subscription_id)) || var.ops_subscription_id == ""
@@ -563,73 +541,31 @@ variable "ops_vnet_subnet_service_endpoints" {
 }
 
 variable "ops_network_security_group_inbound_rules" {
-  type = list(map(string))
-  default = [
-    {
-      name                       = "Allow-Traffic-From-Spokes-SSH"
-      priority                   = "200"
+  description = "A complex object that describes network security group rules for the Workload Virtual Network"
+  type = map(object({
+    name                       = string
+    priority                   = string
+    direction                  = string
+    access                     = string
+    protocol                   = string
+    source_port_range          = string
+    destination_port_ranges    = list(string)
+    source_address_prefixes    = list(string)
+    destination_address_prefix = string
+  }))
+  default = {
+    "allow_traffic_from_spokes_default" = {
+      name                       = "Allow-Traffic-From-Spokes"
+      priority                   = 200
+      direction                  = "Inbound"
       access                     = "Allow"
       protocol                   = "*"
-      source_address_prefix      = "10.0.120.0/26" # Shared Services VNET
       source_port_range          = "*"
+      destination_port_ranges    = ["22", "3389", "80", "443"]
+      source_address_prefixes    = ["10.0.130.0/26", "10.0.125.0/26", "10.0.120.0/26"]
       destination_address_prefix = "10.0.115.0/26"
-      destination_port_range     = "22"
-      description                = "Allow traffic from spokes"
-    },
-    {
-      name                       = "Allow-Traffic-From-Spokes-HTTP"
-      priority                   = "201"
-      access                     = "Allow"
-      protocol                   = "*"
-      source_address_prefix      = "10.0.120.0/26" # Shared Services VNET
-      source_port_range          = "*"
-      destination_address_prefix = "10.0.115.0/26" # Operations VNET
-      destination_port_range     = "80"
-      description                = "Allow traffic from spokes"
-    },
-    {
-      name                       = "Allow-Traffic-From-Spokes-HTTPS"
-      priority                   = "202"
-      access                     = "Allow"
-      protocol                   = "*"
-      source_address_prefix      = "10.0.120.0/26" # Shared Services VNET
-      source_port_range          = "*"
-      destination_address_prefix = "10.0.115.0/26" # Operations VNET
-      destination_port_range     = "443"
-      description                = "Allow traffic from spokes"
-    },
-    {
-      name                       = "Allow-Traffic-From-Spokes-RDP"
-      priority                   = "203"
-      access                     = "Allow"
-      protocol                   = "*"
-      source_address_prefix      = "10.0.120.0/26" # Shared Services VNET
-      source_port_range          = "*"
-      destination_address_prefix = "10.0.115.0/26"  # Operations VNET
-      destination_port_range     = "3389"
-      description                = "Allow traffic from spokes"
     }
-  ]
-  description = "List of objects that represent the configuration of each inbound rule."
-}
-
-variable "ops_network_security_group_outbound_rules" {
-  type        = list(map(string))
-  default     = []
-  description = "List of objects that represent the configuration of each outbound rule."
-  # inbound_rules = [
-  #   {
-  #     name                       = ""
-  #     priority                   = ""
-  #     access                     = ""
-  #     protocol                   = ""
-  #     source_address_prefix      = ""
-  #     source_port_range          = ""
-  #     destination_address_prefix = ""
-  #     destination_port_range     = ""
-  #     description                = ""
-  #   }
-  # ]
+  }
 }
 
 variable "ops_storage_account_config" {
@@ -655,7 +591,7 @@ variable "ops_storage_account_config" {
 variable "svcs_subscription_id" {
   description = "Subscription ID for the Shared Services Virtual Network deployment"
   type        = string
-  default     = "964c406a-1019-48d1-a927-9461123de233"
+  default     = "<<subscriptionId>>"
 
   validation {
     condition     = can(regex("^[a-z0-9-]{36}$", var.svcs_subscription_id)) || var.svcs_subscription_id == ""
@@ -686,73 +622,31 @@ variable "svcs_vnet_subnet_service_endpoints" {
 }
 
 variable "svcs_network_security_group_inbound_rules" {
-  type        = list(map(string))
-  default = [
-    {
-      name                       = "Allow-Traffic-From-Spokes-SSH"
-      priority                   = "200"
+  description = "A complex object that describes network security group rules for the Workload Virtual Network"
+  type = map(object({
+    name                       = string
+    priority                   = string
+    direction                  = string
+    access                     = string
+    protocol                   = string
+    source_port_range          = string
+    destination_port_ranges    = list(string)
+    source_address_prefixes    = list(string)
+    destination_address_prefix = string
+  }))
+  default = {
+    "allow_traffic_from_spokes_default" = {
+      name                       = "Allow-Traffic-From-Spokes"
+      priority                   = 200
+      direction                  = "Inbound"
       access                     = "Allow"
       protocol                   = "*"
-      source_address_prefix      = "10.0.115.0/26" # Operations VNET
       source_port_range          = "*"
-      destination_address_prefix = "10.0.120.0/26"  # Shared Services VNET
-      destination_port_range     = "22"
-      description                = "Allow traffic from spokes"
-    },
-    {
-      name                       = "Allow-Traffic-From-Spokes-HTTP"
-      priority                   = "201"
-      access                     = "Allow"
-      protocol                   = "*"
-      source_address_prefix      = "10.0.115.0/26" # Operations VNET
-      source_port_range          = "*"
-      destination_address_prefix = "10.0.120.0/26"  # Shared Services VNET
-      destination_port_range     = "80"
-      description                = "Allow traffic from spokes"
-    },
-    {
-      name                       = "Allow-Traffic-From-Spokes-HTTPS"
-      priority                   = "202"
-      access                     = "Allow"
-      protocol                   = "*"
-      source_address_prefix      = "10.0.115.0/26" # Operations VNET
-      source_port_range          = "*"
-      destination_address_prefix = "10.0.120.0/26"  # Shared Services VNET
-      destination_port_range     = "443"
-      description                = "Allow traffic from spokes"
-    },
-    {
-      name                       = "Allow-Traffic-From-Spokes-RDP"
-      priority                   = "203"
-      access                     = "Allow"
-      protocol                   = "*"
-      source_address_prefix      = "10.0.115.0/26" # Operations VNET
-      source_port_range          = "*"
-      destination_address_prefix = "10.0.120.0/26"  # Shared Services VNET
-      destination_port_range     = "3389"
-      description                = "Allow traffic from spokes"
+      destination_port_ranges    = ["22", "3389", "80", "443"]
+      source_address_prefixes    = ["10.0.130.0/26", "10.0.125.0/26", "10.0.115.0/26"]
+      destination_address_prefix = "10.0.120.0/26"
     }
-  ]
-  description = "List of objects that represent the configuration of each inbound rule."
-}
-
-variable "svcs_network_security_group_outbound_rules" {
-  type        = list(map(string))
-  default     = []
-  description = "List of objects that represent the configuration of each outbound rule."
-  # inbound_rules = [
-  #   {
-  #     name                       = ""
-  #     priority                   = ""
-  #     access                     = ""
-  #     protocol                   = ""
-  #     source_address_prefix      = ""
-  #     source_port_range          = ""
-  #     destination_address_prefix = ""
-  #     destination_port_range     = ""
-  #     description                = ""
-  #   }
-  # ]
+  }
 }
 
 variable "svcs_storage_account_config" {
@@ -771,75 +665,109 @@ variable "svcs_storage_account_config" {
   }
 }
 
+######################################################
+# Tier 2 - Shared Services Workloads Configuration  ##
+######################################################
+
+#############################
+# Cosmos Configuration    ##
+#############################
+
+variable "create_cosmos_sqldb_resource_group" {
+  description = "Whether to create resource group and use it for all networking resources"
+  default     = false
+  type        = bool
+}
+
+variable "cosmosdb_account_config" {
+  type = map(object({
+    offer_type                            = string
+    kind                                  = optional(string)
+    enable_free_tier                      = optional(bool)
+    analytical_storage_enabled            = optional(bool)
+    enable_automatic_failover             = optional(bool)
+    public_network_access_enabled         = optional(bool)
+    is_virtual_network_filter_enabled     = optional(bool)
+    key_vault_key_id                      = optional(string)
+    enable_multiple_write_locations       = optional(bool)
+    access_key_metadata_writes_enabled    = optional(bool)
+    mongo_server_version                  = optional(string)
+    network_acl_bypass_for_azure_services = optional(bool)
+    network_acl_bypass_ids                = optional(list(string))
+  }))
+  description = "Manages a CosmosDB (formally DocumentDB) Account specifications"
+  default = {
+    demo-cosmosdb = {
+      offer_type = "Standard"
+      kind       = "GlobalDocumentDB"
+    }
+  }
+}
+
+variable "enable_advanced_threat_protection" {
+  description = "Whether to enable Advanced Threat Protection on CosmosDB"
+  default     = false
+  type        = bool
+}
+
+variable "create_cosmosdb_sql_database" {
+  description = "Whether to create a CosmosDB SQL Database"
+  default     = true
+  type        = bool
+}
+
+variable "create_cosmosdb_sql_container" {
+  description = "Whether to create a CosmosDB SQL Container"
+  default     = true
+  type        = bool
+}
+
+#####################################
+# Storage Account Configuration    ##
+#####################################
+
+###############################
+# Key Vault Configuration    ##
+###############################
+
 ###############################################
-# Dev Team 1 Env Workload Spoke Configuration
+# Dev Team Env Workload Spoke Configuration
 ##############################################
 
-variable "dev1_subscription_id" {
+variable "dev_team_subscription_id" {
   description = "Subscription ID for the Workload Virtual Network deployment"
   type        = string
-  default     = "964c406a-1019-48d1-a927-9461123de233"
+  default     = "<<subscriptionId>>"
 
   validation {
-    condition     = can(regex("^[a-z0-9-]{36}$", var.dev1_subscription_id)) || var.dev1_subscription_id == ""
+    condition     = can(regex("^[a-z0-9-]{36}$", var.dev_team_subscription_id)) || var.dev_team_subscription_id == ""
     error_message = "Value must be a valid Subscription ID (GUID)."
   }
 }
 
-variable "dev1_spoke_vnet_address_space" {
+variable "dev_team_spoke_vnet_address_space" {
   description = "Address space prefixes for the Workload Virtual Network"
   type        = list(string)
   default     = ["10.0.125.0/24"]
 }
 
-variable "dev1_spoke_subnets" {
-  description = "A complex object that describes subnets for the Workload Virtual Network"
-  type = list(object({
-    name              = string
-    address_prefixes  = list(string)
-    service_endpoints = list(string)
+variable "dev_team_vnet_subnet_address_prefixes" {
+  description = "The CIDR Address Prefixes for the Subnets in the Hub Virtual Network."
+  type        = list(string)
+  default     = ["10.0.125.0/27"]
+}
 
-    enforce_private_link_endpoint_network_policies = bool
-    enforce_private_link_service_network_policies  = bool
-  }))
+variable "dev_team_vnet_subnet_service_endpoints" {
+  description = "The CIDR Address Prefixes for the Subnets in the Hub Virtual Network."
+  type        = list(string)
   default = [
-    {
-      name             = "clusternodes-snet"
-      address_prefixes = ["10.0.125.64/26"]
-      service_endpoints = [
-        "Microsoft.KeyVault",
-        "Microsoft.Sql",
-        "Microsoft.Storage",
-      ]
-      enforce_private_link_endpoint_network_policies = false
-      enforce_private_link_service_network_policies  = false
-    },
-    {
-      name             = "privatelinks-snet"
-      address_prefixes = ["10.0.125.128/28"]
-      service_endpoints = [
-        "Microsoft.KeyVault",
-        "Microsoft.Sql",
-        "Microsoft.Storage",
-      ]
-      enforce_private_link_endpoint_network_policies = false
-      enforce_private_link_service_network_policies  = false
-    },
-    {
-      name             = "default-snet"
-      address_prefixes = ["10.0.125.0/27"]
-      service_endpoints = [
-        "Microsoft.KeyVault",
-        "Microsoft.Sql",
-        "Microsoft.Storage",
-      ]
-      enforce_private_link_endpoint_network_policies = false
-      enforce_private_link_service_network_policies  = false
-    }
+    "Microsoft.KeyVault",
+    "Microsoft.Sql",
+    "Microsoft.Storage",
   ]
 }
 
-variable "dev1_network_security_group_rules" {
+variable "dev_team_network_inbound_security_group_rules" {
   description = "A complex object that describes network security group rules for the Workload Virtual Network"
   type = map(object({
     name                       = string
@@ -848,8 +776,8 @@ variable "dev1_network_security_group_rules" {
     access                     = string
     protocol                   = string
     source_port_range          = string
-    destination_port_range     = list(string)
-    source_address_prefix      = list(string)
+    destination_port_ranges    = list(string)
+    source_address_prefixes    = list(string)
     destination_address_prefix = string
   }))
   default = {
@@ -860,20 +788,107 @@ variable "dev1_network_security_group_rules" {
       access                     = "Allow"
       protocol                   = "*"
       source_port_range          = "*"
-      destination_port_range     = ["22", "3389", "80", "443"]
-      source_address_prefix      = ["10.0.110.0/26", "10.0.130.0/26", "10.0.120.0/26"]
+      destination_port_ranges    = ["22", "3389", "80", "443"]
+      source_address_prefixes    = ["10.0.110.0/26", "10.0.130.0/26", "10.0.120.0/26"]
       destination_address_prefix = "10.0.125.0/26"
     }
   }
 }
 
-variable "dev1_log_storage_account_name" {
+variable "dev_team_log_storage_account_name" {
   description = "Storage Account name for the Workload Virtual Network deployment"
   type        = string
   default     = "stlogsworkload"
 }
 
-variable "dev1_logging_storage_account_config" {
+variable "dev_team_logging_storage_account_config" {
+  description = "Storage Account variables for the Workload Virtual Network deployment"
+  type = object({
+    sku_name                 = string
+    kind                     = string
+    min_tls_version          = string
+    account_replication_type = string
+  })
+  default = {
+    sku_name                 = "Standard_LRS"
+    kind                     = "StorageV2"
+    min_tls_version          = "TLS1_2"
+    account_replication_type = "LRS"
+  }
+}
+
+###############################################
+# Prod Env Workload Spoke Configuration
+##############################################
+
+variable "prod_subscription_id" {
+  description = "Subscription ID for the Workload Virtual Network deployment"
+  type        = string
+  default     = "<<subscriptionId>>"
+
+  validation {
+    condition     = can(regex("^[a-z0-9-]{36}$", var.prod_subscription_id)) || var.prod_subscription_id == ""
+    error_message = "Value must be a valid Subscription ID (GUID)."
+  }
+}
+
+variable "prod_spoke_vnet_address_space" {
+  description = "Address space prefixes for the Workload Virtual Network"
+  type        = list(string)
+  default     = ["10.0.130.0/24"]
+}
+
+variable "prod_vnet_subnet_address_prefixes" {
+  description = "The CIDR Address Prefixes for the Subnets in the Hub Virtual Network."
+  type        = list(string)
+  default     = ["10.0.130.0/27"]
+}
+
+variable "prod_vnet_subnet_service_endpoints" {
+  description = "The CIDR Address Prefixes for the Subnets in the Hub Virtual Network."
+  type        = list(string)
+  default = [
+    "Microsoft.KeyVault",
+    "Microsoft.Sql",
+    "Microsoft.Storage",
+  ]
+}
+
+variable "prod_network_inbound_security_group_rules" {
+  description = "A complex object that describes network security group rules for the Workload Virtual Network"
+  type = map(object({
+    name                       = string
+    priority                   = string
+    direction                  = string
+    access                     = string
+    protocol                   = string
+    source_port_range          = string
+    destination_port_ranges    = list(string)
+    source_address_prefixes    = list(string)
+    destination_address_prefix = string
+  }))
+  default = {
+    "allow_traffic_from_spokes_default" = {
+      name                       = "Allow-Traffic-From-Spokes"
+      priority                   = 200
+      direction                  = "Inbound"
+      access                     = "Allow"
+      protocol                   = "*"
+      source_port_range          = "*"
+      destination_port_ranges    = ["22", "3389", "80", "443"]
+      source_address_prefixes    = ["10.0.110.0/26", "10.0.125.0/26", "10.0.120.0/26"]
+      destination_address_prefix = "10.0.130.0/26"
+    }
+  }
+}
+
+variable "prod_log_storage_account_name" {
+  description = "Storage Account name for the Workload Virtual Network deployment"
+  type        = string
+  default     = "stlogsworkload"
+}
+
+variable "prod_logging_storage_account_config" {
   description = "Storage Account variables for the Workload Virtual Network deployment"
   type = object({
     sku_name                 = string

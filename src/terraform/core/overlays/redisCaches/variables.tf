@@ -110,7 +110,7 @@ variable "redis_configuration" {
 variable "authorized_cidrs" {
   description = "Map of authorized cidrs"
   type        = map(string)
-  default = {}
+  default     = {}
 }
 
 variable "allow_non_ssl_connections" {
@@ -171,7 +171,7 @@ variable "data_persistence_storage_account_replication" {
 variable "redis_version" {
   description = "Redis version to deploy. Allowed values are 4 or 6"
   type        = number
-  default     = 4
+  default     = 6
 }
 
 variable "zones" {

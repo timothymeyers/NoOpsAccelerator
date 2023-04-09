@@ -23,7 +23,7 @@ variable "tags" {
   type        = map(string)
   default = {
     "Organization" : "anoa",
-    "Region" : "usgovvirginia",
+    "Region" : "usgovarizona",
     "DeployEnvironment" : "dev"
   }
 }
@@ -73,7 +73,7 @@ variable "metadata_host" {
 variable "location" {
   description = "List of Azure regions into which stamps are deployed. Important: The first location in this list will be used as the main location for this deployment."
   type        = string
-  default     = "eastus"
+  default     = "usgovarizona"
 }
 
 variable "root_management_group_id" {
@@ -155,7 +155,7 @@ variable "management_groups" {
       display_name               = "transport"
       management_group_name      = "transport"
       parent_management_group_id = "platforms"
-      subscription_ids           = ["<<subscriptionId>>"]
+      subscription_ids           = ["subscriptionID"]
     },
     "management" = {
       display_name               = "management"
@@ -208,7 +208,7 @@ variable "log_analytics_config" {
 variable "hub_subscription_id" {
   description = "Subscription ID for the Hub deployment"
   type        = string
-  default     = "<<subscriptionId>>"
+  default     = "subscriptionID"
 
   validation {
     condition     = can(regex("^[a-z0-9-]{36}$", var.hub_subscription_id)) || var.hub_subscription_id == ""
@@ -510,7 +510,7 @@ variable "firewall_supernet_IP_address" {
 variable "ops_subscription_id" {
   description = "Subscription ID for the Operations Virtual Network deployment"
   type        = string
-  default     = "<<subscriptionId>>"
+  default     = "subscriptionID"
 
   validation {
     condition     = can(regex("^[a-z0-9-]{36}$", var.ops_subscription_id)) || var.ops_subscription_id == ""
@@ -591,7 +591,7 @@ variable "ops_storage_account_config" {
 variable "svcs_subscription_id" {
   description = "Subscription ID for the Shared Services Virtual Network deployment"
   type        = string
-  default     = "<<subscriptionId>>"
+  default     = "subscriptionID"
 
   validation {
     condition     = can(regex("^[a-z0-9-]{36}$", var.svcs_subscription_id)) || var.svcs_subscription_id == ""
@@ -737,7 +737,7 @@ variable "create_cosmosdb_sql_container" {
 variable "dev_team_subscription_id" {
   description = "Subscription ID for the Workload Virtual Network deployment"
   type        = string
-  default     = "<<subscriptionId>>"
+  default     = "subscriptionID"
 
   validation {
     condition     = can(regex("^[a-z0-9-]{36}$", var.dev_team_subscription_id)) || var.dev_team_subscription_id == ""
@@ -824,7 +824,7 @@ variable "dev_team_logging_storage_account_config" {
 variable "prod_subscription_id" {
   description = "Subscription ID for the Workload Virtual Network deployment"
   type        = string
-  default     = "<<subscriptionId>>"
+  default     = "subscriptionID"
 
   validation {
     condition     = can(regex("^[a-z0-9-]{36}$", var.prod_subscription_id)) || var.prod_subscription_id == ""

@@ -82,42 +82,133 @@ variable "network_security_group_bastion_id" {
   default     = " "
 }
 
-variable "bastion_host_nsg_inbound_rules" {
-  type        = list(map(string))
-  default     = []
-  description = "List of objects that represent the configuration of each inbound rule."
-  # inbound_rules = [
-  #   {
-  #     name                       = ""
-  #     priority                   = ""
-  #     access                     = ""
-  #     protocol                   = ""
-  #     source_address_prefix      = ""
-  #     source_port_range          = ""
-  #     destination_address_prefix = ""
-  #     destination_port_range     = ""
-  #     description                = ""
-  #   }
-  # ]
-}
+#variable "bastion_host_nsg_inbound_rules" {
+#type        = list(map(string))
+#default     = []
+#description = "List of objects that represent the configuration of each inbound rule."
+# inbound_rules = [
+#   {
+#     name                       = ""
+#     priority                   = ""
+#     access                     = ""
+#     protocol                   = ""
+#     source_address_prefix      = ""
+#     source_port_range          = ""
+#     destination_address_prefix = ""
+#     destination_port_range     = ""
+#     description                = ""
+#   }
+# ]
+#}
 
-variable "bastion_host_nsg_outbound_rules" {
-  type        = list(map(string))
-  default     = []
-  description = "List of objects that represent the configuration of each outbound rule."
-  # outbound_rules = [
-  #   {
-  #     name                       = ""
-  #     priority                   = ""
-  #     access                     = ""
-  #     protocol                   = ""
-  #     source_address_prefix      = ""
-  #     source_port_range          = ""
-  #     destination_address_prefix = ""
-  #     destination_port_range     = ""
-  #     description                = ""
-  #   }
-  # ]
+#variable "bastion_host_nsg_outbound_rules" {
+#type        = list(map(string))
+#default     = []
+#description = "List of objects that represent the configuration of each outbound rule."
+# outbound_rules = [
+#   {
+#     name                       = ""
+#     priority                   = ""
+#     access                     = ""
+#     protocol                   = ""
+#     source_address_prefix      = ""
+#     source_port_range          = ""
+#     destination_address_prefix = ""
+#     destination_port_range     = ""
+#     description                = ""
+#   }
+# ]
+#}
+
+variable "nsg_inbound_rules" {
+  type = list(object({
+    name                       = string
+    priority                   = number
+    direction                  = string
+    access                     = string
+    protocol                   = string
+    source_address_prefix      = string
+    source_port_range          = string
+    destination_address_prefix = string
+    destination_port_range     = string
+  }))
+  default = [
+    {
+      name                       = "AllowHttpsInbound"
+      priority                   = 120
+      direction                  = "Inbound"
+      access                     = "Allow"
+      protocol                   = "Tcp"
+      source_address_prefix      = "*"
+      source_port_range          = "*"
+      destination_address_prefix = "*"
+      destination_port_range     = "443"
+    },
+    {
+      name                       = "AllowGatewayManagerInbound"
+      priority                   = 130
+      direction                  = "Inbound"
+      access                     = "Allow"
+      protocol                   = "Tcp"
+      source_address_prefix      = "*"
+      source_port_range          = "*"
+      destination_address_prefix = "*"
+      destination_port_range     = "443"
+    }
+  ]
+}
+variable "nsg_SshRdp_outbound_rules" {
+  type = list(object({
+    name                       = string
+    priority                   = number
+    direction                  = string
+    access                     = string
+    protocol                   = string
+    source_address_prefix      = string
+    source_port_range          = string
+    destination_address_prefix = string
+    destination_port_range     = list(string)
+  }))
+
+  default = [
+    {
+      name                       = "AllowSshRdpOutbound"
+      priority                   = 100
+      direction                  = "outbound"
+      access                     = "Allow"
+      protocol                   = "*"
+      source_address_prefix      = "*"
+      source_port_range          = "*"
+      destination_address_prefix = "*"
+      destination_port_range     = ["22", "3389"]
+    }
+  ]
+}
+variable "nsg_AllowAzureCloud_outbound_rules" {
+  type = list(object({
+    name                       = string
+    priority                   = number
+    direction                  = string
+    access                     = string
+    protocol                   = string
+    source_address_prefix      = string
+    source_port_range          = string
+    destination_address_prefix = string
+    destination_port_range     = string
+  }))
+  default = [
+    {
+      name                       = "AllowAzureCloudOutbound"
+      priority                   = 110
+      direction                  = "Inbound"
+      access                     = "Allow"
+      protocol                   = "Tcp"
+      source_address_prefix      = "*"
+      source_port_range          = "*"
+      destination_address_prefix = "*"
+      destination_port_range     = "443"
+    }
+  ]
 }
 
 variable "domain_name_label" {

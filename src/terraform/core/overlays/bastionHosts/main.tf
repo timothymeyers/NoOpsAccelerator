@@ -33,7 +33,7 @@ resource "azurerm_public_ip" "pip" {
   allocation_method   = var.public_ip_allocation_method
   sku                 = var.public_ip_sku # Mandatory for Azure Bastion host is Standard
   domain_name_label   = var.domain_name_label != null ? var.domain_name_label : format("gw%s%s", lower(replace(coalesce(var.custom_bastion_name, data.azurenoopsutils_resource_name.bastion.result), "/[[:^alnum:]]/", "")), random_string.str.result)
-  zones               = var.public_ip_zones
+  #zones               = var.public_ip_zones
 
   tags = merge(local.default_tags, var.extra_tags)
 
